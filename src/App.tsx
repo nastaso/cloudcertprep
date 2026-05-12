@@ -7,6 +7,7 @@ import { Footer } from './components/Footer'
 import { DonateButton } from './components/DonateButton'
 import { LoadingSpinner } from './components/LoadingSpinner'
 import { CookieConsent } from './components/CookieConsent'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { ScrollToTop } from './components/ScrollToTop'
 import { trackPageView } from './lib/analytics'
 
@@ -58,24 +59,29 @@ function AppRoutes() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <ThemeProvider>
-          <AppContent />
-        </ThemeProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <AuthProvider>
+          <ThemeProvider>
+            <AppContent />
+          </ThemeProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }
 
 function AppContent() {
-  const [isExamActive, setIsExamActive] = useState(false)
+  // Lazy initializer reads the initial value once at mount, avoiding the
+  // react-hooks/set-state-in-effect lint error that fires when setState is
+  // called inside a useEffect on initial mount.
+  const [isExamActive, setIsExamActive] = useState(
+    () => typeof document !== 'undefined' && document.body.dataset.examActive === 'true'
+  )
 
   useEffect(() => {
-    // Check initial state
-    setIsExamActive(document.body.dataset.examActive === 'true')
-
-    // Watch for changes to data-exam-active attribute
+    // Initial state was set by the lazy initializer above. This effect only
+    // tracks subsequent attribute changes via MutationObserver.
     const observer = new MutationObserver(() => {
       setIsExamActive(document.body.dataset.examActive === 'true')
     })

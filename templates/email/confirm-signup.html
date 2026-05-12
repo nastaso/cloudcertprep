@@ -5,115 +5,89 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Confirm your CloudCertPrep account</title>
-  <style>
-    @media (prefers-color-scheme: dark) {
-      .email-bg    { background-color: #0F1923 !important; }
-      .email-card  { background-color: #1A2332 !important; border-color: rgba(148,163,184,0.08) !important; }
-      .email-foot  { background-color: #1A2332 !important; border-color: rgba(148,163,184,0.1) !important; }
-      .email-h1    { color: #F8FAFC !important; }
-      .email-p     { color: #94A3B8 !important; }
-      .email-notice     { background-color: rgba(255,153,0,0.08) !important; border-color: rgba(255,153,0,0.2) !important; }
-      .email-notice-p   { color: #94A3B8 !important; }
-      .email-notice-b   { color: #FF9900 !important; }
-      .email-security   { color: rgba(148,163,184,0.65) !important; border-left-color: rgba(148,163,184,0.2) !important; }
-      .email-fallback   { color: rgba(148,163,184,0.6) !important; }
-      .email-foot-main  { color: #94A3B8 !important; }
-      .email-foot-links { color: rgba(148,163,184,0.55) !important; }
-      .email-foot-copy  { color: rgba(148,163,184,0.35) !important; }
-      .email-btn        { background-color: #FF9900 !important; }
-      .email-btn a      { background-color: #FF9900 !important; }
-      .email-header-title { color: #ffffff !important; }
-      .email-header-sub   { color: rgba(255,255,255,0.85) !important; }
-    }
-  </style>
 </head>
-<body class="email-bg" style="margin:0;padding:0;background-color:#F5F5F4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+<body style="margin:0;padding:0;background-color:#F5F5F4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#1C1917;">
 
   <!-- Preheader: preview text visible in inbox before email is opened -->
-  <span style="display:none;font-size:1px;max-height:0;overflow:hidden;opacity:0;">Verify your email address to activate your CloudCertPrep account.</span>
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">Verify your email address to activate your CloudCertPrep account.</div>
 
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" class="email-bg" style="background-color:#F5F5F4;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#F5F5F4;">
     <tr>
-      <td align="center" style="padding:40px 16px;">
+      <td align="center" style="padding:48px 16px;">
 
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:580px;">
+        <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" style="max-width:560px;">
 
-          <!-- Header — horizontal layout matching website header -->
+          <!-- Header: solid #EA8C00, matches website light-mode primary (Header.tsx uses gradient on web; emails use solid for client compat) -->
           <tr>
-            <td style="background:linear-gradient(to right,#FF9900,#FF7700);background-color:#FF9900;border-radius:12px 12px 0 0;padding:20px 28px;">
+            <td style="background-color:#EA8C00;border-radius:12px 12px 0 0;padding:24px 32px;">
               <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <!-- Logo -->
                   <td valign="middle" style="vertical-align:middle;padding-right:14px;">
                     <img src="https://www.cloudcertprep.io/logo-email.png"
-                         width="46" height="46"
+                         width="44" height="44"
                          alt="CloudCertPrep"
-                         style="display:block;width:46px;height:46px;border-radius:10px;border:0;">
+                         style="display:block;width:44px;height:44px;border-radius:10px;border:0;">
                   </td>
-                  <!-- Brand name + subtitle -->
                   <td valign="middle" style="vertical-align:middle;">
-                    <span class="email-header-title" style="display:block;font-size:21px;font-weight:700;color:#ffffff;letter-spacing:-0.4px;line-height:1.2;">CloudCertPrep</span>
-                    <span class="email-header-sub" style="display:block;font-size:11px;color:rgba(255,255,255,0.85);font-weight:500;margin-top:3px;">AWS Certification Exam Prep</span>
+                    <span style="display:block;font-size:22px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;line-height:1.2;">CloudCertPrep</span>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- Body -->
+          <!-- Body card -->
           <tr>
-            <td class="email-card" style="background-color:#FFFFFF;padding:36px 32px 28px;border-left:1px solid rgba(28,25,23,0.08);border-right:1px solid rgba(28,25,23,0.08);">
+            <td align="center" style="background-color:#FFFFFF;padding:56px 40px 40px;border-left:1px solid #E7E5E4;border-right:1px solid #E7E5E4;text-align:center;">
 
-              <h1 class="email-h1" style="margin:0 0 10px;font-size:22px;font-weight:700;color:#1C1917;letter-spacing:-0.3px;">Confirm your email address</h1>
-              <p class="email-p" style="margin:0 0 24px;font-size:15px;color:#57534E;line-height:1.65;">
-                Thanks for signing up to CloudCertPrep. Click the button below to verify your email address and activate your account.
+              <h1 style="margin:0 0 14px;font-size:26px;font-weight:700;color:#1C1917;letter-spacing:-0.4px;line-height:1.25;">
+                Confirm your email
+              </h1>
+              <p style="margin:0 auto 36px;max-width:440px;font-size:15px;color:#57534E;line-height:1.65;">
+                Welcome to CloudCertPrep. Confirm your email to activate your account.
               </p>
 
-              <!-- CTA Button -->
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto 28px;">
+              <!-- CTA button (centered) -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center" style="margin:0 auto 28px;">
                 <tr>
-                  <td class="email-btn" style="border-radius:8px;background-color:#EA8C00;">
+                  <td style="border-radius:8px;background-color:#EA8C00;box-shadow:0 1px 2px rgba(234,140,0,0.25);">
                     <a href="{{ .ConfirmationURL }}"
-                       style="display:inline-block;padding:14px 36px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;background-color:#EA8C00;letter-spacing:0.1px;">
-                      Confirm Email Address
+                       style="display:inline-block;padding:14px 40px;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;letter-spacing:0.1px;">
+                      Confirm email
                     </a>
                   </td>
                 </tr>
               </table>
 
-              <!-- Expiry note -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:24px;">
-                <tr>
-                  <td class="email-notice" style="background-color:#FFF8EC;border:1px solid rgba(234,140,0,0.3);border-radius:8px;padding:12px 16px;">
-                    <p class="email-notice-p" style="margin:0;font-size:13px;color:#57534E;line-height:1.5;">
-                      <span class="email-notice-b" style="color:#EA8C00;font-weight:600;">This link expires in 24 hours.</span>
-                      If you didn't create a CloudCertPrep account, you can ignore this email.
-                    </p>
-                  </td>
-                </tr>
-              </table>
+              <p style="margin:0 auto 32px;max-width:420px;font-size:13px;color:#78716C;line-height:1.55;">
+                This link expires in 24 hours. If you didn't create a CloudCertPrep account, you can ignore this email.
+              </p>
 
               <!-- Fallback URL -->
-              <p class="email-fallback" style="margin:0;font-size:12px;color:rgba(87,83,78,0.6);line-height:1.6;">
-                Button not working? Copy and paste this URL into your browser:<br>
-                <a href="{{ .ConfirmationURL }}" style="color:#EA8C00;text-decoration:none;word-break:break-all;font-size:11px;">{{ .ConfirmationURL }}</a>
-              </p>
+              <div style="border-top:1px solid #E7E5E4;padding-top:20px;margin-top:8px;">
+                <p style="margin:0;font-size:12px;color:#A8A29E;line-height:1.6;">
+                  Button not working? Copy and paste this URL into your browser:<br>
+                  <a href="{{ .ConfirmationURL }}" style="color:#EA8C00;text-decoration:none;word-break:break-all;font-size:11px;">{{ .ConfirmationURL }}</a>
+                </p>
+              </div>
 
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
-            <td class="email-foot" style="background-color:#FFFFFF;border-top:1px solid rgba(28,25,23,0.08);border-radius:0 0 12px 12px;border-left:1px solid rgba(28,25,23,0.08);border-right:1px solid rgba(28,25,23,0.08);border-bottom:1px solid rgba(28,25,23,0.08);padding:20px 32px;text-align:center;">
-              <p class="email-foot-main" style="margin:0 0 8px;font-size:12px;color:#57534E;">
+            <td style="background-color:#FFFFFF;border-top:1px solid #E7E5E4;border-radius:0 0 12px 12px;border-left:1px solid #E7E5E4;border-right:1px solid #E7E5E4;border-bottom:1px solid #E7E5E4;padding:24px 40px;text-align:center;">
+              <p style="margin:0 0 10px;font-size:12px;color:#57534E;line-height:1.6;">
                 Questions? Email <a href="mailto:alex@cloudcertprep.io" style="color:#EA8C00;text-decoration:none;">alex@cloudcertprep.io</a>
               </p>
-              <p class="email-foot-links" style="margin:0 0 8px;font-size:12px;color:rgba(87,83,78,0.6);">
-                <a href="{{ .SiteURL }}/privacy" style="color:rgba(87,83,78,0.6);text-decoration:none;">Privacy Policy</a>
+              <p style="margin:0 0 10px;font-size:12px;color:#A8A29E;line-height:1.6;">
+                <a href="{{ .SiteURL }}/privacy" style="color:#A8A29E;text-decoration:none;">Privacy Policy</a>
                 &nbsp;&middot;&nbsp;
-                <a href="{{ .SiteURL }}/terms" style="color:rgba(87,83,78,0.6);text-decoration:none;">Terms of Service</a>
+                <a href="{{ .SiteURL }}/terms" style="color:#A8A29E;text-decoration:none;">Terms of Service</a>
+                &nbsp;&middot;&nbsp;
+                <a href="https://github.com/nastaso/cloudcertprep" style="color:#A8A29E;text-decoration:none;">GitHub</a>
               </p>
-              <p class="email-foot-copy" style="margin:0;font-size:11px;color:rgba(87,83,78,0.4);">
+              <p style="margin:0;font-size:11px;color:#A8A29E;line-height:1.6;">
                 &copy; 2026 CloudCertPrep &nbsp;&middot;&nbsp; Not affiliated with AWS or Amazon Web Services
               </p>
             </td>

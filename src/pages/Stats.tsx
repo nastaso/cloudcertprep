@@ -4,9 +4,10 @@ import { LoadingSpinner } from '../components/LoadingSpinner'
 import { supabase } from '../lib/supabase'
 import { formatRelativeDate } from '../lib/formatting'
 import { formatTime } from '../lib/scoring'
-import { usePageTitle } from '../hooks/usePageTitle'
-import { CERTIFICATION_LIST, getCertTotalQuestions } from '../data/certifications'
-import { Trophy, TrendingUp, Clock } from 'lucide-react'
+import { useSEO } from '../hooks/useSEO'
+import { ROUTE_SEO } from '../lib/seo-data'
+import { CERTIFICATION_LIST, getCertTotalQuestions, getCertDomains } from '../data/certifications'
+import { Trophy, TrendingUp, Clock, Check } from 'lucide-react'
 import { logError } from '../lib/logger'
 
 interface PlatformStats {
@@ -36,7 +37,8 @@ interface CertStats {
 
 interface DomainStat {
   domain_id: number
-  domain_name: string
+  /** Optional: legacy RPC returned this; new RPC returns only domain_id and the client resolves the name via getCertDomains(). */
+  domain_name?: string
   avg_score: number
 }
 
@@ -46,7 +48,7 @@ export function Stats() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  usePageTitle('Community Statistics | CloudCertPrep')
+  useSEO(ROUTE_SEO['/stats'])
 
   useEffect(() => {
     loadStats()
@@ -193,7 +195,7 @@ export function Stats() {
                   </div>
                   <div>
                     <p className="text-2xl md:text-3xl font-bold text-text-primary">
-                      {cs.fastest_pass_seconds ? formatTime(cs.fastest_pass_seconds) : '—'}
+                      {cs.fastest_pass_seconds ? formatTime(cs.fastest_pass_seconds) : 'N/A'}
                     </p>
                     <p className="text-text-muted text-xs md:text-sm mt-1">Fastest Pass</p>
                   </div>
@@ -204,12 +206,16 @@ export function Stats() {
                   <div className="mb-6">
                     <h3 className="text-sm md:text-base font-semibold text-text-primary mb-3">Domain Difficulty (Hardest First)</h3>
                     <div className="space-y-3">
-                      {cs.domain_stats.map((ds, index) => (
+                      {(() => {
+                        const certDomainNames = getCertDomains(cs.cert_code)
+                        return cs.domain_stats.map((ds, index) => {
+                          const domainName = ds.domain_name ?? certDomainNames[ds.domain_id] ?? `Domain ${ds.domain_id}`
+                          return (
                         <div key={ds.domain_id}>
                           <div className="flex items-center justify-between mb-1">
                             <div className="flex items-center gap-2">
                               <span className="text-text-muted text-xs font-medium">#{index + 1}</span>
-                              <p className="text-text-primary text-xs md:text-sm font-medium">{ds.domain_name}</p>
+                              <p className="text-text-primary text-xs md:text-sm font-medium">{domainName}</p>
                             </div>
                             <p className="text-text-muted text-xs md:text-sm">{Math.round(ds.avg_score)}% avg</p>
                           </div>
@@ -223,7 +229,9 @@ export function Stats() {
                             />
                           </div>
                         </div>
-                      ))}
+                          )
+                        })
+                      })()}
                     </div>
                   </div>
                 )}
@@ -240,7 +248,7 @@ export function Stats() {
                         <div key={i} className="flex items-center justify-between p-3 bg-bg-dark rounded-lg">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center">
-                              <span className="text-success text-sm">✓</span>
+                              <Check className="w-4 h-4 text-success" />
                             </div>
                             <div>
                               <p className="text-text-primary font-bold text-sm md:text-base">{pass.scaled_score}/1000</p>

@@ -1,0 +1,26 @@
+# CloudCertPrep
+
+> Free, open-source web application for AWS certification exam preparation. Currently supports the AWS Certified Cloud Practitioner (CLF-C02) with 1,050+ practice questions, full-length timed mock exams, domain-by-domain practice with adaptive spaced repetition, and progress tracking. No ads, no paywalls, no premium tiers. MIT licensed.
+
+## Pages
+
+- [Home / Dashboard](https://www.cloudcertprep.io/): practice modes, certification toggle, recent activity for signed-in users
+- [Practice Exam](https://www.cloudcertprep.io/practice-exam): full-length timed mock exam (65 questions, 90 minutes, scaled scoring)
+- [Domain Practice](https://www.cloudcertprep.io/domain-practice): focused study by exam domain with instant feedback and explanations
+- [Public Statistics](https://www.cloudcertprep.io/stats): community-wide pass rates, attempt counts, and recent passes
+- [Privacy Policy](https://www.cloudcertprep.io/privacy): GDPR-compliant data practices, EU hosting, no data selling
+- [Terms of Service](https://www.cloudcertprep.io/terms): MIT license, AWS trademark notice, no warranty disclaimer
+
+## CLF-C02 question bank
+
+- Domain 1 (Cloud Concepts): 187 questions
+- Domain 2 (Security and Compliance): 247 questions
+- Domain 3 (Cloud Technology and Services): 384 questions
+- Domain 4 (Billing, Pricing, and Support): 232 questions
+- Total: 1,050 questions, aligned with the 2026 exam guide
+
+## Resources
+
+- [GitHub repository](https://github.com/nastaso/cloudcertprep)
+- [Report a question error](https://github.com/nastaso/cloudcertprep/issues/new?title=Question+error)
+- [Author portfolio](https://santonastaso.me)

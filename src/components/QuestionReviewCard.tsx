@@ -1,9 +1,8 @@
 import { AnswerButton } from './AnswerButton'
-import { DOMAIN_COLOR } from '../types'
 import type { Question, OptionKey } from '../types'
 import { getCertDomains, DEFAULT_CERT_ID } from '../data/certifications'
-import { GITHUB_ISSUES_URL } from '../lib/constants'
-import { Flag } from 'lucide-react'
+import { buildGitHubIssueUrl } from '../lib/constants'
+import { Flag, Check, X } from 'lucide-react'
 
 interface QuestionReviewCardProps {
   question: Question
@@ -41,19 +40,17 @@ export function QuestionReviewCard({
             </span>
           )}
         </div>
-        <div className={`px-2 py-0.5 rounded-lg font-semibold text-xs ${
+        <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg font-semibold text-xs ${
           isCorrect ? 'bg-success/20 text-success' : 'bg-danger/20 text-danger'
         }`}>
-          {isCorrect ? '✓ CORRECT' : '✗ INCORRECT'}
+          {isCorrect ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+          <span>{isCorrect ? 'CORRECT' : 'INCORRECT'}</span>
         </div>
       </div>
 
       {/* Domain Badge */}
       <div className="mb-2">
-        <span className="text-xs font-medium px-2 py-0.5 rounded" style={{
-          backgroundColor: `${DOMAIN_COLOR}20`,
-          color: DOMAIN_COLOR
-        }}>
+        <span className="text-xs font-medium px-2 py-0.5 rounded bg-aws-orange/20 text-aws-orange">
           {getCertDomains(certCode)[question.domainId] ?? `Domain ${question.domainId}`}
         </span>
       </div>
@@ -104,7 +101,7 @@ export function QuestionReviewCard({
         <span className="text-[10px] text-text-muted/60">
           Found an error?{' '}
           <a 
-            href={GITHUB_ISSUES_URL}
+            href={buildGitHubIssueUrl(question.id)}
             target="_blank" 
             rel="noopener noreferrer"
             className="text-aws-orange hover:text-aws-orange/80 hover:underline"

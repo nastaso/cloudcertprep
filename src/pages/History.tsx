@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useCert } from '../hooks/useCert'
-import { usePageTitle } from '../hooks/usePageTitle'
+import { useSEO } from '../hooks/useSEO'
+import { ROUTE_SEO } from '../lib/seo-data'
+import { useNoIndex } from '../hooks/useNoIndex'
 import { supabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { Header } from '../components/Header'
 import { LoadingSpinner } from '../components/LoadingSpinner'
-import { DOMAIN_COLOR } from '../types'
 import type { Question, ExamAttempt } from '../types'
 import { formatDuration } from '../lib/scoring'
 import { formatRelativeDate } from '../lib/formatting'
@@ -16,6 +17,7 @@ import { getCertDomains } from '../data/certifications'
 import { Modal } from '../components/Modal'
 import { QuestionReviewCard } from '../components/QuestionReviewCard'
 import { TrendingUp, Check, X, Trash2, AlertTriangle } from 'lucide-react'
+import { Button } from '../components/Button'
 
 interface AttemptQuestionRow {
   question_id: string
@@ -105,9 +107,8 @@ function AttemptReviewPanel({
             key={domainId}
             onClick={() => { onDomainFilterChange(reviewDomainFilter === domainId ? null : domainId); onQuestionIndexChange(0) }}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-              reviewDomainFilter === domainId ? 'text-white' : 'bg-bg-dark text-text-muted hover:text-text-primary'
+              reviewDomainFilter === domainId ? 'bg-aws-orange text-white' : 'bg-bg-dark text-text-muted hover:text-text-primary'
             }`}
-            style={reviewDomainFilter === domainId ? { backgroundColor: DOMAIN_COLOR } : {}}
           >
             {name}
           </button>
@@ -173,7 +174,14 @@ export function History() {
   const [loading, setLoading] = useState(true)
   const [attempts, setAttempts] = useState<ExamAttempt[]>([])
 
-  usePageTitle(`${cert.shortName} Exam History | CloudCertPrep`)
+  useSEO({
+    ...ROUTE_SEO['/history'],
+    title: `${cert.shortName} exam history · CloudCertPrep`,
+  })
+
+  // The logged-out view of /history is a sign-in funnel page, not real content.
+  // Mark it noindex so search engines don't index the thin "sign in to see X" view.
+  useNoIndex(!user)
   const [filter, setFilter] = useState<'all' | 'passed' | 'failed'>('all')
   const [expandedAttempt, setExpandedAttempt] = useState<string | null>(null)
   const [itemsPerPage, setItemsPerPage] = useState(3)
@@ -329,13 +337,14 @@ export function History() {
           <div className="flex items-center justify-between mb-4 md:mb-6">
             <h1 className="text-xl md:text-2xl font-semibold text-text-primary">{cert.shortName} Exam History</h1>
             {user && attempts.length > 0 && (
-              <button
+              <Button
                 onClick={() => setShowResetModal(true)}
-                className="flex items-center gap-2 px-3 py-2 bg-bg-card hover:bg-danger/10 text-text-muted hover:text-danger border border-text-muted/20 hover:border-danger rounded-lg transition-colors text-xs md:text-sm font-medium"
+                variant="secondary"
+                size="sm"
+                leftIcon={<Trash2 className="w-4 h-4" />}
               >
-                <Trash2 className="w-4 h-4" />
-                <span className="hidden md:inline">Reset Progress</span>
-              </button>
+                <span className="hidden md:inline">Reset progress</span>
+              </Button>
             )}
           </div>
 
@@ -352,7 +361,7 @@ export function History() {
             <div className="flex gap-2">
             <button
               onClick={() => setFilter('all')}
-              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
                 filter === 'all'
                   ? 'bg-aws-orange text-white'
                   : 'bg-bg-card text-text-muted hover:text-text-primary'
@@ -362,9 +371,9 @@ export function History() {
             </button>
             <button
               onClick={() => setFilter('passed')}
-              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
                 filter === 'passed'
-                  ? 'bg-success text-white'
+                  ? 'bg-aws-orange text-white'
                   : 'bg-bg-card text-text-muted hover:text-text-primary'
               }`}
             >
@@ -372,9 +381,9 @@ export function History() {
             </button>
             <button
               onClick={() => setFilter('failed')}
-              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
                 filter === 'failed'
-                  ? 'bg-danger text-white'
+                  ? 'bg-aws-orange text-white'
                   : 'bg-bg-card text-text-muted hover:text-text-primary'
               }`}
             >
@@ -388,7 +397,7 @@ export function History() {
               <select
                 value={itemsPerPage}
                 onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                className="px-3 py-2 bg-bg-card text-text-primary rounded-lg border border-text-muted/30 hover:border-aws-orange focus:border-aws-orange focus:outline-none transition-colors text-sm"
+                className="px-3 py-2 bg-bg-dark text-text-primary rounded-lg border border-text-muted/30 focus:border-aws-orange focus:outline-none transition-colors text-sm"
               >
                 <option value={3}>3 per page</option>
                 <option value={5}>5 per page</option>
@@ -400,27 +409,24 @@ export function History() {
           </div>
         )}
 
-        {/* Guest User Empty State */}
-        {!user && (
-          <div className="mb-6 p-6 bg-warning/10 border border-warning rounded-lg">
+        {/* Guest User: only sign-in CTA, no misleading empty-state card. */}
+        {!user ? (
+          <div className="p-6 bg-warning/10 border border-warning rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-5 h-5 text-warning" />
-              <p className="text-warning font-semibold">Track Your Progress</p>
+              <p className="text-warning font-semibold">Track your progress</p>
             </div>
             <p className="text-text-muted text-sm mb-4">
               Sign in to track your practice exam history and monitor your progress over time.
             </p>
-            <button
-              onClick={() => navigate('/login')}
-              className="px-6 py-2 bg-aws-orange hover:bg-aws-orange/90 text-white font-medium rounded-lg transition-colors"
-            >
-              Sign In
-            </button>
+            <Button onClick={() => navigate('/login')} variant="primary" size="sm">
+              Sign in
+            </Button>
           </div>
-        )}
-
+        ) : (
+          <>
         {/* Showing counter */}
-        {user && filteredAttempts.length > 0 && (
+        {filteredAttempts.length > 0 && (
           <div className="mb-4 text-sm text-text-muted">
             Showing {startIndex + 1}-{Math.min(endIndex, filteredAttempts.length)} of {filteredAttempts.length} attempts
           </div>
@@ -435,12 +441,13 @@ export function History() {
                 : `No ${filter} attempts yet.`}
             </p>
             {filter === 'all' && (
-              <button
+              <Button
                 onClick={() => navigate('/practice-exam')}
-                className="mt-6 px-8 py-3 bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold rounded-lg transition-colors"
+                variant="primary"
+                className="mt-6"
               >
-                Start Practice Exam
-              </button>
+                Start practice exam
+              </Button>
             )}
           </div>
         ) : (
@@ -482,16 +489,13 @@ export function History() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {Object.entries(domains).map(([id, name]) => {
                       const domainId = Number(id)
-                      const score = attempt[`domain_${domainId}_score` as keyof ExamAttempt] as number
+                      const score = attempt.domain_scores?.[id] ?? 0
                       return (
                         <div key={domainId} className="flex items-center justify-between">
                           <span className="text-text-muted text-xs md:text-sm">
                             {name}
                           </span>
-                          <span 
-                            className="text-sm md:text-base font-bold"
-                            style={{ color: DOMAIN_COLOR }}
-                          >
+                          <span className="text-sm md:text-base font-bold text-aws-orange">
                             {score}%
                           </span>
                         </div>
@@ -506,7 +510,7 @@ export function History() {
                     onClick={() => handleExpandAttempt(attempt.id)}
                     className="w-full px-4 py-2 bg-bg-dark hover:bg-bg-dark/70 text-aws-orange font-medium rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
                   >
-                    {expandedAttempt === attempt.id ? '▼' : '▶'} View Details
+                    {expandedAttempt === attempt.id ? '▼' : '▶'} View details
                   </button>
                   
                   {expandedAttempt === attempt.id && (
@@ -538,15 +542,16 @@ export function History() {
         )}
 
         {/* Page Navigation */}
-        {user && filteredAttempts.length > 0 && totalPages > 1 && (
+        {filteredAttempts.length > 0 && totalPages > 1 && (
           <div className="mt-6 flex items-center justify-center gap-2">
-            <button
+            <Button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="px-4 py-2 bg-bg-card hover:bg-bg-card-hover text-text-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              variant="secondary"
+              size="sm"
             >
-              ← Previous
-            </button>
+              Previous
+            </Button>
             
             <div className="flex gap-1">
               {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
@@ -577,14 +582,17 @@ export function History() {
               })}
             </div>
             
-            <button
+            <Button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-bg-card hover:bg-bg-card-hover text-text-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              variant="secondary"
+              size="sm"
             >
-              Next →
-            </button>
+              Next
+            </Button>
           </div>
+        )}
+          </>
         )}
         </div>
       </div>
@@ -603,19 +611,22 @@ export function History() {
           </div>
 
           <div className="flex gap-3">
-            <button
+            <Button
               onClick={() => setShowResetModal(false)}
-              className="flex-1 px-4 py-3 bg-bg-dark hover:bg-bg-card-hover text-text-primary font-medium rounded-lg transition-colors"
+              variant="secondary"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleResetProgress}
-              disabled={resetting}
-              className="flex-1 px-4 py-3 bg-danger hover:bg-danger/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              variant="danger"
+              loading={resetting}
+              loadingText="Resetting..."
+              className="flex-1"
             >
-              {resetting ? 'Resetting...' : 'Reset Everything'}
-            </button>
+              Reset everything
+            </Button>
           </div>
         </div>
       </Modal>

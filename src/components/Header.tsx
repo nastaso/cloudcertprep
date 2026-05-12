@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
-import { KOFI_URL } from '../lib/constants'
-import { Menu, X, Heart, Cloud, Check, Sun, Moon } from 'lucide-react'
+import { KOFI_URL, GITHUB_REPO_URL } from '../lib/constants'
+import { Menu, X, Heart, Cloud, Check, Sun, Moon, Github } from 'lucide-react'
+import { Button } from './Button'
 
 interface HeaderProps {
   showNav?: boolean
@@ -43,6 +44,8 @@ export function Header({ showNav = false }: HeaderProps) {
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="md:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
                 aria-label="Toggle menu"
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-menu"
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -50,12 +53,6 @@ export function Header({ showNav = false }: HeaderProps) {
               {/* Desktop Navigation - Hidden on Mobile */}
               <div className="hidden md:flex items-center gap-4 lg:gap-6">
                 <nav className="flex items-center gap-4 lg:gap-6">
-                  <Link 
-                    to="/" 
-                    className="text-white/90 hover:text-white font-medium transition-colors text-base lg:text-lg"
-                  >
-                    Home
-                  </Link>
                   {user && (
                     <Link 
                       to="/history" 
@@ -64,6 +61,18 @@ export function Header({ showNav = false }: HeaderProps) {
                       History
                     </Link>
                   )}
+                  {/* GitHub link signals open-source positioning at the top of
+                      the funnel. Replaces the redundant 'Home' link (logo on the
+                      left already routes to /). */}
+                  <a
+                    href={GITHUB_REPO_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white/90 hover:text-white transition-colors p-1"
+                    aria-label="View source on GitHub"
+                  >
+                    <Github className="w-5 h-5 lg:w-6 lg:h-6" />
+                  </a>
                 </nav>
                 
                 {user ? (
@@ -74,14 +83,14 @@ export function Header({ showNav = false }: HeaderProps) {
                     }}
                     className="px-5 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-medium rounded-lg text-base lg:text-lg whitespace-nowrap"
                   >
-                    Sign Out
+                    Sign out
                   </button>
                 ) : (
                   <button
                     onClick={() => navigate('/login')}
                     className="px-5 py-3 bg-white hover:bg-white/90 text-aws-orange font-medium rounded-lg text-base lg:text-lg whitespace-nowrap"
                   >
-                    Sign In
+                    Sign in
                   </button>
                 )}
               </div>
@@ -96,7 +105,7 @@ export function Header({ showNav = false }: HeaderProps) {
                   />
                   
                   {/* Drawer */}
-                  <div className="md:hidden fixed top-0 right-0 bottom-0 w-64 bg-bg-card shadow-2xl z-[101] flex flex-col">
+                  <div id="mobile-menu" className="md:hidden fixed top-0 right-0 bottom-0 w-64 bg-bg-card shadow-2xl z-[101] flex flex-col">
                     {/* Drawer Header */}
                     <div className="flex items-center justify-between p-4 border-b border-text-muted/20">
                       <h2 className="text-lg font-semibold text-text-primary">Menu</h2>
@@ -110,13 +119,6 @@ export function Header({ showNav = false }: HeaderProps) {
 
                     {/* Navigation Links */}
                     <nav className="flex flex-col p-4 gap-2">
-                      <Link
-                        to="/"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="px-4 py-3 text-text-primary hover:bg-bg-dark rounded-lg transition-colors font-medium"
-                      >
-                        Home
-                      </Link>
                       {user && (
                         <Link
                           to="/history"
@@ -126,38 +128,51 @@ export function Header({ showNav = false }: HeaderProps) {
                           History
                         </Link>
                       )}
+                      <a
+                        href={GITHUB_REPO_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="px-4 py-3 text-text-primary hover:bg-bg-dark rounded-lg transition-colors font-medium flex items-center gap-3"
+                      >
+                        <Github className="w-5 h-5" />
+                        GitHub
+                      </a>
                       <button
                         onClick={toggleTheme}
                         className="px-4 py-3 text-text-primary hover:bg-bg-dark rounded-lg transition-colors font-medium flex items-center gap-3 w-full text-left"
                       >
                         {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-                        {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                        {theme === 'dark' ? 'Light mode' : 'Dark mode'}
                       </button>
                     </nav>
 
                     {/* Auth Button */}
                     <div className="p-4 border-t border-text-muted/20">
                       {user ? (
-                        <button
+                        <Button
                           onClick={() => {
                             signOut()
                             navigate('/login')
                             setMobileMenuOpen(false)
                           }}
-                          className="w-full px-4 py-3.5 bg-bg-dark hover:bg-bg-dark/70 text-text-primary border border-text-muted/20 font-semibold rounded-lg transition-colors"
+                          variant="secondary"
+                          fullWidth
                         >
-                          Sign Out
-                        </button>
+                          Sign out
+                        </Button>
                       ) : (
-                        <button
+                        <Button
                           onClick={() => {
                             navigate('/login')
                             setMobileMenuOpen(false)
                           }}
-                          className="w-full px-4 py-3.5 bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold rounded-lg transition-colors shadow-lg"
+                          variant="primary"
+                          fullWidth
+                          className="shadow-lg"
                         >
-                          Sign In
-                        </button>
+                          Sign in
+                        </Button>
                       )}
                     </div>
 

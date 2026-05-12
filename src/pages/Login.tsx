@@ -1,26 +1,35 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { validatePassword } from '../lib/validation'
+import { validatePassword, isPasswordStrongEnough } from '../lib/validation'
 import { Header } from '../components/Header'
 import { trackEvent } from '../lib/analytics'
-import { usePageTitle } from '../hooks/usePageTitle'
+import { useSEO } from '../hooks/useSEO'
 import { useCert } from '../hooks/useCert'
 import { getCertTotalQuestions } from '../data/certifications'
-import { BookOpen, FileText, Target, TrendingUp, CheckCircle, Mail } from 'lucide-react'
+import { BookOpen, FileText, Target, TrendingUp, CheckCircle, Mail, Github } from 'lucide-react'
+import { useNoIndex } from '../hooks/useNoIndex'
+import { PasswordInput } from '../components/PasswordInput'
+import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter'
+import { Button } from '../components/Button'
 
 export function Login() {
+  // Auth pages should never be indexed by search engines.
+  useNoIndex()
+
   const cert = useCert()
   const [isSignUp, setIsSignUp] = useState(false)
   const [isForgotPassword, setIsForgotPassword] = useState(false)
   const [signUpSuccess, setSignUpSuccess] = useState(false)
 
-  // Set page title based on mode
-  usePageTitle(
-    isForgotPassword ? 'Reset Password | CloudCertPrep'
-    : isSignUp ? 'Sign Up | CloudCertPrep'
-    : 'Sign In | CloudCertPrep'
-  )
+  // Title varies by auth mode; canonical=null since auth pages are noindex.
+  useSEO({
+    title: isForgotPassword ? 'Reset password · CloudCertPrep'
+      : isSignUp ? 'Sign up · CloudCertPrep'
+      : 'Sign in · CloudCertPrep',
+    description: 'Sign in to CloudCertPrep to track your AWS practice exam history and progress.',
+    canonical: null,
+  })
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -75,6 +84,22 @@ export function Login() {
     }
   }
 
+  const handleGitHubSignIn = async () => {
+    setError('')
+    setLoading(true)
+    try {
+      trackEvent('sign_in_initiated', { method: 'github' })
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: { redirectTo: `${window.location.origin}/` },
+      })
+      if (error) throw error
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'GitHub sign-in failed')
+      setLoading(false)
+    }
+  }
+
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -87,7 +112,7 @@ export function Login() {
       })
 
       if (error) throw error
-      setSuccess('Password reset link sent! Check your email.')
+      setSuccess('Check your email for a reset link')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
@@ -103,7 +128,7 @@ export function Login() {
           {/* Left Column - Features/Benefits */}
           <div className="hidden lg:flex flex-col justify-center space-y-6 lg:pr-8">
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-3">
+                <h1 className="text-3xl md:text-4xl font-semibold text-text-primary mb-3">
                   Master the AWS Cloud Practitioner Exam
                 </h1>
               </div>
@@ -125,7 +150,7 @@ export function Login() {
                   </div>
                   <div>
                     <h3 className="text-text-primary font-semibold mb-1">Full-Length Practice Exams</h3>
-                    <p className="text-text-muted text-sm">65 questions, 90 minutes - same format as the real exam</p>
+                    <p className="text-text-muted text-sm">65 questions, 90 minutes, same format as the real exam.</p>
                   </div>
                 </div>
 
@@ -167,26 +192,27 @@ export function Login() {
           {signUpSuccess ? (
             <div className="text-center">
               <Mail className="w-12 h-12 text-aws-orange mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-text-primary mb-2">Check your inbox</h2>
+              <h2 className="text-2xl font-semibold text-text-primary mb-2">Check your email</h2>
               <p className="text-text-muted text-sm leading-relaxed mb-6">
-                We sent a verification link to <span className="text-text-primary font-medium">{email}</span>. Click it to activate your account.
+                We sent a verification link to <span className="text-text-primary font-medium">{email}</span>. Check your spam folder if you don't see it.
               </p>
-              <button
+              <Button
                 onClick={() => { setSignUpSuccess(false); setIsSignUp(false) }}
-                className="w-full px-6 py-3 bg-bg-dark hover:bg-bg-card-hover text-text-primary font-medium rounded-lg transition-colors border border-text-muted/30"
+                variant="secondary"
+                fullWidth
               >
-                Back to Sign In
-              </button>
+                Back to sign in
+              </Button>
             </div>
           ) : (
           <>
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-text-primary mb-2">
-              {isForgotPassword ? 'Reset Password' : isSignUp ? 'Create Account' : 'Sign In'}
+            <h2 className="text-2xl font-semibold text-text-primary mb-2">
+              {isForgotPassword ? 'Reset password' : isSignUp ? 'Sign up' : 'Sign in'}
             </h2>
             {isForgotPassword && (
               <p className="text-text-muted text-sm">
-                Enter your email to receive a reset link
+                We'll send you a link to reset it
               </p>
             )}
           </div>
@@ -202,6 +228,7 @@ export function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoFocus
               className="w-full px-4 py-2 bg-bg-dark border border-text-muted/30 rounded-lg text-text-primary focus:outline-none focus:border-aws-orange transition-colors"
               placeholder="you@example.com"
               autoComplete="email"
@@ -214,16 +241,14 @@ export function Login() {
                 <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-2">
                   Password
                 </label>
-                <input
+                <PasswordInput
                   id="password"
-                  type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={setPassword}
                   required
-                  className="w-full px-4 py-2 bg-bg-dark border border-text-muted/30 rounded-lg text-text-primary focus:outline-none focus:border-aws-orange transition-colors"
-                  placeholder="••••••••"
                   autoComplete={isSignUp ? 'new-password' : 'current-password'}
                 />
+                {isSignUp && <PasswordStrengthMeter password={password} />}
               </div>
 
               {isSignUp && (
@@ -232,14 +257,11 @@ export function Login() {
                   <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-primary mb-2">
                     Confirm Password
                   </label>
-                  <input
+                  <PasswordInput
                     id="confirmPassword"
-                    type="password"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={setConfirmPassword}
                     required
-                    className="w-full px-4 py-2 bg-bg-dark border border-text-muted/30 rounded-lg text-text-primary focus:outline-none focus:border-aws-orange transition-colors"
-                    placeholder="••••••••"
                     autoComplete="new-password"
                   />
                 </div>
@@ -253,7 +275,7 @@ export function Login() {
                   />
                   <span className="text-text-muted text-sm leading-relaxed">
                     I agree to the{' '}
-                    <Link to="/terms" className="text-aws-orange hover:underline" target="_blank" rel="noopener noreferrer">Terms of Service</Link>
+                    <Link to="/terms" className="text-aws-orange hover:underline" target="_blank" rel="noopener noreferrer">Terms</Link>
                     {' '}and{' '}
                     <Link to="/privacy" className="text-aws-orange hover:underline" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>
                   </span>
@@ -275,13 +297,20 @@ export function Login() {
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
-            disabled={loading || (isSignUp && !acceptedTerms)}
-            className="w-full bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="primary"
+            fullWidth
+            loading={loading}
+            loadingText="Loading..."
+            disabled={
+              (isSignUp && !acceptedTerms) ||
+              (isSignUp && !isPasswordStrongEnough(password)) ||
+              (isSignUp && password !== confirmPassword)
+            }
           >
-            {loading ? 'Loading...' : isForgotPassword ? 'Send Reset Link' : isSignUp ? 'Sign Up' : 'Sign In'}
-          </button>
+            {isForgotPassword ? 'Send reset link' : isSignUp ? 'Sign up' : 'Sign in'}
+          </Button>
         </form>
 
         {!isSignUp && !isForgotPassword && (
@@ -315,10 +344,10 @@ export function Login() {
             className="text-text-muted hover:text-aws-orange transition-colors text-sm"
           >
             {isForgotPassword 
-              ? 'Back to Sign In' 
+              ? 'Back to sign in' 
               : isSignUp 
-              ? 'Already have an account? Sign In' 
-              : "Don't have an account? Sign Up"}
+              ? 'Already have an account? Sign in' 
+              : "Don't have an account? Sign up"}
           </button>
 
           {!isForgotPassword && (
@@ -329,13 +358,26 @@ export function Login() {
                 <div className="flex-1 border-t border-text-muted/30"></div>
               </div>
 
-              <button
+              <Button
+                type="button"
+                onClick={handleGitHubSignIn}
+                disabled={loading}
+                variant="secondary"
+                fullWidth
+                leftIcon={<Github className="w-5 h-5" />}
+                className="mb-3"
+              >
+                Continue with GitHub
+              </Button>
+
+              <Button
                 type="button"
                 onClick={() => navigate('/')}
-                className="w-full px-6 py-3 bg-bg-dark hover:bg-bg-card-hover text-text-primary font-medium rounded-lg transition-colors border border-text-muted/30"
+                variant="secondary"
+                fullWidth
               >
-                Continue as Guest
-              </button>
+                Continue as guest
+              </Button>
 
             </>
           )}

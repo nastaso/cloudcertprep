@@ -2,4 +2,19 @@
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.supabase.co https://cloud.umami.is; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://cloud.umami.is; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+
+# HTML routes: revalidate on each load so users always get the bundle that
+# matches the deployed assets (avoids stale index.html pointing to deleted JS).
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Static assets have content-hashed filenames (e.g. index-A8f2k3.js), so they
+# are safe to cache forever. New deploys produce new hashes => new filenames.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

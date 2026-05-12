@@ -17,7 +17,7 @@
   animation: slide-up 0.3s ease-out;
 }
 
-/* Theme: Light mode (default) — warm-toned */
+/* Theme: Light mode (default), warm-toned */
 :root {
   --color-aws-orange: 234 140 0;
   --color-aws-orange-end: 255 119 0;
@@ -31,7 +31,7 @@
   --color-text-muted: 87 83 78;
 }
 
-/* Theme: Dark mode — cool-toned */
+/* Theme: Dark mode, cool-toned */
 .dark {
   --color-aws-orange: 255 153 0;
   --color-aws-orange-end: 255 119 0;

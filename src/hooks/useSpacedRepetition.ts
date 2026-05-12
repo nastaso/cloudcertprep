@@ -95,13 +95,13 @@ export function useSpacedRepetition(
       const row = masteryMap.get(question.id)
 
       if (!row) {
-        // Never seen — separate pool for quota guarantee
+        // Never seen, separate pool for quota guarantee
         unseenPool.push(question)
         continue
       }
 
       if (row.weight === null) {
-        // Excluded (mastered + in exclusion window) — goes to backfill
+        // Excluded (mastered + in exclusion window), goes to backfill
         backfillPool.push({ question, lastSeenAt: row.last_seen_at })
         continue
       }

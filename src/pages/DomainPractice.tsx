@@ -2,23 +2,23 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useCert } from '../hooks/useCert'
-import { usePageTitle } from '../hooks/usePageTitle'
+import { useSEO } from '../hooks/useSEO'
+import { ROUTE_SEO } from '../lib/seo-data'
 import { supabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { Header } from '../components/Header'
 import { AnswerButton } from '../components/AnswerButton'
 import { ProgressBar } from '../components/ProgressBar'
 import { QuestionReviewCard } from '../components/QuestionReviewCard'
-import { LoadingSpinner } from '../components/LoadingSpinner'
+import { Button } from '../components/Button'
 import { updateDomainProgress } from '../lib/supabaseUtils'
-import { DOMAIN_COLOR } from '../types'
 import type { Question, OptionKey } from '../types'
 import { loadDomainQuestions } from '../data/questions'
 import { isAnswerCorrect } from '../lib/scoring'
 import { trackEvent } from '../lib/analytics'
 import { useSpacedRepetition } from '../hooks/useSpacedRepetition'
 import { shuffleAndMapQuestions, toOriginalAnswer, toggleMultiAnswer, type OptionKeyMap } from '../lib/utils'
-import { MAX_MULTI_ANSWER, ANSWER_FEEDBACK_DELAY_MS, GITHUB_ISSUES_URL } from '../lib/constants'
+import { MAX_MULTI_ANSWER, ANSWER_FEEDBACK_DELAY_MS, buildGitHubIssueUrl } from '../lib/constants'
 import { Check, X } from 'lucide-react'
 
 type Screen = 'selection' | 'config' | 'practice' | 'results'
@@ -41,10 +41,14 @@ export function DomainPractice() {
 
   // Set dynamic page title based on screen and domain
   const pageTitle = screen === 'practice' && selectedDomain !== null
-    ? `${cert.shortName} - ${domains[selectedDomain] ?? ''} Practice | CloudCertPrep`
-    : screen === 'results' ? `${cert.shortName} Practice Results | CloudCertPrep`
-    : `${cert.shortName} Domain Practice | CloudCertPrep`
-  usePageTitle(pageTitle)
+    ? `${cert.shortName} · ${domains[selectedDomain] ?? ''} · CloudCertPrep`
+    : screen === 'results' ? `${cert.shortName} practice results · CloudCertPrep`
+    : `${cert.shortName} domain practice · CloudCertPrep`
+  useSEO({
+    title: pageTitle,
+    description: ROUTE_SEO['/domain-practice'].description,
+    canonical: screen === 'selection' ? '/domain-practice' : null,
+  })
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [userAnswer, setUserAnswer] = useState<string | string[] | null>(null)
@@ -197,7 +201,7 @@ export function DomainPractice() {
         <Header showNav={true} />
         <div className="p-4 md:p-8">
           <div className="max-w-2xl mx-auto bg-bg-card rounded-lg p-4 md:p-6 lg:p-8 shadow-card">
-          <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-3 md:mb-4">{cert.shortName} Domain Practice</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold text-text-primary mb-3 md:mb-4">{cert.shortName} Domain Practice</h1>
           <p className="text-sm md:text-base text-text-muted mb-6 md:mb-8">Practice questions from a specific domain</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
@@ -209,10 +213,7 @@ export function DomainPractice() {
                   className="bg-bg-dark hover:bg-bg-card-hover p-4 md:p-6 rounded-lg border-2 border-transparent hover:border-aws-orange transition-all text-left"
                 >
                   <div className="flex items-center gap-3 md:gap-4">
-                    <div 
-                      className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold flex-shrink-0"
-                      style={{ backgroundColor: DOMAIN_COLOR + '20', color: DOMAIN_COLOR }}
-                    >
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold flex-shrink-0 bg-aws-orange/20 text-aws-orange">
                       {domain.id}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -227,12 +228,9 @@ export function DomainPractice() {
             })}
           </div>
 
-          <button
-            onClick={() => navigate('/')}
-            className="w-full bg-bg-dark hover:bg-bg-card-hover text-text-primary font-medium py-2.5 md:py-3 rounded-lg transition-colors text-sm md:text-base"
-          >
-            ← Back to Home
-          </button>
+          <Button onClick={() => navigate('/')} variant="secondary" fullWidth>
+            Back to home
+          </Button>
           </div>
         </div>
       </div>
@@ -246,8 +244,8 @@ export function DomainPractice() {
         <div className="p-4 md:p-8">
           <div className="max-w-2xl mx-auto">
           <div className="bg-bg-card rounded-lg p-4 md:p-6 lg:p-8 shadow-card">
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-text-primary mb-2">
-              {cert.shortName} - {domains[selectedDomain!]}
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-semibold text-text-primary mb-2">
+              {cert.shortName} · {domains[selectedDomain!]}
             </h1>
             <p className="text-sm md:text-base text-text-muted mb-6 md:mb-8">Configure your practice session</p>
 
@@ -283,27 +281,23 @@ export function DomainPractice() {
             </div>
 
             <div className="flex gap-4">
-              <button
+              <Button
                 onClick={() => setScreen('selection')}
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-bg-dark hover:bg-bg-card-hover text-text-primary font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="secondary"
+                className="flex-1"
               >
-                ← Back
-              </button>
-              <button
+                Back
+              </Button>
+              <Button
                 onClick={startPractice}
-                disabled={loading}
-                className="flex-1 px-6 py-3 bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-75 disabled:cursor-not-allowed"
+                variant="primary"
+                className="flex-1"
+                loading={loading}
+                loadingText="Loading questions..."
               >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <LoadingSpinner size="sm" />
-                    <span>Loading questions...</span>
-                  </span>
-                ) : (
-                  'Start Practice'
-                )}
-              </button>
+                Start practice
+              </Button>
             </div>
           </div>
           </div>
@@ -322,7 +316,7 @@ export function DomainPractice() {
           <div className="max-w-4xl mx-auto">
             {/* Summary Header */}
             <div className="bg-bg-card rounded-lg p-4 md:p-5 text-center mb-4 shadow-card">
-              <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-3">Practice session complete!</h1>
+              <h1 className="text-2xl md:text-3xl font-semibold text-text-primary mb-3">Practice session complete!</h1>
               <p className="text-lg md:text-xl text-text-muted">
                 You got <span className="text-success font-bold">{correctCount}/{results.length}</span> correct ({Math.round((correctCount / results.length) * 100)}%)
               </p>
@@ -368,18 +362,12 @@ export function DomainPractice() {
 
             {/* Action Buttons */}
             <div className="flex flex-col md:flex-row gap-4 mt-6">
-              <button
-                onClick={() => navigate('/')}
-                className="flex-1 px-6 py-3 bg-bg-card hover:bg-bg-card-hover text-text-primary font-semibold rounded-lg transition-colors"
-              >
-                ← Back to Home
-              </button>
-              <button
-                onClick={() => selectDomain(selectedDomain!)}
-                className="flex-1 px-6 py-3 bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold rounded-lg transition-colors"
-              >
-                Practice Again
-              </button>
+              <Button onClick={() => navigate('/')} variant="secondary" className="flex-1">
+                Back to home
+              </Button>
+              <Button onClick={() => selectDomain(selectedDomain!)} variant="primary" className="flex-1">
+                Practice again
+              </Button>
             </div>
           </div>
         </div>
@@ -472,13 +460,14 @@ export function DomainPractice() {
             )}
 
             {currentQuestion.isMultiAnswer && !showFeedback && (
-              <button
+              <Button
                 onClick={() => checkAnswer()}
                 disabled={!userAnswer || (Array.isArray(userAnswer) && userAnswer.length === 0)}
-                className="w-full px-4 py-2 md:px-6 md:py-2.5 bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
+                variant="primary"
+                fullWidth
               >
-                Submit Answer
-              </button>
+                Submit answer
+              </Button>
             )}
 
             {showFeedback && (
@@ -522,7 +511,7 @@ export function DomainPractice() {
               <span className="text-[10px] text-text-muted/60">
                 Found an error?{' '}
                 <a 
-                  href={GITHUB_ISSUES_URL}
+                  href={buildGitHubIssueUrl(currentQuestion.id)}
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-aws-orange hover:text-aws-orange/80 hover:underline"
@@ -534,12 +523,9 @@ export function DomainPractice() {
           </div>
 
           {showFeedback && (
-            <button
-              onClick={nextQuestion}
-              className="w-full px-4 py-2 md:px-6 md:py-2.5 bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold rounded-lg transition-colors text-sm md:text-base"
-            >
-              {currentIndex < questions.length - 1 ? 'Next Question →' : 'Finish Session'}
-            </button>
+            <Button onClick={nextQuestion} variant="primary" fullWidth>
+              {currentIndex < questions.length - 1 ? 'Next question' : 'Finish session'}
+            </Button>
           )}
           </div>
         </div>

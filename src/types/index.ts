@@ -9,7 +9,7 @@ export interface Question {
 }
 
 export type OptionKey = 'A' | 'B' | 'C' | 'D' | 'E'
-export type DomainId = 1 | 2 | 3 | 4
+export type DomainId = number
 
 export interface ExamAttempt {
   id: string
@@ -22,10 +22,13 @@ export interface ExamAttempt {
   time_taken_seconds: number
   total_questions: number
   correct_answers: number
-  domain_1_score: number
-  domain_2_score: number
-  domain_3_score: number
-  domain_4_score: number
+  /**
+   * Per-domain scores as JSONB. Keys are stringified domain IDs (Postgres JSONB
+   * coerces keys to strings); values are 0-100 score percentages.
+   * Supports any number of domains, set by the cert config in `data/certifications.ts`.
+   * Example: { "1": 85, "2": 70, "3": 92, "4": 65 } for a 4-domain cert.
+   */
+  domain_scores: Record<string, number>
 }
 
 export interface DomainProgress {
@@ -35,6 +38,3 @@ export interface DomainProgress {
   questions_correct: number
   mastery_percent: number
 }
-
-/** AWS orange used for all domain colors */
-export const DOMAIN_COLOR = '#FF9900'

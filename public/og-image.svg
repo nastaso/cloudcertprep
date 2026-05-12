@@ -1,29 +1,83 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <!-- Background -->
-  <rect width="1200" height="630" fill="#0F1923"/>
-  
-  <!-- Small logo container at top (white rounded square) -->
-  <rect x="564" y="120" width="72" height="72" rx="12" fill="#FFFFFF"/>
-  
-  <!-- AWS Orange Cloud (Lucide Cloud icon, scaled) -->
-  <g transform="translate(576, 132) scale(2)">
-    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" fill="#FF9900" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
-  
-  <!-- White Checkmark (Lucide Check icon, scaled) -->
-  <g transform="translate(576, 132) scale(2)">
-    <path d="M20 6 9 17l-5-5" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
-  
-  <!-- Main headline (value proposition) -->
-  <text x="600" y="285" font-size="64" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif">Free AWS Exam Prep</text>
-  
-  <!-- Subheadline -->
-  <text x="600" y="355" font-size="28" font-weight="400" fill="#FF9900" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif">1,054 Practice Questions • Mock Exams • Spaced Repetition</text>
-  
-  <!-- Brand name -->
-  <text x="600" y="435" font-size="36" font-weight="700" fill="#FFFFFF" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif">CloudCertPrep</text>
+  <!--
+    CloudCertPrep OG card  1200x630  LIGHT MODE
 
-  <!-- URL watermark (bottom-right) -->
-  <text x="1100" y="590" font-size="20" font-weight="400" fill="#6B7280" text-anchor="end" font-family="system-ui, -apple-system, sans-serif">cloudcertprep.io</text>
+    Palette matches index.css :root and the templates/email/*.html
+    files exactly:
+      page bg     #F5F5F4   (color-bg-dark)
+      card bg     #FFFFFF   (color-bg-card)
+      border      #E7E5E4   (email border)
+      orange bar  #EA8C00   (color-aws-orange, light mode)
+      logo cloud  #FF9900   (matches favicon.svg + logo-email.svg)
+      text dark   #1C1917   (color-text-primary)
+      text muted  #57534E   (color-text-muted)
+
+    Layout follows the Vercel / Linear / Stripe OG pattern: prominent
+    brand strip, dominant H1, one large support line. No small chips
+    or paragraphs because OG cards render at ~470-600px wide on most
+    surfaces (Twitter / Slack / LinkedIn) and anything below ~28px
+    source size becomes illegible after downscale.
+
+    Font stack matches src/index.css body rule, declared on every
+    text element so any SVG renderer picks it up reliably.
+
+    Headline mirrors the live homepage hero verbatim:
+      line 1: Free AWS Cloud Practitioner
+      line 2: (CLF-C02) Practice Exams   [orange accent]
+  -->
+
+  <!-- Page background -->
+  <rect width="1200" height="630" fill="#F5F5F4"/>
+
+  <!-- Slimmer orange header strip (120 vs 140 in og-image.svg). -->
+  <rect x="0" y="0" width="1200" height="120" fill="#EA8C00"/>
+
+  <!--
+    Header cluster. Logo scaled to 76px (was 64). Internal padding
+    ratios still derived from logo-email.svg (92x92): scale factor
+    now 76/92 = 0.826.
+      cloud  translate(18,18) scale(2.333) -> translate(14.87, 14.87) scale(1.928)
+      check  translate(25,25) scale(1.75)  -> translate(20.65, 20.65) scale(1.446)
+      rx     18 -> 15  (13 * 76/64)
+    Group y = (120 - 76) / 2 = 22 so the logo is vertically centred
+    in the 120px bar.
+  -->
+  <g transform="translate(60, 22)">
+    <!-- White rounded square -->
+    <rect width="76" height="76" rx="15" fill="#FFFFFF"/>
+    <!-- Cloud (bright orange, matches logo-email.svg and favicon.svg) -->
+    <g transform="translate(14.87, 14.87) scale(1.928)">
+      <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
+            fill="#FF9900" stroke="#FF9900" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <!-- White check overlaid (Lucide Check path, scaled to email ratio) -->
+    <g transform="translate(20.65, 20.65) scale(1.446)">
+      <path d="M20 6 9 17l-5-5" fill="none" stroke="#FFFFFF"
+            stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <!-- Wordmark, vertically centred next to the bigger logo. -->
+    <text x="96" y="50"
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+          font-size="36" font-weight="700" fill="#FFFFFF" letter-spacing="-0.6">CloudCertPrep</text>
+  </g>
+
+  <!-- Card area below the orange strip -->
+  <rect x="0" y="120" width="1200" height="510" fill="#FFFFFF"/>
+  <rect x="0" y="120" width="1200" height="1" fill="#E7E5E4"/>
+
+  <!-- H1: same 84px size as og-image.svg, shifted up 10px to compensate
+       for the 20px shorter bar above. -->
+  <text x="600" y="310"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="84" font-weight="700" fill="#1C1917" text-anchor="middle" letter-spacing="-1.5">Free AWS Cloud Practitioner</text>
+  <text x="600" y="410"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="84" font-weight="700" fill="#EA8C00" text-anchor="middle" letter-spacing="-1.5">(CLF-C02) Practice Exams</text>
+
+  <!-- Single large support line, same 38px as og-image.svg, shifted
+       up 10px in step with the H1. -->
+  <text x="600" y="530"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+        font-size="38" font-weight="500" fill="#57534E" text-anchor="middle">1,050+ questions  ·  Mock exams  ·  Adaptive spaced repetition</text>
 </svg>

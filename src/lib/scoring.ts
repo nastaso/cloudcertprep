@@ -19,7 +19,7 @@ export function calculateScaledScore(correct: number, total: number): number {
  * Determine if the exam was passed
  * Pass threshold varies by certification (CLF-C02: 700, SAA-C03: 720)
  */
-export function isPassed(scaledScore: number, passingScore: number = 700): boolean {
+export function isPassed(scaledScore: number, passingScore: number): boolean {
   return scaledScore >= passingScore
 }
 
@@ -61,7 +61,7 @@ export function getExamDomainTargets(cert: Certification): Record<number, number
 
 /**
  * Select questions for a mock exam based on the certification's domain proportions.
- * Domain breakdown is derived from cert config — no hardcoded values.
+ * Domain breakdown is derived from cert config (no hardcoded values).
  */
 export function selectExamQuestions(allQuestions: Question[], cert: Certification): Question[] {
   const targets = getExamDomainTargets(cert)

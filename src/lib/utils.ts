@@ -2,7 +2,7 @@ import type { Question, OptionKey } from '../types'
 
 /**
  * Fisher-Yates shuffle for unbiased random ordering.
- * Shared utility — used by scoring.ts (exam selection) and useSpacedRepetition.ts (practice selection).
+ * Shared utility, used by scoring.ts (exam selection) and useSpacedRepetition.ts (practice selection).
  */
 export function fisherYatesShuffle<T>(arr: T[]): T[] {
   const shuffled = [...arr]
@@ -13,7 +13,7 @@ export function fisherYatesShuffle<T>(arr: T[]): T[] {
   return shuffled
 }
 
-/** Maps display key → original key so answers can be translated back for DB storage */
+/** Maps display key to original key so answers can be translated back for DB storage. */
 export type OptionKeyMap = Record<string, string>
 
 /**
@@ -23,9 +23,9 @@ export type OptionKeyMap = Record<string, string>
  * Flow:
  * 1. Display shuffled options to the user (A/B/C/D labels stay, content moves)
  * 2. User picks a display key (e.g. "B")
- * 3. For live scoring: compare against shuffled question.answer → correct
- * 4. For DB save: use keyMap to convert "B" → original key (e.g. "D")
- * 5. History loads original JSON + original keys → correct display
+ * 3. For live scoring: compare against shuffled question.answer -> correct
+ * 4. For DB save: use keyMap to convert "B" -> original key (e.g. "D")
+ * 5. History loads original JSON + original keys -> correct display
  */
 export function shuffleQuestionOptions(question: Question): { question: Question; keyMap: OptionKeyMap } {
   const originalKeys = (Object.keys(question.options) as OptionKey[]).filter(
@@ -48,7 +48,7 @@ export function shuffleQuestionOptions(question: Question): { question: Question
     originalToDisplay[source.key] = displayKey
   })
 
-  // Remap correct answer(s) from original keys → display keys
+  // Remap correct answer(s) from original keys -> display keys
   const remap = (key: string) => originalToDisplay[key] || key
   const newAnswer = Array.isArray(question.answer)
     ? question.answer.map(remap)
@@ -78,7 +78,7 @@ export function toOriginalAnswer(
 
 /**
  * Shuffle all questions and track their key mappings.
- * Returns both the shuffled questions and a Map of question ID → keyMap.
+ * Returns both the shuffled questions and a Map of question ID -> keyMap.
  */
 export function shuffleAndMapQuestions(questions: Question[]): {
   questions: Question[]

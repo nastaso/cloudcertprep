@@ -1,42 +1,53 @@
-import { Check, X } from 'lucide-react'
-
 interface PassFailBannerProps {
   passed: boolean
   scaledScore: number
   percent: number
 }
 
+/**
+ * Result summary shown after submitting a Mock Exam.
+ *
+ * Design language matches the rest of the app: a plain `bg-bg-card` card
+ * with a small uppercase status badge (same pattern as the ACTIVE/COMING SOON
+ * badges in `Stats.tsx`) and a large neutral score (same treatment as the
+ * Stats page metrics).
+ *
+ * No coloured accent strip, no full-bleed solid colour, no tinted icon
+ * circle. Status colour is communicated entirely through the small badge,
+ * keeping visual weight balanced and consistent across the app.
+ *
+ * Domain Practice's instant per-question red/green flash is intentionally
+ * untouched: that is a micro-interaction, this is a persistent summary.
+ */
 export function PassFailBanner({ passed, scaledScore, percent }: PassFailBannerProps) {
+  const badgeClasses = passed
+    ? 'bg-success/20 text-success'
+    : 'bg-danger/20 text-danger'
+  const badgeLabel = passed ? 'PASSED' : 'FAILED'
+  const subtitle = passed
+    ? 'Congratulations! You passed the exam.'
+    : 'Keep practicing. You can do this!'
+
   return (
-    <div
-      className={`w-full p-4 md:p-8 rounded-lg ${
-        passed ? 'bg-success' : 'bg-danger'
-      }`}
-    >
-      <div className="flex flex-col md:flex-row items-center md:justify-between gap-4">
-        <div className="flex items-center gap-3 md:gap-4">
-          <div className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-full flex items-center justify-center flex-shrink-0">
-            {passed ? (
-              <Check className="w-7 h-7 md:w-10 md:h-10 text-success" strokeWidth={3} />
-            ) : (
-              <X className="w-7 h-7 md:w-10 md:h-10 text-danger" strokeWidth={3} />
-            )}
-          </div>
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-1">
-              {passed ? 'PASS' : 'FAIL'}
-            </h2>
-            <p className="text-sm md:text-base text-white/90">
-              {passed ? 'Congratulations! You passed the exam.' : 'Keep practicing. You can do this!'}
-            </p>
-          </div>
+    <div className="w-full bg-bg-card rounded-lg shadow-card p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <span
+            className={`inline-block px-2 py-1 rounded text-xs font-medium uppercase tracking-wide ${badgeClasses}`}
+          >
+            {badgeLabel}
+          </span>
+          <p className="text-sm text-text-muted mt-2">{subtitle}</p>
         </div>
-        <div className="text-center md:text-right">
-          <div className="text-3xl md:text-5xl font-bold text-white mb-1">
+        <div className="sm:text-right">
+          <div className="text-3xl md:text-4xl font-bold text-text-primary leading-none">
             {scaledScore}
+            <span className="text-base md:text-lg text-text-muted font-medium ml-1">
+              /1000
+            </span>
           </div>
-          <div className="text-base md:text-xl text-white/90">
-            {Math.round(percent)}%
+          <div className="text-sm text-text-muted mt-1">
+            {Math.round(percent)}% correct
           </div>
         </div>
       </div>

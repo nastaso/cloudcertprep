@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { validatePassword } from '../lib/validation'
+import { validatePassword, isPasswordStrongEnough } from '../lib/validation'
 import { Header } from '../components/Header'
-import { usePageTitle } from '../hooks/usePageTitle'
+import { useSEO } from '../hooks/useSEO'
+import { useNoIndex } from '../hooks/useNoIndex'
+import { PasswordInput } from '../components/PasswordInput'
+import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter'
+import { Button } from '../components/Button'
 
 export function ResetPassword() {
+  // Reset-password is a transient page reached via email link, never index it.
+  useNoIndex()
+
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
@@ -13,7 +20,11 @@ export function ResetPassword() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  usePageTitle('Reset Password | CloudCertPrep')
+  useSEO({
+    title: 'Reset password · CloudCertPrep',
+    description: 'Reset your CloudCertPrep account password.',
+    canonical: null,
+  })
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
@@ -60,38 +71,33 @@ export function ResetPassword() {
       <Header showNav={true} />
       <div className="flex-1 flex items-center justify-center px-4">
       <div className="bg-bg-card p-8 rounded-lg shadow-card max-w-md w-full">
-        <h1 className="text-xl font-semibold text-text-primary mb-2">Reset Password</h1>
-        <p className="text-text-muted mb-8">Enter your new password</p>
+        <h1 className="text-xl font-semibold text-text-primary mb-2">Reset your password</h1>
+        <p className="text-text-muted mb-8">Choose a new password</p>
 
         <form onSubmit={handleResetPassword} className="space-y-4">
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-2">
-              New Password
+              New password
             </label>
-            <input
+            <PasswordInput
               id="password"
-              type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={setPassword}
               required
-              className="w-full px-4 py-2 bg-bg-dark border border-text-muted/30 rounded-lg text-text-primary focus:outline-none focus:border-aws-orange transition-colors"
-              placeholder="••••••••"
               autoComplete="new-password"
             />
+            <PasswordStrengthMeter password={password} />
           </div>
 
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-primary mb-2">
-              Confirm New Password
+              Confirm password
             </label>
-            <input
+            <PasswordInput
               id="confirmPassword"
-              type="password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={setConfirmPassword}
               required
-              className="w-full px-4 py-2 bg-bg-dark border border-text-muted/30 rounded-lg text-text-primary focus:outline-none focus:border-aws-orange transition-colors"
-              placeholder="••••••••"
               autoComplete="new-password"
             />
           </div>
@@ -108,13 +114,16 @@ export function ResetPassword() {
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
-            disabled={loading}
-            className="w-full bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="primary"
+            fullWidth
+            loading={loading}
+            loadingText="Updating..."
+            disabled={!isPasswordStrongEnough(password) || password !== confirmPassword}
           >
-            {loading ? 'Updating...' : 'Update Password'}
-          </button>
+            Reset password
+          </Button>
         </form>
       </div>
       </div>

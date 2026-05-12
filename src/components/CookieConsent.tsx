@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Cookie, X } from 'lucide-react'
+import { Button } from './Button'
 
 const CONSENT_KEY = 'cloudcertprep_cookie_consent'
 
@@ -82,12 +83,9 @@ export function CookieConsent() {
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
-          <button
-            onClick={handleAccept}
-            className="flex-1 bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold py-3 rounded-lg transition-colors"
-          >
+          <Button onClick={handleAccept} variant="primary" className="flex-1">
             Accept
-          </button>
+          </Button>
           <button
             onClick={handleReject}
             className="flex-1 bg-bg-dark hover:bg-bg-card-hover text-text-primary font-medium py-3 rounded-lg transition-colors"

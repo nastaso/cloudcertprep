@@ -30,7 +30,7 @@ const CERT_LOADERS: Record<string, Record<number, DomainLoader>> = {
 
 /**
  * Load questions for a single domain of a specific certification.
- * Each domain is a separate chunk — only the requested domain is downloaded.
+ * Each domain is a separate chunk, only the requested domain is downloaded.
  * Results are cached in memory to avoid re-mapping domainId on repeat calls.
  */
 export async function loadDomainQuestions(certCode: string, domainId: number): Promise<Question[]> {

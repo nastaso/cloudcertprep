@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+# Auth and transient pages also have <meta name="robots" content="noindex">
+# but listing them here saves crawl budget.
+Disallow: /login
+Disallow: /reset-password
 
 Sitemap: https://www.cloudcertprep.io/sitemap.xml

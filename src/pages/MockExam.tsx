@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Cloud, Check, Flag, AlertCircle } from 'lucide-react'
+import { Cloud, Check, Flag, AlertCircle, ArrowRight } from 'lucide-react'
+import { Button } from '../components/Button'
 import { useTimer } from '../hooks/useTimer'
 import { useAuth } from '../hooks/useAuth'
-import { usePageTitle } from '../hooks/usePageTitle'
+import { useSEO } from '../hooks/useSEO'
+import { ROUTE_SEO } from '../lib/seo-data'
 import { useCert } from '../hooks/useCert'
 import { Header } from '../components/Header'
 import { AnswerButton } from '../components/AnswerButton'
@@ -15,7 +17,6 @@ import { selectExamQuestions, calculateScaledScore, isPassed, getDomainScore, fo
 import { supabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { updateDomainProgress } from '../lib/supabaseUtils'
-import { DOMAIN_COLOR } from '../types'
 import type { Question, OptionKey } from '../types'
 import { loadAllQuestions } from '../data/questions'
 import { shuffleAndMapQuestions, toOriginalAnswer, toggleMultiAnswer, type OptionKeyMap } from '../lib/utils'
@@ -94,10 +95,8 @@ export function MockExam() {
     correctCount: number
     totalQuestions: number
     timeTaken: number
-    domain1Score: number
-    domain2Score: number
-    domain3Score: number
-    domain4Score: number
+    /** Per-domain scores keyed by stringified domain ID (matches the JSONB shape). */
+    domainScores: Record<string, number>
     questionResults: Array<{
       questionId: string
       domainId: number
@@ -109,6 +108,7 @@ export function MockExam() {
   } | null>(null)
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [startTime, setStartTime] = useState<number>(0)
   const [reviewFilter, setReviewFilter] = useState<'all' | 'incorrect' | 'flagged'>('all')
   const [reviewDomainFilter, setReviewDomainFilter] = useState<number | null>(null)
@@ -120,13 +120,20 @@ export function MockExam() {
     onComplete: handleTimeUp,
   })
 
-  // Page title
+  // Title varies by screen. Only the start screen is canonical-eligible;
+  // exam-in-progress and results are transient and shouldn't be indexed
+  // separately from the entry point.
+  const isStartScreen = screen === 'start'
   const pageTitle = screen === 'exam'
-    ? `Question ${currentIndex + 1} of ${cert.examQuestionCount} | CloudCertPrep Practice Exam`
-    : screen === 'results' ? 'Exam Results | CloudCertPrep'
-    : screen === 'review' ? 'Review Exam | CloudCertPrep'
-    : `${cert.shortName} Practice Exam | CloudCertPrep`
-  usePageTitle(pageTitle)
+    ? `Question ${currentIndex + 1} of ${cert.examQuestionCount} · CloudCertPrep`
+    : screen === 'results' ? 'Exam results · CloudCertPrep'
+    : screen === 'review' ? 'Review exam · CloudCertPrep'
+    : `${cert.shortName} practice exam · CloudCertPrep`
+  useSEO({
+    title: pageTitle,
+    description: ROUTE_SEO['/practice-exam'].description,
+    canonical: isStartScreen ? '/practice-exam' : null,
+  })
 
   // Track exam abandonment - fires when user leaves during active exam
   useEffect(() => {
@@ -155,6 +162,7 @@ export function MockExam() {
 
   async function startExam() {
     setLoading(true)
+    setLoadError(null)
     try {
       const allQuestions = await loadAllQuestions(cert.code)
       const selectedQuestions = selectExamQuestions(allQuestions, cert)
@@ -169,6 +177,10 @@ export function MockExam() {
       document.body.dataset.examActive = 'true'
       trackEvent('exam_started')
       window.scrollTo(0, 0)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to load questions'
+      setLoadError(`Could not start the exam. ${msg}. Please check your connection and try again.`)
+      logError('MockExam.startExam', err)
     } finally {
       setLoading(false)
     }
@@ -243,10 +255,11 @@ export function MockExam() {
     const passed = isPassed(scaledScore, cert.passingScore)
     const percentScore = (correctCount / questions.length) * 100
 
-    const domain1Score = getDomainScore(results, 1)
-    const domain2Score = getDomainScore(results, 2)
-    const domain3Score = getDomainScore(results, 3)
-    const domain4Score = getDomainScore(results, 4)
+    // Build per-domain scores keyed by string domain ID. Works for any number of domains.
+    const domainScores: Record<string, number> = {}
+    for (const domain of cert.domains) {
+      domainScores[String(domain.id)] = getDomainScore(results, domain.id)
+    }
 
     try {
       // Only save to database if user is logged in AND exam took at least 60 seconds
@@ -262,10 +275,7 @@ export function MockExam() {
           time_taken_seconds: timeTaken,
           total_questions: questions.length,
           correct_answers: correctCount,
-          domain_1_score: domain1Score,
-          domain_2_score: domain2Score,
-          domain_3_score: domain3Score,
-          domain_4_score: domain4Score,
+          domain_scores: domainScores,
         })
         .select()
         .single()
@@ -314,10 +324,7 @@ export function MockExam() {
       correctCount,
       totalQuestions: questions.length,
       timeTaken,
-      domain1Score,
-      domain2Score,
-      domain3Score,
-      domain4Score,
+      domainScores,
       questionResults: results,
     })
 
@@ -339,8 +346,8 @@ export function MockExam() {
         <Header showNav={true} />
         <div className="p-4 md:p-8">
           <div className="max-w-2xl mx-auto bg-bg-card rounded-lg p-4 md:p-6 lg:p-8 shadow-card">
-          <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-3 md:mb-4">{cert.shortName} Practice Exam</h1>
-          <p className="text-sm md:text-base text-text-muted mb-6 md:mb-8">{cert.examQuestionCount} questions — {Math.round(cert.examTimeSeconds / 60)} minutes — No answer feedback during exam</p>
+          <h1 className="text-2xl md:text-3xl font-semibold text-text-primary mb-3 md:mb-4">{cert.shortName} Practice Exam</h1>
+          <p className="text-sm md:text-base text-text-muted mb-6 md:mb-8">{cert.examQuestionCount} questions, {Math.round(cert.examTimeSeconds / 60)} minutes. No answer feedback during exam.</p>
           
           <div className="bg-bg-dark rounded-lg p-4 md:p-6 mb-6 md:mb-8">
             <h2 className="text-lg md:text-xl font-semibold text-text-primary mb-3 md:mb-4">Domain Breakdown</h2>
@@ -348,7 +355,7 @@ export function MockExam() {
               {(() => {
                 const targets = getExamDomainTargets(cert)
                 return cert.domains.map(d => (
-                  <p key={d.id}>• {targets[d.id]} {d.name} ({Math.round(d.examProportion * 100)}%)</p>
+                  <p key={d.id}>- {targets[d.id]} {d.name} ({Math.round(d.examProportion * 100)}%)</p>
                 ))
               })()}
             </div>
@@ -361,54 +368,58 @@ export function MockExam() {
             </div>
           </div>
 
-          <button
-            onClick={startExam}
-            disabled={loading}
-            className="w-full bg-aws-orange hover:bg-aws-orange/90 text-white font-bold py-3 md:py-4 rounded-lg transition-colors text-base md:text-lg disabled:opacity-75 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <LoadingSpinner size="sm" />
-                <span>Loading questions...</span>
-              </span>
-            ) : (
-              'Start Exam'
-            )}
-          </button>
+          {loadError && (
+            <div className="bg-danger/10 border border-danger rounded-lg p-3 md:p-4 mb-4 md:mb-6 flex items-start gap-3">
+              <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-danger flex-shrink-0 mt-0.5" />
+              <p className="text-sm md:text-base text-danger">{loadError}</p>
+            </div>
+          )}
 
-          <button
-            onClick={() => navigate('/')}
-            disabled={loading}
-            className="w-full mt-3 md:mt-4 bg-bg-dark hover:bg-bg-card-hover text-text-primary font-medium py-2.5 md:py-3 rounded-lg transition-colors text-sm md:text-base disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            ← Back to Home
-          </button>
+          <div className="flex flex-col md:flex-row gap-3 md:gap-4">
+            <Button
+              onClick={() => navigate('/')}
+              disabled={loading}
+              variant="secondary"
+              size="lg"
+              className="flex-1"
+            >
+              Back to home
+            </Button>
+            <Button
+              onClick={startExam}
+              variant="primary"
+              size="lg"
+              className="flex-1"
+              loading={loading}
+              loadingText="Loading questions..."
+            >
+              Start exam
+            </Button>
+          </div>
         </div>
       </div>
     </div>
     )
   }
 
-  if (screen === 'results' && results) {
-    return (
-      <div className="bg-bg-dark flex flex-col">
-        <Header showNav={true} />
-        <div className="p-4 md:p-8">
-          <div className="max-w-4xl mx-auto">
+  if (screen === 'results') return (
+    <div className="min-h-screen bg-bg-dark flex flex-col">
+      <Header showNav={true} />
+      <div className="flex-1 flex items-center justify-center px-4 py-8">
+        <div className="max-w-2xl w-full space-y-6">
           <PassFailBanner
-            passed={results.passed}
-            scaledScore={results.scaledScore}
-            percent={results.percentScore}
+            passed={results!.passed}
+            scaledScore={results!.scaledScore}
+            percent={results!.percentScore}
           />
 
           {submitError && (
-            <div className="mt-4 bg-warning/10 border border-warning rounded-lg p-4 flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-warning flex-shrink-0" />
-              <p className="text-sm text-text-primary">{submitError}</p>
+            <div className="bg-warning/10 border border-warning text-warning px-4 py-3 rounded-lg text-sm">
+              {submitError}
             </div>
           )}
 
-          <div className="mt-8 bg-bg-card rounded-lg p-6 shadow-card">
+          <div className="bg-bg-card p-6 md:p-8 rounded-lg shadow-card space-y-6">
             <div className="bg-aws-orange/10 border border-aws-orange/30 rounded-lg p-4 mb-6">
               <p className="text-sm text-text-muted">
                 <span className="font-semibold text-aws-orange">AWS Scaled Scoring:</span> Scores range from 100-1000, where 100 is the minimum (0% correct) and 1000 is the maximum (100% correct). You need {cert.passingScore}+ to pass.
@@ -422,16 +433,15 @@ export function MockExam() {
               </div>
               <div>
                 <p className="text-text-muted text-sm mb-1">Time Taken</p>
-                <p className="text-2xl font-bold text-text-primary">{formatDuration(results.timeTaken)}</p>
+                <p className="text-2xl font-bold text-text-primary">{formatDuration(results!.timeTaken)}</p>
               </div>
             </div>
 
             <h3 className="text-xl font-semibold text-text-primary mb-4">Domain Breakdown</h3>
             <div className="space-y-4">
               {cert.domains.map(domain => {
-                const domainScores = [results.domain1Score, results.domain2Score, results.domain3Score, results.domain4Score]
-                const score = domainScores[domain.id - 1]
-                const domainQuestions = results.questionResults.filter(r => r.domainId === domain.id)
+                const score = results!.domainScores[String(domain.id)] ?? 0
+                const domainQuestions = results!.questionResults.filter(r => r.domainId === domain.id)
                 const correct = domainQuestions.filter(r => r.isCorrect).length
                 
                 return (
@@ -441,7 +451,7 @@ export function MockExam() {
                       <p className="text-text-muted text-sm">{correct}/{domainQuestions.length} correct</p>
                     </div>
                     <div className="text-right">
-                      <span className="text-2xl font-bold" style={{ color: DOMAIN_COLOR }}>
+                      <span className="text-2xl font-bold text-aws-orange">
                         {score}%
                       </span>
                     </div>
@@ -452,7 +462,7 @@ export function MockExam() {
           </div>
 
           <div className="mt-6 space-y-3">
-            <button
+            <Button
               onClick={() => {
                 setReviewFilter('all')
                 setReviewDomainFilter(null)
@@ -460,33 +470,31 @@ export function MockExam() {
                 window.scrollTo(0, 0)
                 setScreen('review')
               }}
-              className="w-full bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold py-3 rounded-lg transition-colors"
+              variant="primary"
+              fullWidth
             >
-              Review Exam Questions
-            </button>
+              Review questions
+            </Button>
             <div className="flex gap-4">
-              <button
-                onClick={() => navigate('/')}
-                className="flex-1 bg-bg-card hover:bg-bg-card-hover text-text-primary font-semibold py-3 rounded-lg transition-colors"
-              >
-                ← Back to Home
-              </button>
-              <button
+              <Button onClick={() => navigate('/')} variant="secondary" className="flex-1">
+                Back to home
+              </Button>
+              <Button
                 onClick={() => {
                   setScreen('start')
                   setResults(null)
                 }}
-                className="flex-1 bg-bg-card hover:bg-bg-card-hover text-text-primary font-semibold py-3 rounded-lg transition-colors"
+                variant="secondary"
+                className="flex-1"
               >
-                Retake Exam
-              </button>
+                Retake exam
+              </Button>
             </div>
           </div>
         </div>
       </div>
     </div>
     )
-  }
 
   if (screen === 'exam' && currentQuestion) {
     return (
@@ -519,7 +527,7 @@ export function MockExam() {
                   onClick={() => setShowEndModal(true)}
                   className="px-4 py-2 md:px-6 md:py-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold rounded-lg transition-colors text-sm md:text-base"
                 >
-                  End Exam
+                  End exam
                 </button>
               </div>
             </div>
@@ -531,13 +539,16 @@ export function MockExam() {
             {/* Main Content */}
             <div className="flex-1">
             {/* Mobile Question Navigation Button */}
-            <button
+            <Button
               onClick={() => setShowQuestionNav(true)}
-              className="lg:hidden w-full mb-4 px-4 py-2 bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold rounded-lg transition-colors flex items-center justify-between"
+              variant="primary"
+              size="sm"
+              fullWidth
+              className="lg:hidden mb-4 !justify-between"
             >
               <span>Question {currentIndex + 1} of {questions.length}</span>
-              <span className="text-sm">View All Questions →</span>
-            </button>
+              <span className="flex items-center gap-1 text-sm">View all questions <ArrowRight className="w-4 h-4" /></span>
+            </Button>
 
             <div className="bg-bg-card rounded-lg p-2.5 md:p-3 lg:p-4 mb-3 shadow-card">
               <div className="hidden lg:flex items-center justify-end mb-2">
@@ -596,32 +607,27 @@ export function MockExam() {
                 }`}
               >
                 <Flag className={`w-4 h-4 md:w-5 md:h-5 ${currentState?.flagged ? 'fill-warning' : ''}`} />
-                <span className="font-medium text-xs md:text-sm">{currentState?.flagged ? 'Flagged for Review' : 'Flag for Review'}</span>
+                <span className="font-medium text-xs md:text-sm">{currentState?.flagged ? 'Flagged for review' : 'Flag for review'}</span>
               </button>
             </div>
 
             <div className="flex gap-4">
-              <button
+              <Button
                 onClick={previousQuestion}
                 disabled={currentIndex === 0}
-                className="flex-1 px-6 py-3 bg-bg-card hover:bg-bg-card-hover text-text-primary font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="secondary"
+                className="flex-1"
               >
-                ← Previous
-              </button>
+                Previous
+              </Button>
               {currentIndex === questions.length - 1 ? (
-                <button
-                  onClick={() => setShowEndModal(true)}
-                  className="flex-1 px-6 py-3 bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold rounded-lg transition-colors"
-                >
-                  End Exam
-                </button>
+                <Button onClick={() => setShowEndModal(true)} variant="primary" className="flex-1">
+                  End exam
+                </Button>
               ) : (
-                <button
-                  onClick={nextQuestion}
-                  className="flex-1 px-6 py-3 bg-bg-card hover:bg-bg-card-hover text-text-primary font-semibold rounded-lg transition-colors"
-                >
-                  Next →
-                </button>
+                <Button onClick={nextQuestion} variant="secondary" className="flex-1">
+                  Next
+                </Button>
               )}
             </div>
             </div>
@@ -659,7 +665,7 @@ export function MockExam() {
         </Modal>
 
         {/* End Exam Modal */}
-        <Modal isOpen={showEndModal} title="End Exam" onClose={() => setShowEndModal(false)}>
+        <Modal isOpen={showEndModal} title="End exam" onClose={() => setShowEndModal(false)}>
           <div className="space-y-4">
             <p className="text-text-primary">You have answered <span className="font-bold">{answeredCount}</span> of {questions.length} questions.</p>
             <p className="text-text-primary"><span className="font-bold">{flaggedCount}</span> questions are flagged for review.</p>
@@ -670,18 +676,12 @@ export function MockExam() {
               </div>
             ) : (
               <div className="flex gap-4 mt-6">
-                <button
-                  onClick={() => setShowEndModal(false)}
-                  className="flex-1 px-6 py-3 bg-bg-dark hover:bg-bg-card-hover text-text-primary font-semibold rounded-lg transition-colors"
-                >
-                  Go Back
-                </button>
-                <button
-                  onClick={handleSubmitExam}
-                  className="flex-1 px-6 py-3 bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold rounded-lg transition-colors"
-                >
-                  Submit Exam
-                </button>
+                <Button onClick={() => setShowEndModal(false)} variant="secondary" className="flex-1">
+                  Go back
+                </Button>
+                <Button onClick={handleSubmitExam} variant="primary" className="flex-1">
+                  Submit exam
+                </Button>
               </div>
             )}
           </div>
@@ -711,15 +711,15 @@ export function MockExam() {
             <div className="max-w-4xl mx-auto">
               <div className="bg-bg-card rounded-lg p-8 text-center shadow-card">
                 <p className="text-text-muted text-lg mb-6">No questions match the selected filters.</p>
-                <button
+                <Button
                   onClick={() => {
                     setReviewFilter('all')
                     setReviewDomainFilter(null)
                   }}
-                  className="px-6 py-3 bg-aws-orange hover:bg-aws-orange/90 text-white font-semibold rounded-lg transition-colors"
+                  variant="primary"
                 >
-                  Clear Filters
-                </button>
+                  Clear filters
+                </Button>
               </div>
             </div>
           </div>
@@ -747,7 +747,7 @@ export function MockExam() {
                         setReviewFilter('all')
                         setReviewQuestionIndex(0)
                       }}
-                      className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
                         reviewFilter === 'all'
                           ? 'bg-aws-orange text-white'
                           : 'bg-bg-dark text-text-muted hover:text-text-primary'
@@ -763,7 +763,7 @@ export function MockExam() {
                         }
                       }}
                       disabled={incorrectCount === 0}
-                      className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
                         reviewFilter === 'incorrect'
                           ? 'bg-aws-orange text-white'
                           : incorrectCount === 0
@@ -781,7 +781,7 @@ export function MockExam() {
                         }
                       }}
                       disabled={flaggedReviewCount === 0}
-                      className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
                         reviewFilter === 'flagged'
                           ? 'bg-aws-orange text-white'
                           : flaggedReviewCount === 0
@@ -803,7 +803,7 @@ export function MockExam() {
                         setReviewDomainFilter(null)
                         setReviewQuestionIndex(0)
                       }}
-                      className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
                         reviewDomainFilter === null
                           ? 'bg-aws-orange text-white'
                           : 'bg-bg-dark text-text-muted hover:text-text-primary'
@@ -818,12 +818,11 @@ export function MockExam() {
                           setReviewDomainFilter(reviewDomainFilter === domain.id ? null : domain.id)
                           setReviewQuestionIndex(0)
                         }}
-                        className={`px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
+                        className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors ${
                           reviewDomainFilter === domain.id
-                            ? 'text-white'
+                            ? 'bg-aws-orange text-white'
                             : 'bg-bg-dark text-text-muted hover:text-text-primary'
                         }`}
-                        style={reviewDomainFilter === domain.id ? { backgroundColor: DOMAIN_COLOR } : {}}
                       >
                         {domain.name}
                       </button>
@@ -900,12 +899,9 @@ export function MockExam() {
               />
             </div>
 
-            <button
-              onClick={() => setScreen('results')}
-              className="w-full px-6 py-3 bg-bg-dark hover:bg-bg-card-hover text-text-primary font-semibold rounded-lg transition-colors"
-            >
-              ← Back to Results
-            </button>
+            <Button onClick={() => setScreen('results')} variant="secondary" fullWidth>
+              Back to results
+            </Button>
           </div>
         </div>
       </div>

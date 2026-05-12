@@ -1,156 +1,160 @@
 # CloudCertPrep
 
-Free AWS certification practice exams — [cloudcertprep.io](https://www.cloudcertprep.io)
+Free, open-source AWS certification practice exams.
 
-1,050 practice questions · Timed mock exams · Spaced repetition · Progress tracking
+No ads, no paywalls, no premium tiers. MIT licensed.
 
----
+[![CI](https://github.com/nastaso/cloudcertprep/actions/workflows/ci.yml/badge.svg)](https://github.com/nastaso/cloudcertprep/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Live demo](https://img.shields.io/badge/demo-cloudcertprep.io-FF9900)](https://www.cloudcertprep.io)
 
-## System Design
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                          Netlify CDN                                │
-│                    (static hosting, global edge)                    │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│   index.html ──► React SPA (code-split per route)                  │
-│                                                                     │
-│   ┌──────────┐  ┌──────────────┐  ┌───────────────┐               │
-│   │ vendor-  │  │  vendor-     │  │   App routes   │               │
-│   │ react    │  │  supabase    │  │  (lazy-loaded) │               │
-│   │ 16 KB gz │  │  45 KB gz    │  │  1-6 KB each   │               │
-│   └──────────┘  └──────────────┘  └───────────────┘               │
-│                                                                     │
-│   Question Data (static JSON → JS chunks, per domain)              │
-│   ┌─────────┐ ┌─────────┐ ┌──────────┐ ┌─────────┐               │
-│   │ D1      │ │ D2      │ │ D3       │ │ D4      │               │
-│   │ 53 KB gz│ │ 74 KB gz│ │ 107 KB gz│ │ 68 KB gz│               │
-│   │ 187 Qs  │ │ 247 Qs  │ │ 384 Qs   │ │ 232 Qs  │               │
-│   └─────────┘ └─────────┘ └──────────┘ └─────────┘               │
-│                                                                     │
-└─────────────────────────────────┬───────────────────────────────────┘
-                                  │ HTTPS (auth + data persistence)
-                                  ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                         Supabase (BaaS)                             │
-│                                                                     │
-│   ┌──────────────┐  ┌────────────────────────────────────────┐     │
-│   │  Auth         │  │  PostgreSQL                            │     │
-│   │  Email/pass   │  │                                        │     │
-│   │  JWT tokens   │  │  exam_attempts ◄── attempt_questions   │     │
-│   │  RLS policies │  │  domain_progress   platform_stats      │     │
-│   └──────────────┘  │  question_mastery (view)                │     │
-│                      │                                        │     │
-│   ┌──────────────┐  │  Triggers: auto-increment stats         │     │
-│   │  RPC          │  │  RLS: auth.uid() = user_id             │     │
-│   │  get_public_  │  │  Indexes: user_id, attempt_id,         │     │
-│   │  exam_stats() │  │           cert_code, attempted_at      │     │
-│   └──────────────┘  └────────────────────────────────────────┘     │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-**Data flow:** Questions are static assets served from CDN (zero DB cost). Only authentication, progress tracking, and exam history hit Supabase — keeping free tier usage minimal.
+> Most paid AWS exam-prep platforms ship a fixed handful of practice exams pulled from a small question bank. CloudCertPrep randomises every exam from a much larger bank, so the practice variations are effectively unlimited.
 
 ---
 
 ## Features
 
-| Feature | Details |
-|---------|---------|
-| **Mock Exams** | Timed simulation matching real AWS format (65 Qs, 90 min, 700/1000 pass) |
-| **Domain Practice** | Per-domain sessions with instant answer feedback |
-| **Spaced Repetition** | Weighted question selection based on past performance |
-| **Answer Randomization** | Options shuffled per question; correct mapping preserved for scoring |
-| **Progress Tracking** | Domain mastery %, exam history with question-by-question review |
-| **Community Stats** | Public page with pass rates, avg scores, domain difficulty rankings |
-| **Multi-Cert Architecture** | CLF-C02 active, SAA-C03 ready to plug in |
-| **Guest + Auth Modes** | Full functionality without login; sign in to persist data |
+- **Timed mock exams** that match the real AWS format (questions, duration, and passing score read from each cert's config).
+- **Domain practice** with instant per-question feedback and explanations.
+- **Spaced repetition** weighting prioritises questions you've previously got wrong or haven't seen.
+- **Answer randomisation** shuffles option order per attempt (correct-answer mapping preserved server-side).
+- **Progress tracking** for domain mastery, full exam history, and per-question review.
+- **Community stats page** with pass rates, average scores, and domain difficulty rankings.
+- **Multi-certification architecture** that supports any number of domains per cert with no code or schema changes.
+- **Guest mode** for the full exam without an account; sign in only when you want progress saved.
+- **GitHub OAuth** for one-click sign-in.
+
+Current certifications:
+
+| Cert | Status | Questions |
+|---|---|---|
+| AWS Cloud Practitioner (CLF-C02) | Active | ~1,050 |
+| AWS Solutions Architect Associate (SAA-C03) | Coming soon | Placeholder |
 
 ---
 
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 19, TypeScript, Vite 7 |
-| Styling | Tailwind CSS 3.4 |
-| Auth / DB | Supabase (PostgreSQL, RLS, JWT) |
-| Hosting | Netlify (CDN, auto-deploy from `main`) |
-| Analytics | GA4 (deferred, consent-gated) |
-
----
-
-## Performance
-
-| Metric | Value |
-|--------|-------|
-| Initial load (gzipped) | **130 KB** |
-| Time to interactive | < 1.5s on 3G |
-| Route code splitting | Yes (React.lazy) |
-| Question data | Chunked by domain, loaded on demand |
-| Vendor splitting | React + Supabase in separate cacheable chunks |
-
----
-
-## Project Structure
-
-```
-src/
-├── pages/          # Route components (MockExam, DomainPractice, History, etc.)
-├── components/     # Shared UI (AnswerButton, QuestionReviewCard, Modal, etc.)
-├── hooks/          # useAuth, useCert, useTheme, useTimer, useSpacedRepetition
-├── lib/            # scoring, utils, analytics, supabase client, constants
-├── data/           # Certification config + question JSON per cert/domain
-└── types/          # TypeScript interfaces (Question, ExamAttempt, etc.)
-```
-
----
-
-## Adding a Certification
-
-1. Add config in `src/data/certifications.ts`
-2. Create `src/data/<cert-code>/domain1.json` through `domain4.json`
-3. Register loaders in `src/data/questions.ts`
-
-Question format:
-```json
-{
-  "id": "q001",
-  "question": "Which AWS service provides managed relational databases?",
-  "options": { "A": "Amazon S3", "B": "Amazon RDS", "C": "AWS Lambda", "D": "Amazon SQS" },
-  "answer": "B",
-  "explanation": "Amazon RDS is a managed relational database service...",
-  "isMultiAnswer": false
-}
-```
-
-`domainId` is injected automatically at load time based on the file.
-
----
-
-## Development
+## Quick Start
 
 ```bash
+git clone https://github.com/nastaso/cloudcertprep.git
+cd cloudcertprep
 npm install
+cp .env.example .env   # fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 npm run dev
 ```
 
-Requires `.env`:
+You'll need your own [Supabase](https://supabase.com) project to test authenticated flows. The anon key and project URL are safe to expose (security is enforced server-side via Row Level Security). The service role key is private and never appears in client code.
+
+Open <http://localhost:5173>. Sign-up flows require a working Supabase backend; everything else (guest exams, domain practice) works offline against the bundled question JSON.
+
+---
+
+## Architecture
+
 ```
-VITE_SUPABASE_URL=<project_url>
-VITE_SUPABASE_ANON_KEY=<anon_key>
++-------------------------------------------------------------+
+|                       Netlify CDN                           |
+|                 (static hosting, global edge)               |
++-------------------------------------------------------------+
+|                                                             |
+|  index.html  ->  React SPA (code-split per route)           |
+|                                                             |
+|  vendor-react  +  vendor-supabase  +  per-route chunks      |
+|                                                             |
+|  Question data: static JSON, code-split per cert/domain.    |
+|  Loaded on demand (only the chunks you need).               |
+|                                                             |
++-----------------------------+-------------------------------+
+                              | HTTPS (auth + persistence)
+                              v
++-------------------------------------------------------------+
+|             Supabase (PostgreSQL + Auth, EU/Ireland)        |
+|                                                             |
+|  Auth:  email/password, GitHub OAuth, JWT                   |
+|                                                             |
+|  Tables                                                     |
+|    exam_attempts        domain scores stored as JSONB       |
+|                         (supports any number of domains)    |
+|    attempt_questions    per-question results, flagged state |
+|    domain_progress      per-domain mastery percentages      |
+|    platform_stats       aggregate counters                  |
+|    question_mastery     view, SECURITY INVOKER, RLS         |
+|                                                             |
+|  RPC: get_public_exam_stats() returns aggregates only       |
+|                                                             |
+|  Security: RLS on every user-data table                     |
+|            policy: auth.uid() = user_id                     |
++-------------------------------------------------------------+
 ```
 
-`VITE_GA_MEASUREMENT_ID` is set in Netlify environment variables for production. Not needed locally (analytics gracefully no-op if undefined).
+**Data flow:** the question bank is static, served from the CDN with zero database cost regardless of traffic. Guest sessions never touch Supabase. Authenticated sessions hit Supabase to sign in, persist exam attempts, and read back history, domain progress, and community stats. This keeps the free tier comfortable even with thousands of concurrent guest exams.
+
+---
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 19, TypeScript, Vite 7 |
+| Styling | Tailwind CSS 3.4 (CSS variable tokens for theming) |
+| Auth and DB | Supabase (PostgreSQL with Row Level Security, JWT auth) |
+| Hosting | Netlify (auto-deploy from `main`) |
+| Email | Brevo SMTP via Supabase Auth |
+| Analytics | Umami (cookieless, always on) + GA4 (consent-gated) |
+| CI | GitHub Actions: lint, question-bank validation, build |
+
+The full bundle is small and code-split: the initial route ships around 130 KB gzipped, with per-route and per-cert-domain chunks loaded on demand. See `npm run build` output for exact sizes against your local build.
+
+---
+
+## Project structure
+
+```
+src/
+  pages/          Route components (MockExam, DomainPractice, History, Stats, etc.)
+  components/     Shared UI (AnswerButton, QuestionReviewCard, Modal, ErrorBoundary, ...)
+  hooks/          useAuth, useCert, useTheme, useTimer, useSEO, useSpacedRepetition
+  lib/            scoring, formatting, analytics, supabase client, constants, logger
+  data/           Certification config + question JSON per cert/domain
+  types/          TypeScript interfaces (Question, ExamAttempt, OptionKey, DomainId)
+
+templates/
+  email/          HTML templates for Supabase Auth (confirm signup, reset, magic link, email change)
+
+scripts/
+  validate-questions.mjs   Question-bank validator (`npm run validate`)
+  generate-sitemap.mjs     Sitemap generator (runs in `prebuild`)
+
+.github/
+  workflows/ci.yml          GitHub Actions CI
+  ISSUE_TEMPLATE/           Bug report, question error, new cert templates
+  PULL_REQUEST_TEMPLATE.md  PR checklist
+```
 
 ---
 
 ## Contributing
 
-Open an issue or PR on [GitHub](https://github.com/snts42/cloudcertprep). Question contributions welcome — follow the JSON format above.
+Question fixes, new certifications, accessibility improvements, and bug fixes are all welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full guide, including the question JSON schema, the design tokens, and the walkthrough for adding a new cert.
+
+Quick links:
+
+- [Report a question error](https://github.com/nastaso/cloudcertprep/issues/new?template=report-question-error.yml)
+- [Propose a new certification](https://github.com/nastaso/cloudcertprep/issues/new?template=add-certification.yml)
+- [File a bug](https://github.com/nastaso/cloudcertprep/issues/new?template=bug-report.yml)
+
+Run all checks locally before opening a PR (the same three CI runs on every pull request):
+
+```bash
+npm run lint
+npm run validate
+npm run build
+```
+
+---
 
 ## License
 
-MIT
+[MIT](./LICENSE). Built by [Alex Santonastaso](https://santonastaso.me). If this saved you the cost of a paid practice platform, you can [buy me a coffee](https://ko-fi.com/alexsantonastaso).
+
+> **Disclaimer.** Not affiliated with, endorsed by, or associated with Amazon Web Services, Inc. AWS, Amazon Web Services, and all related marks are trademarks of Amazon.com, Inc. or its affiliates.

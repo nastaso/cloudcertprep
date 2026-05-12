@@ -1,17 +1,18 @@
 import { Link } from 'react-router-dom'
 import { Header } from '../components/Header'
-import { usePageTitle } from '../hooks/usePageTitle'
+import { useSEO } from '../hooks/useSEO'
+import { ROUTE_SEO } from '../lib/seo-data'
 
 export function Terms() {
-  usePageTitle('Terms of Service | CloudCertPrep')
+  useSEO(ROUTE_SEO['/terms'])
 
   return (
     <div className="bg-bg-dark flex flex-col">
       <Header showNav={true} />
       <div className="p-4 md:p-8">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-2xl md:text-3xl font-bold text-text-primary mb-2">Terms of Service</h1>
-          <p className="text-text-muted text-sm mb-8">Last updated: March 2026</p>
+          <h1 className="text-2xl md:text-3xl font-semibold text-text-primary mb-2">Terms of Service</h1>
+          <p className="text-text-muted text-sm mb-8">Last updated: May 2026</p>
 
           <div className="space-y-8">
             <section>

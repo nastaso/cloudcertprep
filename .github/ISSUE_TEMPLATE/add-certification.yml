@@ -1,0 +1,46 @@
+name: Add a certification
+description: Propose adding a new AWS (or other) certification to CloudCertPrep.
+title: "Add certification: <code>"
+labels: ["new-cert", "enhancement"]
+body:
+  - type: input
+    id: cert_code
+    attributes:
+      label: Certification code
+      description: AWS code, e.g. SAA-C03, SAP-C02, DOP-C02. For non-AWS, use any short identifier.
+      placeholder: SAA-C03
+    validations:
+      required: true
+  - type: input
+    id: cert_name
+    attributes:
+      label: Full certification name
+      placeholder: AWS Certified Solutions Architect - Associate
+    validations:
+      required: true
+  - type: textarea
+    id: domains
+    attributes:
+      label: Domains and proportions
+      description: List each exam domain with its name and the percentage of questions on the real exam. Sum should equal 100%.
+      placeholder: |
+        1. Design Secure Architectures - 30%
+        2. Design Resilient Architectures - 26%
+        3. Design High-Performing Architectures - 24%
+        4. Design Cost-Optimized Architectures - 20%
+    validations:
+      required: true
+  - type: textarea
+    id: questions
+    attributes:
+      label: Questions you can contribute
+      description: Roughly how many questions per domain are you willing to author? See CONTRIBUTING.md for the JSON schema.
+      placeholder: |
+        Domain 1: 50 questions ready
+        Domain 2: 30 questions in progress
+        Domain 3 and 4: would need help
+  - type: input
+    id: exam_format
+    attributes:
+      label: Exam format (questions, time, pass score)
+      placeholder: 65 questions, 130 minutes, 720 to pass
