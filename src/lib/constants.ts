@@ -12,7 +12,18 @@ export const KOFI_URL = 'https://ko-fi.com/alexsantonastaso'
 export const GITHUB_REPO_URL = 'https://github.com/nastaso/cloudcertprep'
 export const GITHUB_ISSUES_URL = 'https://github.com/nastaso/cloudcertprep/issues'
 
-/** Build a URL that pre-fills the GitHub issue title with a question ID. */
+/**
+ * Build a URL that opens the GitHub "Report a question error" issue form
+ * with the question ID and a sensible title pre-filled.
+ *
+ * Template lives at `.github/ISSUE_TEMPLATE/report-question-error.yml`.
+ * The URL parameter names must match the form field `id`s exactly.
+ */
 export function buildGitHubIssueUrl(questionId: string): string {
-  return `${GITHUB_ISSUES_URL}/new?title=${encodeURIComponent(`Question error: ${questionId}`)}`
+  const params = new URLSearchParams({
+    template: 'report-question-error.yml',
+    title: `Question error: ${questionId}`,
+    'question_id': questionId,
+  })
+  return `${GITHUB_ISSUES_URL}/new?${params.toString()}`
 }
