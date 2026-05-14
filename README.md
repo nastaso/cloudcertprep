@@ -1,3 +1,8 @@
+![GitHub stars](https://img.shields.io/github/stars/nastaso/cloudcertprep?style=social)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Last commit](https://img.shields.io/github/last-commit/nastaso/cloudcertprep)
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fcloudcertprep.io)
+
 # CloudCertPrep
 
 Free, open-source AWS certification practice exams.
