@@ -1,0 +1,26 @@
+---
+/**
+ * 404 Not Found — prerendered Astro markup. Noindexed.
+ * Satisfies: R1.2
+ */
+import BaseLayout from '../layouts/BaseLayout.astro'
+import Button from '../components/Button.astro'
+---
+
+<BaseLayout
+  title="Page Not Found · CloudCertPrep"
+  description="The page you are looking for does not exist."
+  canonical="https://www.cloudcertprep.io/404"
+  robots="noindex"
+>
+  <div class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+    <h1 class="text-5xl md:text-6xl font-bold text-brand mb-4">404</h1>
+    <p class="text-xl text-text-primary mb-2">Page not found</p>
+    <p class="text-text-muted mb-8 max-w-md">The page you're looking for doesn't exist or has been moved.</p>
+    <Button href="/">Back to home</Button>
+  </div>
+
+  <script is:inline>
+    (function(){if(window.trackEvent){window.trackEvent('page_not_found',{path:location.pathname})}else{window.addEventListener('load',function(){if(window.trackEvent){window.trackEvent('page_not_found',{path:location.pathname})}})}})();
+  </script>
+</BaseLayout>

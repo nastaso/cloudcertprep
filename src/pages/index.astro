@@ -1,0 +1,190 @@
+---
+/**
+ * Home page (/) — prerendered Astro markup.
+ *
+ * Recreates the MultiCertHome visual design as static HTML: hero with primary
+ * CTA, cert grid, About card, and generic FAQ. The locked citation content
+ * (H1, first paragraph) is carried in the visible body for SEO/citation
+ * continuity. Interactive chrome (Header, Footer, DonateButton, CookieConsent)
+ * is mounted as islands by BaseLayout.
+ *
+ * Satisfies: R1.2, R16.4, R16.6, R16.7, R16.8
+ */
+import BaseLayout from '../layouts/BaseLayout.astro'
+import CertCard from '../components/landing/CertCard.astro'
+import AboutCard from '../components/landing/AboutCard.astro'
+import HeroSection from '../components/landing/HeroSection.astro'
+import ValuePropRow from '../components/landing/ValuePropRow.astro'
+import PrimaryExamCTA from '../components/landing/PrimaryExamCTA.astro'
+import Faq from '../components/Faq.astro'
+import {
+  CERTIFICATIONS,
+  DEFAULT_CERT_ID,
+  getActiveTotalQuestions,
+  getCertTotalQuestions,
+  getSortedCerts,
+} from '../data/certifications'
+import { buildHomeFirstParagraph, buildHomeMetaDescription, HOME_H1 } from '../lib/citation-content'
+import { SITE_URL } from '../lib/seo-data'
+import { serializeJsonLd } from '../lib/jsonld'
+
+const totalQuestions = getActiveTotalQuestions()
+const clfCount = getCertTotalQuestions('clf-c02')
+const aifCount = getCertTotalQuestions('aif-c01')
+const defaultCert = CERTIFICATIONS[DEFAULT_CERT_ID]
+const activeCerts = getSortedCerts().filter(c => c.status === 'active')
+// Coming-soon certs render as greyed cards after the active ones so they are
+// discoverable (their "watch on GitHub" funnel needs an inbound link) and
+// signal an active roadmap — without entering the indexable signals (they stay
+// out of the ItemList JSON-LD below and out of the sitemap).
+const comingSoonCerts = getSortedCerts().filter(c => c.status === 'coming-soon')
+
+const title = 'Free AWS Certification Practice Exams · CloudCertPrep'
+const description = buildHomeMetaDescription(clfCount, aifCount)
+const canonical = 'https://www.cloudcertprep.io/'
+
+// Locked citation content (R16.4-R16.8). HOME_H1 renders as the single page
+// <h1>; the lede (buildHomeFirstParagraph) carries the locked phrases
+// ("MIT licensed", "publicly auditable on GitHub", "spaced repetition", the
+// question-count regexes) so the Build_Time_Citation_Guard passes regardless
+// of the hero's visual treatment.
+const homeFirstParagraph = buildHomeFirstParagraph(clfCount, aifCount)
+
+// Subtle, token-based radial glow behind the hero headline (a "gradient mesh"
+// treatment). No Tailwind utility exists for a
+// multi-stop radial mesh, so it is composed inline from the brand token at low
+// alpha — light+dark aware for free because --color-brand switches with the
+// theme. Purely decorative (aria-hidden) and pointer-transparent.
+const meshBackground = [
+  'radial-gradient(40rem 28rem at 50% -10%, rgb(var(--color-brand) / 0.10), transparent 70%)',
+  'radial-gradient(32rem 24rem at 12% 8%, rgb(var(--color-brand) / 0.06), transparent 70%)',
+  'radial-gradient(32rem 24rem at 88% 12%, rgb(var(--color-brand) / 0.05), transparent 70%)',
+].join(', ')
+
+// ItemList JSON-LD listing both active Cert_Landing URLs
+const itemListJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'AWS Certification Practice Exams',
+  numberOfItems: activeCerts.length,
+  itemListElement: activeCerts.map((cert, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: cert.name,
+    url: `${SITE_URL}/${cert.provider}/${cert.code}`,
+  })),
+})
+
+// SoftwareApplication JSON-LD (audit W3). Makes the "free web app" signal
+// machine-readable for Google's free-tool rich results and for LLMs deciding
+// which tools to recommend. Price "0" is factual; no aggregateRating is
+// emitted (we do not surface a fabricated satisfaction score — the community
+// pass rate on /stats is a different metric and lives in its Dataset JSON-LD).
+const softwareAppJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  '@id': `${SITE_URL}/#app`,
+  name: 'CloudCertPrep',
+  description: `Free, open-source AWS certification practice platform. ${totalQuestions.toLocaleString('en-US')}+ practice questions across ${activeCerts.length} active certifications, with timed mock exams, adaptive spaced repetition, and domain mastery analytics.`,
+  url: `${SITE_URL}/`,
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: 'Web',
+  isAccessibleForFree: true,
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  publisher: { '@id': `${SITE_URL}/#organization` },
+})
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} jsonLd={[itemListJsonLd, softwareAppJsonLd]}>
+  {/* Hero — "gradient mesh" treatment: a centered
+      column over a subtle token-based radial glow. HOME_H1 is the single
+      page <h1>; the lede carries the locked citation phrases verbatim. */}
+  <div class="relative overflow-hidden">
+    <div
+      class="pointer-events-none absolute inset-0 -z-10"
+      style={`background: ${meshBackground};`}
+      aria-hidden="true"
+    >
+    </div>
+
+    <HeroSection align="center" width="narrow" class="stagger !py-12 md:!py-16 lg:!py-20">
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-tight text-text-primary">
+        {HOME_H1}
+      </h1>
+      <p class="text-lg md:text-xl text-text-muted max-w-2xl">
+        {homeFirstParagraph}
+      </p>
+
+      <ValuePropRow layout="inline" items={['100% Free', 'Open Source', 'No Ads', `${totalQuestions.toLocaleString('en-US')}+ Questions`]} />
+
+      {/* Community social-proof TrustLine is temporarily hidden: the attempt
+          sample is too small to present a credible "community pass rate" yet.
+          To re-enable, re-add the `snapshot` import + the TrustLine component
+          here once volume grows (the snapshot wiring still feeds /stats). */}
+
+      {defaultCert && (
+        <PrimaryExamCTA
+          href={`/${defaultCert.provider}/${defaultCert.code}/practice-exam`}
+          label={`Start ${defaultCert.shortName} Practice Exam`}
+          data-cc-event="cta_start_practice_exam"
+          data-cc-param-location="home_hero"
+          data-cc-param-cert={defaultCert.code}
+        />
+      )}
+    </HeroSection>
+  </div>
+
+  <div class="p-4 md:p-8 pt-0">
+    <div class="max-w-4xl mx-auto">
+      <div class="space-y-8">
+
+        {/* Cert grid */}
+        <section data-reveal>
+          <h2 class="text-xl md:text-2xl font-semibold text-text-primary mb-4">
+            Pick a certification
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            {activeCerts.map(cert => <CertCard cert={cert} variant="compact" />)}
+            {comingSoonCerts.map(cert => <CertCard cert={cert} variant="compact" />)}
+          </div>
+        </section>
+
+        {/* Exam-realism prose (E-E-A-T body copy; not a Locked_Citation_Phrase).
+            Two scannable points instead of one centred wall of text. */}
+        <section class="space-y-4" data-reveal>
+          <h2 class="text-xl md:text-2xl font-semibold text-text-primary">
+            Built to mirror the real exam
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-bg-card rounded-xl shadow-card p-5">
+              <h3 class="text-base md:text-lg font-semibold text-text-primary mb-2">
+                Realistic by design
+              </h3>
+              <p class="text-text-muted text-sm md:text-base leading-relaxed">
+                Every question bank mirrors the live AWS exam, so you sit practice exams that match the real question style, scoring scale and time pressure.
+              </p>
+            </div>
+            <div class="bg-bg-card rounded-xl shadow-card p-5">
+              <h3 class="text-base md:text-lg font-semibold text-text-primary mb-2">
+                Aligned and explained
+              </h3>
+              <p class="text-text-muted text-sm md:text-base leading-relaxed">
+                Each question is aligned to the current official exam guide and ships with a detailed explanation of why the correct answer is right and why each distractor is wrong.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* About card */}
+        <AboutCard />
+
+        {/* Generic FAQ */}
+        <Faq genericOnly />
+      </div>
+    </div>
+  </div>
+</BaseLayout>

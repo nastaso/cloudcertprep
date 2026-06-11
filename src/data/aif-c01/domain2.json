@@ -1,0 +1,1357 @@
+[
+  {
+    "id": "aif-q002",
+    "question": "A publisher needs to turn long research reports into short briefs that capture their main points, using a large language model (LLM). Which solution meets this requirement?",
+    "options": {
+      "A": "Build a recommendation engine",
+      "B": "Develop a summarization chatbot",
+      "C": "Build a named entity recognition system",
+      "D": "Create a multi-language translation system"
+    },
+    "answer": "B",
+    "explanation": "A summarization chatbot uses an LLM to read long documents and produce a shorter version that keeps the essential points, which is exactly what condensing research reports into briefs requires.\nA recommendation engine suggests relevant items from user behavior and does not condense documents. A named entity recognition system only pulls out entities such as names, dates, and places rather than producing a coherent summary. A multi-language translation system converts text between languages without shortening or distilling the content.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q010",
+    "question": "A smart-home device maker wants its appliances to run language-model inference on the device itself, with the lowest latency possible. Which solution meets this requirement?",
+    "options": {
+      "A": "Deploy optimized large language models (LLMs) on the edge devices",
+      "B": "Deploy optimized small language models (SLMs) on the edge devices",
+      "C": "Call a centralized small language model (SLM) API asynchronously from the edge devices",
+      "D": "Call a centralized large language model (LLM) API asynchronously from the edge devices"
+    },
+    "answer": "B",
+    "explanation": "Deploying optimized small language models (SLMs) on the edge devices keeps inference local and avoids network round-trips, which delivers the lowest possible latency, and SLMs are compact enough to run on constrained edge hardware.\nDeploying LLMs on edge devices is impractical because their size and compute demands exceed typical edge hardware and would raise latency. Calling a centralized SLM or LLM API requires network communication, and the asynchronous round-trips add latency rather than minimizing it.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q012",
+    "question": "A fintech engineering team plans to adopt Amazon Q Developer to ship features faster. What can Amazon Q Developer do to help the team?",
+    "options": {
+      "A": "Run an application without provisioning or managing servers",
+      "B": "Convert audio files into text documents by using ML models",
+      "C": "Generate code snippets and provide reference tracking and open source license tracking",
+      "D": "Enable voice commands for coding and natural-language search"
+    },
+    "answer": "C",
+    "explanation": "Amazon Q Developer boosts developer productivity by generating code snippets and providing reference tracking and open source license tracking.\nRunning an application without provisioning or managing servers describes serverless compute such as AWS Lambda. Converting audio files into text describes Amazon Transcribe. Enabling voice commands for coding is not a function of Amazon Q Developer.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Q"
+    ]
+  },
+  {
+    "id": "aif-q018",
+    "question": "An ecommerce team is building visual search that accepts both a typed phrase and a product photo as the query. Which kind of foundation model (FM) should power it?",
+    "options": {
+      "A": "Text embedding model",
+      "B": "Multimodal embedding model",
+      "C": "Image generation model",
+      "D": "Multimodal generation model"
+    },
+    "answer": "B",
+    "explanation": "A multimodal embedding model encodes both text and images into a shared vector space, so queries of either type can be compared and matched, which is what a search application handling text and image queries needs.\nA text embedding model handles only text. An image generation model creates images from prompts rather than encoding queries for search. A multimodal generation model produces new content across modalities rather than the embeddings needed for similarity search.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q022",
+    "question": "A marketing agency is exploring generative AI. Which of these tasks is a generative AI use case?",
+    "options": {
+      "A": "Improving network security by using an intrusion detection system",
+      "B": "Forecasting stock market trends from historical financial data",
+      "C": "Generating photorealistic images from text descriptions for a marketing campaign",
+      "D": "Speeding up database queries with optimized indexing"
+    },
+    "answer": "C",
+    "explanation": "Generative AI creates new content, and producing photorealistic images from text descriptions for a marketing campaign is content generation, a classic generative AI use case.\nIntrusion detection is a security and classification task. Forecasting stock trends from historical data is predictive analytics. Optimizing database indexing is performance tuning. None of these create new content, so they are not generative AI use cases.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q023",
+    "question": "While picking a foundation model (FM) on Amazon Bedrock, a research team needs to know how much text it can pack into a single prompt. Which model property tells them this?",
+    "options": {
+      "A": "Temperature",
+      "B": "Model size",
+      "C": "Context window",
+      "D": "Batch size"
+    },
+    "answer": "C",
+    "explanation": "The context window defines how many tokens a foundation model can take in at once, so it determines how much information fits into a single prompt.\nTemperature controls output randomness, not input capacity. Model size relates to parameter count and overall capability, not prompt length. Batch size concerns how many inputs are processed together, not how much text one prompt can hold.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q032",
+    "question": "A small studio wants to prototype on Amazon Bedrock on a tight budget and avoid any long-term commitment. Which Amazon Bedrock pricing model fits?",
+    "options": {
+      "A": "Provisioned Throughput",
+      "B": "Model customization",
+      "C": "On-Demand",
+      "D": "Spot Instances"
+    },
+    "answer": "C",
+    "explanation": "The On-Demand pricing model charges only for what is used with no upfront or long-term commitment, which fits a limited budget that needs flexibility.\nProvisioned Throughput requires committing to and paying for a fixed capacity level over time. Model customization is a fine-tuning activity, not a flexible pricing option. Spot Instances are an Amazon EC2 pricing concept and are not an Amazon Bedrock pricing model.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q033",
+    "question": "A data-science team wants to stand up a foundation model (FM) quickly inside its own VPC. Which AWS service or feature lets the team do that?",
+    "options": {
+      "A": "Amazon Personalize",
+      "B": "PartyRock, an Amazon Bedrock Playground",
+      "C": "Amazon SageMaker JumpStart",
+      "D": "Amazon SageMaker AI endpoints"
+    },
+    "answer": "C",
+    "explanation": "Amazon SageMaker JumpStart offers pre-built foundation models that a team can deploy quickly inside its own VPC and begin using right away, which matches the requirement.\nAmazon Personalize is a recommendation service, not an FM-deployment feature. PartyRock is a public playground for experimenting with apps, not for deploying FMs in a VPC. Amazon SageMaker AI endpoints host models for inference, but they do not provide a curated catalog of pre-built foundation models ready to deploy with a few clicks, which is the value JumpStart adds.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker JumpStart",
+      "Amazon Personalize",
+      "Amazon Bedrock",
+      "Amazon SageMaker AI"
+    ]
+  },
+  {
+    "id": "aif-q035",
+    "question": "A retail company keeps large volumes of sales data in a database. It wants an application that lets non-technical staff type a plain-language question and have it automatically turned into a SQL query. Which type of model is best suited to power this application?",
+    "options": {
+      "A": "Residual neural network (ResNet)",
+      "B": "Support vector machine (SVM)",
+      "C": "WaveNet",
+      "D": "Generative pre-trained transformer (GPT)"
+    },
+    "answer": "D",
+    "explanation": "Generative pre-trained transformers are large language models trained to generate text, and they can translate a natural-language request into a structured SQL query, which lets non-technical staff retrieve data without writing SQL themselves, exactly as the requirement describes.\nA residual neural network (ResNet) is a deep architecture built for image recognition and computer vision, not language generation. A support vector machine (SVM) is a classic supervised algorithm for classification or regression and cannot generate SQL from text. WaveNet is a generative model for producing realistic audio and speech, so it is the wrong modality for converting text into queries.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q050",
+    "question": "A company summarizes contracts with an Amazon Bedrock base model and has now trained a custom model for better quality. What must the company do to use the custom model in Amazon Bedrock?",
+    "options": {
+      "A": "Deploy the custom model to an Amazon SageMaker AI endpoint for real-time inference",
+      "B": "Register the model in the Amazon SageMaker Model Registry",
+      "C": "Request model access for the custom model in Amazon Bedrock",
+      "D": "Purchase Provisioned Throughput for the custom model"
+    },
+    "answer": "D",
+    "explanation": "To run a custom (fine-tuned) model in Amazon Bedrock, the company must purchase Provisioned Throughput for that model, which allocates the dedicated capacity Bedrock requires to serve custom models.\nDeploying to a SageMaker AI endpoint or registering in the SageMaker Model Registry are Amazon SageMaker workflows, not how Bedrock serves a custom model. Requesting model access applies to Bedrock base models, not to using your own custom model.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "Amazon SageMaker AI"
+    ]
+  },
+  {
+    "id": "aif-q055",
+    "question": "A company is building an application that must generate synthetic data based on its existing data. Which type of model can the company use to meet this requirement?",
+    "options": {
+      "A": "XGBoost",
+      "B": "WaveNet",
+      "C": "Generative adversarial network (GAN)",
+      "D": "Residual neural network"
+    },
+    "answer": "C",
+    "explanation": "A generative adversarial network (GAN) is built from two competing neural networks, a generator that creates synthetic samples resembling the real data and a discriminator that tries to tell real from generated, and through this competition it learns to produce realistic synthetic data based on an existing dataset, which is exactly what the company needs.\nXGBoost is a gradient-boosting algorithm for supervised classification and regression, not for generating new data. A residual neural network (ResNet) is a deep convolutional architecture used mainly for image recognition and classification. WaveNet is a generative model, but it is specialised for synthesising raw audio such as speech rather than producing general synthetic data from an arbitrary existing dataset.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q063",
+    "question": "In AI and Natural Language Processing (NLP), what is the term for the numerical representations of real-world objects and concepts that help models better understand text?",
+    "options": {
+      "A": "Tokens",
+      "B": "Parameters",
+      "C": "Embeddings",
+      "D": "Models"
+    },
+    "answer": "C",
+    "explanation": "Embeddings are numerical vector representations of objects and concepts such as words or phrases; by placing similar items close together in vector space they capture relationships and meaning, which helps AI and NLP models understand and work with text more effectively.\nTokens are the individual units, such as words or sub-words, that text is split into before processing, not representations of meaning. A model is the trained system that makes predictions, not a representation of a concept. Parameters are the internal weights a model learns during training and do not represent real-world objects or concepts.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q074",
+    "question": "A retail analyst wants charts of top-product sales by store over the last year generated automatically. Which AWS solution fits this need?",
+    "options": {
+      "A": "Amazon Q Developer",
+      "B": "Amazon Q in Amazon QuickSight",
+      "C": "Amazon Q in AWS Chatbot",
+      "D": "Amazon Q in Amazon EC2"
+    },
+    "answer": "B",
+    "explanation": "Amazon Q in Amazon QuickSight lets users ask questions in natural language and automatically builds charts and visualizations, such as total sales for top products, which meets the requirement.\nAmazon Q Developer assists with coding tasks. Amazon Q in AWS Chatbot helps operate AWS resources from chat channels. Amazon Q in Amazon EC2 provides EC2 guidance. None of these generate business data visualizations.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Q"
+    ]
+  },
+  {
+    "id": "aif-q080",
+    "question": "A travel company receives a flood of booking questions every day and plans to use Agents for Amazon Bedrock to keep up. What is a key benefit of using these agents?",
+    "options": {
+      "A": "Generating custom foundation models (FMs) to predict customer needs",
+      "B": "Choosing a foundation model (FM) based on predefined criteria and metrics",
+      "C": "Automating repetitive tasks and orchestrating complex, multi-step workflows",
+      "D": "Calling several foundation models (FMs) at once and merging their results"
+    },
+    "answer": "C",
+    "explanation": "Agents for Amazon Bedrock automate repetitive tasks and orchestrate complex, multi-step workflows, which lets the company handle high volumes of inquiries faster and more efficiently.\nAgents do not generate custom foundation models, they do not choose a model by predefined criteria, and their purpose is not to call multiple models and merge results. Their value is task automation and workflow orchestration.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q083",
+    "question": "A startup is budgeting for a generative AI app on Amazon Bedrock and wants to know what drives the cost of each inference from a large language model (LLM). Which factor is it?",
+    "options": {
+      "A": "The temperature value used for generation",
+      "B": "The amount of data used to train the LLM",
+      "C": "The number of tokens consumed",
+      "D": "The total time spent training the LLM"
+    },
+    "answer": "C",
+    "explanation": "Inference cost is driven by the number of tokens consumed, because LLM pricing charges for the input and output tokens processed by each request.\nThe temperature value only shapes output randomness and has no cost impact. The amount of training data and the total training time affect the one-time cost of building the model, not the cost of running inference.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q085",
+    "question": "A company customized an Amazon Bedrock foundation model (FM) and now needs to upload a dataset for Bedrock to validate the model's answers. Which AWS service should hold that dataset?",
+    "options": {
+      "A": "Amazon Elastic Block Store (Amazon EBS)",
+      "B": "AWS Snowcone",
+      "C": "Amazon S3",
+      "D": "Amazon Elastic File System (Amazon EFS)"
+    },
+    "answer": "C",
+    "explanation": "Amazon S3 is the scalable object storage service that integrates with Amazon Bedrock, so it is the right place to upload and store the validation dataset for Bedrock to use.\nAmazon EBS provides block storage for EC2 volumes, Amazon EFS provides shared file storage for instances, and AWS Snowcone is an edge data-transfer device. None of these is the storage service that Bedrock reads datasets from.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon S3",
+      "Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q099",
+    "question": "A logistics company's analysts have little coding experience but need to build data integration jobs in AWS Glue. Which AWS service can help them?",
+    "options": {
+      "A": "AWS Config",
+      "B": "Amazon Comprehend",
+      "C": "Amazon Q Developer",
+      "D": "Amazon Personalize"
+    },
+    "answer": "C",
+    "explanation": "Amazon Q Developer is a generative AI coding assistant that can generate and explain code, helping users with limited programming experience build and work with AWS Glue jobs.\nAWS Config tracks resource configuration and compliance. Amazon Personalize provides recommendations. Amazon Comprehend performs NLP tasks such as sentiment and entity analysis. None of these helps write or simplify AWS Glue code.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Q",
+      "AWS Config",
+      "Amazon Personalize",
+      "Amazon Comprehend"
+    ]
+  },
+  {
+    "id": "aif-q105",
+    "question": "A development team wants a large language model (LLM) to write code from plain-language comments. Which LLM capability does this rely on?",
+    "options": {
+      "A": "Text summarization",
+      "B": "Text classification",
+      "C": "Text generation",
+      "D": "Text completion"
+    },
+    "answer": "C",
+    "explanation": "Text generation is the LLM capability that produces new text, in this case code, from a given input such as natural-language comments, which is exactly what the requirement needs.\nText summarization condenses existing text. Text classification assigns labels to text. Text completion only continues a given snippet rather than generating full code from descriptive comments.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q112",
+    "question": "A pharmacy chain wants a short overview of each new medication based on its customer reviews. Which solution meets this requirement?",
+    "options": {
+      "A": "Build a time-series forecasting model to analyze the reviews with Amazon Personalize",
+      "B": "Build a classification model that sorts medications into groups with Amazon Comprehend",
+      "C": "Generate medication review summaries with Amazon Bedrock large language models (LLMs)",
+      "D": "Generate medication review summaries with Amazon Rekognition"
+    },
+    "answer": "C",
+    "explanation": "Amazon Bedrock provides large language models well suited to summarization, so generating concise summaries of medication reviews with Bedrock LLMs meets the requirement.\nA time-series forecasting model with Amazon Personalize predicts future values and is not for summarizing text. A classification model with Amazon Comprehend sorts items into categories rather than producing a written overview. Amazon Rekognition analyzes images and video, not text reviews.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "Amazon Personalize",
+      "Amazon Comprehend",
+      "Amazon Rekognition"
+    ]
+  },
+  {
+    "id": "aif-q129",
+    "question": "A developer wants a service that offers foundation models (FMs) for building and scaling generative AI applications. Which AWS service provides this?",
+    "options": {
+      "A": "Amazon Q Developer",
+      "B": "Amazon Kendra",
+      "C": "Amazon Bedrock",
+      "D": "Amazon Comprehend"
+    },
+    "answer": "C",
+    "explanation": "Amazon Bedrock gives access to foundation models from AWS and third parties through a managed service, so users can build and scale generative AI applications without managing infrastructure.\nAmazon Q Developer is a coding assistant. Amazon Kendra is an intelligent enterprise search service. Amazon Comprehend is an NLP service. None of these provides foundation models for building generative AI apps.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "Amazon Q Developer",
+      "Amazon Kendra",
+      "Amazon Comprehend"
+    ]
+  },
+  {
+    "id": "aif-q134",
+    "question": "A subscription box company runs a generative AI support chatbot and wants to measure its financial effect on operations. Which metric should the company track?",
+    "options": {
+      "A": "Number of customer inquiries handled",
+      "B": "Cost per customer conversation",
+      "C": "Average handle time (AHT)",
+      "D": "Cost of training the AI models"
+    },
+    "answer": "B",
+    "explanation": "Cost per customer conversation directly quantifies the operational expense of using the chatbot, so the company can measure its financial effect and compare it to alternatives such as human agents.\nThe number of inquiries handled measures volume, not cost. Average handle time measures efficiency and speed. The cost of training the models is a one-time build cost, not the ongoing operational cost of conversations.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q137",
+    "question": "An insurer's support chatbot on Amazon Bedrock needs several turns to resolve a claim. How can the large language model (LLM) use content from the customer's earlier messages?",
+    "options": {
+      "A": "Turn on model invocation logging to collect the messages",
+      "B": "Use Amazon Personalize to store the conversation history",
+      "C": "Include the previous messages in the model prompt",
+      "D": "Use Provisioned Throughput for the LLM"
+    },
+    "answer": "C",
+    "explanation": "Including the previous messages in the model prompt gives the LLM the conversation history it needs, so it can keep context across turns and respond coherently.\nModel invocation logging records requests for monitoring but does not feed history back into the model. Amazon Personalize is a recommendation service, not a way to supply prompt context. Provisioned Throughput sets capacity and does not add conversation context.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q138",
+    "question": "A call-center team manually gives customers location-based product tips and wants foundation models (FMs) to automate it. Which AWS service meets this need?",
+    "options": {
+      "A": "Amazon Macie",
+      "B": "Amazon Bedrock",
+      "C": "Amazon Textract",
+      "D": "Amazon Transcribe"
+    },
+    "answer": "B",
+    "explanation": "Amazon Bedrock lets the company use foundation models to generate product descriptions and location-based recommendations without managing infrastructure, which automates the task.\nAmazon Macie discovers and protects sensitive data. Amazon Textract extracts text from documents. Amazon Transcribe converts speech to text. None of these provides foundation models to generate recommendations.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "Amazon Macie",
+      "Amazon Transcribe",
+      "Amazon Textract"
+    ]
+  },
+  {
+    "id": "aif-q152",
+    "question": "An investment firm uses ML across its operations. Which of these is a generative AI use case?",
+    "options": {
+      "A": "Classifying customers by product usage",
+      "B": "Forecasting revenue for certain products",
+      "C": "Summarizing customer complaints",
+      "D": "Segmenting customers by type of investment"
+    },
+    "answer": "C",
+    "explanation": "Summarizing customer complaints generates new, condensed text from longer input, which is a generative AI task typically handled by large language models.\nClassifying customers by product usage and forecasting revenue are predictive tasks, and segmenting customers by investment type is clustering. These are traditional ML tasks that do not generate new content.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q158",
+    "question": "Which statement describes a defining characteristic of transformer-based language models?",
+    "options": {
+      "A": "They use convolutional layers to apply filters across the input and capture local patterns",
+      "B": "They use self-attention mechanisms to capture contextual relationships",
+      "C": "They can process only text data",
+      "D": "They process a sequence one element at a time in repeated cycles"
+    },
+    "answer": "B",
+    "explanation": "Transformer-based models use self-attention mechanisms that weigh the importance of each token relative to the others, which lets them capture contextual relationships across an entire input.\nConvolutional layers are characteristic of CNNs, not transformers. Transformers are not limited to text and can be multimodal. Processing one element at a time in cycles describes recurrent networks (RNNs), not the parallel self-attention of transformers.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q168",
+    "question": "A newsroom is piloting a generative AI writing aide. Pilot traffic is light, performance is not a concern, and future usage is unpredictable; the newsroom wants the lowest cost. Which solution meets these requirements?",
+    "options": {
+      "A": "Use GPU-powered Amazon EC2 instances",
+      "B": "Use Amazon Bedrock with On-Demand pricing",
+      "C": "Use Amazon Bedrock with Provisioned Throughput",
+      "D": "Use Amazon SageMaker JumpStart"
+    },
+    "answer": "B",
+    "explanation": "Amazon Bedrock with On-Demand pricing charges only for the inference calls actually made, with no capacity commitment, so it keeps costs low during a small pilot and scales elastically with unpredictable future demand.\nGPU-powered EC2 instances incur ongoing costs whether or not they are used. Provisioned Throughput requires paying for committed capacity that low, unpredictable usage would waste. Amazon SageMaker JumpStart still requires provisioning and managing hosting capacity, which is not the most cost-effective for this case.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "Amazon EC2",
+      "Amazon SageMaker JumpStart"
+    ]
+  },
+  {
+    "id": "aif-q174",
+    "question": "A company fine-tuned a custom large language model (LLM) from Amazon Bedrock and will serve a steady, predictable number of requests per minute in production. Which option is MOST cost-effective?",
+    "options": {
+      "A": "Deploy the model on an Amazon EC2 compute optimized instance",
+      "B": "Purchase Provisioned Throughput for the model on Amazon Bedrock",
+      "C": "Use the model with On-Demand throughput on Amazon Bedrock",
+      "D": "Store the model in Amazon S3 and host it with AWS Lambda"
+    },
+    "answer": "B",
+    "explanation": "For steady, predictable request volume, Provisioned Throughput on Amazon Bedrock offers a lower per-request cost by committing to a fixed throughput level, making it the most cost-effective way to serve a custom model.\nAn EC2 compute optimized instance means self-managing infrastructure and is not how Bedrock serves custom models. On-Demand throughput costs more per request at steady high volume. Storing the model in Amazon S3 and hosting it with AWS Lambda is not a supported way to serve a Bedrock custom model.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "Amazon EC2",
+      "Amazon S3",
+      "AWS Lambda"
+    ]
+  },
+  {
+    "id": "aif-q375",
+    "question": "A medical clinic wants a generative AI tool with speech-to-text that helps doctors dictate and create clinical notes. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon Q Developer",
+      "B": "Amazon Polly",
+      "C": "AWS HealthScribe",
+      "D": "Amazon Rekognition"
+    },
+    "answer": "C",
+    "explanation": "AWS HealthScribe is purpose-built for healthcare and combines speech recognition with generative AI to transcribe clinical conversations and produce structured clinical notes, which meets the clinic's need.\nAmazon Q Developer is a coding assistant. Amazon Polly performs text-to-speech, the opposite direction. Amazon Rekognition analyzes images and video, not clinical speech.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS HealthScribe",
+      "Amazon Q Developer",
+      "Amazon Polly",
+      "Amazon Rekognition"
+    ]
+  },
+  {
+    "id": "aif-q184",
+    "question": "In a large language model (LLM), what do vector embeddings make possible?",
+    "options": {
+      "A": "Splitting text into manageable pieces of data",
+      "B": "Comparing texts mathematically",
+      "C": "Grouping a set of characters to be treated as a single unit",
+      "D": "Counting every word in the input"
+    },
+    "answer": "B",
+    "explanation": "Vector embeddings convert text into numerical vectors that capture meaning, so texts can be compared mathematically by measuring distance or similarity, which supports tasks like retrieval and clustering.\nSplitting text into manageable pieces describes chunking. Grouping characters into a single unit describes tokenization. Counting every word is a simple word-frequency count, not an embedding.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q197",
+    "question": "An edtech company is building an app where students type a question or snap a photo of one, and the app returns a written answer with an explanation. Which type of model should power the app?",
+    "options": {
+      "A": "Computer Vision model",
+      "B": "Diffusion model",
+      "C": "Large multimodal language model",
+      "D": "Text-to-speech model"
+    },
+    "answer": "C",
+    "explanation": "A large multimodal language model can take both text and images as input and generate text output, so it can accept a typed or photographed question and return a written answer with an explanation.\nA Computer Vision model analyzes images but does not generate explanatory text answers. A diffusion model generates images, not text answers. A text-to-speech model converts text into audio, which does not produce written answers from mixed inputs.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q199",
+    "question": "Which statement correctly describes embeddings in generative AI?",
+    "options": {
+      "A": "Embeddings search data to find the most helpful information for answering natural-language questions",
+      "B": "Embeddings lower hardware requirements by using a less precise data type for weights and activations",
+      "C": "Embeddings represent data as high-dimensional vectors that capture semantic relationships",
+      "D": "Embeddings store and retrieve data for generative AI applications"
+    },
+    "answer": "C",
+    "explanation": "Embeddings map inputs such as words or documents into high-dimensional vectors where semantic similarity corresponds to closeness in the vector space, letting models reason about meaning and relationships.\nSearching data to find helpful information describes retrieval, as in RAG. Reducing hardware needs with a less precise data type describes quantization. Storing and retrieving data describes a database or vector store, not embeddings themselves.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q201",
+    "question": "A company needs a generative AI model for an app that must answer users in real time. Which model characteristic matters most?",
+    "options": {
+      "A": "Model complexity",
+      "B": "Inference speed",
+      "C": "Training time",
+      "D": "Innovation speed"
+    },
+    "answer": "B",
+    "explanation": "Inference speed determines how quickly the model generates a response, so it is the key characteristic for a real-time application where users need answers with low latency.\nModel complexity affects capability and cost but not directly the real-time requirement. Training time is a one-time build concern. Innovation speed describes how fast a model family evolves, none of which governs real-time response latency.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q202",
+    "question": "What is the term for the instructions you give a foundation model (FM) to help it return a more accurate answer?",
+    "options": {
+      "A": "Direction",
+      "B": "Dialog",
+      "C": "Prompt",
+      "D": "Translation"
+    },
+    "answer": "C",
+    "explanation": "A prompt is the input instruction or query provided to a foundation model that guides what it should do, helping it produce a more accurate response.\nDirection and dialog are not the term for the model's input instruction. Translation is a task type, not the instruction itself.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q242",
+    "question": "A company wants an AI assistant that lets employees ask questions about internal company data. Which AWS service meets this need?",
+    "options": {
+      "A": "Amazon Rekognition",
+      "B": "Amazon Textract",
+      "C": "Amazon Q Business",
+      "D": "Amazon Lex"
+    },
+    "answer": "C",
+    "explanation": "Amazon Q Business builds generative AI assistants that connect to internal data sources, so employees can ask questions and get answers, which meets the requirement.\nAmazon Rekognition analyzes images and video. Amazon Textract extracts text from documents. Amazon Lex builds conversational chatbots but is not designed as an enterprise assistant over internal company data.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Q",
+      "Amazon Rekognition",
+      "Amazon Textract",
+      "Amazon Lex"
+    ]
+  },
+  {
+    "id": "aif-q250",
+    "question": "A team wants a low-cost, hands-on way to experiment with and learn about generative AI applications. Which solution is MOST cost-effective?",
+    "options": {
+      "A": "Amazon Q Developer",
+      "B": "Amazon Bedrock PartyRock",
+      "C": "Amazon SageMaker JumpStart",
+      "D": "Amazon Q Business"
+    },
+    "answer": "B",
+    "explanation": "Amazon Bedrock PartyRock provides a low-cost, hands-on playground for building and experimenting with generative AI applications, which fits learning in an experimental environment cost-effectively.\nAmazon Q Developer is a coding assistant. Amazon SageMaker JumpStart requires provisioning and managing model hosting. Amazon Q Business is an enterprise assistant over company data. None of these is a low-cost experimentation playground for learning about generative AI apps.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "Amazon Q",
+      "Amazon SageMaker JumpStart"
+    ]
+  },
+  {
+    "id": "aif-q275",
+    "question": "A studio that produces video content wants to use generative AI to create new clips and cut production time. Which solution meets these requirements MOST operationally efficiently?",
+    "options": {
+      "A": "Use the Amazon Titan Image Generator model on Amazon Bedrock to create intermediate images, then assemble videos with video editing software",
+      "B": "Use the Amazon Nova Reel model on Amazon Bedrock to generate videos",
+      "C": "Use the Amazon Nova Canvas model on Amazon Bedrock to create intermediate images, then assemble videos with video editing software",
+      "D": "Use the Amazon Nova Pro model on Amazon Bedrock to generate videos"
+    },
+    "answer": "B",
+    "explanation": "The Amazon Nova Reel model on Amazon Bedrock is built for generative video creation, so it lets the company generate new video content directly and reduce production time in the most operationally efficient way.\nUsing Amazon Titan Image Generator or Amazon Nova Canvas produces only still images that then require manual editing into videos, which adds steps. Amazon Nova Pro is a general multimodal model and is not the purpose-built video-generation option.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q278",
+    "question": "A compliance team wants to pull the key insights out of long policy documents so staff can work faster. Which generative AI strategy meets this requirement?",
+    "options": {
+      "A": "Regression",
+      "B": "Summarization",
+      "C": "Clustering",
+      "D": "Classification"
+    },
+    "answer": "B",
+    "explanation": "Summarization condenses large documents into their key insights, so employees can quickly grasp and act on the essential information.\nRegression predicts numeric values, clustering groups similar items, and classification assigns labels. None of these extracts and condenses the key insights from a document.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q282",
+    "question": "An online store uses a generative AI assistant on Amazon Bedrock to recommend products and wants to measure its direct impact on sales. Which metric meets this requirement?",
+    "options": {
+      "A": "The number of customer interactions with the AI assistant",
+      "B": "Sentiment analysis scores from customer feedback after interactions",
+      "C": "The conversion rate of customers who purchase after interacting with the AI assistant",
+      "D": "Natural language understanding accuracy rates"
+    },
+    "answer": "C",
+    "explanation": "Conversion rate, the share of customers who buy after interacting with the assistant, ties assistant engagement directly to sales outcomes, so it measures the direct impact on sales.\nThe number of interactions measures usage volume, not sales. Sentiment scores measure customer mood. Natural language understanding accuracy measures technical quality. None of these directly measures sales impact.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q284",
+    "question": "Which scenario is a practical use case for generative AI?",
+    "options": {
+      "A": "Using an ML model to forecast product demand",
+      "B": "Tracking website traffic and user behavior with an analytics dashboard",
+      "C": "Using a chatbot to give human-like responses to customer queries in real time",
+      "D": "Using a rule-based recommendation engine to suggest products"
+    },
+    "answer": "C",
+    "explanation": "A chatbot that gives human-like responses to customer queries in real time uses a generative model to create relevant, natural-language answers, which is a practical generative AI use case.\nForecasting product demand with an ML model is predictive analytics. An analytics dashboard tracks metrics. A rule-based recommendation engine follows fixed rules. None of these generates new content.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q293",
+    "question": "What is the difference between discriminative and generative AI models?",
+    "options": {
+      "A": "Discriminative models are faster than generative models",
+      "B": "Discriminative models are more accurate than generative models",
+      "C": "Discriminative models classify or predict, while generative models create new content",
+      "D": "Discriminative models need more data than generative models"
+    },
+    "answer": "C",
+    "explanation": "Discriminative models learn to classify inputs or predict outcomes, whereas generative models learn to create new content similar to their training data; this is the core distinction between the two.\nClaims that discriminative models are inherently faster, more accurate, or need more data are not the defining difference and are not generally true; the real distinction is what each type of model produces.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q295",
+    "question": "What is the primary purpose of Amazon Q Business?",
+    "options": {
+      "A": "To train custom ML models",
+      "B": "To store large datasets",
+      "C": "To provide AI-powered business assistance over company data",
+      "D": "To monitor infrastructure"
+    },
+    "answer": "C",
+    "explanation": "Amazon Q Business is a generative AI assistant for the enterprise; its primary purpose is to provide AI-powered assistance over a company's internal data, answering questions, generating content, and summarizing information while respecting access controls.\nTraining custom ML models is the role of Amazon SageMaker AI. Storing large datasets is the role of services like Amazon S3. Monitoring infrastructure is the role of services like Amazon CloudWatch. None of these is the purpose of Amazon Q Business.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Q"
+    ]
+  },
+  {
+    "id": "aif-q298",
+    "question": "A company is comparing Amazon Nova models on Amazon Bedrock and needs a multimodal model that supports several languages. Which Nova model meets these requirements MOST cost-effectively?",
+    "options": {
+      "A": "Nova Pro",
+      "B": "Nova Lite",
+      "C": "Nova Canvas",
+      "D": "Nova Reel"
+    },
+    "answer": "B",
+    "explanation": "Amazon Nova Lite is a low-cost multimodal model that supports multiple languages, so it meets the multimodal and multilingual requirements as the most cost-effective Nova option.\nAmazon Nova Pro is also multimodal but is a higher-cost, higher-capability model. Amazon Nova Canvas generates images and Amazon Nova Reel generates video, so these single-purpose generation models are not cost-effective multilingual multimodal choices.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q303",
+    "question": "An edtech company is building a reading app that lets students add illustrations to their stories. Which solution meets this requirement?",
+    "options": {
+      "A": "Use Amazon Polly to create an audiobook from the story text",
+      "B": "Use Amazon Rekognition to analyze image content and detect text attributes",
+      "C": "Use Amazon Bedrock Stable Diffusion 3.5 Large to generate images from text inputs",
+      "D": "Create a standard prompt template and use Amazon Q Business to illustrate the stories"
+    },
+    "answer": "C",
+    "explanation": "Amazon Bedrock Stable Diffusion 3.5 Large generates images from text prompts, so students can create illustrations for their stories from descriptions, which supports reading comprehension with visuals.\nAmazon Polly converts text to speech, producing audio rather than illustrations. Amazon Rekognition analyzes existing images rather than generating new ones. Amazon Q Business is an enterprise assistant over company data and does not generate story illustrations.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "Amazon Polly",
+      "Amazon Rekognition",
+      "Amazon Q Business"
+    ]
+  },
+  {
+    "id": "aif-q309",
+    "question": "A developer wants to quickly create a test case and documentation for some code with the LEAST effort. Which solution meets this requirement?",
+    "options": {
+      "A": "Upload the code to an online coding assistant",
+      "B": "Use Amazon Q Developer in an integrated development environment (IDE)",
+      "C": "Build an application that uses foundation models (FMs)",
+      "D": "Research and write the test cases by hand, then add the documentation"
+    },
+    "answer": "B",
+    "explanation": "Amazon Q Developer in an IDE can automatically generate test cases and documentation for code, which meets the requirement with the least effort.\nUploading code to an online coding assistant adds manual steps and data-handling concerns. Building a custom application on foundation models is far more effort. Researching and writing everything by hand is the most effort of all.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Q"
+    ]
+  },
+  {
+    "id": "aif-q310",
+    "question": "An ecommerce company needs to generate thousands of unique product descriptions a day, written as paragraphs with a consistent style and tone. Which type of generative model meets these requirements?",
+    "options": {
+      "A": "A variational autoencoder (VAE) model",
+      "B": "A diffusion model",
+      "C": "A transformer-based model",
+      "D": "A generative adversarial network (GAN) model"
+    },
+    "answer": "C",
+    "explanation": "Transformer-based models, such as large language models, generate coherent paragraphs of text with consistent style and tone and scale to producing thousands of unique descriptions, which fits the requirement.\nVariational autoencoders and generative adversarial networks are used mainly to generate images or other data, not fluent long-form text. Diffusion models generate images, so none of these is suited to producing styled product-description text at scale.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q334",
+    "question": "What is a token in the context of generative AI?",
+    "options": {
+      "A": "A security feature",
+      "B": "A type of neural network",
+      "C": "A unit of text processed by the model",
+      "D": "A model evaluation metric"
+    },
+    "answer": "C",
+    "explanation": "A token is the basic unit of text, such as a word or sub-word, that a model processes and generates, which is what the term refers to.\nA token is not a security feature, not a type of neural network, and not a model evaluation metric; those describe unrelated concepts.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q336",
+    "question": "What is a primary advantage of the adaptability of generative AI?",
+    "options": {
+      "A": "It can work only with structured data",
+      "B": "It always produces perfect results",
+      "C": "It can handle a wide range of tasks and domains",
+      "D": "It removes the need for any human oversight"
+    },
+    "answer": "C",
+    "explanation": "Adaptability means a generative model can be applied to a wide range of tasks and domains, which is its key advantage.\nGenerative AI is not limited to structured data, it does not always produce perfect results, and it does not remove the need for human oversight; these claims misstate its capabilities.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q338",
+    "question": "Which AWS service is designed specifically for developing generative AI applications?",
+    "options": {
+      "A": "Amazon EC2",
+      "B": "Amazon Bedrock",
+      "C": "Amazon S3",
+      "D": "Amazon RDS"
+    },
+    "answer": "B",
+    "explanation": "Amazon Bedrock is purpose-built for generative AI, providing access to foundation models and tools to build and scale generative AI applications.\nAmazon EC2 provides general compute, Amazon S3 provides object storage, and Amazon RDS provides managed relational databases; none is specifically designed for developing generative AI applications.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "Amazon EC2",
+      "Amazon S3",
+      "Amazon RDS"
+    ]
+  },
+  {
+    "id": "aif-q339",
+    "question": "What is a foundation model in generative AI?",
+    "options": {
+      "A": "A model that can only generate text",
+      "B": "A model designed specifically for image generation",
+      "C": "A large, pre-trained model that can be adapted for many tasks",
+      "D": "A model that requires no training data"
+    },
+    "answer": "C",
+    "explanation": "A foundation model is a large model pre-trained on vast amounts of data that can be adapted or fine-tuned for many downstream tasks such as text generation, summarization, and question answering.\nA foundation model is not limited to text and is not built only for image generation, and it is trained on large amounts of data, so the claim that it needs no training data is incorrect.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q341",
+    "question": "What is a primary advantage of using AWS generative AI services to build applications?",
+    "options": {
+      "A": "They are always free",
+      "B": "They guarantee 100% accuracy",
+      "C": "They lower the barrier to entry",
+      "D": "They remove the need for any coding"
+    },
+    "answer": "C",
+    "explanation": "AWS generative AI services provide managed infrastructure, pre-trained foundation models, and APIs, which lower the barrier to entry by removing the need to build and train large models from scratch.\nThese services are not always free, they do not guarantee perfect accuracy, and they do not remove the need for any coding; those statements overstate what the services provide.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q082",
+    "question": "In generative AI, what are tokens?",
+    "options": {
+      "A": "The vector representations of words or concepts",
+      "B": "The basic units of input and output, such as words or subwords",
+      "C": "The instructions or prompts given to the model",
+      "D": "The hidden layers of the neural network"
+    },
+    "answer": "B",
+    "explanation": "Tokens are the smallest units, such as words, subwords, or characters, that a generative model reads and produces, forming the basis of its input and output.\nVector representations describe embeddings, prompts are the instructions given to the model, and hidden layers are part of the model's architecture; none of these defines a token.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q193",
+    "question": "Which two statements about a model's latent space are correct?",
+    "options": {
+      "A": "It must be stored in a specific type of database",
+      "B": "It captures the model's internal understanding of relationships among concepts",
+      "C": "It applies only to image data",
+      "D": "It enables computing semantic similarity between different inputs",
+      "E": "It is a human-readable lookup table"
+    },
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "A model's latent space is the internal representation where it organizes concepts, so it both captures the relationships the model has learned and lets it compute semantic similarity between different inputs.\nLatent space is not limited to images, does not require a specific database type, and is not a human-readable lookup table.",
+    "isMultiAnswer": true,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q198",
+    "question": "In the generative AI model lifecycle, which stage runs tests to check the model's accuracy?",
+    "options": {
+      "A": "Pre-training",
+      "B": "Fine-tuning",
+      "C": "Evaluation",
+      "D": "Deployment"
+    },
+    "answer": "C",
+    "explanation": "The evaluation stage tests the model against validation or hold-out data using metrics such as accuracy before it moves to deployment.\nPre-training builds the base model, fine-tuning adapts it to a task, and deployment puts the finished model into production; none of these is where accuracy testing happens.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q289",
+    "question": "What is the primary benefit of Amazon SageMaker JumpStart?",
+    "options": {
+      "A": "It reduces inference costs",
+      "B": "It provides access to pre-trained models and solutions",
+      "C": "It automatically tunes model hyperparameters",
+      "D": "It manages data labeling with a human workforce"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker JumpStart provides access to pre-trained models, built-in algorithms, and end-to-end solutions, which speeds up the start of machine learning and generative AI projects.\nReducing inference cost, hyperparameter tuning, and managed human labeling are handled by other capabilities, such as SageMaker Automatic Model Tuning and SageMaker Ground Truth Plus.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker JumpStart"
+    ]
+  },
+  {
+    "id": "aif-q340",
+    "question": "Which of the following is NOT a stage of the foundation model (FM) lifecycle?",
+    "options": {
+      "A": "Fine-tuning",
+      "B": "Marketing",
+      "C": "Pre-training",
+      "D": "Deployment"
+    },
+    "answer": "B",
+    "explanation": "Marketing is a business activity and is not part of the technical FM lifecycle, which covers stages such as data selection, pre-training, fine-tuning, evaluation, and deployment.\nFine-tuning, pre-training, and deployment are all genuine lifecycle stages, so none of them is the correct answer to what is NOT a stage.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q342",
+    "question": "In generative AI, what is prompt engineering?",
+    "options": {
+      "A": "A method for compressing models to run faster",
+      "B": "The process of crafting effective input prompts to guide a model's outputs",
+      "C": "A technique for designing a model's neural network architecture",
+      "D": "The process of labeling training data for supervised learning"
+    },
+    "answer": "B",
+    "explanation": "Prompt engineering is the practice of designing and refining input prompts, for example by adding context, constraints, or examples, to guide a generative model toward accurate, relevant outputs.\nIt is not model compression, not the design of a neural network architecture, and not the labeling of training data.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q077",
+    "question": "An AI practitioner uses a large language model to write marketing copy. The output sounds plausible and factual but is actually incorrect. Which problem is the model exhibiting?",
+    "options": {
+      "A": "Data leakage",
+      "B": "Hallucination",
+      "C": "Overfitting",
+      "D": "Underfitting"
+    },
+    "answer": "B",
+    "explanation": "Hallucination is when a large language model produces content that sounds plausible and factual but is actually incorrect or fabricated, which matches the marketing copy described.\nData leakage is the unintended exposure of information, overfitting is when a model memorizes training data and generalizes poorly, and underfitting is when a model is too simple to capture patterns. None of these describes confidently stated but false output.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q180",
+    "question": "A company has an application that ingests consumer complaints from public sources and processes them with complex hard-coded rules. The company wants to scale this logic across new markets and product lines. Which advantage of generative AI models applies to this scenario?",
+    "options": {
+      "A": "Predictable outputs",
+      "B": "Adaptability",
+      "C": "Reduced sensitivity to input changes",
+      "D": "Explainability"
+    },
+    "answer": "B",
+    "explanation": "Adaptability is the generative AI advantage that applies here: the models can generalize learned patterns to new markets and product lines with little manual reconfiguration, avoiding the need to rewrite complex hard-coded rules.\nPredictable outputs and reduced sensitivity to input changes are not strengths of generative AI, which is nondeterministic and sensitive to input wording. Explainability is unrelated to scaling the complaint-processing logic.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q302",
+    "question": "An AI practitioner notices that a large language model returns different responses each time it receives the same input. Which risk of AI does this describe?",
+    "options": {
+      "A": "Hallucinations",
+      "B": "Nondeterminism",
+      "C": "Accuracy",
+      "D": "Multimodality"
+    },
+    "answer": "B",
+    "explanation": "Nondeterminism is the property by which a large language model can return different responses to the same input because of randomness in how it generates text, which matches the observed behavior.\nHallucinations are fabricated but plausible outputs, accuracy concerns correctness, and multimodality is the ability to work across data types such as text and images. None of these describes varying responses to identical inputs.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q337",
+    "question": "In the context of generative AI, what is a hallucination?",
+    "options": {
+      "A": "A visual output produced by the model",
+      "B": "A type of model architecture",
+      "C": "An incorrect or fabricated output presented as fact",
+      "D": "A method of training a model"
+    },
+    "answer": "C",
+    "explanation": "A hallucination is an output that is incorrect or fabricated but is presented by the model as if it were factual.\nA hallucination is not a visual output, a type of model architecture, or a method of training a model. These options describe unrelated concepts.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q343",
+    "question": "Which of the following is a potential disadvantage of generative AI solutions?",
+    "options": {
+      "A": "Adaptability",
+      "B": "Responsiveness",
+      "C": "Inaccuracy",
+      "D": "Simplicity"
+    },
+    "answer": "C",
+    "explanation": "Inaccuracy is a known disadvantage of generative AI, which can produce incorrect, biased, or fabricated information that requires validation and human oversight.\nAdaptability and responsiveness are advantages of generative AI, and simplicity is not a disadvantage. None of these represents a drawback of generative AI solutions.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q353",
+    "question": "A media company wants to use an AWS-developed foundation model to generate marketing copy and images. Which AWS service provides first-party foundation models built by Amazon?",
+    "options": {
+      "A": "Amazon Rekognition",
+      "B": "Amazon Nova",
+      "C": "Amazon Comprehend",
+      "D": "Amazon Polly"
+    },
+    "answer": "B",
+    "explanation": "Amazon Nova is a family of foundation models developed by AWS that can generate text, images, and other content, making it the appropriate choice when a company wants to use first-party Amazon-built foundation models for content generation.\nAmazon Rekognition analyzes images and video for object detection and facial recognition but does not generate content. Amazon Comprehend extracts insights such as sentiment and entities from text. Amazon Polly converts text to speech. None of these is a generative foundation model built by Amazon.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon Nova",
+      "Amazon Rekognition",
+      "Amazon Comprehend",
+      "Amazon Polly"
+    ]
+  },
+  {
+    "id": "aif-q376",
+    "question": "A development team is building a customer support assistant on Amazon Bedrock. The assistant must remember account details from earlier in the conversation, reference relevant help articles, and follow company guidelines. Which concept describes managing all of this information that is fed to the foundation model?",
+    "options": {
+      "A": "Prompt engineering",
+      "B": "Context engineering",
+      "C": "Model distillation",
+      "D": "Continuous pre-training"
+    },
+    "answer": "B",
+    "explanation": "Context engineering is the practice of managing the full set of information provided to a foundation model at inference time, including conversation history, retrieved documents, system instructions, and any other relevant data, so the model produces accurate, grounded responses that account for all necessary context.\nPrompt engineering focuses specifically on crafting the instruction or query text itself, whereas context engineering encompasses the broader strategy of assembling all relevant information the model needs. Model distillation compresses a larger model into a smaller one for efficiency. Continuous pre-training updates a model's knowledge by training on new data over time, not by managing runtime context.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q377",
+    "question": "A legal firm's AI assistant on Amazon Bedrock must combine the user's question, relevant contract clauses retrieved from a knowledge base, the firm's compliance rules, and the conversation history into a single model call. Which practice governs how these elements are assembled and prioritized?",
+    "options": {
+      "A": "Fine-tuning",
+      "B": "Hyperparameter tuning",
+      "C": "Context engineering",
+      "D": "Feature engineering"
+    },
+    "answer": "C",
+    "explanation": "Context engineering governs how all the information elements, such as retrieved documents, system rules, user input, and conversation history, are assembled, prioritized, and structured before being passed to the model, ensuring it has the right context to answer accurately.\nFine-tuning updates model weights with new training data and does not control what is passed at inference time. Hyperparameter tuning adjusts training configuration settings like learning rate and batch size. Feature engineering transforms raw data into model inputs during the ML training pipeline, not at inference time for a foundation model.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q378",
+    "question": "What is the role of Model Context Protocol (MCP) in agentic AI systems?",
+    "options": {
+      "A": "It compresses models to reduce inference latency",
+      "B": "It provides a standard interface for connecting AI agents to external tools and data sources",
+      "C": "It encrypts model weights during training",
+      "D": "It measures model accuracy on benchmark datasets"
+    },
+    "answer": "B",
+    "explanation": "Model Context Protocol (MCP) provides a standardized interface that allows AI agents to connect to external tools, APIs, and data sources in a consistent way, enabling them to retrieve information and take actions across different systems without custom integrations for each one.\nModel compression for reduced latency describes techniques like quantization or distillation. Encrypting model weights is a security practice handled by services like AWS KMS. Measuring accuracy on benchmarks is model evaluation. None of these describes a protocol for agent-to-tool connectivity.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q379",
+    "question": "A financial services company wants multiple specialized AI agents to collaborate on complex customer requests. One agent handles account queries, another processes transactions, and a third checks compliance. Which agentic AI concept does this architecture represent?",
+    "options": {
+      "A": "Single-agent reinforcement learning",
+      "B": "Multi-agent system pattern",
+      "C": "Supervised classification pipeline",
+      "D": "Batch inference workflow"
+    },
+    "answer": "B",
+    "explanation": "A multi-agent system pattern uses multiple specialized AI agents that communicate and collaborate to handle complex tasks, with each agent responsible for a specific capability such as account queries, transactions, or compliance checks, which matches the architecture described.\nSingle-agent reinforcement learning trains one agent through environmental rewards without collaboration between multiple agents. A supervised classification pipeline assigns labels to inputs and does not involve agent collaboration. A batch inference workflow processes data in bulk offline and has no concept of multiple agents working together.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q380",
+    "question": "An AI agent assists a healthcare researcher over multiple sessions spanning several days. The agent needs to recall findings from previous sessions to avoid repeating work. Which agentic AI capability enables this?",
+    "options": {
+      "A": "Tool usage",
+      "B": "Memory management",
+      "C": "Workflow orchestration",
+      "D": "Model pre-training"
+    },
+    "answer": "B",
+    "explanation": "Memory management in agentic AI allows an agent to persist and retrieve information across sessions, so it can recall previous findings, avoid redundant work, and build on past interactions over time.\nTool usage enables agents to call external APIs and services but does not handle storing and retrieving past interaction history. Workflow orchestration coordinates the sequence of steps an agent takes but does not address long-term memory. Model pre-training builds the base model's knowledge during initial training, not the ability to remember individual user sessions.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q381",
+    "question": "A startup wants to build custom AI agents using an open-source Python SDK that supports tool use, multi-agent orchestration, and integration with multiple model providers. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon Personalize",
+      "B": "Amazon Comprehend",
+      "C": "Strands Agents",
+      "D": "Amazon Lex"
+    },
+    "answer": "C",
+    "explanation": "Strands Agents is an open-source Python SDK from AWS that lets developers build AI agents with tool use, multi-agent orchestration, and flexibility to work with different model providers, which matches what the startup needs.\nAmazon Personalize generates recommendations from user behavior data. Amazon Comprehend performs Natural Language Processing tasks like sentiment analysis. Amazon Lex builds conversational chatbots and voice interfaces. None of these provides an open-source SDK for building custom AI agents with multi-agent orchestration.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Strands Agents",
+      "Amazon Personalize",
+      "Amazon Comprehend",
+      "Amazon Lex"
+    ]
+  },
+  {
+    "id": "aif-q382",
+    "question": "An enterprise wants managed infrastructure to deploy, scale, and monitor its AI agents in production without handling the underlying compute and networking. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon Bedrock AgentCore",
+      "B": "Amazon SageMaker Canvas",
+      "C": "Amazon Kendra",
+      "D": "Amazon Polly"
+    },
+    "answer": "A",
+    "explanation": "Amazon Bedrock AgentCore provides managed infrastructure for deploying, scaling, and monitoring AI agents in production, handling the compute, networking, and operational concerns so the enterprise can focus on agent logic rather than infrastructure management.\nAmazon SageMaker Canvas is a no-code interface for building ML models. Amazon Kendra provides intelligent enterprise search. Amazon Polly converts text to speech. None of these provides managed infrastructure specifically for running AI agents in production.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon Bedrock AgentCore",
+      "Amazon SageMaker Canvas",
+      "Amazon Kendra",
+      "Amazon Polly"
+    ]
+  },
+  {
+    "id": "aif-q383",
+    "question": "A travel agency builds an AI agent that can search flight availability, book tickets, and process payments by calling the airline's APIs. Which agentic AI capability allows the agent to interact with these external systems?",
+    "options": {
+      "A": "Memory management",
+      "B": "Tool usage",
+      "C": "Model fine-tuning",
+      "D": "Prompt caching"
+    },
+    "answer": "B",
+    "explanation": "Tool usage is the agentic AI capability that allows an agent to call external APIs, services, and systems to retrieve information or take actions, which is how the travel agent searches flights, books tickets, and processes payments through the airline's APIs.\nMemory management stores and retrieves information across interactions but does not call external systems. Model fine-tuning updates model weights during training rather than enabling runtime API calls. Prompt caching stores frequently used prompts for efficiency but does not interact with external systems.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q437",
+    "question": "A company uses Amazon Bedrock for a customer support chatbot and notices costs increasing. The team discovers that full conversation histories are included in every prompt. Which aspect of the token-based pricing model explains this?",
+    "options": {
+      "A": "Cost is based on the number of API calls regardless of content",
+      "B": "Cost increases with the total number of input and output tokens processed per request",
+      "C": "Cost is determined by the time the model spends processing each request",
+      "D": "Cost depends on the number of concurrent users"
+    },
+    "answer": "B",
+    "explanation": "Token-based pricing charges for the total number of input and output tokens processed in each request, so including long conversation histories increases the input token count on every call and directly drives up costs.\nAmazon Bedrock does not charge a flat fee per API call regardless of content. Pricing is not based on processing time or concurrent user count; it is based on token volume.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q438",
+    "question": "How does reducing the maximum output token limit affect cost and performance when using a foundation model?",
+    "options": {
+      "A": "It increases cost but has no effect on response time",
+      "B": "It decreases cost and can reduce response time",
+      "C": "It has no effect on cost or response time",
+      "D": "It increases response time but decreases cost"
+    },
+    "answer": "B",
+    "explanation": "Reducing the maximum output token limit means fewer tokens are generated per request, which directly lowers cost under token-based pricing and can also reduce response time because the model produces less output.\nFewer output tokens means less to pay for, so cost does not increase. Output tokens directly affect both billing and generation time, so there is an effect. Generating fewer tokens is faster, not slower.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q439",
+    "question": "A startup with no ML infrastructure wants to launch a generative AI feature quickly. Which advantage of using AWS GenAI services like Amazon Bedrock is most relevant?",
+    "options": {
+      "A": "The startup must train its own foundation model from scratch",
+      "B": "AWS GenAI services lower the barrier to entry by providing managed access to pre-trained foundation models",
+      "C": "AWS GenAI services require the startup to manage GPU clusters",
+      "D": "AWS GenAI services are only available to enterprise customers"
+    },
+    "answer": "B",
+    "explanation": "AWS GenAI services like Amazon Bedrock provide managed access to pre-trained foundation models through APIs, which lowers the barrier to entry by removing the need to train models, manage infrastructure, or procure GPUs, letting the startup launch quickly.\nThe startup does not need to train its own model because pre-trained models are available. AWS manages the infrastructure so the startup does not manage GPU clusters. These services are available to all customers, not only enterprises.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q440",
+    "question": "A healthcare company is evaluating whether to build its generative AI application on AWS. Which benefit of AWS infrastructure is most important for this regulated industry?",
+    "options": {
+      "A": "AWS provides the lowest possible inference latency globally",
+      "B": "AWS infrastructure provides built-in security, compliance certifications, and data protection controls",
+      "C": "AWS guarantees that AI models never produce incorrect outputs",
+      "D": "AWS eliminates the need for any data governance policies"
+    },
+    "answer": "B",
+    "explanation": "AWS infrastructure provides security controls, compliance certifications (such as HIPAA eligibility), and data protection features that regulated industries like healthcare require to deploy AI applications responsibly and meet legal obligations.\nNo provider guarantees the lowest latency globally in all cases. No AI system can guarantee it never produces incorrect outputs. AWS does not eliminate the need for data governance — organizations must still implement their own policies.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q441",
+    "question": "A retail company deployed a generative AI chatbot six months ago and wants to measure its business value. Which metric best indicates the chatbot's impact on revenue?",
+    "options": {
+      "A": "Model parameter count",
+      "B": "Average revenue per user",
+      "C": "Number of training epochs",
+      "D": "Inference latency"
+    },
+    "answer": "B",
+    "explanation": "Average revenue per user measures the financial value generated from each customer, so tracking whether it increases after deploying the chatbot directly indicates the chatbot's revenue impact.\nModel parameter count describes model size. Number of training epochs is a training configuration detail. Inference latency measures response speed. None of these reflects revenue impact.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q442",
+    "question": "A company uses a generative AI assistant to help its support team and wants to measure operational efficiency gains. Which metric should it track?",
+    "options": {
+      "A": "ROUGE score",
+      "B": "Efficiency measured as reduction in average handle time per case",
+      "C": "BERTScore",
+      "D": "Model perplexity"
+    },
+    "answer": "B",
+    "explanation": "Reduction in average handle time per case directly measures how much faster agents resolve issues with the AI assistant's help, which is an operational efficiency gain and a business value metric for GenAI applications.\nROUGE and BERTScore measure generated text quality against references. Model perplexity measures language-modeling fit. None of these captures operational efficiency.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q443",
+    "question": "Which stage of the foundation model lifecycle involves selecting the right data sources and preparing them before any model training begins?",
+    "options": {
+      "A": "Deployment",
+      "B": "Evaluation",
+      "C": "Data selection",
+      "D": "Feedback"
+    },
+    "answer": "C",
+    "explanation": "Data selection is the first stage of the foundation model lifecycle, where appropriate data sources are identified and curated before pre-training begins. The quality and breadth of selected data directly shapes what the model learns.\nDeployment is a later stage where the trained model is made available for inference. Evaluation assesses model performance after training. Feedback is the final stage where user interactions inform improvements.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q450",
+    "question": "A company invested in a generative AI solution to automate report writing. Which metric best measures whether this investment delivered financial value?",
+    "options": {
+      "A": "Return on investment (ROI)",
+      "B": "Model accuracy",
+      "C": "Number of model parameters",
+      "D": "Training data volume"
+    },
+    "answer": "A",
+    "explanation": "Return on investment (ROI) measures whether the financial benefits of the AI solution, such as labor savings and faster output, exceed the costs of building and running it, which directly shows whether the investment delivered financial value.\nModel accuracy measures prediction quality but not financial return. Number of parameters and training data volume are technical details unrelated to business value.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  }
+]

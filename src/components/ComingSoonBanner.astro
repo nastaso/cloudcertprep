@@ -1,0 +1,81 @@
+---
+/**
+ * ComingSoonBanner.astro — Astro port of the React ComingSoonBanner.
+ *
+ * Rendered on cert landing pages when `cert.status === 'coming-soon'`.
+ * Replaces the practice-exam CTA with a roadmap note plus a "Watch on GitHub"
+ * CTA. Inlines the Clock and Github lucide SVGs. Identical markup/classes to
+ * the React source.
+ */
+import Button from './Button.astro'
+import { GITHUB_REPO_URL } from '../lib/constants'
+import type { Certification } from '../data/certifications'
+
+interface Props {
+  cert: Certification
+}
+
+const { cert } = Astro.props
+
+// lucide icon path data (24x24, stroke-based)
+const icons = {
+  clock: '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>',
+  github: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>',
+}
+---
+
+<div class="bg-brand/10 border border-brand/30 rounded-xl p-4 md:p-6 shadow-card">
+  <div class="flex items-start gap-3 mb-4">
+    <svg
+      class="w-5 h-5 md:w-6 md:h-6 text-brand flex-shrink-0 mt-0.5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      set:html={icons.clock}
+    />
+    <div>
+      <h2 class="text-base md:text-lg font-semibold text-text-primary mb-1">
+        {cert.shortName} is coming soon
+      </h2>
+      <p class="text-sm md:text-base text-text-muted leading-relaxed">
+        The {cert.name} ({cert.shortName}) question bank is being authored.
+        Watch the GitHub repository to be notified when it ships, or open an
+        issue to suggest topics, services, or sample questions.
+      </p>
+    </div>
+  </div>
+  <div class="flex flex-col md:flex-row gap-3">
+    <Button
+      href={GITHUB_REPO_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="flex-1"
+    >
+      <svg
+        class="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        set:html={icons.github}
+      />
+      Watch on GitHub
+    </Button>
+    <Button
+      href={`${GITHUB_REPO_URL}/issues/new?template=add-certification.yml&title=Suggest+content+for+${cert.shortName}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      variant="secondary"
+      class="flex-1"
+    >
+      Suggest content
+    </Button>
+  </div>
+</div>

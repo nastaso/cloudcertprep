@@ -1,0 +1,439 @@
+---
+/**
+ * /aws/:cert/:domain : the Domain_Landing.
+ *
+ * One programmatic page per (active cert, domain) pair. At squash time that is
+ * 4 CLF-C02 domains + 5 AIF-C01 domains = 9 indexable pages. Every page is
+ * fully prerendered: the sample questions are server-rendered with their
+ * correct answers + explanations (via SampleQuestionCard.astro, NOT the React
+ * AnswerButton), so crawlers and LLM browse-mode read the content without any
+ * JS execution.
+ *
+ * SEO: per-domain title/description/canonical, a domain-specific FAQPage
+ * JSON-LD (rendered visibly AND emitted as structured data), and a
+ * BreadcrumbList (from Breadcrumb.astro). AIF-C01 is GA and indexable on day
+ * one (CERTS_UNDER_REVIEW is empty at squash).
+ *
+ * Satisfies: R6.1-R6.10, R6.12-R6.19, R10.1, R13.5, R13.7, R17.5.
+ */
+import { getCollection, type CollectionEntry } from 'astro:content'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import Button from '../../../components/Button.astro'
+import Card from '../../../components/Card.astro'
+import Breadcrumb from '../../../components/Breadcrumb.astro'
+import LastUpdatedStamp from '../../../components/LastUpdatedStamp.astro'
+import SampleQuestionCard from '../../../components/SampleQuestionCard.astro'
+import GitHubPermalinkCallout from '../../../components/GitHubPermalinkCallout.astro'
+import Faq from '../../../components/Faq.astro'
+import PostCard from '../../../components/PostCard.astro'
+import {
+  CERTIFICATIONS,
+  getCertDomainSlug,
+  getCertTotalQuestions,
+  isCertNoindex,
+  type Certification,
+  type CertDomain,
+} from '../../../data/certifications'
+import {
+  getKeywordCluster,
+  getSampleKeywordTerms,
+  titleCaseKeyword,
+  fixKeywordInitialisms,
+} from '../../../data/keyword-clusters'
+import { SITE_URL } from '../../../lib/seo-data'
+import { GITHUB_REPO_URL } from '../../../lib/constants'
+
+// Static imports of every active cert's question banks. Keyed lookup:
+// QUESTION_BANKS[certCode][domainId] -> question array.
+import clfDomain1 from '../../../data/clf-c02/domain1.json'
+import clfDomain2 from '../../../data/clf-c02/domain2.json'
+import clfDomain3 from '../../../data/clf-c02/domain3.json'
+import clfDomain4 from '../../../data/clf-c02/domain4.json'
+import aifDomain1 from '../../../data/aif-c01/domain1.json'
+import aifDomain2 from '../../../data/aif-c01/domain2.json'
+import aifDomain3 from '../../../data/aif-c01/domain3.json'
+import aifDomain4 from '../../../data/aif-c01/domain4.json'
+import aifDomain5 from '../../../data/aif-c01/domain5.json'
+
+interface SampleQuestion {
+  id: string
+  question: string
+  options: Record<string, string>
+  answer: string | string[]
+  explanation: string
+  isMultiAnswer?: boolean
+}
+
+const QUESTION_BANKS: Record<string, Record<number, SampleQuestion[]>> = {
+  'clf-c02': {
+    1: clfDomain1 as SampleQuestion[],
+    2: clfDomain2 as SampleQuestion[],
+    3: clfDomain3 as SampleQuestion[],
+    4: clfDomain4 as SampleQuestion[],
+  },
+  'aif-c01': {
+    1: aifDomain1 as SampleQuestion[],
+    2: aifDomain2 as SampleQuestion[],
+    3: aifDomain3 as SampleQuestion[],
+    4: aifDomain4 as SampleQuestion[],
+    5: aifDomain5 as SampleQuestion[],
+  },
+}
+
+export function getStaticPaths() {
+  const paths = []
+  for (const cert of Object.values(CERTIFICATIONS)) {
+    if (cert.status !== 'active') continue
+    if (cert.provider !== 'aws') continue
+    for (const domain of cert.domains) {
+      paths.push({
+        params: { cert: cert.code, domain: getCertDomainSlug(cert, domain.id) },
+        props: { cert, domain },
+      })
+    }
+  }
+  return paths
+}
+
+interface Props {
+  cert: Certification
+  domain: CertDomain
+}
+
+const { cert, domain } = Astro.props
+
+const domainSlug = getCertDomainSlug(cert, domain.id)
+const certPath = `/aws/${cert.code}`
+const canonical = `${SITE_URL}/aws/${cert.code}/${domainSlug}`
+
+// Per-domain OG composite generated at build time by generate-og-images.mjs.
+// Each Domain_Landing gets a unique cert+domain image. (R6.14)
+const ogImage = `${SITE_URL}/og/og-${cert.code}-${domainSlug}.png`
+
+// Sample questions: single-select only (multi-answer "Select N" questions are
+// not shown as samples), ranked so the questions whose text matches this
+// domain's high-volume Semrush keyword terms (from keyword-clusters.ts, R6.18)
+// surface first. The page's question-count claim still uses the full bank.
+const bank: SampleQuestion[] = QUESTION_BANKS[cert.code]?.[domain.id] ?? []
+const singleSelectBank = bank.filter(q => !q.isMultiAnswer)
+const sampleKeywordTerms = getSampleKeywordTerms(cert.code, domain.id)
+const scoreQuestion = (q: SampleQuestion): number => {
+  const haystack = `${q.question} ${Object.values(q.options).join(' ')}`.toLowerCase()
+  let score = 0
+  for (const term of sampleKeywordTerms) {
+    if (haystack.includes(term)) score++
+  }
+  return score
+}
+const sampleQuestions = singleSelectBank
+  .map((q, i) => ({ q, i, score: scoreQuestion(q) }))
+  // Stable sort: higher keyword score first, original bank order as tiebreak.
+  .sort((a, b) => b.score - a.score || a.i - b.i)
+  .slice(0, 5)
+  .map(entry => entry.q)
+const totalDomainQuestions = bank.length
+const totalCertQuestions = getCertTotalQuestions(cert.code)
+
+// Task statements scoped to this domain (AIF-C01 exposes them; CLF-C02 does not).
+const domainTaskStatements = (cert.taskStatements ?? []).filter(t => t.domainId === domain.id)
+
+// Sister domains for the "Other domains" grid.
+const sisterDomains = cert.domains
+  .filter(d => d.id !== domain.id)
+  .map(d => ({
+    name: d.name,
+    href: `/aws/${cert.code}/${getCertDomainSlug(cert, d.id)}`,
+  }))
+
+// In-scope AWS services for this cert (AIF-C01 exposes them; CLF-C02 does not).
+const relatedServices = cert.services ?? []
+
+// --- Latest blog posts for this domain (8.7) --------------------------
+// Build-time only: list the 3 most recent non-draft posts whose `tags`
+// include this domain's slug, ordered by date descending. The block is only
+// rendered when at least one matching post exists (no empty heading).
+const latestPosts = (await getCollection('blog'))
+  .filter((post: CollectionEntry<'blog'>) => !post.data.draft && post.data.tags.includes(domainSlug))
+  .sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3)
+
+// --- SEO ---------------------------------------------------------------
+// Per-domain keyword cluster (R6.18). The primary keyword drives the title,
+// meta description, H1, first intro paragraph, and at least one H2. Body-only
+// supporting terms (cluster.body) are NEVER read here, so they can't leak into
+// the head metadata.
+const cluster = getKeywordCluster(cert.code, domain.id)
+const primaryKeyword = cluster.primary
+const primaryTitleCased = titleCaseKeyword(primaryKeyword)
+// Initialism-fixed variant for MID-SENTENCE body/H2 use ("AWS cloud concepts
+// practice questions", "AIF-C01 questions") — keeps lowercase words lowercase
+// but corrects AWS/AI/CLF-C02 etc., so the running copy reads naturally
+// instead of showing a raw lowercase keyword.
+const primaryInSentence = fixKeywordInitialisms(primaryKeyword)
+
+// Title: lead with the primary keyword, anchor to the cert, end with the
+// brand. Never names a competitor (R6.13, R16.5), asserted below. No em
+// dashes anywhere (site-wide rule): the cert short name is parenthesised.
+const title = `${primaryTitleCased} (${cert.shortName}) · CloudCertPrep`
+// Meta description: includes the primary keyword + domain question count,
+// reads naturally, ~150 chars, no competitor name (R6.13, R16.5).
+const description = `${primaryTitleCased}: ${totalDomainQuestions}+ free ${cert.shortName} questions with explanations for the ${domain.name} domain. No signup required.`
+
+// Secondary keywords woven into the intro body copy (joined for a natural
+// sentence). Body-only terms are intentionally NOT surfaced here. Each term is
+// initialism-fixed (AWS/AI/CLF-C02 …) for natural mid-sentence reading.
+const secondaryList = cluster.secondary.length > 0
+  ? cluster.secondary.map(fixKeywordInitialisms).reduce((acc, term, i, arr) => {
+      if (i === 0) return term
+      if (i === arr.length - 1) return `${acc}, and ${term}`
+      return `${acc}, ${term}`
+    }, '')
+  : ''
+
+// Robots: noindex coming-soon OR under-review certs (CERTS_UNDER_REVIEW is
+// empty at squash, so AIF-C01 is index,follow today). Driven by the shared
+// isCertNoindex helper so a future under-review cert auto-noindexes here, not
+// just in the sitemap. (R2.9, R6.17)
+const robots = isCertNoindex(cert) ? 'noindex' : 'index, follow'
+
+// --- Conversion CTAs ---------------------------------------------------
+// Primary CTA deep-links into domain practice for THIS domain via the
+// ?domain=<id> query param (read by _DomainPractice.tsx). Secondary CTA
+// routes to the full timed mock exam.
+const domainPracticeHref = `${certPath}/domain-practice?domain=${domain.id}`
+const practiceExamHref = `${certPath}/practice-exam`
+const examPercent = Math.round(domain.examProportion * 100)
+
+// Hero trust bullets (check + label), mirroring the cert landing rhythm.
+const heroBullets = [
+  `${totalDomainQuestions}+ questions`,
+  'Free, no signup',
+  `${examPercent}% of the exam`,
+  'Detailed explanations',
+]
+
+const breadcrumbItems = [
+  { label: 'Home', to: '/' },
+  { label: cert.shortName, to: certPath },
+  { label: domain.name },
+]
+
+// --- Domain-specific FAQ (rendered visibly + emitted as FAQPage JSON-LD) ---
+const faqEntries = [
+  {
+    question: `How many ${cert.shortName} ${domain.name} practice questions are there?`,
+    answer: `There are ${totalDomainQuestions} free practice questions for the ${domain.name} domain of the ${cert.name} (${cert.shortName}) exam, part of a pool of ${totalCertQuestions.toLocaleString('en-US')}+ questions across the whole certification. Every question includes a detailed explanation.`,
+  },
+  {
+    question: `How do I practise ${cert.shortName} ${domain.name} questions?`,
+    answer: `Start a free domain practice session for ${domain.name} on CloudCertPrep. Signed-in users get adaptive spaced repetition that prioritises questions you have got wrong or have not seen yet. No account is required to practise as a guest.`,
+  },
+  {
+    question: `How hard is the ${domain.name} domain on the ${cert.shortName} exam?`,
+    answer: `The ${domain.name} domain accounts for roughly ${Math.round(domain.examProportion * 100)}% of the ${cert.shortName} exam. ${cert.level === 'foundational' ? 'As a foundational certification, it tests breadth of understanding rather than deep implementation detail.' : 'It tests applied knowledge of this area of the exam blueprint.'} Working through the practice questions and reading the explanations is the fastest way to build confidence.`,
+  },
+  {
+    question: `Are these ${cert.shortName} ${domain.name} practice questions free?`,
+    answer: `Yes. Every practice question on CloudCertPrep is 100% free with no paywalls, premium tiers, or ads. The platform is MIT licensed and sustained by optional donations.`,
+  },
+  {
+    question: `Where do the ${cert.shortName} ${domain.name} questions come from?`,
+    answer: `The entire question bank is open source and publicly auditable on GitHub at ${GITHUB_REPO_URL}. The ${domain.name} questions live in src/data/${cert.code}/domain${domain.id}.json, aligned to the official AWS exam guide. You can inspect them, suggest corrections, or open a pull request.`,
+  },
+]
+
+const checkIcon = '<polyline points="20 6 9 17 4 12"></polyline>'
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  ogImage={ogImage}
+  robots={robots}
+>
+  <div class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="space-y-8">
+        {/* 1. Breadcrumb (visible + BreadcrumbList JSON-LD) */}
+        <Breadcrumb items={breadcrumbItems} />
+
+        {/* 2. Conversion hero: keyword H1, brand accent sub-line, muted intro,
+            primary + secondary CTAs, and a check-marked trust-bullet row. The
+            primary keyword stays in the H1 (R6.5). */}
+        <header class="text-center py-4 md:py-8">
+          <h1 class="text-3xl md:text-5xl font-bold text-text-primary mb-4 md:mb-6">
+            {cert.shortName} {domain.name}
+            <span class="block text-text-primary mt-2">{primaryTitleCased}</span>
+          </h1>
+          <p class="text-lg md:text-xl text-text-muted mb-6 md:mb-8 max-w-2xl mx-auto">
+            {totalDomainQuestions}+ free practice questions for the {domain.name} domain of the {cert.name} ({cert.shortName}) exam, each with a detailed explanation. Practise right in your browser.
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 md:mb-8">
+            <Button href={domainPracticeHref} size="lg" arrow>
+              Start practising
+            </Button>
+            <Button href={practiceExamHref} variant="secondary" size="lg">
+              Take a full mock exam
+            </Button>
+          </div>
+
+          <ul class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-text-muted text-sm md:text-base mb-4 list-none p-0">
+            {heroBullets.map(label => (
+              <li class="inline-flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={checkIcon} />
+                {label}
+              </li>
+            ))}
+          </ul>
+
+          <div class="flex justify-center">
+            <LastUpdatedStamp examGuideVersion={cert.examGuideVersion} examGuideUrl={cert.examGuideUrl} />
+          </div>
+        </header>
+
+        {/* 4. Intro (200-400 words, primary keyword in first paragraph + an H2) */}
+        <section class="space-y-4 text-text-muted text-sm md:text-base leading-relaxed">
+          <p>
+            Looking for {primaryInSentence}? You are in the right place. The <strong class="text-text-primary">{domain.name}</strong> domain is a core part of the {cert.name} ({cert.shortName}) certification exam, making up roughly {Math.round(domain.examProportion * 100)}% of the questions you will face. Every question on this page is written to match the difficulty, style, and topic coverage of the real exam, and each one comes with a detailed explanation of why the correct answer is right and the others are wrong.
+          </p>
+          <p>
+            {domain.taskRange && domain.weight ? `This domain covers Task Statements ${domain.taskRange} of the official AWS ${cert.shortName} exam guide (${domain.weight}% of the scored exam). ` : ''}CloudCertPrep is a free, open-source AWS certification practice platform. There are {totalDomainQuestions}+ questions in this domain alone, part of a pool of {totalCertQuestions.toLocaleString('en-US')}+ across the whole {cert.shortName} exam.{secondaryList ? ` If you have searched for ${secondaryList}, these cover the same ground.` : ''} You can practise as a guest with no signup, or create a free account to unlock adaptive spaced repetition that focuses your study on the questions you find hardest.
+          </p>
+          <h2 class="text-xl md:text-2xl font-semibold text-text-primary pt-2">
+            How to use these {primaryInSentence}
+          </h2>
+          <p>
+            Read each question carefully, pick your answer, then read the explanation in full. The explanations are where the real learning happens. Once you are comfortable with the {domain.name} domain, take a full-length timed mock exam to build pacing and stamina. Because the entire question bank is open source, you can verify every question against the official AWS documentation and exam guide yourself.
+          </p>
+        </section>
+
+        {/* 5. What this domain covers (from task statements when available) */}
+        {domainTaskStatements.length > 0 && (
+          <Card as="section" padding="md">
+            <h2 class="text-xl md:text-2xl font-semibold text-text-primary mb-4">
+              What this domain covers
+            </h2>
+            <ul class="space-y-2 list-none p-0">
+              {domainTaskStatements.map(task => (
+                <li class="flex items-start gap-2 text-text-muted text-sm md:text-base">
+                  <svg class="w-4 h-4 md:w-5 md:h-5 text-success flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={checkIcon} />
+                  <span><span class="text-text-primary font-medium">{task.id}</span>: {task.name}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        )}
+
+        {/* 6. GitHub permalink callout */}
+        <GitHubPermalinkCallout certCode={cert.code} domainId={domain.id} />
+
+        {/* 7. Sample questions (server-rendered, answers pre-revealed) */}
+        {sampleQuestions.length > 0 && (
+          <section class="space-y-4">
+            <h2 class="text-xl md:text-2xl font-semibold text-text-primary">
+              Sample {domain.name} questions
+            </h2>
+            <div class="space-y-4">
+              {sampleQuestions.map((q, i) => (
+                <SampleQuestionCard
+                  question={q.question}
+                  options={q.options}
+                  answer={q.answer}
+                  explanation={q.explanation}
+                  index={i + 1}
+                  certCode={cert.code}
+                  domainSlug={domainSlug}
+                  questionId={q.id}
+                />
+              ))}
+            </div>
+            <div class="flex flex-wrap gap-3 pt-2">
+              <Button href={domainPracticeHref} arrow>
+                Practise {domain.name}
+              </Button>
+              <Button href={practiceExamHref} variant="secondary">
+                Take a full mock exam
+              </Button>
+            </div>
+          </section>
+        )}
+
+        {/* 7b. Repeat primary CTA below the fold so there is a conversion path
+            above and below the sample questions. */}
+        <Card as="section" padding="md" class="text-center">
+          <h2 class="text-xl md:text-2xl font-semibold text-text-primary mb-4">
+            Ready to practise {domain.name}?
+          </h2>
+          <div class="flex justify-center">
+            <Button href={domainPracticeHref} size="lg" arrow>
+              Start practising
+            </Button>
+          </div>
+        </Card>
+
+        {/* 8. Related AWS services (when cert.services exposes them) */}
+        {relatedServices.length > 0 && (
+          <Card as="section" padding="md">
+            <h2 class="text-xl md:text-2xl font-semibold text-text-primary mb-4">
+              Related AWS services
+            </h2>
+            <p class="text-text-muted text-sm md:text-base mb-3">
+              The {cert.shortName} exam draws on these in-scope AWS services:
+            </p>
+            <ul class="flex flex-wrap gap-2 list-none p-0">
+              {relatedServices.map(service => (
+                <li class="inline-flex items-center px-3 py-1 bg-bg-dark rounded-full text-xs md:text-sm text-text-primary">
+                  {service}
+                </li>
+              ))}
+            </ul>
+          </Card>
+        )}
+
+        {/* 9. FAQ block (visible + FAQPage JSON-LD via Faq.astro) */}
+        <Faq entries={faqEntries} headingId="domain-faq-heading" />
+
+        {/* 10. Latest blog posts tagged for this domain (8.7). Rendered only
+            when at least one matching non-draft post exists. */}
+        {latestPosts.length > 0 && (
+          <section>
+            <h2 class="text-xl md:text-2xl font-semibold text-text-primary mb-4">
+              Latest blog posts
+            </h2>
+            <div class="grid grid-cols-1 gap-4">
+              {latestPosts.map((post: CollectionEntry<'blog'>) => (
+                <PostCard data={post.data} slug={post.data.slug} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* 11. Other domains of this cert */}
+        {sisterDomains.length > 0 && (
+          <section>
+            <h2 class="text-xl md:text-2xl font-semibold text-text-primary mb-4">
+              Other {cert.shortName} domains
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {sisterDomains.map(sister => (
+                <a
+                  href={sister.href}
+                  class="block bg-bg-card hover:bg-bg-card-hover rounded-xl shadow-card p-4 transition-colors text-text-primary font-medium text-sm md:text-base lift focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
+                >
+                  {sister.name}
+                </a>
+              ))}
+            </div>
+            <p class="mt-4 text-sm">
+              <a href={certPath} class="text-text-primary hover:text-text-primary/70 underline rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark">
+                ← Back to all {cert.shortName} practice
+              </a>
+            </p>
+          </section>
+        )}
+      </div>
+    </div>
+  </div>
+</BaseLayout>

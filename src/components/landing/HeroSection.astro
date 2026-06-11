@@ -1,0 +1,46 @@
+---
+/**
+ * HeroSection.astro — the hero <section> wrapper.
+ *
+ * Owns only layout rhythm (max width, vertical padding, horizontal alignment)
+ * and a generous whitespace cadence. The consuming page
+ * supplies the hero body (headline, lede, CTA, value props) via the default
+ * slot — including the single top-level <h1>, whose TEXT is the locked
+ * production HOME_H1; the shell only guarantees spacing + the section landmark.
+ *
+ * Brand-rarity: the shell itself carries NO brand color. It relies solely on
+ * existing token-based spacing/layout utilities.
+ */
+interface Props {
+  /** Horizontal alignment of the hero column. Default 'center'. */
+  align?: 'center' | 'start'
+  /** Inner column max width: 'narrow' = max-w-3xl, 'wide' = max-w-5xl. Default 'narrow'. */
+  width?: 'narrow' | 'wide'
+  /** Optional extra classes appended to the <section>. */
+  class?: string
+}
+
+const { align = 'center', width = 'narrow', class: className } = Astro.props
+
+const maxWidthClass = width === 'wide' ? 'max-w-5xl' : 'max-w-3xl'
+// Both alignments keep the column horizontally centered in the page
+// (mx-auto). `start` only changes the text/cross-axis alignment to the left,
+// so left-aligned heroes sit in a balanced centered column rather than
+// hugging the far-left viewport edge.
+const alignmentClass =
+  align === 'center'
+    ? 'mx-auto text-center items-center'
+    : 'mx-auto text-left items-start'
+---
+
+<section
+  class:list={[
+    // Page padding rhythm + generous vertical breathing room (mobile-first).
+    'w-full p-4 md:p-8 py-16 md:py-24 lg:py-32',
+    className,
+  ]}
+>
+  <div class:list={['flex flex-col gap-6 md:gap-8', maxWidthClass, alignmentClass]}>
+    <slot />
+  </div>
+</section>

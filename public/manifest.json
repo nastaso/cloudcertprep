@@ -1,0 +1,21 @@
+{
+  "name": "CloudCertPrep · Free Cloud Certification Practice Exams",
+  "short_name": "CloudCertPrep",
+  "description": "Free cloud certification practice exams across 2 active certifications (1,459+ questions). Timed mock exams, domain practice with adaptive spaced repetition, and progress tracking. No signup, no ads.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F5F4",
+  "theme_color": "#FF9900",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

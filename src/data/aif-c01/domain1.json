@@ -1,0 +1,2342 @@
+[
+  {
+    "id": "aif-q004",
+    "question": "A manufacturer built a model that classifies photos of parts as defective or not. The team wants to know what proportion of the part images the model classified correctly. Which evaluation metric should they use?",
+    "options": {
+      "A": "Mean absolute error (MAE)",
+      "B": "Number of training epochs",
+      "C": "Root mean squared error (RMSE)",
+      "D": "Accuracy"
+    },
+    "answer": "D",
+    "explanation": "Accuracy is the ratio of correct predictions to the total number of predictions, so it directly measures how many part images the model classified correctly, which is exactly what the team wants for this classification task.\nRoot mean squared error (RMSE) and mean absolute error (MAE) are regression metrics that quantify the difference between predicted and actual continuous values, so neither is suited to measuring classification correctness. Number of training epochs is a training configuration setting that controls how many passes the model makes over the data; it is not an evaluation metric at all.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q006",
+    "question": "A company runs an ML pipeline on Amazon SageMaker AI in production. Its requests carry large payloads of up to 1 GB and can take up to an hour to process, and the company wants near real-time latency. Which SageMaker AI inference option meets these requirements?",
+    "options": {
+      "A": "Real-time inference",
+      "B": "Batch transform",
+      "C": "Serverless inference",
+      "D": "Asynchronous inference"
+    },
+    "answer": "D",
+    "explanation": "Asynchronous inference is built for large payloads of up to 1 GB and long processing times of up to an hour; it queues incoming requests and processes them in the background, returning results when ready without requiring the caller to wait synchronously, which suits workloads that need near real-time handling of demanding requests.\nReal-time inference targets small payloads and fast synchronous responses, and its payload and timeout limits would be exceeded by 1 GB inputs and hour-long processing. Serverless inference suits intermittent traffic with smaller payloads and likewise cannot handle such large inputs or long durations. Batch transform processes large datasets offline in bulk and is not designed to deliver near real-time latency.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon SageMaker AI"
+    ]
+  },
+  {
+    "id": "aif-q007",
+    "question": "A company needs to build models for several new but related tasks. Rather than training models from scratch, it wants to adapt existing pre-trained models. Which ML strategy meets this requirement?",
+    "options": {
+      "A": "Increase the number of epochs",
+      "B": "Use transfer learning",
+      "C": "Decrease the number of epochs",
+      "D": "Use unsupervised learning"
+    },
+    "answer": "B",
+    "explanation": "Transfer learning lets a company take a model already trained on one task and adapt it to new, related tasks, which reuses the knowledge captured in the pre-trained model and saves significant time and data compared to training from scratch.\nIncreasing the number of epochs simply trains a model for more passes over the data and does not provide a way to reuse an existing pre-trained model. Decreasing the number of epochs reduces training passes and likewise has nothing to do with adapting pre-trained models for new tasks. Unsupervised learning finds patterns in unlabeled data but is a learning approach rather than a strategy for reusing and adapting an already trained model.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q014",
+    "question": "A startup is building an educational quiz app that asks players questions such as: \"A bag holds six red, four green, and three yellow marbles. What is the probability of drawing a green marble?\" Which approach satisfies this requirement with the LEAST operational overhead?",
+    "options": {
+      "A": "Train a supervised learning regression model to predict the probability",
+      "B": "Build an unsupervised learning model to estimate the probability density",
+      "C": "Apply reinforcement learning to train a model that returns the probability",
+      "D": "Write simple code that calculates the probability using basic arithmetic rules"
+    },
+    "answer": "D",
+    "explanation": "The probability here is a deterministic calculation of favourable outcomes divided by total outcomes, so a few lines of code applying basic arithmetic produce an exact answer with no data to gather, no model to train, and no endpoint to host, giving the least operational overhead.\nThe three machine learning options all stand up an unnecessary pipeline of data collection, training, tuning, and hosting for a problem that already has a known closed-form answer. Beyond that shared waste, supervised regression would only approximate a value that can be computed exactly; unsupervised learning is meant to uncover structure in unlabelled data, which is irrelevant when the formula is known; and reinforcement learning is designed for sequential decision-making guided by rewards in an environment, not for answering a static arithmetic question.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q015",
+    "question": "A company has deployed a model to production and wants a metric that reflects how efficiently the model operates at runtime. Which metric should it use?",
+    "options": {
+      "A": "Average inference latency",
+      "B": "Customer satisfaction score (CSAT)",
+      "C": "Number of training examples",
+      "D": "Training time per epoch"
+    },
+    "answer": "A",
+    "explanation": "Average inference latency captures how long the model takes to return a prediction once it is running, so it directly reflects the runtime efficiency of operating the model in production, where lower latency means faster, more efficient responses.\nCustomer satisfaction score (CSAT) measures how happy users are with a product or service, which is a business outcome rather than a measure of operational efficiency. Training time per epoch and number of training examples both relate to the training phase, namely how long training runs and how much data it uses, and say nothing about how efficiently the deployed model operates at inference time.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q017",
+    "question": "A retailer has accumulated petabytes of customer records that have no labels or predefined categories. The business wants to group these customers into distinct segments to target them with tailored promotions. Which machine learning approach best fits this requirement?",
+    "options": {
+      "A": "Supervised learning",
+      "B": "Unsupervised learning",
+      "C": "Reinforcement learning",
+      "D": "Semi-supervised learning"
+    },
+    "answer": "B",
+    "explanation": "Unsupervised learning discovers patterns and natural groupings within unlabeled data, making it the right approach for segmenting customers when no predefined labels or categories exist, as is the case with the retailer's unlabeled records.\nSupervised learning requires labeled training data where each record has a known target output, which the retailer does not have. Reinforcement learning trains an agent through rewards and penalties as it interacts with an environment, which does not apply to segmenting a static dataset of customers. Semi-supervised learning relies on a small amount of labeled data combined with a larger pool of unlabeled data, but here there are no labels at all, so a purely unsupervised approach is the correct fit.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q020",
+    "question": "A company wants to use AI to protect its application from threats by checking whether an incoming IP address comes from a suspicious source. Which solution meets this requirement?",
+    "options": {
+      "A": "Build a speech recognition system",
+      "B": "Develop an anomaly detection system",
+      "C": "Create a fraud forecasting system",
+      "D": "Set up a named entity recognition system using Natural Language Processing (NLP)"
+    },
+    "answer": "B",
+    "explanation": "An anomaly detection system learns what normal traffic and behaviour look like and flags activity that deviates from those patterns, so it can pick out IP addresses that behave suspiciously or differ from legitimate sources, directly meeting the goal of protecting the application from threats.\nA speech recognition system converts spoken audio into text and has nothing to do with analysing IP addresses. A named entity recognition system based on NLP extracts entities such as names and places from text, not network threat signals. A fraud forecasting system predicts future fraud volumes or trends rather than flagging an individual suspicious IP as it arrives.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q027",
+    "question": "A company has built an image classification model and wants a web application to call it for real-time predictions. The company needs a fully managed way to host the model and serve those predictions that scales automatically with demand. Which solution meets these requirements?",
+    "options": {
+      "A": "Use Amazon SageMaker Serverless Inference to deploy the model",
+      "B": "Use Amazon CloudFront to deploy the model",
+      "C": "Use Amazon API Gateway to host the model and serve predictions",
+      "D": "Use AWS Batch to host the model and serve predictions"
+    },
+    "answer": "A",
+    "explanation": "Amazon SageMaker Serverless Inference is a fully managed option that hosts a model and serves predictions on demand while automatically provisioning and scaling the underlying compute, so a web application can call the model for real-time predictions without the company managing capacity.\nAmazon CloudFront is a content delivery network that caches and distributes content to reduce latency, and it cannot host an ML model or generate predictions. Amazon API Gateway creates and manages the API layer that fronts a backend, but it does not itself host a model or run inference and would still need a compute service behind it. AWS Batch runs batch computing jobs on managed compute and is suited to offline bulk processing rather than serving low-latency, on-demand predictions to a web application.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": [
+      "Amazon SageMaker AI",
+      "Amazon CloudFront",
+      "AWS Batch"
+    ]
+  },
+  {
+    "id": "aif-q031",
+    "question": "A wildlife researcher has a large collection of animal photos and wants to automatically identify and categorise the animals in each image without manual effort. Which strategy meets this requirement?",
+    "options": {
+      "A": "Named entity recognition",
+      "B": "Inpainting",
+      "C": "Object detection",
+      "D": "Anomaly detection"
+    },
+    "answer": "C",
+    "explanation": "Object detection is a Computer Vision technique that automatically finds and classifies the objects within an image, so it can locate each animal in a photo and assign it to a category without manual effort, which is exactly what the researcher needs.\nAnomaly detection flags data points that deviate from normal patterns, not the contents of an image. Named entity recognition is a Natural Language Processing (NLP) technique that extracts entities such as names and places from text rather than from photos. Inpainting is a generative Computer Vision technique that fills in missing or removed regions of an image, rather than identifying and categorising what is in it.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q045",
+    "question": "A hotel chain wants to read sentiment from written guest reviews. Which two AWS services can meet this requirement?",
+    "options": {
+      "A": "Amazon Comprehend",
+      "B": "Amazon Polly",
+      "C": "Amazon Bedrock",
+      "D": "Amazon Lex",
+      "E": "Amazon Rekognition"
+    },
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Amazon Comprehend is a Natural Language Processing (NLP) service with built-in sentiment analysis that can determine whether text is positive, negative, neutral, or mixed, making it well suited to analyze written reviews. Amazon Bedrock provides access to foundation models that can also classify the sentiment of text through prompting.\nAmazon Polly is a text-to-speech service that converts written text into lifelike spoken audio, which is the opposite of analyzing text content. Amazon Lex is a service for building conversational chatbots and voice interfaces, not for analyzing the sentiment of existing text. Amazon Rekognition is a Computer Vision service that analyzes images and video for objects, faces, and scenes, and cannot process written text for sentiment.",
+    "isMultiAnswer": true,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Comprehend",
+      "Amazon Bedrock",
+      "Amazon Polly",
+      "Amazon Lex",
+      "Amazon Rekognition"
+    ]
+  },
+  {
+    "id": "aif-q056",
+    "question": "An electronics company wants to forecast customer demand for its memory products. Its team has no coding skills and no knowledge of ML algorithms, yet needs to build a data-driven predictive model that draws on both internal and external data. Which solution meets these requirements?",
+    "options": {
+      "A": "Import the data into Amazon SageMaker Data Wrangler and build the forecasting models using Amazon SageMaker AI built-in algorithms",
+      "B": "Import the data into Amazon SageMaker Canvas and build the forecasting models in Canvas",
+      "C": "Store the data in Amazon S3 and build the forecasting models using Amazon SageMaker AI built-in algorithms",
+      "D": "Import the data into Amazon SageMaker Data Wrangler and build the forecasting models by writing custom training code"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker Canvas is a no-code service that lets business users import data and build ML models and generate predictions through a visual point-and-click interface, without writing code or understanding ML algorithms, which is exactly what a team with no coding or ML experience needs to forecast demand.\nThe other options all require technical skills the team does not have. Using Amazon SageMaker AI built-in algorithms, whether the data is stored in Amazon S3 or prepared in Amazon SageMaker Data Wrangler, still involves coding to build and train the models, and writing custom training code clearly does too. Amazon SageMaker Data Wrangler is also focused on data preparation rather than no-code model building, so none of these meets the no-code requirement.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Canvas",
+      "Amazon SageMaker Data Wrangler",
+      "Amazon SageMaker AI",
+      "Amazon S3"
+    ]
+  },
+  {
+    "id": "aif-q058",
+    "question": "A company is building a customer support chatbot that should keep getting better at responding by learning from its previous conversations. Which AI learning strategy provides this self-improvement capability?",
+    "options": {
+      "A": "Supervised learning using a hand-labelled set of good and bad example responses",
+      "B": "Unsupervised learning to group similar customer questions into clusters",
+      "C": "Reinforcement learning that rewards responses which gain positive customer feedback",
+      "D": "Supervised learning driven by a regularly updated FAQ knowledge base"
+    },
+    "answer": "C",
+    "explanation": "Reinforcement Learning trains a model by rewarding desirable outcomes and penalising undesirable ones, enabling the chatbot to continuously improve its responses based on real signals such as positive customer feedback without requiring a manually prepared labelled dataset for each update.\nSupervised Learning with a manually curated dataset of good and bad responses requires ongoing human effort to label training examples and does not enable autonomous self-improvement from live interactions. Unsupervised Learning identifies patterns and clusters in unlabelled data, which could help group similar customer questions but provides no mechanism for improving response quality based on feedback signals. Supervised Learning with a continuously updated FAQ database also relies on manual maintenance of the underlying dataset rather than autonomous learning from customer interactions.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q059",
+    "question": "An AI practitioner has trained a deep learning model that classifies images into different dog breeds. The practitioner now wants to measure how well the model performs. Which metric will help evaluate the model's performance?",
+    "options": {
+      "A": "Confusion matrix",
+      "B": "Correlation matrix",
+      "C": "R2 score",
+      "D": "Mean squared error (MSE)"
+    },
+    "answer": "A",
+    "explanation": "A confusion matrix is the appropriate metric for evaluating a classification model because it breaks predictions down into true positives, false positives, true negatives, and false negatives, giving a detailed view of where the model is correct and where it misclassifies each breed.\nA correlation matrix measures the statistical relationships between variables in a dataset and is a data exploration tool used during EDA, not a model performance metric. R2 score, or the coefficient of determination, measures how well a regression model explains variance in continuous output values and is not applicable to classification tasks. Mean squared error measures the average squared difference between predicted and actual continuous values, making it a regression metric that is also unsuitable for evaluating a classification model.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q062",
+    "question": "An insurance company needs to run its ML model over several years of archived claims records to generate predictions, with each dataset running to several gigabytes. The results are not required immediately. Which Amazon SageMaker AI inference option best fits this need?",
+    "options": {
+      "A": "Serverless inference",
+      "B": "Batch transform",
+      "C": "Real-time inference",
+      "D": "Asynchronous inference"
+    },
+    "answer": "B",
+    "explanation": "Batch transform runs inference as an offline job over an entire dataset without a persistent endpoint, so it can process the multiple-gigabyte archived data efficiently when the predictions are not needed immediately.\nReal-time inference and serverless inference both return predictions synchronously from a live endpoint for low-latency, on-demand requests, so neither suits offline bulk processing of large datasets. Asynchronous inference queues incoming requests and is intended for large individual payloads that need near-real-time handling, rather than running a single job across an entire archived dataset.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker AI"
+    ]
+  },
+  {
+    "id": "aif-q068",
+    "question": "A recruitment agency receives a growing volume of resumes as PDF files that it can no longer review manually. It needs an automated way to convert these PDF resumes into plain text for further processing. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon Lex",
+      "B": "Amazon Textract",
+      "C": "Amazon Transcribe",
+      "D": "Amazon Personalize"
+    },
+    "answer": "B",
+    "explanation": "Amazon Textract automatically extracts text and data from scanned documents and PDFs, so it can turn the resumes into plain text for downstream processing.\nAmazon Lex builds conversational chatbots and voice interfaces. Amazon Transcribe converts speech audio into text rather than reading documents. Amazon Personalize generates real-time recommendations. None of these extract text from PDF files.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Textract",
+      "Amazon Lex",
+      "Amazon Transcribe",
+      "Amazon Personalize"
+    ]
+  },
+  {
+    "id": "aif-q072",
+    "question": "A data science team has just gathered a new dataset and is examining it by calculating summary statistics, plotting charts, and building a correlation matrix. Which stage of the ML pipeline does this describe?",
+    "options": {
+      "A": "Model training",
+      "B": "Exploratory data analysis",
+      "C": "Data collection",
+      "D": "Feature engineering"
+    },
+    "answer": "B",
+    "explanation": "Exploratory data analysis is the stage where a team summarises a dataset through statistics, visualisations, and correlation matrices to understand its structure, distribution, and relationships before any modelling begins, which is exactly what the team is doing.\nModel training is a later stage where an algorithm learns patterns from prepared data, not where the raw dataset is examined. Data collection is the earlier stage of gathering the raw data; although the data was just gathered, the activities described are about analysing it rather than collecting it. Feature engineering creates or selects input variables to improve model performance, which happens after the data is understood.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q073",
+    "question": "A company recovered a set of text documents after a database error, but some words are missing. It wants an ML model that can predict the most likely word for each gap. Which type of model is suitable?",
+    "options": {
+      "A": "Topic modelling",
+      "B": "Clustering models",
+      "C": "BERT-based models",
+      "D": "Prescriptive analytics models"
+    },
+    "answer": "C",
+    "explanation": "BERT-based models are transformer language models trained with masked language modelling, so they predict a missing token by drawing on the context that surrounds it on both sides, which is exactly what suggesting words to fill the gaps requires.\nTopic modelling discovers the themes present across a collection of documents but does not predict individual missing words. Clustering models group similar items together in an unsupervised way and produce no word-level predictions. Prescriptive analytics models recommend which action to take given a predicted outcome and have nothing to do with text completion.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q092",
+    "question": "A software company wants to use AI to boost its developers' productivity when writing software. Which solution meets this requirement?",
+    "options": {
+      "A": "Use a binary classification model to generate code reviews",
+      "B": "Use a clustering algorithm to group similar code snippets together",
+      "C": "Use a Natural Language Processing (NLP) tool to generate code",
+      "D": "Use a forecasting model to predict future numbers of code defects"
+    },
+    "answer": "C",
+    "explanation": "Natural Language Processing (NLP) tools, which underpin generative AI coding assistants, can turn plain-language descriptions into working code, autocomplete snippets, and write whole blocks of code, automating repetitive work and speeding up development, so they directly increase developer productivity.\nA binary classification model only assigns inputs to one of two categories, so it cannot generate code or reviews. A clustering algorithm groups similar items together but produces no new code. A forecasting model predicts future numeric values, such as defect counts over time, and likewise does nothing to help developers write code faster.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q093",
+    "question": "A retail store plans to forecast demand for a product over the coming weeks using the Amazon SageMaker AI DeepAR algorithm. Which type of data is required to meet this requirement?",
+    "options": {
+      "A": "Text data",
+      "B": "Time series data",
+      "C": "Audio data",
+      "D": "Image data"
+    },
+    "answer": "B",
+    "explanation": "DeepAR is a forecasting algorithm that predicts future values from historical observations recorded in sequence over time, so it needs time series data such as past demand indexed by date in order to learn temporal patterns and project them forward.\nText data suits Natural Language Processing tasks, image data suits Computer Vision tasks, and audio data suits speech or sound processing; none of these capture the chronological, time-indexed measurements that a demand-forecasting model relies on.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q103",
+    "question": "An AI practitioner needs to predict which species each flower belongs to, using its petal length, petal width, sepal length, and sepal width. Which algorithm meets this requirement?",
+    "options": {
+      "A": "Linear regression",
+      "B": "K-nearest neighbors (k-NN)",
+      "C": "K-means",
+      "D": "Autoregressive Integrated Moving Average (ARIMA)"
+    },
+    "answer": "B",
+    "explanation": "K-nearest neighbors (k-NN) is a supervised classification algorithm that labels a new data point by the majority class of its closest neighbors in feature space, so it fits assigning a flower to a species from its petal and sepal measurements.\nK-means is an unsupervised clustering algorithm that groups unlabeled data rather than assigning known categories. Autoregressive Integrated Moving Average (ARIMA) is a time-series forecasting method for sequential data ordered over time. Linear regression predicts a continuous numeric value, not a category.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q115",
+    "question": "A wildlife research team wants to train a model that identifies the animal species shown in camera-trap photos. It has a large set of images that are already tagged with the correct species and will not be labelling any more. Which type of learning should it use?",
+    "options": {
+      "A": "Reinforcement learning",
+      "B": "Supervised learning",
+      "C": "Active learning",
+      "D": "Unsupervised learning"
+    },
+    "answer": "B",
+    "explanation": "Supervised learning is the right choice because the team already has a large dataset in which every image is paired with a known label identifying the species. The model learns to map inputs to the correct output labels from this labelled training data, which is the defining characteristic of supervised learning.\nUnsupervised learning is used when no labelled data is available and the model must discover patterns or groupings on its own, which does not apply here because labelled data already exists. Reinforcement learning trains an agent to take actions in an environment to maximise a cumulative reward through trial and error, and is not suited to classifying images from a static labelled dataset. Active learning is a strategy that iteratively selects the most uncertain examples and requests human labellers to annotate them, reducing the total labelling effort needed; however, the team has explicitly stated they will not be labelling any more data, so active learning's core mechanism cannot be used and it offers no benefit in this scenario.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q117",
+    "question": "A restaurant chain wants to build an ML model to cut daily food waste and increase revenue, and it needs the model's accuracy to keep improving over time. Which solution meets these requirements?",
+    "options": {
+      "A": "Use Amazon Personalize and refine it with historical data only",
+      "B": "Use Amazon Rekognition to improve the model",
+      "C": "Use Amazon SageMaker AI and retrain it on newer data",
+      "D": "Use Amazon CloudWatch to examine customer orders"
+    },
+    "answer": "C",
+    "explanation": "Amazon SageMaker AI is a fully managed ML platform that supports the complete model development lifecycle, including building, training, and deploying models. Retraining on newer data lets the model continuously learn from recent patterns in food demand and waste, directly improving accuracy over time as conditions change.\nAmazon Personalize delivers personalised product and content recommendations and is not a general-purpose platform for training custom regression or forecasting models; relying on historical data only would also stop the model adapting to recent changes. Amazon CloudWatch is a monitoring and observability service for metrics, logs, and alarms on AWS resources, so it cannot examine customer orders or train ML models. Amazon Rekognition is a Computer Vision service for image and video analysis such as object detection and facial recognition, which does not apply to a demand-planning model for reducing food waste.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker AI",
+      "Amazon Personalize",
+      "Amazon CloudWatch",
+      "Amazon Rekognition"
+    ]
+  },
+  {
+    "id": "aif-q118",
+    "question": "A property company has built an ML model that predicts home sale prices and wants to host it for predictions without having to manage any servers or infrastructure. Which solution meets this requirement?",
+    "options": {
+      "A": "Deploy the model on an Amazon EC2 instance",
+      "B": "Deploy the model using Amazon CloudFront with an Amazon S3 integration",
+      "C": "Deploy the model to an Amazon SageMaker AI endpoint",
+      "D": "Deploy the model on an Amazon Elastic Kubernetes Service (Amazon EKS) cluster"
+    },
+    "answer": "C",
+    "explanation": "An Amazon SageMaker AI endpoint is a fully managed deployment option that handles the underlying servers, scaling, and maintenance automatically, so the company can serve predictions from its model without provisioning or managing any infrastructure of its own.\nDeploying the model on an Amazon EC2 instance or an Amazon EKS cluster would require the company to provision, scale, patch, and manage the servers or containers itself, which is the opposite of what it wants. Amazon CloudFront with Amazon S3 is a content delivery and static-storage combination for distributing files and web content, not a service for hosting and running ML model inference.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker AI",
+      "Amazon EC2",
+      "Amazon Elastic Kubernetes Service (Amazon EKS)",
+      "Amazon CloudFront",
+      "Amazon S3"
+    ]
+  },
+  {
+    "id": "aif-q120",
+    "question": "A manufacturing company uses AI to inspect products and find any damages or defects. Which type of AI application is the company using?",
+    "options": {
+      "A": "Recommendation system",
+      "B": "Natural language processing (NLP)",
+      "C": "Computer vision",
+      "D": "Image processing"
+    },
+    "answer": "C",
+    "explanation": "Computer Vision is the field of AI that enables machines to interpret and analyse visual information from images and videos, making it the technology behind automated inspection systems that detect product damage or defects on a production line.\nA recommendation system analyses user behaviour and preferences to suggest relevant products or content, which is unrelated to visual defect detection. Natural Language Processing (NLP) focuses on understanding and generating human language in text or speech, not on analysing images. Image processing refers to low-level manipulation of images such as resizing, filtering, or enhancing them; while it can be part of a vision pipeline, it does not involve the AI-driven interpretation and classification required for defect detection.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q121",
+    "question": "A company wants to build an ML model to predict customer satisfaction and needs the model's tuning to be fully automated. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon Athena",
+      "B": "Amazon Personalize",
+      "C": "Amazon Comprehend",
+      "D": "Amazon SageMaker AI"
+    },
+    "answer": "D",
+    "explanation": "Amazon SageMaker AI is a fully managed ML platform whose Automatic Model Tuning (hyperparameter optimisation) feature automatically searches for the best hyperparameters and tunes the model with no manual effort, which is exactly the fully automated tuning the company needs for its customer-satisfaction model.\nAmazon Personalize is a managed service for generating personalised recommendations, not for training and tuning a custom prediction model. Amazon Athena is an interactive query service for analysing data in Amazon S3 with SQL and has no model-tuning capability. Amazon Comprehend is a Natural Language Processing (NLP) service for extracting insights from text and does not train or tune custom ML models.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker AI",
+      "Amazon Personalize",
+      "Amazon Athena",
+      "Amazon Comprehend"
+    ]
+  },
+  {
+    "id": "aif-q127",
+    "question": "A company needs a highly scalable AWS service to monitor the performance of its production ML systems. Which AWS service meets this requirement?",
+    "options": {
+      "A": "AWS CloudTrail",
+      "B": "AWS Config",
+      "C": "Amazon CloudWatch",
+      "D": "AWS Trusted Advisor"
+    },
+    "answer": "C",
+    "explanation": "Amazon CloudWatch is a highly scalable monitoring and observability service that collects real-time metrics such as resource usage, inference latency, request counts, and errors, and it supports alarms, dashboards, and automated actions, making it well suited to tracking ML system performance.\nAWS CloudTrail records API activity for auditing and governance rather than performance metrics. AWS Config tracks resource configuration changes and compliance. AWS Trusted Advisor offers best-practice recommendations on cost, security, and fault tolerance. None of these is built for real-time performance monitoring of ML systems.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon CloudWatch",
+      "AWS CloudTrail",
+      "AWS Config",
+      "AWS Trusted Advisor"
+    ]
+  },
+  {
+    "id": "aif-q130",
+    "question": "A nonprofit is building a phone app for people with low vision. The app must understand spoken questions and reply with spoken output. Which solution meets these requirements?",
+    "options": {
+      "A": "Build ML models to find patterns in numeric data",
+      "B": "Use generative AI summarization to produce human-like text",
+      "C": "Build custom models for image classification and recognition",
+      "D": "Use a deep learning neural network to perform speech recognition"
+    },
+    "answer": "D",
+    "explanation": "A deep learning neural network for speech recognition lets the app convert users' spoken words into text it can act on, and paired with text-to-speech it can reply with spoken output, which fits an app for users with low vision.\nML models for numeric pattern-finding address tabular data, not speech. Generative AI summarization condenses text but does not capture or speak audio. Image classification models analyze pictures, which is unrelated to hearing and speaking.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q135",
+    "question": "A property company wants to estimate the sale price of homes from features such as floor area, location, and number of bedrooms. Which algorithm should it use to meet this requirement?",
+    "options": {
+      "A": "K-means",
+      "B": "Logistic regression",
+      "C": "Linear regression",
+      "D": "K-nearest neighbours (k-NN)"
+    },
+    "answer": "C",
+    "explanation": "Linear regression is a supervised algorithm that models the relationship between input features and a continuous numeric target, making it the standard choice for estimating a home's sale price from attributes such as floor area, location, and number of bedrooms.\nK-means is an unsupervised clustering algorithm that groups similar records and does not predict a numeric value. Logistic regression predicts the probability of a categorical outcome rather than a continuous price, despite its name. K-nearest neighbours (k-NN) can perform regression, but linear regression is the canonical and most interpretable algorithm for predicting continuous values like house prices from numeric features.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q142",
+    "question": "When evaluating a classification model, what does an F1 score measure?",
+    "options": {
+      "A": "The model's speed in generating responses",
+      "B": "The financial cost of operating the model",
+      "C": "The model's precision and recall",
+      "D": "The energy efficiency of the model's computations"
+    },
+    "answer": "C",
+    "explanation": "The F1 score is the harmonic mean of precision and recall, so it measures the balance between them and is especially useful when the classes are imbalanced.\nResponse speed is a latency measure. Operating cost is a financial measure. Energy efficiency is a sustainability measure. None of these is what an F1 score captures.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q170",
+    "question": "An online retailer has built a system that flags orders as potentially fraudulent, and a team manually reviews each flagged order. The company wants to reduce the time the team wastes reviewing flagged orders that turn out to be legitimate. Which evaluation metric should it optimise for?",
+    "options": {
+      "A": "Recall",
+      "B": "Precision",
+      "C": "F1 score",
+      "D": "Accuracy"
+    },
+    "answer": "B",
+    "explanation": "Precision is the proportion of flagged cases that are genuinely fraudulent, calculated as TP / (TP + FP). Optimising for precision minimises false positives, which are exactly the legitimate orders wrongly flagged that waste the team's review time, so it directly targets the company's goal.\nRecall measures how much of the actual fraud the system catches, TP / (TP + FN); maximising it reduces missed fraud but does nothing to limit false positives and can even increase them. Accuracy is the share of all predictions that are correct, which is misleading on imbalanced fraud data where most transactions are legitimate. F1 score is the harmonic mean of precision and recall and balances both, rather than specifically reducing the false positives that drive the review burden.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q177",
+    "question": "Which option is a benefit of using Infrastructure as Code (IaC) in Machine Learning Operations (MLOps)?",
+    "options": {
+      "A": "IaC eliminates the need for hyperparameter tuning",
+      "B": "IaC always provisions powerful compute instances, contributing to the training of more accurate models",
+      "C": "IaC streamlines the deployment of scalable and consistent ML workloads in cloud environments",
+      "D": "IaC minimizes overall expenses by deploying only low-cost instances"
+    },
+    "answer": "C",
+    "explanation": "IaC allows infrastructure to be defined, versioned, and automated in code, enabling repeatable and consistent provisioning of ML environments across development, testing, and production stages, which directly supports the MLOps principles of scalable systems and repeatable processes.\nHyperparameter tuning is a model optimisation activity that adjusts parameters such as learning rate and batch size during training to improve model performance; it is entirely separate from infrastructure provisioning, so IaC cannot eliminate it. IaC does not inherently provision powerful or low-cost instances, as it simply provisions whatever resources are defined in the configuration code; the choice of instance type and cost profile is determined by the engineer writing the template, not by IaC itself.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q181",
+    "question": "A bank wants to label every credit card transaction as either fraudulent or legitimate based on its transaction data. Which type of ML model meets this requirement?",
+    "options": {
+      "A": "Regression",
+      "B": "Binary classification",
+      "C": "Multi-class classification",
+      "D": "Diffusion"
+    },
+    "answer": "B",
+    "explanation": "Binary classification predicts which of exactly two categories an input belongs to, so it is the right model type for labelling each transaction as one of two outcomes, fraudulent or legitimate, based on its features.\nMulti-class classification assigns inputs to one of three or more categories, which is unnecessary when there are only two possible outcomes. Regression predicts continuous numeric values rather than discrete categories. Diffusion models are generative models that create new content such as images, not models that classify transactions.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q182",
+    "question": "A medical clinic wants doctors to dictate their clinical notes and have the audio automatically converted into text. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon Comprehend",
+      "B": "Amazon Transcribe",
+      "C": "Amazon Polly",
+      "D": "Amazon Rekognition"
+    },
+    "answer": "B",
+    "explanation": "Amazon Transcribe is the managed AI service that converts speech into text, so it can turn doctors' dictated clinical notes into written text, which meets the requirement.\nAmazon Polly does the reverse, converting text into speech. Amazon Rekognition analyzes images and video. Amazon Comprehend extracts insights such as entities and sentiment from text that already exists, but it does not convert speech to text.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Transcribe",
+      "Amazon Comprehend",
+      "Amazon Polly",
+      "Amazon Rekognition"
+    ]
+  },
+  {
+    "id": "aif-q183",
+    "question": "Which type of AI model is built to predict continuous numeric values?",
+    "options": {
+      "A": "Transformer",
+      "B": "Multi-modal",
+      "C": "Diffusion",
+      "D": "Regression"
+    },
+    "answer": "D",
+    "explanation": "Regression is a supervised learning technique designed to predict continuous numerical values by learning the relationship between input features and a numeric output, making it the appropriate model type for tasks such as forecasting sales figures, estimating house prices, or predicting temperatures.\nDiffusion models are generative models that learn to create new content such as images or audio by gradually denoising random noise, and are not used for numeric prediction tasks. Transformers are a neural network architecture that processes sequential data using attention mechanisms and form the basis of large language models, but the architecture itself is not a model type associated with numeric prediction. Multi-modal models are designed to process and generate multiple types of data such as text, images, and audio together, which describes the input and output modalities of a model rather than its predictive function.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q204",
+    "question": "A subscription streaming service is building an ML model to predict which customers are likely to cancel their plan. Which metric is appropriate for evaluating this binary classification model?",
+    "options": {
+      "A": "R-squared",
+      "B": "Mean squared error (MSE)",
+      "C": "F1 score",
+      "D": "Model training time"
+    },
+    "answer": "C",
+    "explanation": "The F1 score combines precision and recall into a single value, which makes it well suited to a binary classification task such as churn prediction, where correctly identifying the customers who will cancel matters and a balance between false positives and false negatives is important.\nR-squared and mean squared error (MSE) are regression metrics that measure error on continuous-value predictions, so they do not apply to a classification task. Model training time only reflects how long the model takes to train, an operational figure that says nothing about how accurately the model predicts churn.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q205",
+    "question": "While evaluating a classification model in Amazon SageMaker AI, an AI practitioner needs a metric that gives the ratio of correctly classified items to the total number of items classified, whether correctly or incorrectly. Which metric meets this requirement?",
+    "options": {
+      "A": "Recall",
+      "B": "Precision",
+      "C": "Accuracy",
+      "D": "F1 score"
+    },
+    "answer": "C",
+    "explanation": "Accuracy is the number of correct predictions (true positives plus true negatives) divided by the total number of predictions (all true and false positives and negatives), which is exactly the ratio of correctly classified items to every item classified that the requirement describes.\nPrecision measures the proportion of positive predictions that are actually correct (true positives over true positives plus false positives), not all classifications. Recall measures the proportion of actual positives the model correctly identifies (true positives over true positives plus false negatives). F1 score is the harmonic mean of precision and recall, balancing those two values rather than reporting overall correct classifications.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q206",
+    "question": "A logistics company ingests several gigabytes of shipment records each day and uses them to train an ML model that predicts next-day delivery volumes. The company only needs predictions generated once per day on the full set of accumulated data. Which type of inference best meets this requirement?",
+    "options": {
+      "A": "Batch inference",
+      "B": "Asynchronous inference",
+      "C": "Real-time inference",
+      "D": "Serverless inference"
+    },
+    "answer": "A",
+    "explanation": "Batch inference is designed for high-volume predictions on large datasets processed together on a schedule, so the company can run a single daily job over all accumulated shipment records to generate its forecasts without maintaining a persistent endpoint.\nAsynchronous inference is suited to handling individual requests with large payloads or long processing times by queuing them, rather than scoring an entire daily dataset in one scheduled run. Real-time inference provides immediate predictions through a continuously running endpoint for low-latency use cases, which is unnecessary and more costly when results are only needed once per day. Serverless inference automatically provisions capacity for intermittent, on-demand requests, which suits unpredictable traffic rather than a predictable bulk job processed on a fixed daily schedule.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q209",
+    "question": "Which ML technique uses training data that is labeled with the correct output values?",
+    "options": {
+      "A": "Supervised learning",
+      "B": "Unsupervised learning",
+      "C": "Reinforcement learning",
+      "D": "Transfer learning"
+    },
+    "answer": "A",
+    "explanation": "Supervised learning trains models on datasets where each input example is paired with a known correct output label, allowing the model to learn the mapping between inputs and targets and make predictions on new unseen data.\nUnsupervised learning works with entirely unlabeled data and discovers hidden patterns or groupings without any known output values to learn from. Reinforcement learning does not use labeled training data at all, instead training an agent to take actions in an environment by rewarding desirable outcomes and penalising undesirable ones. Transfer learning is a technique where a model pre-trained on one task is adapted for a different task, which is about reusing existing model knowledge rather than describing how training data is structured.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q216",
+    "question": "A studio that produces animated films wants to automatically generate subtitles for the dialogue in its videos. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon Transcribe",
+      "B": "Amazon Translate",
+      "C": "Amazon Polly",
+      "D": "Amazon Comprehend"
+    },
+    "answer": "A",
+    "explanation": "Amazon Transcribe uses automatic speech recognition to convert spoken audio into time-stamped text and can output caption files, so it can generate the subtitles for the dialogue in the studio's animated videos.\nAmazon Translate converts text from one language to another but does not turn audio into text, so it cannot produce subtitles on its own. Amazon Polly performs the opposite task, synthesising speech from written text rather than transcribing speech. Amazon Comprehend is a natural language processing service that extracts insights such as sentiment and entities from existing text and does not create transcripts from audio.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-01",
+    "services": [
+      "Amazon Transcribe",
+      "Amazon Translate",
+      "Amazon Polly",
+      "Amazon Comprehend"
+    ]
+  },
+  {
+    "id": "aif-q217",
+    "question": "An online retailer wants to divide its customers into segments based on their buying behaviour and preferences so it can tailor the app experience to each segment. Which ML technique should it use?",
+    "options": {
+      "A": "Classification",
+      "B": "Regression",
+      "C": "Clustering",
+      "D": "Content Generation"
+    },
+    "answer": "C",
+    "explanation": "Clustering is an unsupervised technique that automatically groups customers with similar purchase histories and preferences into segments without any predefined labels, which is exactly what the retailer needs in order to personalise the experience for each segment.\nClassification is a supervised technique that assigns items to predefined categories, which would require the segments to be labelled in advance, but they are not. Regression is a supervised technique that predicts a continuous numeric value such as expected spend, not groups of similar customers. Content generation produces new content such as text or images and does not segment customers at all.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q228",
+    "question": "A business wants to automatically read incoming support emails and route each one into a topic such as billing, technical issues, or account changes. Which AI concept does this scenario represent?",
+    "options": {
+      "A": "Speech Recognition",
+      "B": "Natural Language Processing (NLP)",
+      "C": "Computer Vision",
+      "D": "Forecasting"
+    },
+    "answer": "B",
+    "explanation": "Reading support emails and routing each one into a topic is a Natural Language Processing task, specifically text classification, because it requires interpreting human language in text and assigning it to a predefined category.\nSpeech Recognition converts spoken audio into text and deals with the spoken word rather than analysing and categorising existing written text. Computer Vision interprets images and video rather than language, so it does not apply to email content. Forecasting predicts future numerical values from historical data, which is unrelated to sorting written messages by topic.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q232",
+    "question": "A company is building an application that must automatically organise customers and products into groups of similar items based on their attributes. Which ML strategy should the company use to meet this requirement?",
+    "options": {
+      "A": "Supervised learning",
+      "B": "Reinforcement learning",
+      "C": "Unsupervised learning",
+      "D": "Semi-supervised learning"
+    },
+    "answer": "C",
+    "explanation": "Unsupervised learning automatically discovers patterns and natural groupings within data, which makes it the right strategy for clustering similar customers and products by their attributes when no predefined groups are provided.\nSupervised learning requires labeled training data with known target outputs, so it cannot form groups when no labels or categories are supplied. Reinforcement learning trains an agent through rewards and penalties as it interacts with an environment, which does not apply to grouping items in a static dataset. Semi-supervised learning combines a small amount of labeled data with a larger pool of unlabeled data, but here there are no labels at all, so a fully unsupervised approach is the correct fit.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q233",
+    "question": "An online learning platform publishes its course materials in English and wants to make the same content available to learners in several other languages. Which solution meets these requirements?",
+    "options": {
+      "A": "Add Amazon Transcribe to the platform",
+      "B": "Use the real-time translation feature of Amazon Translate",
+      "C": "Add Amazon Personalize to the platform",
+      "D": "Use the real-time document processing feature of Amazon Textract"
+    },
+    "answer": "B",
+    "explanation": "Amazon Translate provides fast, high-quality language translation of text, making it the right choice for automatically converting course materials from English into multiple other languages.\nAmazon Transcribe is an automatic speech recognition service that converts spoken audio into text, which does not translate content between languages. Amazon Personalize generates personalised recommendations based on user behaviour, which is unrelated to translating content. Amazon Textract extracts text and structured data from scanned documents and images, which addresses document data extraction rather than language translation.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-01",
+    "services": [
+      "Amazon Transcribe",
+      "Amazon Translate",
+      "Amazon Personalize",
+      "Amazon Textract"
+    ]
+  },
+  {
+    "id": "aif-q236",
+    "question": "A documentary filmmaker wants to reach a wider audience by automatically adding subtitles and voice-overs in multiple languages to their films. Which two steps together meet this requirement?",
+    "options": {
+      "A": "Use Amazon Polly to generate voice-overs in multiple languages",
+      "B": "Use Amazon Transcribe and Amazon Translate to produce subtitles in multiple languages",
+      "C": "Use Amazon Translate to generate voice-overs in multiple languages",
+      "D": "Use Amazon Textract and Amazon Translate to produce subtitles in multiple languages"
+    },
+    "answer": [
+      "A",
+      "B"
+    ],
+    "explanation": "Amazon Transcribe converts the film's spoken dialogue into text using automatic speech recognition, and Amazon Translate then renders that text into other languages to create multilingual subtitles. Amazon Polly is a text-to-speech service that turns the translated text into lifelike spoken audio, enabling the multilingual voice-overs the filmmaker needs.\nThe option pairing Amazon Textract with Amazon Translate is incorrect because Textract extracts text from scanned documents and images using optical character recognition, not from spoken audio in video files. The option using only Amazon Translate for voice-overs is incorrect because Translate converts text between languages but outputs text, not audio; generating spoken voice-overs requires Amazon Polly to synthesize speech from the translated text.",
+    "isMultiAnswer": true,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Transcribe",
+      "Amazon Translate",
+      "Amazon Polly",
+      "Amazon Textract"
+    ]
+  },
+  {
+    "id": "aif-q240",
+    "question": "A healthcare company has trained a model on historical patient data, including medical history, demographics, and treatments, to predict in real time whether a patient will be readmitted within 30 days of discharge. Which task in this scenario represents AI model inference?",
+    "options": {
+      "A": "Apply the trained model to predict whether a patient will be readmitted",
+      "B": "Collect historical patient readmission records",
+      "C": "Measure the model's performance using suitable evaluation metrics",
+      "D": "Analyse the data to uncover patterns and correlations among patients"
+    },
+    "answer": "A",
+    "explanation": "Model inference is the stage of applying an already-trained model to new data to generate predictions, so using the trained model to predict whether a patient will be readmitted is the task that represents inference in this scenario.\nCollecting historical readmission records is the data collection stage that happens before training. Measuring the model's performance with evaluation metrics is the evaluation stage, which assesses a model rather than serving predictions. Analysing the data to uncover patterns and correlations is exploratory analysis carried out before or during model building, not the act of generating predictions from a finished model.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q241",
+    "question": "A bank wants to set up workflows in which staff review the predictions produced by its ML models. It needs to define confidence thresholds that determine when a prediction is sent for human review and to adjust those thresholds as its needs change. Which AWS service meets these requirements?",
+    "options": {
+      "A": "Amazon SageMaker Ground Truth",
+      "B": "Amazon Inspector",
+      "C": "Amazon Augmented AI (Amazon A2I)",
+      "D": "AWS Audit Manager"
+    },
+    "answer": "C",
+    "explanation": "Amazon Augmented AI (Amazon A2I) is purpose-built for adding human review of ML predictions, letting the bank set confidence thresholds that decide when a prediction is sent to a human reviewer and tune those thresholds over time.\nAmazon SageMaker Ground Truth also relies on human workers, but it is for labelling training datasets rather than reviewing live model predictions against confidence thresholds. Amazon Inspector is an automated security service that scans workloads for vulnerabilities, and AWS Audit Manager automates the collection of evidence for compliance audits; neither has anything to do with human review of ML predictions.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-01",
+    "services": [
+      "Amazon Augmented AI (Amazon A2I)",
+      "Amazon SageMaker Ground Truth",
+      "Amazon Inspector",
+      "AWS Audit Manager"
+    ]
+  },
+  {
+    "id": "aif-q243",
+    "question": "A retail company wants to build and deploy ML models on AWS without writing any code. Which AWS service or feature meets this requirement?",
+    "options": {
+      "A": "Amazon Rekognition",
+      "B": "Amazon Comprehend",
+      "C": "Amazon SageMaker Canvas",
+      "D": "AWS DeepRacer"
+    },
+    "answer": "C",
+    "explanation": "Amazon SageMaker Canvas offers a no-code visual interface that lets users build, train, and deploy custom ML models without writing any code, which is exactly what the company needs.\nAmazon Rekognition (Computer Vision) and Amazon Comprehend (Natural Language Processing) are pre-built AI services that return predictions from their own models rather than letting you build and deploy your own. AWS DeepRacer is an educational tool for learning Reinforcement Learning through a simulated race car, not a service for building business ML models.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Canvas",
+      "Amazon Rekognition",
+      "Amazon Comprehend",
+      "AWS DeepRacer"
+    ]
+  },
+  {
+    "id": "aif-q251",
+    "question": "A company needs to collect a large dataset to train an AI assistant in a specific content area. Which dataset will meet this requirement?",
+    "options": {
+      "A": "Diverse conversations that use relevant terminology",
+      "B": "Time series data of general purpose historical sales",
+      "C": "Sentiment analysis of news articles",
+      "D": "Unique product IDs and corresponding user IDs"
+    },
+    "answer": "A",
+    "explanation": "Diverse conversations that use relevant terminology provide the contextual, domain-specific language an AI assistant needs to learn how to understand and respond accurately within the targeted content area, making this the appropriate training dataset.\nTime series data of general purpose historical sales is structured numerical data suited to forecasting trends over time, not to training a conversational assistant in a specialised subject. Sentiment analysis of news articles produces classifications of positive or negative tone rather than the conversational examples needed to teach an assistant how to interact. Unique product IDs and corresponding user IDs are identifiers used for tasks such as recommendation systems, and contain no linguistic or contextual content from which an assistant could learn to converse.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q256",
+    "question": "An online retailer wants to divide its customers into groups based on their demographics and purchasing behaviour. Which algorithm should it use to meet this requirement?",
+    "options": {
+      "A": "Decision tree",
+      "B": "Support vector machine",
+      "C": "K-nearest neighbours (k-NN)",
+      "D": "K-means"
+    },
+    "answer": "D",
+    "explanation": "K-means is an unsupervised clustering algorithm that partitions data points into a chosen number of groups based on similarity, so it naturally segments customers by shared demographics and buying patterns without needing labelled examples.\nK-nearest neighbours (k-NN), Decision tree, and Support vector machine are all supervised algorithms that require labelled training data to predict a known target or class, so they suit classification or regression rather than discovering natural groupings in unlabelled customer data.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q264",
+    "question": "Which of the following scenarios is an example of unsupervised learning?",
+    "options": {
+      "A": "A model that organises thousands of news articles into related topics without predefined categories",
+      "B": "A model that flags a loan application as high risk or low risk",
+      "C": "A model that forecasts a city's electricity demand for the next day",
+      "D": "A model that teaches a robot to walk by rewarding successful movements"
+    },
+    "answer": "A",
+    "explanation": "Organising news articles into related topics without predefined categories is an example of unsupervised learning, where the model finds natural patterns and clusters in the data without relying on any labeled outputs.\nFlagging a loan application as high risk or low risk is supervised learning, because the model is trained on labeled examples where the correct outcome is already known. Forecasting a city's electricity demand for the next day is also supervised learning, specifically a regression task that learns from labeled historical values. Teaching a robot to walk by rewarding successful movements is reinforcement learning, where an agent improves by receiving rewards and penalties from its actions rather than discovering clusters in unlabeled data.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q268",
+    "question": "A support team uses sentiment analysis to determine the mood expressed in customer feedback. Sentiment analysis is a subset of which broader field of AI?",
+    "options": {
+      "A": "Natural Language Processing (NLP)",
+      "B": "Computer Vision",
+      "C": "Time Series Forecasting",
+      "D": "Speech Recognition"
+    },
+    "answer": "A",
+    "explanation": "Sentiment analysis is a Natural Language Processing (NLP) task. NLP is the field of AI focused on enabling machines to understand, interpret, and derive meaning from human language, and detecting the emotional tone of text is one of its core applications.\nComputer Vision deals with interpreting images and video rather than language. Speech Recognition converts spoken audio into text and does not itself analyse opinion or sentiment. Time Series Forecasting predicts future numeric values from sequential historical data and is unrelated to understanding language.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q270",
+    "question": "A SaaS company collects large volumes of free-form customer feedback and wants to analyze its sentiment. Which solution meets this requirement?",
+    "options": {
+      "A": "Use a regression algorithm to sort the feedback into predefined categories",
+      "B": "Use a recommendation engine to detect user sentiment",
+      "C": "Use a large language model (LLM) to perform Natural Language Processing (NLP) for sentiment analysis",
+      "D": "Use a time-series algorithm to predict user sentiment from past feedback"
+    },
+    "answer": "C",
+    "explanation": "A large language model can apply Natural Language Processing (NLP) to read unstructured text and determine whether the sentiment is positive, negative, or neutral, which suits large volumes of free-form feedback.\nA regression algorithm predicts numeric values, not sentiment from text. A recommendation engine suggests items based on behavior. A time-series algorithm forecasts values over time. None of these analyzes the sentiment of unstructured text.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q273",
+    "question": "Which of the following is an example of Unsupervised Learning?",
+    "options": {
+      "A": "Training a model to identify animals in photographs",
+      "B": "Producing human-like text in response to a written prompt",
+      "C": "Grouping data points into clusters based on how similar they are",
+      "D": "Predicting a house's selling price from features such as its size and location"
+    },
+    "answer": "C",
+    "explanation": "Grouping data points into clusters by similarity is a classic example of Unsupervised Learning, where the algorithm finds structure and natural groupings in the data on its own, without any labelled examples to guide it.\nTraining a model to identify animals in photographs is Supervised Learning, since it learns from images already labelled with the correct animal. Predicting a house's selling price from its features is also Supervised Learning, specifically regression, because it is trained on examples with known prices. Producing human-like text from a prompt is Generative AI, which creates new content rather than discovering groupings in unlabelled data.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q276",
+    "question": "A company is training ML models on datasets. The datasets contain some classes that have more examples than other classes. The company wants to measure how well the model balances detecting and labeling the classes. Which metric should the company use?",
+    "options": {
+      "A": "Accuracy",
+      "B": "Recall",
+      "C": "Precision",
+      "D": "F1 score"
+    },
+    "answer": "D",
+    "explanation": "The F1 score is the harmonic mean of precision and recall, making it the most appropriate metric for imbalanced datasets because it penalises models that perform well on one measure but poorly on the other, ensuring the model genuinely balances both detecting all instances of a class and labelling them correctly across all classes.\nAccuracy measures the overall percentage of correct predictions but is misleading on imbalanced datasets because a model that always predicts the majority class can achieve high accuracy while completely failing to detect minority classes. Recall measures how well the model detects all actual instances of each class, capturing the ability to find true positives, but it ignores the rate of false positives and so does not reflect how well the model balances detection and correct labelling simultaneously. Precision measures how often a positive prediction is actually correct but ignores false negatives, meaning a model that makes very few predictions can achieve high precision while missing most of the actual instances in underrepresented classes.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-05-30",
+    "services": []
+  },
+  {
+    "id": "aif-q277",
+    "question": "A bank reviews financial transaction records and assigns each one to either a personal or a business category, recording that category on the record. Which data preparation step does this describe?",
+    "options": {
+      "A": "Data normalisation",
+      "B": "Data encoding",
+      "C": "Data balancing",
+      "D": "Data labelling"
+    },
+    "answer": "D",
+    "explanation": "Data labelling is the step of attaching a meaningful category or tag to each record so it can serve as the target for Supervised Learning, which is exactly what assigning every transaction a personal or business category and storing it on the record achieves.\nData encoding converts categorical values into a numeric form that algorithms can process, rather than creating the categories in the first place. Data normalisation rescales numeric features onto a common range so that no single feature dominates. Data balancing adjusts the proportion of classes in a dataset, for example through over- or under-sampling, so they are more evenly represented; none of these produces the category labels themselves.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q280",
+    "question": "An energy provider wants to monitor voltage levels across a power grid in rural regions. It plans to record voltage readings continuously and store them in Amazon RDS, then analyse how the readings fluctuate throughout each day to build an AI model that predicts potential power outages. Which type of data should the provider collect for this task?",
+    "options": {
+      "A": "Tabular data",
+      "B": "Text data",
+      "C": "Time series data",
+      "D": "Audio data"
+    },
+    "answer": "C",
+    "explanation": "Time series data consists of values recorded sequentially over time, such as voltage readings taken at regular intervals, which is exactly what is needed to analyse fluctuations throughout the day and build a model that predicts power outages.\nTabular data organises information into rows and columns of features but does not inherently capture the time-ordered sequence required to model changes throughout the day. Text data represents unstructured written language such as documents or messages, which is not relevant to numerical voltage measurements. Audio data captures sound signals and has no application to monitoring electrical readings over time.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q281",
+    "question": "A manufacturer wants to train an ML model that flags unusual readings in its equipment sensor data, but it has no labelled examples to learn from. Which ML method meets this requirement?",
+    "options": {
+      "A": "Decision tree",
+      "B": "Autoencoders",
+      "C": "Linear regression",
+      "D": "Logistic regression"
+    },
+    "answer": "B",
+    "explanation": "Autoencoders are an unsupervised method that learn to reconstruct normal patterns in the data; readings that produce a large reconstruction error stand out as anomalies, so the technique can detect abnormal sensor behaviour without any labelled training data.\nDecision tree, linear regression, and logistic regression all fail for the same reason: they are supervised methods that require labelled examples to learn from, which the company does not have. Linear regression predicts continuous values and the other two perform classification, but none can be trained for anomaly detection on unlabelled data.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q286",
+    "question": "A music streaming app wants to suggest songs to each listener based on their listening history. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon Personalize",
+      "B": "Amazon Transcribe",
+      "C": "Amazon Polly",
+      "D": "Amazon Comprehend"
+    },
+    "answer": "A",
+    "explanation": "Amazon Personalize is a fully managed ML service that delivers real-time personalised recommendations by analysing each user's history, interactions, and behaviour, making it purpose-built for use cases such as suggesting songs on a music streaming app.\nAmazon Transcribe is an automatic speech recognition service that converts audio and speech into text transcripts and plays no role in analysing listening history or producing recommendations. Amazon Polly is a text-to-speech service that synthesises written text into lifelike speech and cannot generate recommendations. Amazon Comprehend is a Natural Language Processing (NLP) service that extracts insights such as sentiment, entities, and key phrases from text and is not designed to produce personalised recommendations.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Personalize",
+      "Amazon Transcribe",
+      "Amazon Polly",
+      "Amazon Comprehend"
+    ]
+  },
+  {
+    "id": "aif-q290",
+    "question": "A team is adopting MLOps to manage its machine learning workflows more reliably. Which two practices should the team prioritise?",
+    "options": {
+      "A": "Model versioning for reproducibility",
+      "B": "Automated model testing and validation",
+      "C": "Manual-only deployment processes",
+      "D": "Minimal documentation",
+      "E": "No production monitoring"
+    },
+    "answer": [
+      "A",
+      "B"
+    ],
+    "explanation": "Model versioning for reproducibility allows teams to track changes, reproduce results, and roll back to previous versions when needed, directly supporting the MLOps objective of repeatable processes. Automated model testing and validation verifies that a model performs correctly before deployment, supporting the MLOps objective of achieving production readiness. Together these practices help teams build scalable, reliable ML systems as defined in objective 1.3.5.\nManual-only deployment processes contradict the MLOps goal of automating repeatable workflows to reduce errors and increase consistency. Minimal documentation undermines collaboration, auditability, and maintainability, all of which are important to sustainable ML operations and managing technical debt. No production monitoring is the opposite of good practice, as continuous monitoring is essential for detecting performance degradation and data drift over time, which is explicitly called out in the MLOps objectives.",
+    "isMultiAnswer": true,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q300",
+    "question": "In the context of AI, what does the term inference refer to?",
+    "options": {
+      "A": "Gathering the training data used to build AI systems",
+      "B": "Designing brand-new AI algorithms from scratch",
+      "C": "Merging several AI models together into a single model",
+      "D": "Applying an already-trained model to new, unseen data to produce predictions or decisions"
+    },
+    "answer": "D",
+    "explanation": "Inference is the stage where an already-trained model is applied to new, unseen data to generate predictions or decisions, drawing on the patterns it learned during training. It is distinct from training, when the model is still learning from data.\nDesigning new AI algorithms is research and development work, not the act of running a finished model. Merging several models into one describes model ensembling or consolidation rather than producing predictions. Gathering training data is the data collection step that happens before training, well ahead of inference.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q304",
+    "question": "A public health agency has collected a year of patient records and wants to produce a monthly trend report for officials. Each month it needs to run a model across a large set of historical records at one scheduled time, with no requirement for immediate results. Which inference method meets this need most cost-effectively?",
+    "options": {
+      "A": "Real-time inference",
+      "B": "Asynchronous inference",
+      "C": "Batch transform",
+      "D": "Serverless inference"
+    },
+    "answer": "C",
+    "explanation": "Batch transform is designed to run inference over a large dataset all at once as a scheduled, offline job, so the agency can process a whole month of records to generate the report without paying for a continuously running endpoint, which makes it the most cost-effective choice for this periodic bulk workload.\nReal-time inference keeps an endpoint permanently available for low-latency individual predictions, which is unnecessary and more expensive for a scheduled bulk job. Serverless inference suits intermittent, unpredictable request traffic that still needs a quick response per request, not large scheduled batch processing. Asynchronous inference queues individual requests with large payloads or long processing times for near-real-time handling, but it still runs a hosted endpoint and is not intended for processing an entire dataset in one pass.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q306",
+    "question": "A bank is building an ML model to predict the likelihood that a loan applicant will default. The model uses applicant data such as income, credit score, employment length, and existing debt. The historical dataset includes a label indicating whether each past applicant ultimately defaulted. Which ML technique meets these requirements?",
+    "options": {
+      "A": "Unsupervised learning",
+      "B": "Supervised learning",
+      "C": "Reinforcement learning",
+      "D": "Semi-supervised learning"
+    },
+    "answer": "B",
+    "explanation": "Supervised learning is the right technique when the dataset contains both input features, such as income, credit score, and existing debt, and a known label indicating the outcome, because the model learns to predict that labeled target from the example data.\nUnsupervised learning works with unlabeled data to discover patterns or clusters, which does not fit a problem where a known default outcome is already provided for each record. Reinforcement learning trains an agent through rewards and penalties as it interacts with an environment, which does not apply to predicting an outcome from a fixed labeled dataset. Semi-supervised learning is used when only a small portion of the data is labeled and the rest is not, whereas here every historical record already has a known outcome, making fully supervised learning the appropriate choice.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q308",
+    "question": "A photo-sharing service needs to transpose and rotate large batches of images using simple numerical transformations. Which solution is MOST operationally efficient?",
+    "options": {
+      "A": "Build a deep neural network that takes the images as input",
+      "B": "Use an Amazon Bedrock large language model (LLM) with a high temperature",
+      "C": "Create an AWS Lambda function to perform the transformations",
+      "D": "Use AWS Glue Data Quality to correct each image"
+    },
+    "answer": "C",
+    "explanation": "An AWS Lambda function can run straightforward numerical image operations such as transposing and rotating at scale without training or hosting any model, which is the most operationally efficient approach.\nBuilding a deep neural network is unnecessary effort for deterministic transformations. An Amazon Bedrock LLM generates text and cannot transform images. AWS Glue Data Quality validates and cleans data, not rotate images.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS Lambda",
+      "Amazon Bedrock",
+      "AWS Glue"
+    ]
+  },
+  {
+    "id": "aif-q312",
+    "question": "Which statement best describes how Artificial Intelligence (AI) and Machine Learning (ML) relate to each other?",
+    "options": {
+      "A": "AI is a branch of ML",
+      "B": "AI and ML mean the same thing",
+      "C": "ML is a branch of AI",
+      "D": "AI and ML are unrelated fields"
+    },
+    "answer": "C",
+    "explanation": "Machine Learning is a branch of Artificial Intelligence. AI is the broad field of building systems that mimic human intelligence, and ML is one approach within it that lets systems learn patterns from data and improve without being explicitly programmed for every rule.\nStating that AI is a branch of ML reverses the relationship and is incorrect. Saying the two are unrelated ignores that ML sits inside the wider field of AI. Claiming they mean the same thing wrongly equates the broad field with just one of its techniques, overlooking other AI approaches such as rule-based or expert systems.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q313",
+    "question": "Which of the following is NOT a type of machine learning?",
+    "options": {
+      "A": "Supervised learning",
+      "B": "Unsupervised learning",
+      "C": "Reinforcement learning",
+      "D": "Diagnostic learning"
+    },
+    "answer": "D",
+    "explanation": "Diagnostic learning is not a recognised type of machine learning and does not appear in the AI/ML literature or the AWS exam guide, making it the option that does not belong among the established ML learning paradigms.\nSupervised learning, unsupervised learning, and reinforcement learning are the three primary types of machine learning. Supervised learning trains models on labeled datasets where each input is paired with a known correct output. Unsupervised learning discovers hidden patterns in unlabeled data without any predefined output values to learn from. Reinforcement learning trains an agent to make sequential decisions by rewarding desirable behaviours and penalising undesirable ones.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q314",
+    "question": "A team is building a Computer Vision model. Which type of data is the best fit for training it?",
+    "options": {
+      "A": "Text data",
+      "B": "Image data",
+      "C": "Tabular data",
+      "D": "Time-series data"
+    },
+    "answer": "B",
+    "explanation": "Image data is the best fit because Computer Vision models learn from the visual features and pixel patterns in images (and video frames) to perform tasks such as object detection and image classification.\nTabular data holds structured rows and columns and suits classic ML problems like regression. Time-series data captures values ordered over time, such as sensor or sales readings. Text data is the input for Natural Language Processing (NLP) tasks. None of these carry the visual information a Computer Vision model needs.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q315",
+    "question": "A company wants to automatically analyse customer feedback written as text. Which AWS service is best suited for this Natural Language Processing (NLP) task?",
+    "options": {
+      "A": "Amazon SageMaker AI",
+      "B": "Amazon Comprehend",
+      "C": "Amazon Polly",
+      "D": "Amazon Transcribe"
+    },
+    "answer": "B",
+    "explanation": "Amazon Comprehend is a managed Natural Language Processing service that analyses text to extract sentiment, key phrases, entities, and language, making it the purpose-built choice for analysing customer feedback.\nAmazon SageMaker AI is a platform for building, training, and deploying custom ML models, which could perform NLP but requires significant development effort rather than providing ready-made NLP capabilities. Amazon Polly is a text-to-speech service that converts written text into lifelike speech, which is the opposite of analysing text. Amazon Transcribe is an automatic speech recognition service that converts spoken audio into text, and does not analyse the meaning or sentiment of that text.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker AI",
+      "Amazon Comprehend",
+      "Amazon Polly",
+      "Amazon Transcribe"
+    ]
+  },
+  {
+    "id": "aif-q316",
+    "question": "During the ML development lifecycle, why does a data scientist perform exploratory data analysis (EDA) before building a model?",
+    "options": {
+      "A": "To train the model",
+      "B": "To deploy the model",
+      "C": "To uncover the structure, quality, and relationships within the data",
+      "D": "To monitor the model in production"
+    },
+    "answer": "C",
+    "explanation": "Exploratory data analysis is carried out early in the ML development lifecycle to uncover the structure, distribution, quality, and relationships within a dataset, which informs later decisions about data cleaning, feature engineering, and algorithm selection before any training begins.\nTraining the model is a later stage that only happens after EDA and data preparation are complete. Deploying the model occurs after training and evaluation and is concerned with serving predictions, not with understanding the data. Monitoring the model in production is part of the final lifecycle stage, which focuses on detecting performance degradation and data drift once the model is already deployed.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q317",
+    "question": "Which of these would NOT normally be a stage in an ML pipeline?",
+    "options": {
+      "A": "Model training",
+      "B": "Brand advertising",
+      "C": "Data collection",
+      "D": "Feature engineering"
+    },
+    "answer": "B",
+    "explanation": "Brand advertising is a marketing activity aimed at promoting a product and raising awareness, so it is not part of an ML pipeline, which is made up of technical stages for building, validating, and deploying models.\nData collection, feature engineering, and model training are all genuine stages of a typical ML pipeline. Data collection gathers the relevant raw data from available sources. Feature engineering transforms that raw data into meaningful input variables to improve model performance. Model training fits a model to the prepared data by adjusting its parameters to minimise prediction error.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q318",
+    "question": "In the context of model performance metrics, what does the acronym AUC stand for?",
+    "options": {
+      "A": "Area Under the Curve",
+      "B": "Average Usage Cost",
+      "C": "Augmented Use Case",
+      "D": "Automated Utility Calculation"
+    },
+    "answer": "A",
+    "explanation": "AUC stands for Area Under the Curve, specifically the area beneath the ROC (Receiver Operating Characteristic) curve. It measures how well a classification model separates the classes and ranges from 0 to 1, where 1.0 indicates perfect separation and 0.5 means the model is no better than random guessing.\nThe other choices are invented expansions that string together an A, U, and C word, but none of them is the recognised meaning of AUC as a model performance metric.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q319",
+    "question": "You have a large dataset in which every example is already labelled. Which type of machine learning is the best fit?",
+    "options": {
+      "A": "Unsupervised learning",
+      "B": "Supervised learning",
+      "C": "Semi-supervised learning",
+      "D": "Reinforcement learning"
+    },
+    "answer": "B",
+    "explanation": "Supervised learning trains on labelled examples, where each input is paired with its correct output, so the model learns the mapping from inputs to known targets. That makes it the right choice when you have a large, fully labelled dataset.\nUnsupervised learning works with unlabelled data to uncover hidden structure or groupings, so it does not make use of the labels available here. Semi-supervised learning is intended for cases with a small amount of labelled data alongside a large amount of unlabelled data, not a fully labelled set. Reinforcement learning trains an agent through trial-and-error rewards from an environment and does not rely on a labelled dataset at all.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q320",
+    "question": "What is a key advantage of using pre-trained models?",
+    "options": {
+      "A": "They always outperform custom-built models",
+      "B": "They are guaranteed to be more accurate for every task",
+      "C": "They can be used straight away without providing your own training data",
+      "D": "They remove the need to fine-tune for specialised tasks"
+    },
+    "answer": "C",
+    "explanation": "A pre-trained model has already been trained on a large dataset, so it can be applied straight away for inference without the user supplying their own training data, which saves the time, data, and effort of building a model from scratch and is its main advantage.\nClaiming a pre-trained model always outperforms custom-built models or is guaranteed to be more accurate for every task are both overclaims, because a model built or fine-tuned for a specific task can easily beat a general pre-trained model. Saying it removes the need to fine-tune for specialised tasks is also false, since pre-trained models frequently must be fine-tuned to perform well on domain-specific work.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q321",
+    "question": "A data scientist wants to automatically find the optimal hyperparameters for a model instead of tuning them manually. Which AWS service is best suited for this task?",
+    "options": {
+      "A": "Amazon SageMaker Autopilot",
+      "B": "Amazon Comprehend",
+      "C": "Amazon Polly",
+      "D": "Amazon Transcribe"
+    },
+    "answer": "A",
+    "explanation": "Amazon SageMaker Autopilot automatically builds, trains, and tunes machine learning models, including exploring and selecting hyperparameter configurations on the data scientist's behalf, which removes the need for manual hyperparameter experimentation.\nAmazon Comprehend is a natural language processing service that extracts insights such as sentiment and entities from text, and has no role in model training or hyperparameter tuning. Amazon Polly is a text-to-speech service that converts written text into lifelike speech, which is unrelated to building or tuning ML models. Amazon Transcribe is an automatic speech recognition service that converts audio into text, and likewise plays no part in hyperparameter optimisation.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": [
+      "Amazon SageMaker Autopilot",
+      "Amazon Comprehend",
+      "Amazon Polly",
+      "Amazon Transcribe"
+    ]
+  },
+  {
+    "id": "aif-q322",
+    "question": "In a machine learning context, what is the term MLOps an abbreviation of?",
+    "options": {
+      "A": "Machine Learning Optimisation",
+      "B": "Managed Learning Outputs",
+      "C": "Machine Learning Operations",
+      "D": "Model Lifecycle Operations"
+    },
+    "answer": "C",
+    "explanation": "MLOps stands for Machine Learning Operations, the set of practices that bring machine learning together with DevOps principles to automate and manage the deployment, monitoring, and ongoing maintenance of models in production.\nThe remaining choices are invented expansions that string together plausible machine-learning-sounding words, but none of them is the recognised meaning of the acronym, so they are all incorrect.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q323",
+    "question": "Which of the following is NOT a typical business metric used to evaluate Machine Learning models?",
+    "options": {
+      "A": "Return on investment (ROI)",
+      "B": "F1 score",
+      "C": "Customer satisfaction",
+      "D": "Time to market"
+    },
+    "answer": "B",
+    "explanation": "F1 score is a model performance metric, the harmonic mean of precision and recall, so it measures prediction quality rather than business value, which makes it the option that is not a business metric.\nReturn on investment (ROI), customer satisfaction, and time to market are all business metrics that capture the real-world impact, value, and operational outcomes of deploying a model rather than its statistical accuracy.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q324",
+    "question": "Which of the following are considered business metrics for AI model evaluation?",
+    "options": {
+      "A": "Precision score",
+      "B": "Customer satisfaction score",
+      "C": "Mean Average Precision",
+      "D": "Time-to-value",
+      "E": "Root Mean Square Error"
+    },
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Customer satisfaction score measures how well an AI solution meets end user needs and directly reflects the value delivered to the business, while time-to-value measures how quickly the AI solution begins delivering measurable business outcomes, making both examples of business metrics used to assess whether an AI model is meeting organisational objectives.\nPrecision score is a technical model performance metric that measures the proportion of positive predictions that are actually correct (true positives divided by all positive predictions), not a business outcome measure. Mean Average Precision is a technical evaluation metric used in information retrieval and object detection tasks to quantify how well a model ranks relevant results, measuring accuracy across ranked outputs rather than business value. Root Mean Square Error is a regression metric that measures the average magnitude of prediction errors by taking the square root of the mean of squared differences between predicted and actual values, again a technical performance measure rather than an indicator of business impact.",
+    "isMultiAnswer": true,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q325",
+    "question": "A company has rolled out an AI solution and wants to evaluate how successful it has been. Which two types of metrics should be included in the assessment?",
+    "options": {
+      "A": "Improvements to business operations",
+      "B": "Model prediction accuracy",
+      "C": "Return on investment (ROI)",
+      "D": "Technical performance metrics only",
+      "E": "User satisfaction only"
+    },
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Improvements to business operations and return on investment (ROI) both measure the real-world value an AI solution delivers, and together they complement technical evaluation to give a full picture of whether the solution has succeeded.\nTechnical performance metrics only and user satisfaction only fail for the same reason: judging success on a single dimension ignores the wider business value the solution is meant to create. Model prediction accuracy is just one technical measure that is useful for monitoring model quality but says nothing on its own about whether the solution meets its business goals.",
+    "isMultiAnswer": true,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q326",
+    "question": "Which type of machine learning is most appropriate for training an agent to make decisions by interacting with its environment?",
+    "options": {
+      "A": "Supervised learning",
+      "B": "Unsupervised learning",
+      "C": "Reinforcement learning",
+      "D": "Transfer learning"
+    },
+    "answer": "C",
+    "explanation": "Reinforcement learning trains an agent to make decisions by interacting with an environment, where it receives rewards for desirable actions and penalties for undesirable ones and gradually learns a strategy that maximises cumulative reward.\nSupervised learning trains a model on labeled examples with known correct outputs, rather than having an agent learn from the consequences of its own actions. Unsupervised learning finds patterns or clusters in unlabeled data and does not involve an agent, an environment, or a reward signal. Transfer learning reuses knowledge from a model trained on one task to improve performance on a related task, which describes a way of reusing model knowledge rather than learning through environmental interaction.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q327",
+    "question": "A company wants to generate spoken audio narration from its written articles. Which AWS service is the best fit?",
+    "options": {
+      "A": "Amazon Transcribe",
+      "B": "Amazon Polly",
+      "C": "Amazon Translate",
+      "D": "Amazon Comprehend"
+    },
+    "answer": "B",
+    "explanation": "Amazon Polly is a text-to-speech service that turns written text into lifelike spoken audio, which is exactly what generating narration from articles requires.\nAmazon Transcribe does the reverse, converting speech audio into text. Amazon Translate converts text from one language into another. Amazon Comprehend is a Natural Language Processing (NLP) service that extracts insights such as sentiment and entities from text, but it does not produce audio.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Polly",
+      "Amazon Transcribe",
+      "Amazon Translate",
+      "Amazon Comprehend"
+    ]
+  },
+  {
+    "id": "aif-q328",
+    "question": "Within the ML development lifecycle, what is the main goal of feature engineering?",
+    "options": {
+      "A": "To create new input variables or transform existing ones so the model performs better",
+      "B": "To gather additional raw data for the project",
+      "C": "To measure how well the trained model performs",
+      "D": "To release the model into a production environment"
+    },
+    "answer": "A",
+    "explanation": "Feature engineering is the stage where raw data is turned into useful model inputs by creating new features or transforming existing ones, which improves the model's accuracy and overall performance.\nGathering additional raw data describes the data collection stage, measuring how well the model performs describes model evaluation, and releasing the model into production describes deployment; each of these is a separate stage of the ML lifecycle rather than the purpose of feature engineering.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q329",
+    "question": "Which of the following is an example of unsupervised learning?",
+    "options": {
+      "A": "Predicting house prices",
+      "B": "Spam detection",
+      "C": "Clustering customer segments",
+      "D": "Image classification"
+    },
+    "answer": "C",
+    "explanation": "Clustering customer segments is an example of unsupervised learning because the algorithm groups data points based on similarity without being given any labelled examples or predefined categories to learn from. The model discovers the structure in the data on its own.\nPredicting house prices uses labelled training data where each example has a known price, making it a supervised regression task. Spam detection trains a model on emails already labelled as spam or not spam, making it a supervised classification task. Image classification trains a model on images with known labels, such as cat or dog, also making it a supervised classification task.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-05-30",
+    "services": []
+  },
+  {
+    "id": "aif-q330",
+    "question": "What is the main difference between batch inferencing and real-time inferencing?",
+    "options": {
+      "A": "Batch inferencing is always more accurate",
+      "B": "Real-time inferencing can only be done on small datasets",
+      "C": "Batch inferencing processes multiple inputs at once, while real-time inferencing processes individual inputs as they arrive",
+      "D": "Real-time inferencing is always faster than batch inferencing"
+    },
+    "answer": "C",
+    "explanation": "Batch inferencing collects multiple inputs and processes them together in a single job, making it well suited for non-time-sensitive workloads where throughput and efficiency are the priority. Real-time inferencing processes each input individually as it arrives and returns a prediction immediately, making it suitable for applications that require instant responses such as fraud detection or content moderation.\nBatch inferencing is not always more accurate than real-time inferencing because accuracy is a property of the model and its training data, not of the inferencing method used to serve predictions. Real-time inferencing is not limited to small datasets as it processes individual inputs on demand regardless of the overall size of the data being served. Real-time inferencing is not always faster than batch inferencing because while it offers lower latency per individual request, batch inferencing can achieve higher overall throughput by processing many inputs simultaneously.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q331",
+    "question": "A team wants to use a single AWS service to build, train, deploy, and monitor machine learning models end to end. Which service is best suited for this?",
+    "options": {
+      "A": "Amazon Comprehend",
+      "B": "Amazon SageMaker AI",
+      "C": "Amazon Polly",
+      "D": "Amazon Translate"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker AI is a fully managed platform that supports the entire machine learning lifecycle, including data preparation, model training, hyperparameter tuning, deployment, and ongoing monitoring, making it the right choice for managing ML models end to end.\nAmazon Comprehend is a natural language processing service for extracting insights such as sentiment and entities from text, not a platform for managing the full ML lifecycle. Amazon Polly is a text-to-speech service that converts text into lifelike speech, which addresses a single AI capability rather than end-to-end model development. Amazon Translate provides language translation between languages and likewise serves one specific task rather than supporting the complete ML lifecycle.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": [
+      "Amazon Comprehend",
+      "Amazon SageMaker AI",
+      "Amazon Polly",
+      "Amazon Translate"
+    ]
+  },
+  {
+    "id": "aif-q333",
+    "question": "Which of these is NOT a typical use case for AI or ML?",
+    "options": {
+      "A": "Fraud detection",
+      "B": "Manual record keeping",
+      "C": "Speech recognition",
+      "D": "Recommendation systems"
+    },
+    "answer": "B",
+    "explanation": "Manual record keeping is not a typical AI/ML use case because it is a routine, deterministic clerical task that does not involve learning from data or making predictions.\nFraud detection, recommendation systems, and speech recognition are all established AI/ML applications that rely on machine learning models to identify patterns, make predictions, or interpret unstructured data such as transactions, user behaviour, or audio.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q345",
+    "question": "Which AWS services can be used for document analysis and information extraction?",
+    "options": {
+      "A": "Amazon Textract",
+      "B": "Amazon Comprehend",
+      "C": "Amazon Polly",
+      "D": "Amazon Translate",
+      "E": "Amazon Transcribe"
+    },
+    "answer": [
+      "A",
+      "B"
+    ],
+    "explanation": "Amazon Textract extracts text and structured data such as forms and tables directly from documents and images using optical character recognition, making it the primary service for the document analysis layer. Amazon Comprehend then applies natural language processing to extracted text to identify entities, key phrases, sentiment, and other insights, enabling information extraction from the content of documents.\nAmazon Polly converts text to synthesised speech, Amazon Translate performs language translation between languages, and Amazon Transcribe converts spoken audio into text transcripts. None of these services are designed for document analysis or information extraction.",
+    "isMultiAnswer": true,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-01",
+    "services": [
+      "Amazon Textract",
+      "Amazon Comprehend",
+      "Amazon Polly",
+      "Amazon Translate",
+      "Amazon Transcribe"
+    ]
+  },
+  {
+    "id": "aif-q016",
+    "question": "A telecom support team wants to study what customers talk about during recorded phone calls and pull out the important points. Which solution meets these requirements?",
+    "options": {
+      "A": "Create classification labels with Amazon Comprehend",
+      "B": "Build a conversational chatbot with Amazon Lex",
+      "C": "Convert the call recordings to text with Amazon Transcribe",
+      "D": "Extract information from the recordings with Amazon SageMaker Model Monitor"
+    },
+    "answer": "C",
+    "explanation": "Amazon Transcribe converts the speech in the call recordings into text, which the team can then analyze to pull out the key information discussed.\nAmazon Comprehend analyzes text for insights such as classification, but it needs text rather than raw audio as input. Amazon Lex builds conversational chatbots and does not transcribe existing recordings. Amazon SageMaker Model Monitor watches deployed models for drift and has nothing to do with audio transcription.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Transcribe",
+      "Amazon Comprehend",
+      "Amazon Lex",
+      "Amazon SageMaker Model Monitor"
+    ]
+  },
+  {
+    "id": "aif-q116",
+    "question": "At which stage of the ML lifecycle are regulatory and compliance obligations primarily established?",
+    "options": {
+      "A": "Model training",
+      "B": "Data collection",
+      "C": "Business goal identification",
+      "D": "Feature engineering"
+    },
+    "answer": "C",
+    "explanation": "Regulatory and compliance obligations are primarily established during business goal identification, because defining what you want to build determines which laws and regulations apply to the project before any data is collected or processed.\nData collection is where those obligations are applied in practice, such as obtaining consent and verifying data sources, but the obligations themselves must be understood before collection begins. Model training and feature engineering are later technical stages focused on building and optimising the model, not on identifying the legal and regulatory framework that governs the project.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q148",
+    "question": "A streaming service studies subscriber habits and demographics to suggest tailored shows. After putting its custom model into production, the team needs to watch whether the model's quality declines over time. Which AWS service or feature meets these requirements?",
+    "options": {
+      "A": "Amazon SageMaker Clarify",
+      "B": "Amazon Comprehend",
+      "C": "Amazon SageMaker Model Monitor",
+      "D": "Amazon Rekognition"
+    },
+    "answer": "C",
+    "explanation": "Amazon SageMaker Model Monitor continuously tracks a deployed model in production and detects drift and quality degradation over time, which is what the team needs to watch as subscriber behavior changes.\nAmazon SageMaker Clarify focuses on bias and explainability, while Amazon Comprehend and Amazon Rekognition are managed services for text and image analysis, none of which monitor a deployed model for quality drift.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Monitor",
+      "Amazon SageMaker Clarify",
+      "Amazon Comprehend",
+      "Amazon Rekognition"
+    ]
+  },
+  {
+    "id": "aif-q166",
+    "question": "An organization runs many ML models in production and needs to know when any of them starts behaving differently from its baseline so the team can step in. Which AWS service or feature meets these requirements?",
+    "options": {
+      "A": "Amazon SageMaker Data Wrangler",
+      "B": "Amazon SageMaker Model Monitor",
+      "C": "Amazon SageMaker JumpStart",
+      "D": "Amazon SageMaker HyperPod"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker Model Monitor continuously measures data and prediction quality for deployed models and alerts when they deviate from a baseline, letting the organization detect and resolve quality changes quickly.\nAmazon SageMaker Data Wrangler prepares data, Amazon SageMaker JumpStart provides pre-built models, and Amazon SageMaker HyperPod provides distributed training infrastructure; none of these monitors deployed models for quality changes.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Monitor",
+      "Amazon SageMaker JumpStart",
+      "Amazon SageMaker Data Wrangler",
+      "Amazon SageMaker Hyperpod"
+    ]
+  },
+  {
+    "id": "aif-q230",
+    "question": "After producing a number of ML models, a team needs one place to keep them, manage them, and track each version. Which AWS service or feature meets these requirements?",
+    "options": {
+      "A": "Amazon SageMaker Model Monitor",
+      "B": "Amazon SageMaker Canvas",
+      "C": "Amazon SageMaker Model Registry",
+      "D": "AWS Audit Manager"
+    },
+    "answer": "C",
+    "explanation": "Amazon SageMaker Model Registry is a central repository for storing, managing, and versioning ML models and tracking their deployment status across the lifecycle, which meets the team's needs.\nAmazon SageMaker Model Monitor detects drift in deployed models, Amazon SageMaker Canvas builds models with a no-code interface, and AWS Audit Manager collects audit evidence; none of these is the service for model versioning and management.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Registry",
+      "Amazon SageMaker Model Monitor",
+      "Amazon SageMaker Canvas",
+      "AWS Audit Manager"
+    ]
+  },
+  {
+    "id": "aif-q261",
+    "question": "While watching a predictive model with Amazon SageMaker Model Monitor, a team sees data drift cross the threshold it had set. The team wants to limit any harm this could cause the model. Which solution will meet these requirements?",
+    "options": {
+      "A": "Adjust the monitoring sensitivity",
+      "B": "Restart the SageMaker AI endpoint",
+      "C": "Re-train the model with fresh data",
+      "D": "Set up experiment tracking"
+    },
+    "answer": "C",
+    "explanation": "When data drift passes the defined threshold, the data no longer matches what the model was trained on, so re-training the model with fresh data restores its accuracy and limits the negative impact.\nAdjusting the monitoring sensitivity only changes when alerts fire, restarting the endpoint does not address the changed data, and setting up experiment tracking records runs without correcting the drift.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Monitor"
+    ]
+  },
+  {
+    "id": "aif-q332",
+    "question": "Why do teams monitor models once they are running in production?",
+    "options": {
+      "A": "To collect more data",
+      "B": "To detect issues such as model drift or data drift",
+      "C": "To perform feature engineering",
+      "D": "To train new models"
+    },
+    "answer": "B",
+    "explanation": "The primary purpose of model monitoring in production is to detect issues such as model drift or data drift so teams can act before performance degrades.\nCollecting more data, performing feature engineering, and training new models are separate lifecycle activities, not the purpose of monitoring a deployed model.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q346",
+    "question": "Which task is Amazon SageMaker Model Monitor designed to perform?",
+    "options": {
+      "A": "To serve models for inference",
+      "B": "To detect data drift and model performance degradation",
+      "C": "To create training datasets",
+      "D": "To train models faster"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker Model Monitor continuously watches deployed models and detects data drift and model performance degradation, alerting teams when investigation or retraining is needed.\nServing models for inference, creating training datasets, and training models faster are handled by other capabilities and are not the purpose of Model Monitor.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Monitor"
+    ]
+  },
+  {
+    "id": "aif-q125",
+    "question": "An online store wants to tailor its recommendations to each individual shopper. Which AWS service fits?",
+    "options": {
+      "A": "Amazon Comprehend",
+      "B": "Amazon Personalize",
+      "C": "Amazon Kendra",
+      "D": "Amazon Rekognition"
+    },
+    "answer": "B",
+    "explanation": "Amazon Personalize builds machine learning models from user behavior to deliver individualized recommendations, which is exactly what tailoring results per shopper requires.\nAmazon Comprehend analyzes text, Amazon Kendra provides enterprise search, and Amazon Rekognition analyzes images and video; none personalizes recommendations per user.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Personalize",
+      "Amazon Comprehend",
+      "Amazon Kendra",
+      "Amazon Rekognition"
+    ]
+  },
+  {
+    "id": "aif-q150",
+    "question": "A company needs to produce its product descriptions in several languages automatically. Which AWS service does this?",
+    "options": {
+      "A": "Amazon Polly",
+      "B": "Amazon Translate",
+      "C": "Amazon Comprehend",
+      "D": "Amazon Transcribe"
+    },
+    "answer": "B",
+    "explanation": "Amazon Translate uses neural machine translation to convert text between languages automatically, which is what generating product descriptions in multiple languages requires.\nAmazon Polly converts text to speech, Amazon Comprehend extracts insights from text, and Amazon Transcribe converts speech to text; none translates text.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Translate",
+      "Amazon Polly",
+      "Amazon Comprehend",
+      "Amazon Transcribe"
+    ]
+  },
+  {
+    "id": "aif-q153",
+    "question": "A hospital wants an AI application that reads structured patient records, extracts the relevant clinical details, and produces concise summaries. Which solution fits?",
+    "options": {
+      "A": "Use Amazon Personalize to model patient engagement and pass the output to a general model",
+      "B": "Use Amazon Comprehend Medical to extract medical entities and relationships, then apply rule-based logic to format the summaries",
+      "C": "Use Amazon Textract to digitize scanned documents, then run keyword extraction",
+      "D": "Use Amazon Kendra to index the records for search, then apply a template"
+    },
+    "answer": "B",
+    "explanation": "Amazon Comprehend Medical is purpose-built to extract medical entities and relationships from clinical text, and applying rule-based logic afterward formats the information into concise summaries, meeting both needs.\nAmazon Personalize models engagement for recommendations, Amazon Textract digitizes documents without interpreting clinical meaning, and Amazon Kendra indexes content for search rather than extracting structured clinical entities.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Comprehend Medical",
+      "Amazon Personalize",
+      "Amazon Textract",
+      "Amazon Kendra"
+    ]
+  },
+  {
+    "id": "aif-q221",
+    "question": "A company has built custom Computer Vision models and needs an easy-to-use interface for labeling data to reduce errors on new, real-world images. Which AWS tool fits?",
+    "options": {
+      "A": "Amazon SageMaker Canvas",
+      "B": "Amazon SageMaker Ground Truth",
+      "C": "Amazon Rekognition Custom Labels",
+      "D": "Amazon SageMaker Autopilot"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker Ground Truth provides a built-in labeling interface with workflows and quality controls for tasks such as Computer Vision, producing high-quality labeled data that reduces model errors.\nSageMaker Canvas is a no-code interface for building models, Rekognition Custom Labels trains a model rather than offering a general labeling interface, and SageMaker Autopilot auto-builds models from tabular data.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Ground Truth",
+      "Amazon SageMaker Canvas",
+      "Amazon Rekognition",
+      "Amazon SageMaker Autopilot"
+    ]
+  },
+  {
+    "id": "aif-q223",
+    "question": "A bank deployed an ML model to predict customer churn and wants to measure how accurately it predicts churn compared with actual behavior. Which metric fits?",
+    "options": {
+      "A": "Root mean squared error (RMSE)",
+      "B": "F1 score",
+      "C": "Return on investment (ROI)",
+      "D": "Perplexity"
+    },
+    "answer": "B",
+    "explanation": "The F1 score balances precision and recall, which makes it well suited to measuring accuracy on a binary classification task such as predicting whether a customer will churn.\nRMSE measures error for regression predictions, ROI is a business-value metric, and perplexity measures language-modeling fit; none fits binary churn classification.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q245",
+    "question": "Which two capabilities make Amazon Kendra valuable for enterprise search applications?",
+    "options": {
+      "A": "Managed relational database hosting",
+      "B": "Natural language understanding",
+      "C": "Video transcoding",
+      "D": "Semantic search",
+      "E": "Infrastructure monitoring"
+    },
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Amazon Kendra provides natural language understanding that interprets user intent and semantic search that returns results by meaning and context, which together make it effective for enterprise search.\nManaged relational database hosting, video transcoding, and infrastructure monitoring are unrelated tasks that Kendra does not perform.",
+    "isMultiAnswer": true,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Kendra"
+    ]
+  },
+  {
+    "id": "aif-q263",
+    "question": "A model's inference quality dropped after four months in production. The team wants alerts if quality degrades again and to prevent recurrence. Which solution fits?",
+    "options": {
+      "A": "Build a new model and monitor drift with Amazon SageMaker Feature Store",
+      "B": "Retrain the model and monitor drift with Amazon SageMaker Model Monitor",
+      "C": "Retrain the model and monitor drift with Amazon SageMaker Clarify",
+      "D": "Build a new model and watch it with Amazon CloudWatch alarms only"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker Model Monitor continuously detects data and model drift in production and can send alerts, so the team is notified and can retrain before quality degrades again.\nSageMaker Clarify focuses on bias and explainability, SageMaker Feature Store stores features, and CloudWatch alarms track infrastructure metrics but do not detect model drift on their own.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Monitor",
+      "Amazon SageMaker Clarify",
+      "Amazon CloudWatch",
+      "Amazon SageMaker Feature Store",
+      "Amazon SageMaker AI"
+    ]
+  },
+  {
+    "id": "aif-q274",
+    "question": "An online learning company has large volumes of educational material and wants enterprise search across it. Which AWS service fits?",
+    "options": {
+      "A": "Amazon Polly",
+      "B": "Amazon Kendra",
+      "C": "Amazon Textract",
+      "D": "Amazon Comprehend"
+    },
+    "answer": "B",
+    "explanation": "Amazon Kendra is an intelligent enterprise search service that searches large volumes of unstructured content, such as educational materials, which fits this need.\nAmazon Polly converts text to speech, Amazon Textract extracts text from documents, and Amazon Comprehend analyzes text for insights; none provides enterprise search.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Kendra",
+      "Amazon Polly",
+      "Amazon Textract",
+      "Amazon Comprehend"
+    ]
+  },
+  {
+    "id": "aif-q011",
+    "question": "A company is building an ML model with Amazon SageMaker and needs to share and manage variables used for model development across several teams. Which SageMaker feature meets this requirement?",
+    "options": {
+      "A": "Amazon SageMaker Data Wrangler",
+      "B": "Amazon SageMaker Feature Store",
+      "C": "Amazon SageMaker Clarify",
+      "D": "Amazon SageMaker Model Cards"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker Feature Store is a centralized repository for storing, sharing, and reusing features, which lets multiple teams manage the same variables for model development.\nAmazon SageMaker Data Wrangler prepares and transforms data, Amazon SageMaker Clarify detects bias and supports explainability, and Amazon SageMaker Model Cards document model details. None of these is designed to share and manage features across teams.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Feature Store",
+      "Amazon SageMaker Data Wrangler",
+      "Amazon SageMaker Clarify",
+      "Amazon SageMaker Model Cards"
+    ]
+  },
+  {
+    "id": "aif-q036",
+    "question": "A company deployed a deep learning model for object detection to production. When the model examines a new image to identify the objects in it, which AI process is taking place?",
+    "options": {
+      "A": "Training",
+      "B": "Inference",
+      "C": "Bias correction",
+      "D": "Model deployment"
+    },
+    "answer": "B",
+    "explanation": "Inference is the process in which a deployed model analyzes new data, such as a new image, to produce a prediction, so identifying objects in an incoming image is inference.\nTraining is the earlier process of fitting the model to data, model deployment is making the trained model available to serve requests, and bias correction adjusts for unfair outcomes. None of these describes analyzing a new image to make a prediction.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q147",
+    "question": "A company wants to find harmful language in the comments on social media posts and does not plan to use labeled data to train a model. Which approach should the company use?",
+    "options": {
+      "A": "Use Amazon Rekognition moderation",
+      "B": "Use Amazon Comprehend toxicity detection",
+      "C": "Use Amazon SageMaker built-in algorithms to train a model",
+      "D": "Use Amazon Polly to monitor the comments"
+    },
+    "answer": "B",
+    "explanation": "Amazon Comprehend provides pre-trained natural language processing, including toxicity detection, so it can identify harmful language in comments without the company having to label data or train a model.\nAmazon Rekognition moderates images and video, not text. Amazon SageMaker built-in algorithms would require labeled data to train a model. Amazon Polly converts text to speech and does not analyze text for harmful content.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Comprehend",
+      "Amazon Rekognition",
+      "Amazon Polly",
+      "Amazon SageMaker AI"
+    ]
+  },
+  {
+    "id": "aif-q253",
+    "question": "A practitioner with limited ML experience wants to predict employee attrition without writing any code. Which Amazon SageMaker feature meets this requirement?",
+    "options": {
+      "A": "SageMaker Canvas",
+      "B": "SageMaker Clarify",
+      "C": "SageMaker Model Monitor",
+      "D": "SageMaker Data Wrangler"
+    },
+    "answer": "A",
+    "explanation": "Amazon SageMaker Canvas offers a no-code visual interface that lets a user with limited ML experience build, train, and generate predictions, such as employee attrition, without writing code.\nSageMaker Clarify detects bias and explains predictions, SageMaker Model Monitor tracks deployed models for drift, and SageMaker Data Wrangler prepares data. None of these provides a no-code way to build a predictive model.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Canvas",
+      "Amazon SageMaker Clarify",
+      "Amazon SageMaker Model Monitor",
+      "Amazon SageMaker Data Wrangler"
+    ]
+  },
+  {
+    "id": "aif-q347",
+    "question": "A bank must provide regulators with a clear explanation of every factor that influenced each loan decision. The team is choosing between a gradient boosting model and a large language model. Which factor most strongly favors using the traditional ML model?",
+    "options": {
+      "A": "Explainability requirements",
+      "B": "Multilingual support",
+      "C": "Content generation capability",
+      "D": "Conversational interface needs"
+    },
+    "answer": "A",
+    "explanation": "Traditional ML models such as gradient boosting produce outputs that can be traced back to specific input features and their weights, making them well suited to regulated environments where every decision must be fully explainable to auditors and regulators.\nMultilingual support and conversational interface needs are strengths of foundation models, not reasons to choose traditional ML. Content generation capability is a defining feature of generative AI and is irrelevant to a loan-decision model that classifies applications rather than generating text.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q348",
+    "question": "A healthcare startup wants to deploy a diagnostic support tool that must run on devices with limited memory and no internet connection. Which constraint most strongly favors a traditional ML model over a foundation model?",
+    "options": {
+      "A": "The need for real-time image generation",
+      "B": "Operational constraints on memory and connectivity",
+      "C": "The requirement for multilingual chat support",
+      "D": "The desire for open-ended text summarization"
+    },
+    "answer": "B",
+    "explanation": "Traditional ML models are typically much smaller and can run efficiently on resource-constrained edge devices without requiring cloud connectivity, making them the appropriate choice when operational constraints such as limited memory and offline operation apply.\nReal-time image generation, multilingual chat support, and open-ended text summarization are capabilities that favor foundation models, not constraints that would lead a team to choose traditional ML.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q349",
+    "question": "A logistics company processes thousands of delivery route requests each day. Which benefit does AI/ML provide that a purely rule-based system cannot easily achieve?",
+    "options": {
+      "A": "Deterministic outputs for every input",
+      "B": "Ability to scale and adapt to changing patterns in the data",
+      "C": "Guaranteed correctness without validation",
+      "D": "Elimination of all computational costs"
+    },
+    "answer": "B",
+    "explanation": "AI/ML systems learn patterns from data and can adapt as those patterns change over time, and they scale to handle large volumes of requests by generalizing from examples rather than requiring manually coded rules for every scenario, which is a key advantage over rule-based systems.\nDeterministic outputs are actually a characteristic of rule-based systems, not a unique benefit of AI/ML. No system can guarantee correctness without validation. AI/ML does not eliminate computational costs; in fact, training and inference often require significant compute resources.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q350",
+    "question": "A retailer wants to personalize product recommendations for millions of customers. Why is AI/ML more suitable than a manual approach for this task?",
+    "options": {
+      "A": "AI/ML removes the need for any data",
+      "B": "AI/ML can process large volumes of data and identify patterns humans cannot easily detect",
+      "C": "AI/ML guarantees 100% accuracy on every prediction",
+      "D": "AI/ML eliminates the need for computing infrastructure"
+    },
+    "answer": "B",
+    "explanation": "AI/ML excels at processing large volumes of customer data, identifying subtle patterns and preferences, and generating personalized recommendations at a scale that would be impractical for humans to achieve manually, which is why it adds value for this use case.\nAI/ML requires data to learn from, so it does not remove the need for any data. No system guarantees 100% accuracy. AI/ML requires computing infrastructure for training and inference, so it does not eliminate infrastructure needs.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q351",
+    "question": "A startup wants to use a foundation model for its application but lacks the data and resources to train one from scratch. Which approach allows the team to obtain a foundation model without pre-training it themselves?",
+    "options": {
+      "A": "Use an open-source pre-trained model from a model hub",
+      "B": "Build a rule-based expert system instead",
+      "C": "Collect more labeled data and train a decision tree",
+      "D": "Write custom inference code without any model"
+    },
+    "answer": "A",
+    "explanation": "Open-source pre-trained models are available from model hubs and can be used directly or fine-tuned for specific tasks, allowing teams to leverage foundation models without the massive data and compute resources required to pre-train them from scratch.\nBuilding a rule-based expert system does not provide a foundation model. Training a decision tree creates a traditional ML model, not a foundation model. Writing custom inference code without any model provides no predictive capability at all.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q352",
+    "question": "A company wants to experiment with multiple foundation models before selecting one for production. Which AWS service provides access to a variety of pre-trained foundation models from different providers?",
+    "options": {
+      "A": "Amazon Personalize",
+      "B": "Amazon SageMaker JumpStart",
+      "C": "Amazon Comprehend",
+      "D": "Amazon Transcribe"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker JumpStart provides access to a variety of pre-trained foundation models from AWS and third-party providers, allowing teams to experiment with different models and deploy them with minimal setup, which directly addresses the company's need.\nAmazon Personalize builds recommendation models from user interaction data rather than providing access to general-purpose foundation models. Amazon Comprehend is a managed NLP service for text analysis. Amazon Transcribe converts speech to text. None of these provides a catalog of foundation models from multiple providers.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon SageMaker JumpStart",
+      "Amazon Personalize",
+      "Amazon Comprehend",
+      "Amazon Transcribe"
+    ]
+  },
+  {
+    "id": "aif-q354",
+    "question": "An enterprise is modernizing legacy applications and wants an AWS service that helps transform and migrate workloads using AI-assisted tooling. Which AWS service meets this requirement?",
+    "options": {
+      "A": "AWS Transform",
+      "B": "Amazon Textract",
+      "C": "Amazon Translate",
+      "D": "Amazon Transcribe"
+    },
+    "answer": "A",
+    "explanation": "AWS Transform is an AWS service that uses AI-assisted tooling to help enterprises transform and modernize their legacy applications and workloads, which directly meets the company's requirement.\nAmazon Textract extracts text and data from documents. Amazon Translate converts text between languages. Amazon Transcribe converts speech to text. None of these is designed for application modernization and transformation.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "AWS Transform",
+      "Amazon Textract",
+      "Amazon Translate",
+      "Amazon Transcribe"
+    ]
+  },
+  {
+    "id": "aif-q355",
+    "question": "Which description best defines agentic AI?",
+    "options": {
+      "A": "AI that generates images from text prompts",
+      "B": "AI that autonomously plans, decides, and takes actions to achieve goals",
+      "C": "AI that converts speech to text",
+      "D": "AI that groups similar data points into clusters"
+    },
+    "answer": "B",
+    "explanation": "Agentic AI refers to AI systems that can autonomously plan, make decisions, and take actions to accomplish goals, often by using tools, managing memory, and orchestrating multi-step workflows without constant human direction.\nGenerating images from text prompts describes diffusion models or image-generation AI. Converting speech to text describes speech recognition. Grouping similar data points into clusters describes unsupervised learning techniques like K-means.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q356",
+    "question": "How does agentic AI differ from traditional AI systems?",
+    "options": {
+      "A": "Agentic AI requires more training data than traditional AI",
+      "B": "Agentic AI can only process text, while traditional AI handles all data types",
+      "C": "Agentic AI can autonomously execute multi-step tasks, while traditional AI typically responds to single requests",
+      "D": "Agentic AI is always more accurate than traditional AI"
+    },
+    "answer": "C",
+    "explanation": "Agentic AI systems can autonomously break down goals into steps, use tools, and execute multi-step workflows to achieve objectives, whereas traditional AI systems typically process individual requests and return single responses without autonomous planning or action-taking.\nAgentic AI does not inherently require more training data than traditional AI. Agentic AI can work with multiple data types, not just text. Accuracy depends on the specific model and task, not on whether the system is agentic.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q357",
+    "question": "A development team wants an AI assistant that can answer questions about their codebase, explain existing code, and help troubleshoot issues directly in their IDE. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon Comprehend",
+      "B": "Amazon Q Developer",
+      "C": "Amazon Textract",
+      "D": "Amazon Transcribe"
+    },
+    "answer": "B",
+    "explanation": "Amazon Q Developer is an AI-powered assistant that integrates with IDEs to answer questions about code, explain how existing code works, and help developers troubleshoot issues, which matches what the team needs.\nAmazon Comprehend analyzes text for sentiment and entities but does not assist with code. Amazon Textract extracts text from documents and images. Amazon Transcribe converts speech to text. None of these provides code-aware assistance in an IDE.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon Q",
+      "Amazon Comprehend",
+      "Amazon Textract",
+      "Amazon Transcribe"
+    ]
+  },
+  {
+    "id": "aif-q358",
+    "question": "A software team wants to use AI to help define requirements, generate design documents, and implement features based on specifications. Which AWS service supports this spec-driven development workflow?",
+    "options": {
+      "A": "Amazon Personalize",
+      "B": "Amazon Rekognition",
+      "C": "Kiro",
+      "D": "Amazon Polly"
+    },
+    "answer": "C",
+    "explanation": "Kiro is an AI-powered development environment that supports spec-driven development, helping teams define requirements, generate design documents, and implement features based on specifications.\nAmazon Personalize generates recommendations based on user behavior. Amazon Rekognition analyzes images and video. Amazon Polly converts text to speech. None of these supports spec-driven software development workflows.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Kiro",
+      "Amazon Personalize",
+      "Amazon Rekognition",
+      "Amazon Polly"
+    ]
+  },
+  {
+    "id": "aif-q359",
+    "question": "A business analyst wants to create interactive dashboards with AI-generated insights and natural language querying of data. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon Athena",
+      "B": "Amazon Quick",
+      "C": "Amazon Redshift",
+      "D": "AWS Glue"
+    },
+    "answer": "B",
+    "explanation": "Amazon Quick (formerly Amazon QuickSight Q) provides AI-powered business intelligence with natural language querying, allowing business analysts to ask questions in plain language and receive visualizations and insights from their data.\nAmazon Athena runs SQL queries on data in Amazon S3 but does not provide AI-generated insights or natural language querying. Amazon Redshift is a data warehouse for analytics workloads. AWS Glue is a data integration service for ETL jobs. None of these offers the AI-powered natural language business intelligence experience.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon Quick",
+      "Amazon Athena",
+      "Amazon Redshift",
+      "AWS Glue"
+    ]
+  },
+  {
+    "id": "aif-q360",
+    "question": "A contact center wants to build a voice-enabled virtual agent that understands customer requests and routes calls to the appropriate department. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon Polly",
+      "B": "Amazon Lex",
+      "C": "Amazon Translate",
+      "D": "Amazon Comprehend"
+    },
+    "answer": "B",
+    "explanation": "Amazon Lex is a service for building conversational interfaces using voice and text, enabling the contact center to create a virtual agent that understands spoken requests and can route calls based on customer intent.\nAmazon Polly converts text to speech but does not understand or interpret spoken input. Amazon Translate converts text between languages. Amazon Comprehend extracts insights from text but does not build interactive conversational agents.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon Lex",
+      "Amazon Polly",
+      "Amazon Translate",
+      "Amazon Comprehend"
+    ]
+  },
+  {
+    "id": "aif-q361",
+    "question": "A law firm has thousands of legal documents and wants employees to find relevant case law and contract clauses using natural language questions. Which type of AI application best addresses this need?",
+    "options": {
+      "A": "Fraud Detection",
+      "B": "Knowledge Base",
+      "C": "Time Series Forecasting",
+      "D": "Anomaly Detection"
+    },
+    "answer": "B",
+    "explanation": "A knowledge base application uses AI to index, understand, and retrieve information from large document collections, allowing users to find relevant content by asking natural language questions, which is exactly what the law firm needs for searching legal documents.\nFraud detection identifies suspicious transactions or activities. Time series forecasting predicts future values from historical sequential data. Anomaly detection flags unusual patterns in data. None of these enables natural language search across document collections.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q362",
+    "question": "What does the term Large Language Model (LLM) refer to?",
+    "options": {
+      "A": "A database that stores large amounts of text",
+      "B": "A deep learning model trained on vast text data to understand and generate human language",
+      "C": "A tool for translating between programming languages",
+      "D": "A system that converts speech to text"
+    },
+    "answer": "B",
+    "explanation": "A Large Language Model (LLM) is a deep learning model trained on massive amounts of text data that can understand context, generate coherent text, answer questions, and perform various language tasks.\nA database stores data but does not understand or generate language. A programming language translator converts code syntax, not natural language understanding. A speech-to-text system transcribes audio but is not what the term LLM describes.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q363",
+    "question": "Which statement best describes Generative AI?",
+    "options": {
+      "A": "AI that only classifies data into predefined categories",
+      "B": "AI that creates new content such as text, images, or audio based on learned patterns",
+      "C": "AI that exclusively detects anomalies in datasets",
+      "D": "AI that only retrieves existing information from databases"
+    },
+    "answer": "B",
+    "explanation": "Generative AI refers to AI systems that can create new content, including text, images, audio, video, and code, by learning patterns from training data and generating novel outputs that resemble that data.\nClassifying data into predefined categories describes classification models, not generative models. Detecting anomalies describes anomaly detection systems. Retrieving existing information describes search or retrieval systems. None of these involves creating new content.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q364",
+    "question": "A company wants an AI system that can autonomously research competitors, compile findings into a report, and email the summary to stakeholders without human intervention at each step. Which type of AI application best fits this requirement?",
+    "options": {
+      "A": "Speech Recognition",
+      "B": "Image Classification",
+      "C": "Agentic AI",
+      "D": "Sentiment Analysis"
+    },
+    "answer": "C",
+    "explanation": "Agentic AI can autonomously plan and execute multi-step workflows, such as researching information, compiling reports, and sending emails, without requiring human intervention at each step, which matches the company's requirement.\nSpeech recognition converts spoken audio to text. Image classification assigns labels to images. Sentiment analysis determines the emotional tone of text. None of these can autonomously orchestrate multi-step tasks across different systems.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q365",
+    "question": "Which statement best describes how Deep Learning differs from traditional Machine Learning?",
+    "options": {
+      "A": "Deep Learning requires manually engineered features, while traditional Machine Learning does not",
+      "B": "Deep Learning uses multi-layered neural networks that automatically learn feature representations from raw data",
+      "C": "Deep Learning can only be applied to text data",
+      "D": "Deep Learning always requires less data than traditional Machine Learning"
+    },
+    "answer": "B",
+    "explanation": "Deep Learning uses neural networks with many layers that automatically discover useful feature representations directly from raw data, removing the need for manual feature engineering that traditional Machine Learning typically requires.\nTraditional Machine Learning is the approach that usually depends on manually engineered features, so option A reverses the relationship. Deep Learning applies to images, audio, text, and other data types, not only text. Deep Learning generally requires more data than traditional Machine Learning because its multi-layered networks have many more parameters to train.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q366",
+    "question": "A retail chain wants to automatically detect and blur customer faces in its security camera footage before storing the recordings. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon Textract",
+      "B": "Amazon Rekognition",
+      "C": "Amazon Comprehend",
+      "D": "Amazon Transcribe"
+    },
+    "answer": "B",
+    "explanation": "Amazon Rekognition is a Computer Vision service that can detect, analyse, and identify faces in images and video, so it can locate customer faces in security footage for the company to blur before storage.\nAmazon Textract extracts text and structured data from documents and images but does not detect faces. Amazon Comprehend is a Natural Language Processing service that analyses text for sentiment, entities, and key phrases. Amazon Transcribe converts spoken audio into text. None of these provides facial detection in video.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon Rekognition",
+      "Amazon Textract",
+      "Amazon Comprehend",
+      "Amazon Transcribe"
+    ]
+  },
+  {
+    "id": "aif-q367",
+    "question": "Which of the following is an example of unstructured data?",
+    "options": {
+      "A": "A database table of customer orders with columns for date, quantity, and price",
+      "B": "A spreadsheet listing employee IDs, names, and salaries",
+      "C": "A collection of free-form customer support emails",
+      "D": "A CSV file containing sensor readings indexed by timestamp"
+    },
+    "answer": "C",
+    "explanation": "Free-form customer support emails are unstructured data because they have no predefined schema or fixed format — the content varies in length, style, and layout, making them unsuitable for direct storage in rows and columns without processing.\nA database table with defined columns, a spreadsheet with named fields, and a CSV file with consistent columns are all examples of structured data because each record follows a predefined schema where every field has a known type and position.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q368",
+    "question": "In the context of MLOps, what does managing technical debt refer to?",
+    "options": {
+      "A": "Reducing the financial cost of cloud compute instances",
+      "B": "Addressing accumulated shortcuts, outdated dependencies, and undocumented processes that make ML systems harder to maintain over time",
+      "C": "Increasing the number of model parameters to improve accuracy",
+      "D": "Deleting old datasets that are no longer needed"
+    },
+    "answer": "B",
+    "explanation": "Technical debt in MLOps refers to the accumulated cost of shortcuts, poorly documented pipelines, outdated dependencies, and tightly coupled components that make ML systems progressively harder to maintain, extend, and debug over time. Managing it means proactively refactoring, documenting, and modernizing these systems.\nReducing cloud compute costs is cost optimisation, not technical debt management. Increasing model parameters is a modelling decision related to capacity, not maintenance burden. Deleting old datasets is a data governance activity rather than a response to accumulated engineering shortcuts.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q369",
+    "question": "A data science team runs dozens of training jobs with different configurations each week. It needs to compare results and reproduce any previous run. Which MLOps practice meets this requirement?",
+    "options": {
+      "A": "Model deployment",
+      "B": "Experiment tracking",
+      "C": "Data labeling",
+      "D": "Feature serving"
+    },
+    "answer": "B",
+    "explanation": "Experiment tracking records the parameters, metrics, code versions, and artifacts for every training run, allowing the team to compare results across runs and reproduce any previous experiment exactly, which supports the MLOps principles of experimentation and repeatable processes.\nModel deployment is the process of making a trained model available for inference and does not record or compare training configurations. Data labeling assigns ground-truth annotations to training examples, not to tracking the outcomes of training jobs. Feature serving delivers pre-computed features to models at inference time and has nothing to do with recording training experiment details.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q370",
+    "question": "What is the purpose of hyperparameter tuning in the ML development lifecycle?",
+    "options": {
+      "A": "To collect and clean the raw training data",
+      "B": "To find the model configuration settings that produce the best performance",
+      "C": "To deploy the trained model to a production endpoint",
+      "D": "To monitor the model for data drift after deployment"
+    },
+    "answer": "B",
+    "explanation": "Hyperparameter tuning searches for the optimal configuration settings, such as learning rate, batch size, and number of layers, that are set before training begins and directly influence model performance. Finding the best combination maximises the model's accuracy or other target metric.\nCollecting and cleaning raw data is the data collection and preprocessing stage. Deploying the model to a production endpoint is the deployment stage. Monitoring for data drift is part of the post-deployment monitoring stage. Each of these is a separate step in the ML lifecycle.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q371",
+    "question": "In Machine Learning, what does the term bias most commonly refer to?",
+    "options": {
+      "A": "The speed at which a model trains",
+      "B": "A systematic error that causes a model to consistently favour certain outcomes over others",
+      "C": "The total number of parameters in a model",
+      "D": "The process of splitting data into training and test sets"
+    },
+    "answer": "B",
+    "explanation": "In Machine Learning, bias refers to a systematic error where the model consistently skews toward certain predictions or outcomes, which can arise from unrepresentative training data, flawed assumptions in the algorithm, or imbalanced datasets. Identifying and reducing bias is essential for building fair and accurate models.\nTraining speed is a measure of computational performance, not bias. The total number of parameters describes model capacity or complexity. Splitting data into training and test sets is a data preparation step called train-test splitting. None of these relates to the concept of systematic prediction error.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q109",
+    "question": "A team has trained a model to predict customer churn. The model is highly accurate on the training data but predicts poorly on new, unseen customers. Which change will resolve this?",
+    "options": {
+      "A": "Reduce the regularization strength so the model can fit more complex patterns",
+      "B": "Add further features to the input dataset",
+      "C": "Continue training the model for more epochs",
+      "D": "Increase the regularization strength so the model becomes less complex"
+    },
+    "answer": "D",
+    "explanation": "The model is overfitting: it has effectively memorised the training data and fails to generalise to new, unseen customers. Increasing the regularization strength penalises large weights and reduces model complexity, which encourages a simpler model that captures general patterns rather than noise, closing the gap between training and real-world performance.\nReducing the regularization strength would increase model complexity and make the overfitting worse. Adding further input features also tends to increase complexity, again worsening generalisation. Continuing training for more epochs lets the model fit the training data even more closely, which deepens the overfitting rather than resolving it.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q044",
+    "question": "A retail company built a model to forecast product prices. It scored very well on the training dataset, but once it was released to production its accuracy dropped sharply. What should the company do to address this problem?",
+    "options": {
+      "A": "Train the model for a longer period of time",
+      "B": "Increase the amount of data used for training",
+      "C": "Reduce the amount of data used for training",
+      "D": "Add more hyperparameters to the model"
+    },
+    "answer": "B",
+    "explanation": "Strong results on the training set paired with a sharp drop in production is the classic signature of overfitting, where the model has memorised the training examples instead of learning general patterns. Training on a larger and more varied dataset helps the model generalise to unseen data and closes the gap between training and production performance.\nReducing the training data leaves the model even less to learn from and usually makes overfitting and poor generalisation worse. Adding more hyperparameters increases model complexity, which tends to deepen overfitting rather than relieve it. Training for longer simply fits the existing training data more tightly and does nothing to improve performance on new data, so it does not solve the generalisation problem.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-01",
+    "services": []
+  }
+]

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 92 92" width="92" height="92">
+  <!-- White rounded square background (matches rounded-lg in header) -->
+  <rect width="92" height="92" rx="18" ry="18" fill="white"/>
+
+  <!-- Orange filled cloud (Lucide Cloud path, 24×24 viewBox → scaled to ~56px, centered) -->
+  <g transform="translate(18,18) scale(2.333)">
+    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"
+          fill="#FF9900" stroke="#FF9900" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- White checkmark overlaid (Lucide Check path, 24×24 viewBox → scaled to ~42px, centered) -->
+  <g transform="translate(25,25) scale(1.75)">
+    <path d="M20 6 9 17l-5-5"
+          fill="none" stroke="white" stroke-width="3.2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

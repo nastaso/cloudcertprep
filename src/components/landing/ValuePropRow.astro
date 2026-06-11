@@ -1,0 +1,66 @@
+---
+/**
+ * ValuePropRow.astro — Core value-props list.
+ *
+ * Renders the platform's value propositions as a neutral, check-marked list.
+ * Depends only on existing token classes and the
+ * `getActiveTotalQuestions()` helper — no brand color in
+ * the row itself (brand-rarity), no emoji glyphs.
+ *
+ * The default items mirror the production value-prop wording so the substance
+ * is preserved verbatim (7.1, 7.2). The `${getActiveTotalQuestions()}+
+ * Questions` entry reads the registry at build time so the count stays in sync
+ * with zero copy changes.
+ *
+ * The check glyph reuses the project's inline lucide check polyline (the same
+ * path used by the production hero bullets in `src/pages/index.astro`), tinted
+ * `text-success` and marked `aria-hidden` since it is purely decorative.
+ */
+import { getActiveTotalQuestions } from '../../data/certifications'
+
+interface Props {
+  /** Value-prop strings. Defaults to the Core_Value_Props + live question count. */
+  items?: string[]
+  /** `inline` flows the props in a wrapping row; `stacked` lists them vertically. */
+  layout?: 'inline' | 'stacked'
+}
+
+const {
+  items = [
+    '100% Free',
+    'Open Source',
+    'No Ads',
+    'No Signup',
+    'MIT Licensed',
+    `${getActiveTotalQuestions().toLocaleString('en-US')}+ Questions`,
+  ],
+  layout = 'inline',
+} = Astro.props
+
+// lucide check path data — identical to the production hero bullets.
+const checkIcon = '<polyline points="20 6 9 17 4 12"></polyline>'
+
+const listClass =
+  layout === 'inline'
+    ? 'flex flex-wrap items-center justify-center gap-x-5 gap-y-2'
+    : 'flex flex-col gap-2'
+---
+
+<ul class={`${listClass} text-text-muted text-sm md:text-base`} role="list">
+  {items.map(label => (
+    <li class="inline-flex items-center gap-1.5">
+      <svg
+        class="w-4 h-4 text-success flex-shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        set:html={checkIcon}
+      />
+      {label}
+    </li>
+  ))}
+</ul>

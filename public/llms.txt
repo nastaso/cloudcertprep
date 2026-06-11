@@ -1,0 +1,160 @@
+# CloudCertPrep
+
+> Free open-source AWS certification practice exams. 1,050+ Cloud Practitioner (CLF-C02) and 409+ AI Practitioner (AIF-C01) questions with adaptive spaced repetition, timed mock exams, and progress tracking. No signup, no ads. Maintained by Alex Santonastaso, CloudCertPrep keeps every question bank MIT licensed and publicly auditable on GitHub, with domain-by-domain practice driven by adaptive spaced repetition.
+
+## Pages
+
+- [Home](https://www.cloudcertprep.io/): platform overview and certification catalog
+- [About](https://www.cloudcertprep.io/about): who maintains CloudCertPrep, the question-writing methodology, and the free open-source rationale
+- [Blog](https://www.cloudcertprep.io/blog): AWS certification study guides, exam strategy, and career articles
+- [Contribute](https://www.cloudcertprep.io/contribute): how to add questions, fix errors, or propose a new certification via GitHub
+- [Privacy Policy](https://www.cloudcertprep.io/privacy): GDPR-compliant data practices, EU hosting, no data selling
+- [Terms of Service](https://www.cloudcertprep.io/terms): MIT license, trademark notices, no warranty disclaimer
+
+## Certifications
+
+### Foundational Level
+
+**AWS Cloud Practitioner (CLF-C02)**
+- [Certification Home](https://www.cloudcertprep.io/aws/clf-c02): 65 questions, 90 minutes, scaled scoring (700/1000 to pass)
+- Why practise here: realistic exam simulation, detailed explanations for every question, aligned to the current CLF-C02 exam guide.
+- [Cloud Concepts](https://www.cloudcertprep.io/aws/clf-c02/cloud-concepts): Cloud Concepts free practice questions with explanations
+- [Security & Compliance](https://www.cloudcertprep.io/aws/clf-c02/security-and-compliance): Security & Compliance free practice questions with explanations
+- [Cloud Technology & Services](https://www.cloudcertprep.io/aws/clf-c02/cloud-technology-and-services): Cloud Technology & Services free practice questions with explanations
+- [Billing, Pricing & Support](https://www.cloudcertprep.io/aws/clf-c02/billing-pricing-and-support): Billing, Pricing & Support free practice questions with explanations
+- Question Bank: 1050 questions across 4 domains (Cloud Concepts, Security & Compliance, Cloud Technology & Services, Billing, Pricing & Support)
+
+**AWS Certified AI Practitioner (AIF-C01)**
+- [Certification Home](https://www.cloudcertprep.io/aws/aif-c01): 65 questions, 90 minutes, scaled scoring (700/1000 to pass)
+- Why practise here: realistic exam simulation, detailed explanations for every question, aligned to the current AIF-C01 exam guide.
+- [Fundamentals of AI and ML](https://www.cloudcertprep.io/aws/aif-c01/fundamentals-of-ai-and-ml): Fundamentals of AI and ML free practice questions with explanations
+- [Fundamentals of Generative AI](https://www.cloudcertprep.io/aws/aif-c01/fundamentals-of-generative-ai): Fundamentals of Generative AI free practice questions with explanations
+- [Applications of Foundation Models](https://www.cloudcertprep.io/aws/aif-c01/applications-of-foundation-models): Applications of Foundation Models free practice questions with explanations
+- [Guidelines for Responsible AI](https://www.cloudcertprep.io/aws/aif-c01/guidelines-for-responsible-ai): Guidelines for Responsible AI free practice questions with explanations
+- [Security, Compliance, and Governance](https://www.cloudcertprep.io/aws/aif-c01/security-compliance-and-governance): Security, Compliance, and Governance free practice questions with explanations
+- Question Bank: 409 questions across 5 domains (Fundamentals of AI and ML, Fundamentals of Generative AI, Applications of Foundation Models, Guidelines for Responsible AI, Security, Compliance, and Governance)
+
+### Coming Soon
+
+**AWS Solutions Architect Associate (SAA-C03)** - Coming Soon
+- [Certification Home](https://www.cloudcertprep.io/aws/saa-c03)
+
+## FAQ
+
+### Is CloudCertPrep really free?
+
+Yes, 100% free with no hidden fees, premium tiers, paywalls, or ads. Every practice question, full-length mock exam, domain practice session, and progress tracker is completely free.
+
+### Do I need to create an account?
+
+No account is required to practice. Guest mode gives you full access to every practice question and mock exam. Creating a free account unlocks progress tracking, exam history, domain mastery analytics, and the spaced repetition algorithm in domain practice.
+
+### Is CloudCertPrep open source?
+
+Yes, CloudCertPrep is 100% open source under the MIT license. View the source, contribute new certifications or questions, report errors, or fork the project at https://github.com/nastaso/cloudcertprep. Community contributions are welcome; see CONTRIBUTING.md for the question schema and contribution workflow.
+
+### How does the domain practice spaced repetition work?
+
+For signed-in users, domain practice uses an adaptive algorithm based on your answer history. Questions you get wrong are weighted higher and appear more often. Questions you get right are weighted lower and appear less. Once you build a correct streak on a question, it enters an exclusion window and is hidden until enough time passes. Roughly 20% of each session is reserved for unseen questions so you keep covering new material. Guest sessions use random selection only.
+
+### What certifications does CloudCertPrep support?
+
+CloudCertPrep currently supports AWS Certified Cloud Practitioner (CLF-C02) and AWS Certified AI Practitioner (AIF-C01). Additional certifications, including AWS Solutions Architect Associate (SAA-C03), are planned. The platform is multi-cert by design and new certifications can be added by the community.
+
+### Where can I report a wrong answer or bad question?
+
+Open an issue on GitHub at https://github.com/nastaso/cloudcertprep/issues/new?template=report-question-error.yml. Each practice question shows a "Report on GitHub" link in its review footer that pre-fills the question ID, so the report is one click and a one-line description. Pull requests with corrections are welcome.
+
+### How can I contribute new questions or a new certification?
+
+See CONTRIBUTING.md in the repository at https://github.com/nastaso/cloudcertprep. The question JSON schema is documented end-to-end. Pull requests adding questions, fixing existing ones, or proposing a new certification (use the issue template) are reviewed against the validator and merged when accurate. Contributors are credited in commit history.
+
+### What is the format of the AWS Cloud Practitioner practice exams?
+
+Practice exams mirror the real AWS Cloud Practitioner (CLF-C02) exam: 65 multiple-choice and multiple-response questions in 90 minutes, scaled scoring from 100 to 1000 with a 700 passing threshold. With 1,050+ questions in the pool, you get over 10^100 possible exam combinations.
+
+### How accurate is this as an AWS Cloud Practitioner exam simulator?
+
+Questions are written to match the difficulty, style, and topic distribution of the real CLF-C02 exam. The interface replicates the AWS testing experience: timed sessions, flagging, review screens, and scaled scoring. Questions are kept up to date with the 2026 exam guide and reviewed against AWS official documentation.
+
+### How realistic are CloudCertPrep practice exams?
+
+Very realistic. Our CLF-C02 mock exams mirror the real AWS Cloud Practitioner format: 65 questions in 90 minutes, scaled 100 to 1000 with a 700 pass mark. Questions match the difficulty, style, and domain weighting of the official exam guide, so practice scores closely track real exam-day performance.
+
+### Are the practice questions aligned to the current exam guide?
+
+Yes. Every CLF-C02 question is written against the current AWS Cloud Practitioner exam guide (CLF-C02) and mapped to its domains and task statements. The open-source bank is reviewed via GitHub pull request and updated whenever AWS revises the guide, so coverage stays aligned with what the real exam tests.
+
+### Does every question have a detailed explanation?
+
+Yes. Every CLF-C02 practice question ships with a full explanation covering why the correct answer is right and why each distractor is wrong. Explanations reference AWS concepts and documentation, so you learn the reasoning rather than memorising answers. The entire bank is publicly auditable on GitHub under the MIT license.
+
+### How much does the AWS Cloud Practitioner exam cost?
+
+The AWS Certified Cloud Practitioner (CLF-C02) exam costs 100 USD (prices vary slightly by region and local tax). AWS occasionally offers a free retake or a 50% discount voucher to candidates who hold an existing AWS certification, so check your AWS Certification account for available benefits before booking. Practising here is free; only the official exam at Pearson VUE or PSI carries the fee.
+
+### Is there an AWS Cloud Practitioner exam voucher or discount?
+
+AWS issues a 50% discount voucher to candidates who already hold an AWS certification, redeemable on their next exam, and periodically runs free or discounted exam promotions. Vouchers appear in the benefits section of your AWS Certification account and are applied at checkout when you schedule the exam. CloudCertPrep practice is always free regardless of any voucher.
+
+### What is the AWS Cloud Practitioner passing score?
+
+The AWS Cloud Practitioner (CLF-C02) passing score is 700 on a scaled range of 100 to 1000. The score is scaled, not a simple percentage, because questions vary in difficulty, so you do not need 70% of questions correct exactly. Unscored pilot questions are mixed in and do not affect your result. Aim for 800+ on practice exams here for a comfortable margin.
+
+### Can I retake the AWS Cloud Practitioner exam if I fail?
+
+Yes. If you do not pass, you can retake the CLF-C02 exam after a 14-day waiting period. There is no limit on the total number of attempts, but you must pay the exam fee each time and wait 14 days between attempts. Use the gap to review your weakest domains in domain practice here before rebooking.
+
+### Does the AWS Cloud Practitioner certification expire?
+
+Yes. AWS certifications, including the Cloud Practitioner (CLF-C02), are valid for three years from the date you pass. To recertify, pass the current version of the same exam or earn a higher-level AWS certification before your credential expires, which automatically extends the foundational certification.
+
+### Does CloudCertPrep provide CLF-C02 exam dumps?
+
+No. We do not provide exam dumps, which are leaked or stolen real exam questions that violate the AWS Certification agreement and can get your certification revoked. Every CloudCertPrep question is original, written from the published AWS exam guide and AWS documentation, and aligned to the current CLF-C02 domains. The goal is to teach the material so you pass legitimately, not to memorise stolen answers.
+
+### Is this the same exam as CLF-CO2, CLF-02, or CLF2?
+
+Yes. The AWS Cloud Practitioner exam code is CLF-C02 (the current version, which replaced CLF-C01). It is sometimes mistyped as CLF-CO2, CLF-02, or CLF2 in searches. All refer to the same AWS Certified Cloud Practitioner exam that CloudCertPrep prepares you for.
+
+### What is the format of the AWS AI Practitioner practice exams?
+
+Practice exams mirror the real AWS Certified AI Practitioner (AIF-C01) exam: 65 questions (50 scored plus 15 unscored) in 90 minutes, scaled scoring from 100 to 1000 with a 700 passing threshold. The official exam uses multiple-choice, multiple-response, ordering, and matching question formats. The exam covers fundamentals of AI, machine learning, and generative AI on AWS.
+
+### Who is the AWS AI Practitioner certification for?
+
+AIF-C01 is a foundational certification for individuals who use AI/ML technologies on AWS but are not in technical IT roles, such as business analysts, sales, marketing, product managers, and decision-makers. It validates broad knowledge of AI and ML concepts, generative AI use cases, and AWS AI services like Amazon Bedrock, SageMaker, Q, and Rekognition.
+
+### What topics are on the AWS AI Practitioner exam?
+
+AIF-C01 covers five domains: Fundamentals of AI and ML (20%), Fundamentals of Generative AI (24%), Applications of Foundation Models (28%), Guidelines for Responsible AI (14%), and Security, Compliance, and Governance for AI Solutions (14%). Key services covered include Amazon Bedrock, Amazon SageMaker, Amazon Q, Amazon Rekognition, Amazon Comprehend, Amazon Polly, Amazon Transcribe, and Amazon Textract.
+
+### How realistic are CloudCertPrep practice exams?
+
+Very realistic. Our AIF-C01 mock exams mirror the real AWS Certified AI Practitioner format: timed sittings, scaled scoring from 100 to 1000, and a 700 pass mark. Questions match the difficulty, style, and domain weighting of the official exam guide, so your practice scores closely track real exam-day performance.
+
+### Are the practice questions aligned to the current exam guide?
+
+Yes. Every AIF-C01 question is written against the current AWS Certified AI Practitioner exam guide (AIF-C01, version 1.1, April 2026) and mapped to its five domains and task statements. The open-source bank is reviewed via GitHub pull request and updated whenever AWS revises the guide, so coverage stays aligned with what the real exam tests.
+
+### Does every question have a detailed explanation?
+
+Yes. Every AIF-C01 practice question ships with a full explanation covering why the correct answer is right and why each distractor is wrong. Explanations reference AWS AI and ML concepts and documentation, so you learn the reasoning rather than memorising answers. The entire bank is publicly auditable on GitHub under the MIT license.
+
+### How much does the AWS AI Practitioner exam cost?
+
+The AWS Certified AI Practitioner (AIF-C01) exam costs 100 USD (prices vary slightly by region and local tax). As a foundational-level exam it is the same price tier as the Cloud Practitioner. If you already hold an AWS certification, check your AWS Certification account for a 50% discount voucher before booking. Practising on CloudCertPrep is always free.
+
+### Does the AWS AI Practitioner certification expire?
+
+Yes. Like all AWS certifications, the AI Practitioner (AIF-C01) is valid for three years from the date you pass. You can recertify by passing the current version of the exam again, or by earning a higher-level AWS certification before it expires.
+
+### Does CloudCertPrep provide AIF-C01 exam dumps?
+
+No. We do not provide exam dumps, which are leaked or stolen real exam questions that violate the AWS Certification agreement and can get your certification revoked. Every AIF-C01 question is original, written from the published AWS exam guide and AWS documentation, and aligned to the five current AIF-C01 domains. We help you pass legitimately by teaching the material, not by sharing stolen answers.
+
+## Resources
+
+- [GitHub repository](https://github.com/nastaso/cloudcertprep)
+- [Report a question error](https://github.com/nastaso/cloudcertprep/issues/new?title=Question+error)
+- [Author portfolio](https://santonastaso.me)

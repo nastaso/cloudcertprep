@@ -1,0 +1,67 @@
+[
+  {
+    "id": "saa-d3-001",
+    "question": "A company needs to serve static content to users worldwide with low latency. Which AWS service should they use?",
+    "options": {
+      "A": "Amazon EC2",
+      "B": "Amazon CloudFront",
+      "C": "AWS Global Accelerator",
+      "D": "Amazon Route 53"
+    },
+    "answer": "B",
+    "explanation": "CloudFront is a CDN that caches content at edge locations worldwide for low-latency delivery. Global Accelerator improves availability and performance for dynamic content. Route 53 is a DNS service. EC2 is a compute service.",
+    "isMultiAnswer": false
+  },
+  {
+    "id": "saa-d3-002",
+    "question": "Which service should be used to run containers without managing servers or clusters?",
+    "options": {
+      "A": "Amazon EC2",
+      "B": "Amazon ECS on EC2",
+      "C": "AWS Fargate",
+      "D": "AWS Elastic Beanstalk"
+    },
+    "answer": "C",
+    "explanation": "AWS Fargate is a serverless compute engine for containers that removes the need to manage servers. ECS on EC2 requires managing EC2 instances. Elastic Beanstalk is a PaaS for web applications.",
+    "isMultiAnswer": false
+  },
+  {
+    "id": "saa-d3-003",
+    "question": "An application requires sub-millisecond read latency for a DynamoDB table. Which feature should a solutions architect recommend?",
+    "options": {
+      "A": "DynamoDB Streams",
+      "B": "DynamoDB global tables",
+      "C": "DynamoDB Accelerator (DAX)",
+      "D": "DynamoDB on-demand capacity"
+    },
+    "answer": "C",
+    "explanation": "DAX is an in-memory cache for DynamoDB that provides microsecond read latency. Streams captures changes. Global tables provide multi-region replication. On-demand capacity auto-scales throughput.",
+    "isMultiAnswer": false
+  },
+  {
+    "id": "saa-d3-004",
+    "question": "A company needs to process real-time streaming data from IoT sensors. Which service should they use?",
+    "options": {
+      "A": "Amazon SQS",
+      "B": "Amazon Kinesis Data Streams",
+      "C": "Amazon SNS",
+      "D": "Amazon MQ"
+    },
+    "answer": "B",
+    "explanation": "Kinesis Data Streams is designed for real-time streaming data ingestion and processing. SQS is for message queuing. SNS is for pub/sub notifications. Amazon MQ is a managed message broker.",
+    "isMultiAnswer": false
+  },
+  {
+    "id": "saa-d3-005",
+    "question": "Which AWS service provides a fully managed, highly available, and scalable file storage for use with EC2 instances across multiple Availability Zones?",
+    "options": {
+      "A": "Amazon EBS",
+      "B": "Amazon EFS",
+      "C": "Amazon S3",
+      "D": "AWS Storage Gateway"
+    },
+    "answer": "B",
+    "explanation": "Amazon EFS provides scalable, elastic file storage accessible from multiple EC2 instances across AZs. EBS is block storage attached to a single instance. S3 is object storage. Storage Gateway connects on-premises to AWS storage.",
+    "isMultiAnswer": false
+  }
+]

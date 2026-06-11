@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- White circular background -->
+  <circle cx="50" cy="50" r="50" fill="white"/>
+  
+  <!-- AWS Orange Cloud (exact Lucide path, scaled and centered) -->
+  <g transform="translate(17, 17) scale(2.7)">
+    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" fill="#FF9900" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- White Checkmark (exact Lucide path, scaled and centered) -->
+  <g transform="translate(26, 26) scale(2)">
+    <path d="M20 6 9 17l-5-5" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -1,0 +1,30 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# NOTE (R10.8, trailing slashes): an earlier `from = "/*/"` force-redirect here
+# was INVALID — Netlify parses it as `/*`, force-redirecting every path to
+# itself (infinite loop; the entire 2026-06-11 dev branch deploy 301-looped).
+# Netlify splats are only supported as the final path segment. Trailing-slash
+# canonical alignment now comes from Astro `build.format: 'file'` (pages emit
+# as `/about.html`, served at the canonical `/about` with no redirect).
+
+# Pre-promotion noindex preview gate (R9.17, Property 7 NOINDEX-PREVIEW-ISOLATION).
+# Non-production Netlify contexts (branch deploys + deploy previews) set
+# PUBLIC_NOINDEX=true, which makes BaseLayout bake
+# <meta name="robots" content="noindex"> into every prerendered page. Google
+# honors the meta tag fully, so the staging surface is never indexed. The
+# production context (CONTEXT === 'production', BRANCH === 'main') leaves the
+# flag unset, so indexable routes ship index,follow untouched.
+#
+# NOTE: context-scoped [[headers]] blocks (X-Robots-Tag per context) are NOT
+# supported by Netlify and were silently ignored when previously declared here
+# (verified 2026-06-11: branch deploy responses carried no X-Robots-Tag).
+# Only `environment` is context-scopable. The meta tag is the noindex gate.
+[context.deploy-preview]
+  [context.deploy-preview.environment]
+    PUBLIC_NOINDEX = "true"
+
+[context.branch-deploy]
+  [context.branch-deploy.environment]
+    PUBLIC_NOINDEX = "true"

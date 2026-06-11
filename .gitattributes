@@ -1,0 +1,16 @@
+# Normalise line endings on commit to LF, regardless of the developer's OS.
+# Prevents CRLF/LF churn polluting diffs between Windows, macOS, and Linux contributors.
+* text=auto eol=lf
+
+# Lock binary file types so git never tries to normalise them.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.pdf binary

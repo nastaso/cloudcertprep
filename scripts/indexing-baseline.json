@@ -1,0 +1,34 @@
+{
+  "_comment": "Hand-maintained URL baseline for scripts/diagnose-indexing.mjs (R2.2, R10.1). The Live_URL_Baseline (pre-migration, GSC 2026-06-04) plus the planned post-migration sitemap URLs and externally observed LLM/backlink citation targets. Update when the sitemap surface changes.",
+  "liveBaseline2026_06_04": [
+    "/",
+    "/practice-exam",
+    "/domain-practice",
+    "/stats",
+    "/privacy",
+    "/terms"
+  ],
+  "postMigrationSitemap": [
+    "/",
+    "/about",
+    "/contribute",
+    "/stats",
+    "/privacy",
+    "/terms",
+    "/blog",
+    "/aws/clf-c02",
+    "/aws/aif-c01",
+    "/aws/clf-c02/cloud-concepts",
+    "/aws/clf-c02/security-and-compliance",
+    "/aws/clf-c02/cloud-technology-and-services",
+    "/aws/clf-c02/billing-pricing-and-support",
+    "/aws/aif-c01/fundamentals-of-ai-and-ml",
+    "/aws/aif-c01/fundamentals-of-generative-ai",
+    "/aws/aif-c01/applications-of-foundation-models",
+    "/aws/aif-c01/guidelines-for-responsible-ai",
+    "/aws/aif-c01/security-compliance-and-governance"
+  ],
+  "citationTargets": [
+    "/"
+  ]
+}

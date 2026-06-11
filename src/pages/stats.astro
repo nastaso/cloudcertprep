@@ -1,0 +1,146 @@
+---
+/**
+ * /stats — React island shell. NOINDEX for now (temporary, see note below).
+ * Temporarily noindex and removed from the footer and SEO assets: the community
+ * sample is too small to publish a credible "community pass rate" (a handful of
+ * attempts is not a meaningful benchmark and could read as misleading). Re-enable
+ * indexing, the footer link, and sitemap/llms.txt entries once attempt volume is
+ * large enough. The prerender, Dataset JSON-LD, and snapshot wiring all stay in
+ * place so re-enabling is a one-line robots flip.
+ *
+ * Prerenders the as-of-last-deploy community stats SNAPSHOT into static HTML
+ * and feeds the SAME snapshot values into the Dataset JSON-LD (STATS-SNAPSHOT-
+ * CONSISTENCY, Property 6). The React Stats island still hydrates fresher
+ * numbers client-side via get_public_exam_stats(). (R2.8, R2.12)
+ */
+import BaseLayout from '../layouts/BaseLayout.astro'
+import Card from '../components/Card.astro'
+import StatsIsland from '../components/StatsIsland.tsx'
+import snapshot from '../lib/generated/stats-snapshot.json'
+import { CERTIFICATIONS } from '../data/certifications'
+import { SITE_URL } from '../lib/seo-data'
+import { serializeJsonLd } from '../lib/jsonld'
+
+const overall = snapshot.overall
+// R2 empty-state contract: render a row for EVERY active cert, not only the
+// certs the RPC returned. Certs with no completed attempts yet (e.g. AIF-C01
+// before its first live attempt) get a `noDataYet` row so they stay visible on
+// the prerendered /stats surface (LLMs/crawlers see the cert exists and is
+// active) instead of silently vanishing. Left-join: snapshot data wins when
+// present; otherwise a zeroed placeholder. Property 6 preserved — the figures
+// that DO render still come from the snapshot.
+const snapshotByCode = new Map(snapshot.certs.map((c) => [c.certCode, c]))
+const certRows = Object.values(CERTIFICATIONS)
+  .filter((cert) => cert.status === 'active')
+  .map((cert) => {
+    const data = snapshotByCode.get(cert.code)
+    return {
+      certCode: cert.code,
+      name: cert.name,
+      passRatePercent: data?.passRatePercent ?? 0,
+      averageScaledScore: data?.averageScaledScore ?? 0,
+      attemptsCompleted: data?.attemptsCompleted ?? 0,
+      noDataYet: !data || (data.attemptsCompleted ?? 0) === 0,
+    }
+  })
+
+// Dataset JSON-LD describing the community stats (R2.8). The measured values
+// are sourced from the SAME snapshot rendered into the visible HTML below.
+const datasetJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  '@id': `${SITE_URL}/stats#dataset`,
+  name: 'CloudCertPrep community pass-rate dataset',
+  description:
+    'Community-wide pass rates, average scaled scores, and per-domain difficulty rankings for the CloudCertPrep practice exams. Aggregated from authenticated user attempts; no personally identifiable information.',
+  url: `${SITE_URL}/stats`,
+  license: 'https://opensource.org/licenses/MIT',
+  creator: { '@id': `${SITE_URL}/#organization` },
+  isAccessibleForFree: true,
+  dateModified: snapshot.generatedAt,
+  keywords: [
+    'AWS practice exam pass rate',
+    'AWS Cloud Practitioner pass rate',
+    'AWS AI Practitioner pass rate',
+    'exam domain difficulty',
+  ],
+  variableMeasured: [
+    { '@type': 'PropertyValue', name: 'pass_rate_percent', unitText: 'PERCENT', value: overall.passRatePercent },
+    { '@type': 'PropertyValue', name: 'average_scaled_score', unitText: 'POINTS', value: overall.averageScaledScore },
+    { '@type': 'PropertyValue', name: 'attempts_completed', unitText: 'COUNT', value: overall.attemptsCompleted },
+  ],
+  distribution: [
+    { '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: `${SITE_URL}/stats.json` },
+  ],
+})
+---
+
+<BaseLayout
+  title="Community Statistics · CloudCertPrep"
+  description="See how the CloudCertPrep community is performing. Pass rates, score distributions, and domain mastery breakdowns across all certifications."
+  canonical="https://www.cloudcertprep.io/stats"
+  robots="noindex"
+  jsonLd={[datasetJsonLd]}
+>
+  {/*
+    Prerendered snapshot — the crawler-visible, citable surface. The React
+    island below replaces these figures with live numbers after hydration.
+    Both this block and the Dataset JSON-LD read the same snapshot file, so
+    their values are identical by construction (Property 6).
+  */}
+  <section
+    data-stats-snapshot
+    aria-label="Community statistics (as of last update)"
+    class="p-4 md:p-8"
+  >
+    <div class="max-w-6xl mx-auto space-y-6">
+      <header class="space-y-2">
+        <h1 class="text-3xl md:text-4xl font-bold text-text-primary">Community statistics</h1>
+        <p class="text-text-muted text-sm md:text-base">
+          Aggregated, anonymous results from the CloudCertPrep community. Figures below are as of
+          {' '}{snapshot.generatedAt}; live numbers load when the page is interactive.
+        </p>
+      </header>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card padding="md">
+          <p class="text-text-muted text-xs md:text-sm">Community pass rate</p>
+          <p class="text-2xl md:text-3xl font-bold text-text-primary">{overall.passRatePercent}%</p>
+        </Card>
+        <Card padding="md">
+          <p class="text-text-muted text-xs md:text-sm">Average scaled score</p>
+          <p class="text-2xl md:text-3xl font-bold text-text-primary">{overall.averageScaledScore}/1000</p>
+        </Card>
+        <Card padding="md">
+          <p class="text-text-muted text-xs md:text-sm">Exam attempts completed</p>
+          <p class="text-2xl md:text-3xl font-bold text-text-primary">{overall.attemptsCompleted.toLocaleString('en-US')}</p>
+        </Card>
+      </div>
+
+      <div class="space-y-3">
+        <h2 class="text-xl md:text-2xl font-semibold text-text-primary">By certification</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {certRows.map((c) => (
+            <Card padding="md">
+              <p class="text-base md:text-lg font-semibold text-text-primary mb-2">{c.name}</p>
+              {c.noDataYet ? (
+                <p class="text-text-muted text-sm">
+                  Not enough attempts yet. Be the first to set the community benchmark.{' '}
+                  <a href={`/aws/${c.certCode}/practice-exam`} class="text-text-primary hover:text-text-primary/70 underline">Start practising →</a>
+                </p>
+              ) : (
+                <ul class="text-text-muted text-sm space-y-1 list-none p-0">
+                  <li>Pass rate: <span class="text-text-primary font-medium">{c.passRatePercent}%</span></li>
+                  <li>Average scaled score: <span class="text-text-primary font-medium">{c.averageScaledScore}/1000</span></li>
+                  <li>Attempts completed: <span class="text-text-primary font-medium">{c.attemptsCompleted.toLocaleString('en-US')}</span></li>
+                </ul>
+              )}
+            </Card>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <StatsIsland client:only="react" />
+</BaseLayout>

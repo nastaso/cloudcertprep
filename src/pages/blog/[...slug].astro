@@ -1,0 +1,33 @@
+---
+/**
+ * Per-post blog page (/blog/<slug>).
+ *
+ * Builds a static path per non-draft post (all posts in dev) keyed on the
+ * frontmatter `slug` (which is also the URL param). Renders the markdown body
+ * via render(entry) and wraps it in BlogLayout.
+ */
+import type { GetStaticPaths } from 'astro'
+import { getCollection, render, type CollectionEntry } from 'astro:content'
+import BlogLayout from '../../layouts/BlogLayout.astro'
+
+export const getStaticPaths = (async () => {
+  const posts = await getCollection('blog', ({ data }: CollectionEntry<'blog'>) =>
+    import.meta.env.PROD ? data.draft !== true : true,
+  )
+  return posts.map((post: CollectionEntry<'blog'>) => ({
+    params: { slug: post.data.slug },
+    props: { post },
+  }))
+}) satisfies GetStaticPaths
+
+interface Props {
+  post: CollectionEntry<'blog'>
+}
+
+const { post } = Astro.props
+const { Content } = await render(post)
+---
+
+<BlogLayout data={post.data}>
+  <Content />
+</BlogLayout>

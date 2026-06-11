@@ -1,0 +1,58 @@
+---
+/**
+ * Blog index (/blog) — post listing.
+ *
+ * Lists non-draft posts (in PROD), sorted by date descending. Because the
+ * route is a single static page (index.astro has no [page] param segment to
+ * spread paginate() URLs into), the listing renders up to PAGE_SIZE most
+ * recent posts; when the catalogue grows past PAGE_SIZE a dedicated
+ * `blog/page/[page].astro` route can take over numbered pages. The canonical
+ * is self-referential and RSS autodiscovery is emitted via BaseLayout's named
+ * `head` slot.
+ */
+import { getCollection, type CollectionEntry } from 'astro:content'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import Breadcrumb from '../../components/Breadcrumb.astro'
+import PostCard from '../../components/PostCard.astro'
+import { SITE_URL } from '../../lib/seo-data'
+
+const PAGE_SIZE = 10
+
+const posts = await getCollection('blog', ({ data }: CollectionEntry<'blog'>) =>
+  import.meta.env.PROD ? data.draft !== true : true,
+)
+const sorted = posts
+  .sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, PAGE_SIZE)
+
+const canonical = `${SITE_URL}/blog`
+
+const breadcrumbItems = [{ label: 'Home', to: '/' }, { label: 'Blog' }]
+
+const description =
+  'Guides, exam-format breakdowns, and study strategy for AWS certification exams from the CloudCertPrep team.'
+---
+
+<BaseLayout title="Blog · CloudCertPrep" description={description} canonical={canonical} ogImage={`${SITE_URL}/og/og-blog.png`}>
+
+  <div class="p-4 md:p-8">
+    <div class="max-w-3xl mx-auto">
+      <Breadcrumb items={breadcrumbItems} />
+
+      <header class="space-y-2 mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-text-primary">CloudCertPrep Blog</h1>
+        <p class="text-text-muted text-sm md:text-base">{description}</p>
+      </header>
+
+      {sorted.length === 0 ? (
+        <p class="text-text-muted">No posts yet. Check back soon.</p>
+      ) : (
+        <div class="space-y-5">
+          {sorted.map((post: CollectionEntry<'blog'>) => (
+            <PostCard data={post.data} slug={post.data.slug} />
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+</BaseLayout>

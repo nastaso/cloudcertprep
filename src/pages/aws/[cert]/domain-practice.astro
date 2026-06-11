@@ -1,0 +1,26 @@
+---
+/**
+ * /aws/:cert/domain-practice — interactive page body island (DomainPractice).
+ * Noindexed. Static Astro chrome comes from BaseLayout; AppIsland renders only
+ * the body.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import AppIsland from '../../../components/AppIsland.tsx'
+import { getActiveCertStaticPaths, type Certification } from '../../../data/certifications'
+import { canonicalFor } from '../../../lib/seo-data'
+
+export const getStaticPaths = getActiveCertStaticPaths
+
+interface Props {
+  cert: Certification
+}
+
+const { cert } = Astro.props
+const title = `${cert.shortName} Domain Practice · CloudCertPrep`
+const description = `Practice ${cert.name} questions by domain with instant feedback and adaptive spaced repetition.`
+const canonical = canonicalFor(`/aws/${cert.code}/domain-practice`)
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} robots="noindex" headerHideMobileMenu={true} noscriptDirectory={true}>
+  <AppIsland client:only="react" />
+</BaseLayout>

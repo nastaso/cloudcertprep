@@ -1,0 +1,67 @@
+[
+  {
+    "id": "saa-d4-001",
+    "question": "A company wants to reduce EC2 costs for workloads that can tolerate interruptions. Which purchasing option should they use?",
+    "options": {
+      "A": "On-Demand Instances",
+      "B": "Reserved Instances",
+      "C": "Spot Instances",
+      "D": "Dedicated Hosts"
+    },
+    "answer": "C",
+    "explanation": "Spot Instances offer up to 90% discount but can be interrupted. On-Demand has no discount. Reserved Instances require commitment. Dedicated Hosts provide physical server isolation.",
+    "isMultiAnswer": false
+  },
+  {
+    "id": "saa-d4-002",
+    "question": "Which AWS service helps identify underutilized resources and provides cost optimization recommendations?",
+    "options": {
+      "A": "AWS Budgets",
+      "B": "AWS Trusted Advisor",
+      "C": "AWS Cost Explorer",
+      "D": "AWS Pricing Calculator"
+    },
+    "answer": "B",
+    "explanation": "Trusted Advisor inspects your AWS environment and provides recommendations for cost optimization, security, performance, and fault tolerance. Cost Explorer visualizes costs. Budgets sets alerts. Pricing Calculator estimates costs.",
+    "isMultiAnswer": false
+  },
+  {
+    "id": "saa-d4-003",
+    "question": "A company runs a development environment that is only used during business hours. Which approach minimizes costs?",
+    "options": {
+      "A": "Use Reserved Instances",
+      "B": "Use On-Demand Instances and stop them after hours",
+      "C": "Use Spot Instances",
+      "D": "Use Dedicated Hosts"
+    },
+    "answer": "B",
+    "explanation": "Stopping On-Demand instances when not in use eliminates compute charges (only storage costs remain). Reserved Instances are for steady-state workloads. Spot Instances can be interrupted. Dedicated Hosts are expensive.",
+    "isMultiAnswer": false
+  },
+  {
+    "id": "saa-d4-004",
+    "question": "Which S3 feature can automatically move objects to cheaper storage classes based on access patterns?",
+    "options": {
+      "A": "S3 Versioning",
+      "B": "S3 Lifecycle policies",
+      "C": "S3 Replication",
+      "D": "S3 Object Lock"
+    },
+    "answer": "B",
+    "explanation": "S3 Lifecycle policies automatically transition objects between storage classes or expire them based on rules. Versioning preserves object versions. Replication copies objects across buckets. Object Lock prevents deletion.",
+    "isMultiAnswer": false
+  },
+  {
+    "id": "saa-d4-005",
+    "question": "A solutions architect needs to choose between Amazon RDS and Amazon DynamoDB. Which factor most favours DynamoDB?",
+    "options": {
+      "A": "Complex SQL queries with joins",
+      "B": "Consistent single-digit millisecond latency at any scale",
+      "C": "ACID transactions across multiple tables",
+      "D": "Schema enforcement and referential integrity"
+    },
+    "answer": "B",
+    "explanation": "DynamoDB provides consistent single-digit millisecond performance at any scale. RDS is better for complex SQL queries, multi-table ACID transactions, and schema enforcement.",
+    "isMultiAnswer": false
+  }
+]

@@ -1,0 +1,83 @@
+---
+/**
+ * Header.astro — solid AWS Console navy bar (#232F3E) used by BaseLayout on
+ * every page. The logo + wordmark are static Astro markup (no React, no
+ * hydration) so the chrome is in the HTML immediately and never flashes. The
+ * platform tagline lives in the logo link's aria-label rather than as a
+ * visible subheader (clean single-wordmark premium look; a11y/crawler context
+ * preserved). The right-hand cluster (cert switcher, About/Blog/GitHub links,
+ * History, auth button, mobile drawer) is the single `HeaderInteractive` island.
+ *
+ * Identity: the navy chrome + orange CTA pattern is AWS Console's own DNA,
+ * so the site reads as AWS-affiliated on first paint without copying AWS
+ * trade dress (which would be a legal problem). Brand orange #FF9900 is
+ * reserved for the Sign-in pill, the logo cloud mark, and the body CTAs —
+ * never for the chrome.
+ */
+import HeaderInteractive from './HeaderInteractive.tsx'
+
+interface Props {
+  /** When false, render only the logo (no nav cluster / island). Default true. */
+  showNav?: boolean
+  /** When true (default), the header sticks to the top of the viewport on scroll. */
+  sticky?: boolean
+  /** When true, hide the mobile hamburger/drawer (exam shell only). Default false. */
+  hideMobileMenu?: boolean
+}
+
+const { showNav = true, sticky = true, hideMobileMenu = false } = Astro.props
+
+// Current request path, resolved at build time for each prerendered page.
+// Passed into the island so the CertSwitcher renders the correct state in the
+// SSR HTML (it's gated on the route being cert-scoped). Without this the
+// switcher's useSyncExternalStore server snapshot is '/', so the pill is absent
+// from the server HTML and only pops in after client:idle hydration — a visible
+// load delay on cert pages and a flash on every navigation.
+const pathname = Astro.url.pathname
+
+const PLATFORM_TAGLINE = 'AWS Certification Exam Prep'
+
+// Inline lucide icon paths (lucide-react is React-only).
+const cloudPath = 'M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z'
+const checkPath = 'M20 6 9 17l-5-5'
+---
+
+<header class:list={[sticky ? "sticky top-0 z-40" : "relative z-30", "bg-gradient-to-b from-header-bg to-header-bg/90 border-b border-white/5 text-on-header"]}>
+  <div class="max-w-7xl mx-auto px-4 md:px-6">
+    <div class="flex items-center justify-between gap-4 h-14 md:h-16">
+      {/* Logo + wordmark. The accessible name carries the platform tagline
+          (previously a visible subheader) so the chrome reads as a clean
+          single-wordmark (premium) while screen readers and crawlers still get
+          the descriptive context. (audit-reconciliation: tagline → aria-label) */}
+      <a href="/" class="flex items-center gap-2 md:gap-3 group" aria-label={`CloudCertPrep, ${PLATFORM_TAGLINE}, home`}>
+        {/* Brand mark: white tile + orange cloud + white check — the live
+            cloudcertprep.io mark, preserved on the navy bar for brand
+            continuity. The tile stays white in both themes (the header is
+            navy in both), so bg-white (not bg-bg-card, which flips dark). */}
+        <div class="w-9 h-9 md:w-10 md:h-10 bg-white rounded-lg flex items-center justify-center shadow-sm group-active:scale-[0.95] transition-transform duration-150 relative">
+          <svg class="w-5 h-5 md:w-6 md:h-6 text-brand" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={cloudPath} /></svg>
+          <svg class="w-3 h-3 md:w-4 md:h-4 text-white absolute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={checkPath} /></svg>
+        </div>
+        {/* Wordmark: bumped to text-xl/2xl so the cap-height balances the
+            40px tile (premium lockups sit cap-height at ~60-70% of the icon,
+            never matching the full square). Two-tone weight ("Cloud" medium +
+            "CertPrep" bold) gives the compound name internal rhythm so it
+            reads as a brand, not a label — the Vercel/PlanetScale treatment.
+            translate-y-[4px] is a deliberate optical nudge: with leading-none
+            the line-box centres geometrically, but the cap-height block sits
+            ~1px high (descender space reserved at the bottom), so the visible
+            letters read high against the tile without it. The
+            accessible/visible string stays "CloudCertPrep" verbatim. */}
+        <span class="text-xl md:text-2xl text-on-header tracking-tight leading-none translate-y-[4px]">
+          <span class="font-medium">Cloud</span><span class="font-bold">CertPrep</span>
+        </span>
+      </a>
+
+      {/* Right-hand cluster: cert switcher + links + auth + mobile drawer.
+          Hydrated `client:idle`: the static chrome + the cc-authed pre-paint
+          CSS already render the correct header for both auth states on first
+          paint, so the React cost can defer until idle. */}
+      {showNav && <HeaderInteractive client:idle initialPathname={pathname} hideMobileMenu={hideMobileMenu} />}
+    </div>
+  </div>
+</header>

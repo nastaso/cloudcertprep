@@ -1,0 +1,81 @@
+---
+/**
+ * ExplanationShowcase.astro — "Every Question Includes a Detailed Explanation"
+ * section. Pulls the first question from domain 1 of the cert at build time and
+ * renders it through SampleQuestionCard.astro so visitors (and crawlers) see a
+ * real, exam-style question with its full explanation and the correct answer
+ * highlighted on reveal.
+ *
+ * Prerendered HTML only — the reveal interaction comes from SampleQuestionCard's
+ * own bundled script; this component adds no island.
+ *
+ * Guard: renders nothing when no question bank is registered for the cert
+ * (e.g. coming-soon certs), so the page never crashes on a missing bank. (R23.2)
+ */
+import SampleQuestionCard from './SampleQuestionCard.astro'
+import { getCertDomainSlug, type Certification } from '../data/certifications'
+import { GITHUB_REPO_URL } from '../lib/constants'
+
+// Static imports of the domain-1 banks for every active cert. Keyed lookup so
+// the showcase resolves the right bank from the cert prop at build time.
+import clfDomain1 from '../data/clf-c02/domain1.json'
+import aifDomain1 from '../data/aif-c01/domain1.json'
+
+interface ShowcaseQuestion {
+  id: string
+  question: string
+  options: Record<string, string>
+  answer: string | string[]
+  explanation: string
+}
+
+const DOMAIN1_BANKS: Record<string, ShowcaseQuestion[]> = {
+  'clf-c02': clfDomain1 as ShowcaseQuestion[],
+  'aif-c01': aifDomain1 as ShowcaseQuestion[],
+}
+
+interface Props {
+  cert: Certification
+}
+
+const { cert } = Astro.props
+
+const bank = DOMAIN1_BANKS[cert.code] ?? []
+const sample = bank[0]
+
+// Source-file permalink for the domain-1 bank this question lives in.
+const domainSlug = sample ? getCertDomainSlug(cert, 1) : ''
+const sourceUrl = `${GITHUB_REPO_URL}/blob/main/src/data/${cert.code}/domain1.json`
+---
+
+{sample && (
+  <section aria-labelledby="explanation-showcase-heading" class="mt-8 md:mt-12">
+    <h2 id="explanation-showcase-heading" class="text-xl md:text-2xl font-semibold text-text-primary mb-2">
+      Every Question Includes a Detailed Explanation
+    </h2>
+    <p class="text-text-muted text-sm md:text-base mb-4 max-w-2xl leading-relaxed">
+      Every question ships with a full explanation: why the correct answer is right and why each distractor is wrong.
+    </p>
+
+    <SampleQuestionCard
+      question={sample.question}
+      options={sample.options}
+      answer={sample.answer}
+      explanation={sample.explanation}
+      index={1}
+      certCode={cert.code}
+      domainSlug={domainSlug}
+      questionId={sample.id}
+    />
+
+    <p class="mt-3 text-sm text-text-muted">
+      Read this question's source on{' '}
+      <a
+        href={sourceUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-text-primary hover:text-text-primary/70 underline font-medium"
+      >GitHub</a>. The entire question bank is open source and MIT licensed.
+    </p>
+  </section>
+)}

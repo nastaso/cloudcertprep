@@ -1,0 +1,18 @@
+---
+/**
+ * Server-side JSON-LD structured data component for Astro pages.
+ * Replaces the client-side SchemaOrg.tsx usage on prerendered pages.
+ *
+ * Usage:
+ *   <SchemaOrgJsonLd data={myJsonLdObject} />
+ */
+interface Props {
+  data: object
+}
+
+import { serializeJsonLd } from '../lib/jsonld'
+
+const { data } = Astro.props
+---
+
+<script type="application/ld+json" set:html={serializeJsonLd(data)} />

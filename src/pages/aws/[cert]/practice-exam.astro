@@ -1,0 +1,28 @@
+---
+/**
+ * /aws/:cert/practice-exam — interactive page body island (MockExam). Noindexed.
+ *
+ * Static Astro chrome (header/footer) comes from BaseLayout; AppIsland renders
+ * only the exam body. The in-exam timer is an in-page sticky bar inside
+ * MockExam (no longer injected into the header).
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import AppIsland from '../../../components/AppIsland.tsx'
+import { getActiveCertStaticPaths, type Certification } from '../../../data/certifications'
+import { canonicalFor } from '../../../lib/seo-data'
+
+export const getStaticPaths = getActiveCertStaticPaths
+
+interface Props {
+  cert: Certification
+}
+
+const { cert } = Astro.props
+const title = `${cert.shortName} Practice Exam · CloudCertPrep`
+const description = `Take a free ${cert.name} practice exam. ${cert.examQuestionCount} questions in ${Math.round(cert.examTimeSeconds / 60)} minutes, matching the real exam format.`
+const canonical = canonicalFor(`/aws/${cert.code}/practice-exam`)
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} robots="noindex" headerSticky={false} headerHideMobileMenu={true} noscriptDirectory={true}>
+  <AppIsland client:only="react" />
+</BaseLayout>

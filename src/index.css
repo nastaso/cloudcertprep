@@ -1,0 +1,295 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Premium motion vocabulary. Small, shared set of entrance + interaction
+   utilities so motion stays consistent and fast (Apple-style: quick, subtle,
+   never bouncy). All respect prefers-reduced-motion via the block above. */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(2rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes enter {
+  from { opacity: 0; transform: translateY(0.5rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes slide-out-right {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.animate-slide-up { animation: slide-up 0.3s ease-out; }
+.animate-fade-in { animation: fade-in 0.2s ease-out; }
+.animate-scale-in { animation: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-enter { animation: enter 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-slide-in-right { animation: slide-in-right 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+/* Mobile drawer exit (§8 item 5): Apple sheet curve, slightly quicker than
+   entry. Paired with a fade-out on the backdrop. */
+.animate-slide-out-right { animation: slide-out-right 0.24s cubic-bezier(0.32, 0.72, 0, 1) both; }
+.animate-fade-out { animation: fade-out 0.24s ease-out both; }
+
+/* Delayed fade: stays invisible during the delay, fades in only if a Suspense
+   spinner takes long enough to matter. `both` keeps opacity at 0 during the
+   delay window. */
+.animate-delayed-fade {
+  opacity: 0;
+  animation: fade-in 0.3s ease-out 0.25s both;
+}
+
+/* Interactive lift: subtle raise on hover for clickable cards. Pairs with
+   the existing `shadow-card` token. In dark mode the base `--card-shadow` is
+   `none` (flat cards read better on charcoal), so the lift adds an explicit
+   hover shadow tier (`--shadow-card-hover`) to give elevation feedback in BOTH
+   themes rather than only light. (§8 item 6) */
+.lift {
+  transition: transform 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out);
+}
+.lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Hero entrance stagger: direct children fade-and-rise in sequence with a
+   small per-child delay, replacing a single slab animation with a settled,
+   premium cascade. Capped at 6 children; further children share the last
+   delay. Gated by prefers-reduced-motion via the global block above. (§8 item 2) */
+.stagger > * {
+  opacity: 0;
+  animation: enter 0.5s var(--ease-out) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 70ms; }
+.stagger > *:nth-child(3) { animation-delay: 140ms; }
+.stagger > *:nth-child(4) { animation-delay: 210ms; }
+.stagger > *:nth-child(5) { animation-delay: 280ms; }
+.stagger > *:nth-child(n+6) { animation-delay: 350ms; }
+
+/* FAQ open/close polish: animate the panel in when a <details> opens, and
+   (where the browser supports interpolate-size) transition the disclosure
+   height smoothly. Progressive enhancement: unsupported browsers simply
+   snap open as before. (§8 item 4) */
+@supports (interpolate-size: allow-keywords) {
+  :root { interpolate-size: allow-keywords; }
+  details.group::details-content {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.25s var(--ease-out), content-visibility 0.25s allow-discrete;
+  }
+  details.group[open]::details-content {
+    height: auto;
+  }
+}
+details.group[open] > div {
+  animation: enter 0.25s var(--ease-out);
+}
+
+/* Scroll-reveal: below-the-fold elements tagged [data-reveal] fade-and-rise
+   as they enter the viewport. Gated behind `html.cc-js` so no-JS users (and
+   crawlers) always see fully-visible content (the class is only added by the
+   observer script once it runs). Reduced-motion users skip the transform via
+   the global block at the top of this file. (§8 item 3) */
+html.cc-js [data-reveal] {
+  opacity: 0;
+  transform: translateY(1rem);
+  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+}
+html.cc-js [data-reveal].is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Header desktop nav link with an animated underline that wipes in on hover.
+   Used inside the navy header, so currentColor (white) reads cleanly. */
+.hdr-link {
+  position: relative;
+}
+.hdr-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hdr-link:hover::after { transform: scaleX(1); }
+
+/* Header auth-state toggle. The header island is server-rendered in the
+   logged-out state. A pre-paint inline script in BaseLayout adds `cc-authed`
+   to <html> when a Supabase session token is present. Both auth states are
+   always in the DOM; these rules decide which paints. React syncs the class
+   to the real auth result once getSession() resolves. */
+.cc-auth-in { display: none; }
+html.cc-authed .cc-auth-in { display: unset; }
+html.cc-authed .cc-auth-out { display: none; }
+
+/* THEME TOKENS
+   ============
+   Brand: AWS orange #FF9900 — single value, light + dark.
+   On-brand: near-black #1C1917 — text/icons sitting ON an orange fill (8.17:1).
+   Header chrome: navy #232F3E — AWS Console identity. Same in both themes.
+   On-header: white — text/icons sitting on the navy bar. Same in both themes.
+
+   No `brand-end`, no `brand-text`, no `heading-accent`. The premium pattern
+   (Apple, Stripe, Vercel, GitHub) is "brand color is rare". Body text +
+   body icons are NEUTRAL. Brand colour appears on CTAs, the logo mark,
+   active states. Body links are neutral with an underline. */
+:root {
+  --color-brand: 255 153 0;          /* #FF9900 */
+  --color-on-brand: 28 25 23;        /* #1C1917 */
+  --color-header-bg: 35 47 62;       /* #232F3E AWS Console navy */
+  --color-on-header: 255 255 255;    /* white text on navy */
+  --color-bg-dark: 245 245 244;      /* #F5F5F4 */
+  --color-bg-card: 255 255 255;      /* #FFFFFF */
+  --color-bg-card-hover: 250 250 249;/* #FAFAF9 */
+  --color-success: 22 163 74;        /* #16A34A — passes 4.5:1 on white */
+  --color-danger: 220 38 38;         /* #DC2626 — passes 4.5:1 on white */
+  --color-warning: 217 119 6;        /* #D97706 — passes 4.5:1 on white */
+  --color-text-primary: 28 25 23;    /* #1C1917 */
+  --color-text-muted: 87 83 78;      /* #57534E — 7.34:1 on bg-dark */
+}
+
+/* Theme: Dark mode — warm charcoal twin of the warm light mode, so the orange
+   brand reads as a warm glow rather than clashing. Header keeps the same navy
+   (it's chrome, not a theme surface). */
+.dark {
+  --color-bg-dark: 28 25 23;         /* #1C1917 */
+  --color-bg-card: 41 37 36;         /* #292524 */
+  --color-bg-card-hover: 50 46 43;   /* #322E2B */
+  --color-success: 74 222 128;       /* #4ADE80 — passes 4.5:1 on dark */
+  --color-danger: 248 113 113;       /* #F87171 — passes 4.5:1 on dark */
+  --color-warning: 251 191 36;       /* #FBBF24 — passes 4.5:1 on dark */
+  --color-text-primary: 250 250 249; /* #FAFAF9 */
+  --color-text-muted: 168 162 158;   /* #A8A29E — 5.85:1 on bg-card */
+}
+
+/* Light mode: subtle card shadows for visual separation. */
+:root {
+  --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --shadow-card-hover: 0 10px 25px -5px rgb(0 0 0 / 0.10), 0 4px 10px -4px rgb(0 0 0 / 0.08);
+  /* Shared easing curve (premium "settle": quick out, no bounce). Tokenised
+     so CSS utilities and tailwind.config reference one value. (§8 item 9) */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dark {
+  --card-shadow: none;
+  /* Dark cards are flat at rest; the lift hover adds a deeper, tinted shadow
+     so elevation still reads on charcoal. */
+  --shadow-card-hover: 0 10px 30px -5px rgb(0 0 0 / 0.55), 0 4px 12px -4px rgb(0 0 0 / 0.45);
+}
+
+/* Disable transitions during theme switch to prevent flash. */
+.no-transition,
+.no-transition * {
+  transition: none !important;
+}
+
+/* Apple San Francisco font stack — applied to entire site. */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: rgb(var(--color-bg-dark));
+  color: rgb(var(--color-text-primary));
+}
+
+/* Blog article typography. Project intentionally does not depend on
+   @tailwindcss/typography (CONTRIBUTING: no new deps). Token-aware so light
+   and dark themes both render correctly. Body links use text-primary with
+   underline (premium pattern: brand colour is rare; underline + colour
+   contrast carries the link affordance). */
+.blog-content {
+  line-height: 1.7;
+  color: rgb(var(--color-text-primary));
+}
+.blog-content > * + * { margin-top: 1.25em; }
+.blog-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+  color: rgb(var(--color-text-primary));
+}
+.blog-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: rgb(var(--color-text-primary));
+}
+.blog-content p,
+.blog-content li {
+  color: rgb(var(--color-text-muted));
+}
+.blog-content a {
+  color: rgb(var(--color-text-primary));
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.blog-content a:hover {
+  text-decoration-thickness: 2px;
+}
+.blog-content strong {
+  color: rgb(var(--color-text-primary));
+  font-weight: 600;
+}
+.blog-content ul,
+.blog-content ol { padding-left: 1.5rem; }
+.blog-content ul { list-style: disc; }
+.blog-content ol { list-style: decimal; }
+.blog-content li + li { margin-top: 0.5em; }
+.blog-content code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875em;
+  background-color: rgb(var(--color-bg-card));
+  padding: 0.15em 0.4em;
+  border-radius: 0.25rem;
+}
+.blog-content pre {
+  background-color: rgb(var(--color-bg-card));
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+.blog-content pre code {
+  background-color: transparent;
+  padding: 0;
+}
+.blog-content blockquote {
+  border-left: 3px solid rgb(var(--color-brand));
+  padding-left: 1rem;
+  color: rgb(var(--color-text-muted));
+  font-style: italic;
+}

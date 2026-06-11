@@ -1,0 +1,67 @@
+[
+  {
+    "id": "saa-d2-001",
+    "question": "A web application must remain available even if an entire Availability Zone fails. Which architecture pattern achieves this?",
+    "options": {
+      "A": "Deploy to a single AZ with Auto Scaling",
+      "B": "Deploy across multiple AZs with an Application Load Balancer",
+      "C": "Deploy to a single AZ with a larger instance type",
+      "D": "Deploy to a single Region with CloudFront"
+    },
+    "answer": "B",
+    "explanation": "Multi-AZ deployment with an ALB distributes traffic across AZs, providing resilience against a single AZ failure. A single AZ deployment, regardless of scaling or instance size, cannot survive an AZ outage.",
+    "isMultiAnswer": false
+  },
+  {
+    "id": "saa-d2-002",
+    "question": "Which Amazon RDS feature provides automatic failover to a standby replica in a different Availability Zone?",
+    "options": {
+      "A": "Read Replicas",
+      "B": "Multi-AZ deployment",
+      "C": "Aurora Serverless",
+      "D": "RDS Proxy"
+    },
+    "answer": "B",
+    "explanation": "Multi-AZ deployment maintains a synchronous standby replica in a different AZ with automatic failover. Read Replicas are for read scaling, not automatic failover. Aurora Serverless auto-scales capacity. RDS Proxy manages database connections.",
+    "isMultiAnswer": false
+  },
+  {
+    "id": "saa-d2-003",
+    "question": "A company needs to decouple their application components to handle variable processing loads. Which service should they use?",
+    "options": {
+      "A": "Amazon SQS",
+      "B": "Amazon RDS",
+      "C": "Amazon EC2",
+      "D": "Amazon S3"
+    },
+    "answer": "A",
+    "explanation": "Amazon SQS is a fully managed message queuing service that decouples application components. RDS is a database service. EC2 is a compute service. S3 is object storage.",
+    "isMultiAnswer": false
+  },
+  {
+    "id": "saa-d2-004",
+    "question": "Which S3 storage class should be used for data that is accessed less than once per quarter and can tolerate retrieval times of 12 hours?",
+    "options": {
+      "A": "S3 Standard",
+      "B": "S3 Glacier Instant Retrieval",
+      "C": "S3 Glacier Deep Archive",
+      "D": "S3 One Zone-IA"
+    },
+    "answer": "C",
+    "explanation": "Glacier Deep Archive is the lowest-cost storage class, suitable for data accessed rarely with retrieval times of 12-48 hours. Glacier Instant Retrieval provides millisecond access. One Zone-IA stores data in one AZ.",
+    "isMultiAnswer": false
+  },
+  {
+    "id": "saa-d2-005",
+    "question": "An application uses Amazon DynamoDB and must be able to recover from accidental table deletion. Which feature should be enabled?",
+    "options": {
+      "A": "DynamoDB Streams",
+      "B": "Point-in-time recovery (PITR)",
+      "C": "DynamoDB Accelerator (DAX)",
+      "D": "Global tables"
+    },
+    "answer": "B",
+    "explanation": "Point-in-time recovery allows continuous backups of DynamoDB tables and restoration to any point in the last 35 days. Streams captures table changes. DAX is an in-memory cache. Global tables provide multi-region replication.",
+    "isMultiAnswer": false
+  }
+]

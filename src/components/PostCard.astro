@@ -1,0 +1,46 @@
+---
+/**
+ * PostCard.astro — compact card for one blog post in the index listing.
+ *
+ * Links the title to /blog/<slug>, shows the publish date, description, and
+ * tags. Takes the post entry's frontmatter `data` plus its `slug`.
+ */
+interface PostData {
+  title: string
+  description: string
+  date: Date
+  tags?: string[]
+}
+
+interface Props {
+  data: PostData
+  slug: string
+}
+
+const { data, slug } = Astro.props
+
+const href = `/blog/${slug}`
+const dateIso = data.date.toISOString()
+const dateDisplay = data.date.toLocaleDateString('en-GB', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+})
+---
+
+<article class="bg-bg-card border border-text-muted/20 rounded-lg p-5 md:p-6 hover:border-brand/50 transition-colors">
+  <h2 class="text-lg md:text-xl font-semibold text-text-primary">
+    <a href={href} class="hover:text-text-primary transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card">{data.title}</a>
+  </h2>
+  <p class="mt-1 text-xs text-text-muted">
+    <time datetime={dateIso}>{dateDisplay}</time>
+  </p>
+  <p class="mt-2 text-sm md:text-base text-text-muted leading-relaxed">{data.description}</p>
+  {data.tags && data.tags.length > 0 && (
+    <ul class="mt-3 flex flex-wrap gap-2 list-none p-0 m-0">
+      {data.tags.map((tag) => (
+        <li class="text-xs px-2 py-1 rounded bg-brand text-on-brand">#{tag}</li>
+      ))}
+    </ul>
+  )}
+</article>

@@ -1,0 +1,11 @@
+# Code ownership for CloudCertPrep.
+# The maintainer is the default reviewer for all changes. Question-bank
+# directories are explicitly gated so any change to the validated banks
+# requires maintainer review before merge. (R22.7)
+
+# Default owner for everything in the repo
+*                       @nastaso
+
+# Question banks — maintainer review required (validated content)
+/src/data/clf-c02/      @nastaso
+/src/data/aif-c01/      @nastaso

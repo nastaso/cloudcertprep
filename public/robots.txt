@@ -1,0 +1,46 @@
+User-agent: *
+Allow: /
+# Auth and transient pages also have <meta name="robots" content="noindex">
+# but listing them here saves crawl budget.
+Disallow: /login
+Disallow: /reset-password
+Disallow: /history
+# Block query-string variants. Social trackers (?fbclid, ?utm_*, ?gclid) can
+# create duplicate crawls of canonical URLs. We have canonical tags as the
+# primary defence; this is belt-and-braces.
+Disallow: /*?
+
+# --- AI crawler preferences (R23.8) ---
+# Preference-signaling only, NOT an enforcement boundary. The interactive
+# practice flows are client-rendered React islands, so their question content
+# is never in the prerendered HTML a crawler sees regardless of these rules.
+#
+# Browse-mode citation crawlers (answer a user's live query, then cite us) are
+# welcome on the full indexable surface — this is the LLM-citation flywheel.
+User-agent: ChatGPT-User
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+
+# Training-ingestion crawlers may read the marketing/landing surface but we
+# prefer they skip the interactive practice/auth shells (no useful prerendered
+# content there anyway).
+User-agent: GPTBot
+Allow: /
+Disallow: /login
+Disallow: /reset-password
+Disallow: /history
+Disallow: /*/practice-exam
+Disallow: /*/domain-practice
+
+User-agent: CCBot
+Allow: /
+Disallow: /login
+Disallow: /reset-password
+Disallow: /history
+Disallow: /*/practice-exam
+Disallow: /*/domain-practice
+
+Sitemap: https://www.cloudcertprep.io/sitemap.xml

@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Least-privilege default token: CI only reads the repo (checkout + npm). No
+# job here writes issues, PRs, or contents. (security V11)
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate question bank
+        run: npm run validate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check (Astro + TS)
+        run: npm run check:astro
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+
+      # `npm run build` already runs check:citation + check:graph +
+      # check:person-graph via its postbuild hook, so they are not repeated here.
+      # --- Delivery Phase 2 quality gates (informational) ---
+      - name: free-for-dev backlink check (informational)
+        run: npm run check:free-for-dev || echo "free-for-dev check failed (informational; upstream edits are outside our control)"
+
+      - name: Indexing diagnostic (informational)
+        run: node scripts/diagnose-indexing.mjs --base https://www.cloudcertprep.io || echo "indexing diagnostic reported issues (informational)"
+
+  lighthouse:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run Lighthouse CI
+        run: npm run check:lighthouse

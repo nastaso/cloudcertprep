@@ -1,0 +1,209 @@
+---
+/**
+ * SampleQuestionCard.astro — server-rendered sample question that behaves like
+ * the React SPA: the correct answer is NOT revealed up front. The visitor
+ * clicks an option; the card then reveals the correct/wrong states (matching
+ * AnswerButton's success/danger styling) and the explanation.
+ *
+ * The interaction is driven by a single bundled <script> (Astro dedupes it
+ * across every card instance on the page), so there is no per-card inline JS.
+ * Crawlers still read the full question text, all options, the correct answer
+ * (encoded in data-correct), and the explanation in the static HTML — the JS
+ * only controls reveal timing, not content (R6.7).
+ *
+ * The interactive AnswerButton.tsx stays in service for the MockExam /
+ * DomainPractice islands; this component is import-only from the Domain_Landing
+ * template.
+ */
+interface Props {
+  question: string
+  options: Record<string, string>
+  answer: string | string[]
+  explanation: string
+  /** 1-based position of this question within the sample set. */
+  index: number
+  /**
+   * Optional context for the prerendered "Suggest a fix on GitHub" link.
+   * When all three are provided, a pre-filled new-issue link is rendered at
+   * the bottom of the card. (R22.5)
+   */
+  certCode?: string
+  domainSlug?: string
+  questionId?: string
+}
+
+const { question, options, answer, explanation, index, certCode, domainSlug, questionId } = Astro.props
+
+// Pre-filled GitHub new-issue URL for reporting an error on this exact
+// question. Only rendered when the cert/domain/question context is supplied.
+const GITHUB_REPO = 'https://github.com/nastaso/cloudcertprep'
+let suggestFixUrl: string | null = null
+if (certCode && domainSlug && questionId) {
+  const params = new URLSearchParams({
+    title: `Question error: ${certCode} ${domainSlug} ${questionId}`,
+    body: `**Page:** /aws/${certCode}/${domainSlug}\n**Question ID:** ${questionId}\n\n**What is wrong:**\n\n**Suggested correction:**\n`,
+  })
+  suggestFixUrl = `${GITHUB_REPO}/issues/new?${params.toString()}`
+}
+
+// Normalise the answer(s) to a Set of correct option keys.
+const correctKeys = new Set(Array.isArray(answer) ? answer : [answer])
+
+// Stable option order (A, B, C, ...).
+const optionEntries = Object.entries(options).sort(([a], [b]) => a.localeCompare(b))
+
+const isMultiAnswer = correctKeys.size > 1
+
+// Full explanation, split into paragraphs (the bank stores the correct-answer
+// rationale and the per-distractor analysis joined by newlines). The first
+// paragraph is the correct-answer rationale; the rest explain why each wrong
+// option is wrong. We render ALL of them so the sample matches the real
+// domain-practice explanation depth (R6.7), not just the first line.
+const explanationParagraphs = (explanation ?? '')
+  .split('\n')
+  .map(p => p.trim())
+  .filter(Boolean)
+---
+
+<div
+  class="sample-question bg-bg-card rounded-xl shadow-card p-4 md:p-6"
+  data-answer-count={correctKeys.size}
+>
+  <div class="flex items-start gap-2 mb-3">
+    <span class="flex-shrink-0 text-xs md:text-sm font-semibold text-text-muted">Q{index}.</span>
+    <p class="text-text-primary text-sm md:text-base font-medium">{question}</p>
+  </div>
+
+  {isMultiAnswer && (
+    <p class="text-xs text-text-muted mb-2">Select {correctKeys.size} answers.</p>
+  )}
+
+  <div class="space-y-2" role="group">
+    {optionEntries.map(([key, text]) => {
+      const isCorrect = correctKeys.has(key)
+      return (
+        <button
+          type="button"
+          class="sample-option w-full border-2 rounded-lg text-left flex items-start p-2 md:p-2.5 gap-2 text-xs md:text-sm transition-colors duration-200 border-text-muted/30 bg-bg-card hover:border-text-muted/50 hover:bg-bg-card-hover"
+          data-correct={isCorrect ? 'true' : 'false'}
+          aria-pressed="false"
+        >
+          <span class="sample-badge flex-shrink-0 rounded-full flex items-center justify-center font-bold w-6 h-6 text-xs bg-bg-dark text-text-primary">
+            {key}
+          </span>
+          <span class="flex-1 text-text-primary pt-0.5">{text}</span>
+        </button>
+      )
+    })}
+  </div>
+
+  {explanationParagraphs.length > 0 && (
+    <div class="sample-explanation mt-3 hidden border-l-2 border-success/40 pl-3">
+      <p class="text-xs md:text-sm font-semibold text-text-primary mb-1">Explanation</p>
+      <div class="space-y-2">
+        {explanationParagraphs.map(para => (
+          <p class="text-text-muted text-xs md:text-sm leading-relaxed">{para}</p>
+        ))}
+      </div>
+    </div>
+  )}
+
+  {suggestFixUrl && (
+    <p class="mt-3 text-right">
+      <a
+        href={suggestFixUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-[11px] md:text-xs text-text-muted hover:text-text-primary underline"
+      >
+        Suggest a fix on GitHub
+      </a>
+    </p>
+  )}
+</div>
+
+<script>
+  // Bundled once by Astro across all SampleQuestionCard instances on the page.
+  // Click-to-reveal behaviour aligned with the React AnswerButton states:
+  // selected (brand) -> on resolve, correct options turn success-green and a
+  // wrong pick turns danger-red, then the explanation is shown.
+  function initSampleQuestions() {
+    const cards = document.querySelectorAll<HTMLElement>('.sample-question:not([data-ready])')
+    cards.forEach((card) => {
+      card.dataset.ready = 'true'
+      const needed = Number(card.dataset.answerCount || '1')
+      const options = Array.from(card.querySelectorAll<HTMLButtonElement>('.sample-option'))
+      const explanation = card.querySelector<HTMLElement>('.sample-explanation')
+      const selected = new Set<HTMLButtonElement>()
+      let resolved = false
+
+      function setSelected(btn: HTMLButtonElement, on: boolean) {
+        const badge = btn.querySelector<HTMLElement>('.sample-badge')
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false')
+        if (on) {
+          btn.classList.remove('border-text-muted/30', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover')
+          btn.classList.add('border-brand', 'bg-brand/10')
+          badge?.classList.remove('bg-bg-dark', 'text-text-primary')
+          badge?.classList.add('bg-brand', 'text-on-brand')
+        } else {
+          btn.classList.add('border-text-muted/30', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover')
+          btn.classList.remove('border-brand', 'bg-brand/10')
+          badge?.classList.add('bg-bg-dark', 'text-text-primary')
+          badge?.classList.remove('bg-brand', 'text-on-brand')
+        }
+      }
+
+      function resolve() {
+        resolved = true
+        options.forEach((btn) => {
+          const badge = btn.querySelector<HTMLElement>('.sample-badge')
+          const isCorrect = btn.dataset.correct === 'true'
+          const wasSelected = selected.has(btn)
+          // Clear interim/default styling.
+          btn.classList.remove(
+            'border-text-muted/30', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover',
+            'border-brand', 'bg-brand/10',
+          )
+          badge?.classList.remove('bg-bg-dark', 'text-text-primary', 'bg-brand', 'text-on-brand')
+          if (isCorrect) {
+            btn.classList.add('border-success', 'bg-success/10')
+            badge?.classList.add('bg-success', 'text-on-brand')
+          } else if (wasSelected) {
+            btn.classList.add('border-danger', 'bg-danger/10')
+            badge?.classList.add('bg-danger', 'text-on-brand')
+          } else {
+            btn.classList.add('border-text-muted/30', 'bg-bg-card', 'opacity-60')
+            badge?.classList.add('bg-bg-dark', 'text-text-primary')
+          }
+          btn.disabled = true
+          btn.setAttribute('aria-pressed', wasSelected ? 'true' : 'false')
+        })
+        if (explanation) explanation.classList.remove('hidden')
+      }
+
+      options.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (resolved) return
+          if (needed === 1) {
+            selected.add(btn)
+            resolve()
+            return
+          }
+          // Multi-answer: toggle until the required number is chosen, then resolve.
+          if (selected.has(btn)) {
+            selected.delete(btn)
+            setSelected(btn, false)
+          } else {
+            selected.add(btn)
+            setSelected(btn, true)
+          }
+          if (selected.size === needed) resolve()
+        })
+      })
+    })
+  }
+
+  initSampleQuestions()
+  // Re-init after bfcache restore (Back navigation).
+  window.addEventListener('pageshow', initSampleQuestions)
+</script>

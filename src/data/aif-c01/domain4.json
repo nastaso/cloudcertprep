@@ -1,0 +1,915 @@
+[
+  {
+    "id": "aif-q001",
+    "question": "A logistics company uses ML models to forecast demand each quarter. An analyst is preparing a report that helps stakeholders understand how the trained models reach their predictions. What should the analyst include to satisfy the transparency and explainability needs?",
+    "options": {
+      "A": "Sample data used for training",
+      "B": "Model convergence tables",
+      "C": "Partial dependence plots (PDPs)",
+      "D": "Source code used to train the model"
+    },
+    "answer": "C",
+    "explanation": "Partial dependence plots (PDPs) show how one or more input features relate to a model's predicted output, which makes them an effective way to explain feature influence and give stakeholders transparency into how the trained models reach their forecasts.\nSource code used to train the model and sample training data reveal implementation and inputs but do not explain how individual features drive predictions. Model convergence tables describe how training progressed toward a solution rather than how the finished model behaves, so they do not meet the explainability requirement.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q003",
+    "question": "A research lab needs to sort genetic samples into 20 categories based on their characteristics. The team requires an algorithm whose internal decision logic can be clearly documented to show how it produces each output. Which algorithm fits this need?",
+    "options": {
+      "A": "Logistic regression",
+      "B": "Decision trees",
+      "C": "Neural networks",
+      "D": "Linear regression"
+    },
+    "answer": "B",
+    "explanation": "Decision trees make their internal logic explicit through a series of readable split rules, so the team can document exactly how the model moves from input characteristics to one of the 20 output categories. This interpretability is why decision trees fit the requirement.\nNeural networks are highly opaque, so their internal mechanism is difficult to document. Linear regression predicts a continuous value rather than assigning discrete categories, which does not match a 20-class problem. Logistic regression is interpretable through its coefficients but is less natural for clearly documenting decision paths across many classes than a decision tree.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q047",
+    "question": "A media platform plans to use a large language model for content moderation and wants to check its outputs for bias and unfair treatment of particular groups. Which data source allows this assessment with the least administrative effort?",
+    "options": {
+      "A": "Moderation logs",
+      "B": "User-generated content",
+      "C": "Benchmark datasets",
+      "D": "Internal content moderation guidelines"
+    },
+    "answer": "C",
+    "explanation": "Benchmark datasets are standardized, curated datasets created specifically to evaluate models for bias and fairness, so they let the platform assess the model's outputs consistently with very little administrative effort.\nUser-generated content and moderation logs would need substantial manual labeling and review and do not provide a consistent fairness baseline. Internal content moderation guidelines are policy documents, not a dataset that can be used to measure bias in outputs.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q049",
+    "question": "A lender is building a generative AI solution that offers discounts to new applicants based on business rules. To use the model responsibly and limit bias that could harm some customers, which two actions should the company take?",
+    "options": {
+      "A": "Check the data for imbalances or disparities across groups",
+      "B": "Run the model as frequently as possible",
+      "C": "Evaluate the model's behavior so the company can offer transparency to stakeholders",
+      "D": "Use the ROUGE metric to measure the quality of generated text",
+      "E": "Keep the model's inference time within accepted limits"
+    },
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Checking the data for imbalances or disparities helps surface and reduce bias that could unfairly affect some applicants, and evaluating the model's behavior lets the company explain its decisions and offer transparency to stakeholders. Both are core responsible AI practices for limiting bias.\nRunning the model frequently and keeping inference time within limits are operational concerns that do not address bias. The ROUGE metric measures the overlap of generated text with reference text for summarization quality and does not detect bias.",
+    "isMultiAnswer": true,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q052",
+    "question": "A student submits essays by copying text produced by a generative AI tool without attribution. Which responsible AI challenge does this illustrate?",
+    "options": {
+      "A": "Toxicity",
+      "B": "Hallucinations",
+      "C": "Privacy",
+      "D": "Plagiarism"
+    },
+    "answer": "D",
+    "explanation": "Reusing generative AI output as one's own work without attribution is plagiarism, which is a recognized responsible AI and intellectual-property concern.\nToxicity refers to harmful or offensive content, hallucinations are fabricated but plausible-sounding outputs, and privacy concerns the handling of personal data. None of these describes copying generated text and presenting it as original work.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q057",
+    "question": "A store installed cameras and uses an ML model to review the footage for possible theft. The model flags people from one ethnic group far more often than others. Which type of bias is influencing the model's output?",
+    "options": {
+      "A": "Measurement bias",
+      "B": "Sampling bias",
+      "C": "Confirmation bias",
+      "D": "Observer bias"
+    },
+    "answer": "B",
+    "explanation": "Sampling bias arises when the training data does not represent the full population, which can cause a model to flag one ethnic group far more often than others. The skewed flagging points to training data that under-represented some groups.\nMeasurement bias comes from systematic errors in how data is recorded. Confirmation bias and observer bias relate to how people interpret or label results, not to the representativeness of the training sample.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q067",
+    "question": "A hospital put a disease-detection model into service on Amazon Bedrock. To respect privacy rules, the model must never expose personal patient details in its replies, and staff must be notified whenever that happens. Which solution meets these requirements?",
+    "options": {
+      "A": "Use Amazon Macie to scan the model's output for sensitive data and set up alerts for potential exposure",
+      "B": "Use Amazon Bedrock Guardrails to filter the content and configure Amazon CloudWatch alarms for notifications",
+      "C": "Configure AWS CloudTrail to monitor the model's responses and create alerts for any detected personal data",
+      "D": "Use Amazon SageMaker Model Monitor to detect data drift and alert when model quality degrades"
+    },
+    "answer": "B",
+    "explanation": "Amazon Bedrock Guardrails can filter the model's output so personal patient information is not returned, and Amazon CloudWatch alarms can notify staff whenever a policy violation occurs.\nAmazon Macie discovers sensitive data in Amazon S3 but does not filter a model's live responses. AWS CloudTrail logs API calls rather than inspecting response content. Amazon SageMaker Model Monitor detects data drift and quality issues, not disclosure of personal information.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock Guardrails",
+      "Amazon CloudWatch",
+      "Amazon Macie",
+      "AWS CloudTrail",
+      "Amazon SageMaker Model Monitor"
+    ]
+  },
+  {
+    "id": "aif-q071",
+    "question": "An insurance firm plans to deploy a large language model to automate document processing and wants to proceed responsibly to avoid harm. Which two actions should the firm take?",
+    "options": {
+      "A": "Include fairness metrics when evaluating the model",
+      "B": "Adjust the model's temperature parameter",
+      "C": "Modify the training data to reduce bias",
+      "D": "Avoid overfitting on the training data",
+      "E": "Apply prompt engineering techniques"
+    },
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Including fairness metrics when evaluating the model helps confirm it treats cases equitably, and modifying the training data to reduce bias addresses bias at its source. Both directly support responsible use and reduce potential harm.\nAdjusting the temperature parameter and applying prompt engineering techniques tune output style and quality but do not address fairness or bias. Avoiding overfitting improves generalization but is a general model-quality goal rather than a measure that limits biased or harmful outcomes.",
+    "isMultiAnswer": true,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q091",
+    "question": "A research team builds custom ML models and shares the model artifacts with other teams, while keeping the training code and data. The team wants a standardized way to document and later audit each model it publishes. Which solution should the team use?",
+    "options": {
+      "A": "Write the details in documents and store them in Amazon S3",
+      "B": "Commit the model training scripts to a Git repository",
+      "C": "Create Amazon SageMaker Model Cards that capture intended uses and training and inference details",
+      "D": "Use AWS AI Service Cards to describe the models"
+    },
+    "answer": "C",
+    "explanation": "Amazon SageMaker Model Cards provide a standardized place to document a model's intended uses along with its training and inference details, giving the team a consistent, shareable record that other teams can later audit.\nWriting the details in documents stored in Amazon S3 is unstructured and not standardized. Committing training scripts to a Git repository versions code rather than model metadata. AWS AI Service Cards describe AWS's own managed AI services, not custom models the team builds.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Cards"
+    ]
+  },
+  {
+    "id": "aif-q094",
+    "question": "A bank wants to build an ML system to help its risk team decide loan allocations across different demographic groups. What should the bank do to develop an unbiased model?",
+    "options": {
+      "A": "Reduce the size of the training dataset",
+      "B": "Make sure the model's predictions match historical results",
+      "C": "Build a separate model for each demographic group",
+      "D": "Measure class imbalance in the training data and adjust the training process accordingly"
+    },
+    "answer": "D",
+    "explanation": "Measuring class imbalance in the training data and adapting the training process, for example through resampling or class weights, helps the model treat under-represented groups equitably and reduces biased predictions.\nReducing the dataset size removes information and can worsen bias. Forcing predictions to match historical results can carry past discrimination into the model. Building a separate model per demographic group can entrench disparities and does not address imbalance within the data.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q100",
+    "question": "A company is building a mobile app that uses a phone camera to assess insect bites. To train its image classification model, the company gathers a wide range of bite photos spanning different genders, ethnicities, and regions. Which responsible AI principle does this reflect?",
+    "options": {
+      "A": "Explainability",
+      "B": "Transparency",
+      "C": "Fairness",
+      "D": "Governance"
+    },
+    "answer": "C",
+    "explanation": "Gathering bite photos across different genders, ethnicities, and regions is aimed at preventing the model from working better for some groups than others, which reflects the fairness principle of responsible AI.\nExplainability and transparency concern revealing how the model reaches its outputs, and governance concerns policies and oversight. None of these describes the act of assembling a representative, balanced dataset to avoid biased outcomes.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q101",
+    "question": "A company is developing an ML model for loan approvals. It needs to detect bias in the model and also explain the model's predictions. Which solution meets these requirements?",
+    "options": {
+      "A": "Amazon SageMaker Data Wrangler",
+      "B": "Amazon SageMaker Clarify",
+      "C": "Amazon SageMaker Model Cards",
+      "D": "AWS AI Service Cards"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker Clarify both detects bias in data and model predictions and provides explainability for those predictions, which covers the two requirements for the loan-approval model.\nAmazon SageMaker Data Wrangler prepares and transforms data. Amazon SageMaker Model Cards document model details for transparency but do not run bias analysis. AWS AI Service Cards describe AWS managed AI services rather than a customer's own model.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Clarify",
+      "Amazon SageMaker Data Wrangler",
+      "Amazon SageMaker Model Cards"
+    ]
+  },
+  {
+    "id": "aif-q111",
+    "question": "A bank is building a loan-decision solution on a foundation model. For audit and oversight, the bank needs the model's decisions to be explainable. Which factor most affects how explainable those decisions are?",
+    "options": {
+      "A": "Training time",
+      "B": "Model complexity",
+      "C": "Number of hyperparameters",
+      "D": "Deployment time"
+    },
+    "answer": "B",
+    "explanation": "Model complexity most affects explainability: simpler models such as linear models or decision trees are easier to interpret, while highly complex models like deep neural networks behave as black boxes whose decisions are hard to explain for audit purposes.\nTraining time, the number of hyperparameters, and deployment time relate to how the model is built and operated, but they do not determine how interpretable its decisions are.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q113",
+    "question": "A company wants a lead-scoring application that lets employees see and adjust the weight given to each input variable based on their domain expertise. Which type of ML model supports this requirement?",
+    "options": {
+      "A": "K-nearest neighbors (k-NN) model",
+      "B": "Logistic regression model",
+      "C": "Deep learning model built on principal components",
+      "D": "Neural network"
+    },
+    "answer": "B",
+    "explanation": "A logistic regression model assigns an explicit weight (coefficient) to each input variable, so employees can see how each feature contributes and adjust those weights using their domain expertise. This interpretability matches the requirement.\nK-nearest neighbors makes predictions from neighboring data points and has no per-feature weights to adjust. A neural network and a deep learning model built on principal components are opaque and do not expose simple, adjustable feature weights.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q122",
+    "question": "Which technique can a company use to reduce bias and toxicity in a generative AI application during the postprocessing stage of the ML lifecycle?",
+    "options": {
+      "A": "Data augmentation",
+      "B": "Human-in-the-loop",
+      "C": "Feature engineering",
+      "D": "Adversarial training"
+    },
+    "answer": "B",
+    "explanation": "Human-in-the-loop adds human review during the postprocessing stage so that biased or toxic outputs can be caught and corrected before they reach users, which reduces bias and toxicity in the generative AI application.\nData augmentation and feature engineering act on data before or during training, and adversarial training hardens the model during training. None of these operates as a postprocessing safeguard on generated outputs.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q141",
+    "question": "What is a benefit of using Amazon SageMaker Model Cards to document AI models?",
+    "options": {
+      "A": "Reducing a model's overall computational requirements",
+      "B": "Standardizing information about a model's purpose, performance, and limitations",
+      "C": "Providing a visually appealing summary of a model's capabilities",
+      "D": "Physically storing models for archival purposes"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker Model Cards standardize the documentation of a model's purpose, performance, and limitations, which supports transparency, governance, and easier tracking of models over time.\nReducing computational requirements and physically storing models for archival are not functions of Model Cards. Providing a visually appealing summary is a presentation detail rather than the core benefit of standardized documentation.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Cards"
+    ]
+  },
+  {
+    "id": "aif-q144",
+    "question": "A company built an AI resume-screening system trained on a large dataset of resumes that did not represent all demographic groups. Which core dimension of responsible AI does this situation involve?",
+    "options": {
+      "A": "Transparency",
+      "B": "Fairness",
+      "C": "Privacy and security",
+      "D": "Explainability"
+    },
+    "answer": "B",
+    "explanation": "Training on a dataset that does not represent all demographic groups can lead to biased predictions, which is a fairness concern. Fairness is the responsible AI dimension focused on equitable outcomes across groups.\nTransparency and explainability concern revealing how the model makes decisions, and privacy and security concern protecting data. None of these describes the bias introduced by an unrepresentative training dataset.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q149",
+    "question": "A company deploys AI/ML models on AWS and wants to offer transparency into how the models make decisions and provide explanations for their outputs. Which AWS service or feature meets these requirements?",
+    "options": {
+      "A": "Amazon Lex",
+      "B": "Amazon Rekognition",
+      "C": "Amazon SageMaker Model Cards",
+      "D": "Amazon Comprehend"
+    },
+    "answer": "C",
+    "explanation": "Amazon SageMaker Model Cards document key details such as a model's purpose, training data, performance, and limitations, which gives stakeholders transparency into how the model makes decisions and helps explain its outputs.\nAmazon Lex builds conversational interfaces, Amazon Rekognition analyzes images and video, and Amazon Comprehend performs natural language processing. None of these is designed to document model transparency and explainability.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Cards"
+    ]
+  },
+  {
+    "id": "aif-q165",
+    "question": "A company is collaborating with several research institutes to develop an AI model. It needs standardized documentation that tracks model versions and records how the model was developed. Which solution meets these requirements?",
+    "options": {
+      "A": "Track model changes by using a Git repository",
+      "B": "Track model changes by using Amazon Comprehend",
+      "C": "Track model changes by using Amazon SageMaker Model Cards",
+      "D": "Track model changes by using Amazon S3"
+    },
+    "answer": "C",
+    "explanation": "Amazon SageMaker Model Cards provide a standardized framework for documenting model details and versions along with a record of how the model was developed, which meets the need for shared, auditable documentation across collaborators.\nA Git repository versions code rather than standardized model documentation. Amazon Comprehend performs natural language processing, and Amazon S3 stores objects without any model-documentation structure.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Cards"
+    ]
+  },
+  {
+    "id": "aif-q172",
+    "question": "A hospital built an AI system that gives patients personalized treatment recommendations. The system must explain the reasoning behind each recommendation and make those insights accessible to both doctors and patients. Which human-centered design principle does this reflect?",
+    "options": {
+      "A": "Data governance",
+      "B": "Privacy and security",
+      "C": "Explainability",
+      "D": "Fairness"
+    },
+    "answer": "C",
+    "explanation": "Explaining the reasoning behind each treatment recommendation and making those insights accessible to doctors and patients reflects explainability, a human-centered design principle that focuses on making AI decisions understandable.\nPrivacy and security concern protecting patient data, fairness concerns equitable outcomes across groups, and data governance concerns policies for managing data. None of these describes revealing the rationale behind the system's recommendations.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q187",
+    "question": "A healthcare company wants to use generative AI to answer patients' medical questions. Which AWS service should it use to support responsible AI for the application?",
+    "options": {
+      "A": "Amazon Inspector",
+      "B": "Amazon Bedrock Guardrails",
+      "C": "Amazon Rekognition",
+      "D": "AWS Trusted Advisor"
+    },
+    "answer": "B",
+    "explanation": "Amazon Bedrock Guardrails let the company define and enforce safety, content, and bias controls on generative AI responses, which supports responsible AI for an application that answers patients' medical questions.\nAmazon Inspector scans for software vulnerabilities, Amazon Rekognition analyzes images and video, and AWS Trusted Advisor checks accounts against best practices. None of these enforces responsible AI controls on generated content.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock Guardrails"
+    ]
+  },
+  {
+    "id": "aif-q203",
+    "question": "A retail company wants to build a product recommendation model using responsible practices. Which practice should it apply when collecting data to reduce bias in the model?",
+    "options": {
+      "A": "Use data only from the company's most active customers",
+      "B": "Collect data from a single high-value customer segment",
+      "C": "Make sure the data is representative of the company's entire customer base",
+      "D": "Use the smallest dataset that lets the model train quickly"
+    },
+    "answer": "C",
+    "explanation": "Collecting data that is representative of the company's entire customer base reduces skew toward any single group and helps the recommendation model treat all customers equitably, which is the responsible practice for limiting bias.\nUsing data only from the most active customers or from a single high-value segment produces a skewed dataset that increases bias. Using the smallest dataset that trains quickly risks under-representing groups and does not address fairness.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q207",
+    "question": "A company deployed a generative AI model for customer segmentation, and it has run in production for a long time. The team now notices inconsistent responses and wants to evaluate the model for bias and drift. Which AWS service or feature meets this requirement?",
+    "options": {
+      "A": "Amazon SageMaker Feature Store",
+      "B": "Amazon SageMaker Clarify",
+      "C": "Amazon SageMaker Model Monitor",
+      "D": "Amazon SageMaker Model Cards"
+    },
+    "answer": "C",
+    "explanation": "Amazon SageMaker Model Monitor continuously collects data from a deployed model and detects data drift, concept drift, and shifts in bias over time, so it can surface the inconsistencies appearing in the long-running segmentation model.\nAmazon SageMaker Clarify measures bias and explainability at a point in time rather than continuously monitoring production. Amazon SageMaker Feature Store manages features, and Amazon SageMaker Model Cards document model details; neither monitors a model for drift.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Monitor",
+      "Amazon SageMaker Clarify",
+      "Amazon SageMaker Model Cards",
+      "Amazon SageMaker Feature Store"
+    ]
+  },
+  {
+    "id": "aif-q222",
+    "question": "A company is adding AI to its recruitment and hiring process and wants to reduce bias risks and keep hiring decisions equitable. Which two core dimensions of responsible AI should the company focus on?",
+    "options": {
+      "A": "Fairness",
+      "B": "Flexibility",
+      "C": "Tolerance",
+      "D": "Open source",
+      "E": "Transparency"
+    },
+    "answer": [
+      "A",
+      "E"
+    ],
+    "explanation": "Fairness keeps hiring outcomes equitable across demographic groups, which directly mitigates bias, and transparency makes the AI's decisions clear so they can be explained and audited. Both are core dimensions of responsible AI.\nFlexibility, tolerance, and open source are not core responsible AI dimensions for ensuring equitable, accountable hiring decisions.",
+    "isMultiAnswer": true,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q225",
+    "question": "A food company is collecting a dataset to predict customer food preferences and wants the preferences of all demographic groups represented in the data. Which dataset characteristic does this describe?",
+    "options": {
+      "A": "Accuracy",
+      "B": "Diversity",
+      "C": "Recency bias",
+      "D": "Reliability"
+    },
+    "answer": "B",
+    "explanation": "Making sure the dataset represents all demographic groups addresses its diversity, so the model can learn from a wide range of customer preferences.\nAccuracy and reliability concern the correctness and consistency of the data rather than how broadly it represents groups. Recency bias is a flaw in which recent data is over-weighted, which is not what including all demographics describes.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q231",
+    "question": "An AI practitioner is building an ML model and wants to give stakeholders transparency and explainability into its predictions. Which solution meets this requirement?",
+    "options": {
+      "A": "Present the model's Shapley values",
+      "B": "Provide the model's accuracy measure",
+      "C": "Provide the model's confusion matrix",
+      "D": "Provide a secure model inference endpoint"
+    },
+    "answer": "A",
+    "explanation": "Shapley values quantify how much each feature contributes to an individual prediction, which gives stakeholders transparency and explainability into why the model produced a given output.\nAccuracy and the confusion matrix measure overall model performance but do not explain individual predictions. A secure inference endpoint concerns how the model is deployed and accessed, not how its predictions are explained.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q252",
+    "question": "A bank is building a generative AI application for loan approval decisions and needs the outputs to be responsible and fair. Which solution meets these requirements?",
+    "options": {
+      "A": "Use a deep learning model with many hidden layers",
+      "B": "Review the training data for bias and include data from all demographic groups",
+      "C": "Keep the model's decision-making process secret to protect proprietary algorithms",
+      "D": "Continuously monitor the model on a single static test dataset"
+    },
+    "answer": "B",
+    "explanation": "Reviewing the training data for bias and including data from all demographic groups reduces biased outcomes at the source, which is essential for a responsible and fair loan-approval application.\nUsing a deep learning model with many hidden layers can reduce explainability and does not address fairness. Keeping the decision process secret undermines transparency. Monitoring on a single static test dataset does not detect or correct bias in the data.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q255",
+    "question": "A company has an ML model and wants to understand how the model arrives at its predictions. Which term describes understanding a model's predictions?",
+    "options": {
+      "A": "Model interpretability",
+      "B": "Model training",
+      "C": "Model performance",
+      "D": "Model interoperability"
+    },
+    "answer": "A",
+    "explanation": "Model interpretability refers to understanding how a model arrives at its predictions, which is exactly what the company wants.\nModel training is the process of fitting the model to data, model performance measures how well it predicts, and model interoperability concerns working across systems. None of these terms describes understanding the reasoning behind predictions.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q262",
+    "question": "A bank uses a generative AI model to set credit limits for new customers and wants to make the model's decision-making process more transparent to those customers. Which solution meets this requirement?",
+    "options": {
+      "A": "Replace the ML model with a rule-based system",
+      "B": "Apply explainable AI techniques to show which factors influenced the model's decision",
+      "C": "Build an interactive UI that gives customers detailed technical explanations of the system",
+      "D": "Increase the model's accuracy to reduce the need for transparency"
+    },
+    "answer": "B",
+    "explanation": "Applying explainable AI techniques surfaces the specific factors that influenced each credit-limit decision, making the generative AI model's reasoning transparent to customers.\nReplacing the model with a rule-based system changes the approach instead of explaining the model. An interactive UI with detailed technical explanations does not necessarily reveal which factors drove a decision. Increasing accuracy improves predictions but does not make the decision process transparent.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q267",
+    "question": "An AI practitioner wants to evaluate ML models and provide explanations of their predictions to customers and stakeholders. Which AWS service or feature meets this requirement?",
+    "options": {
+      "A": "Amazon Quick",
+      "B": "Amazon Comprehend",
+      "C": "AWS Trusted Advisor",
+      "D": "Amazon SageMaker Clarify"
+    },
+    "answer": "D",
+    "explanation": "Amazon SageMaker Clarify provides feature-attribution explanations for model predictions, so the practitioner can generate and share interpretability reports with customers and stakeholders.\nAmazon Quick is a business intelligence service, Amazon Comprehend performs natural language processing, and AWS Trusted Advisor checks accounts against best practices. None of these explains ML model predictions.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Clarify"
+    ]
+  },
+  {
+    "id": "aif-q279",
+    "question": "A company uses Amazon SageMaker to deploy a model that detects whether social media posts contain certain topics. The company needs to show how different input features influence the model's behavior. Which SageMaker feature meets this requirement?",
+    "options": {
+      "A": "SageMaker Ground Truth",
+      "B": "SageMaker Clarify",
+      "C": "SageMaker Feature Store",
+      "D": "SageMaker Canvas"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker Clarify offers model explainability, including feature attribution, so it can show how different input features influence the deployed model's behavior.\nSageMaker Ground Truth labels data, SageMaker Feature Store manages features, and SageMaker Canvas builds models without code. None of these explains how input features drive model behavior.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Clarify"
+    ]
+  },
+  {
+    "id": "aif-q287",
+    "question": "A company built an ML model that approves or rejects loan applications. To meet regulatory requirements, its decision-making must be transparent and explainable, and the company must document the process for audits. Which solution meets these requirements?",
+    "options": {
+      "A": "Amazon Textract",
+      "B": "Amazon SageMaker Model Cards",
+      "C": "AWS CloudFormation",
+      "D": "Amazon Comprehend"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker Model Cards document a model's intended use, performance, and decision-making details, which provides the transparency, explainability, and audit record the loan model must meet for regulatory purposes.\nAmazon Textract extracts text from documents, AWS CloudFormation provisions infrastructure, and Amazon Comprehend performs natural language processing. None of these documents a model's decision-making for transparency and audit.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Cards"
+    ]
+  },
+  {
+    "id": "aif-q292",
+    "question": "Which two Amazon Bedrock features help with content filtering and safety?",
+    "options": {
+      "A": "Guardrails for filtering content",
+      "B": "Model customization options",
+      "C": "Prompt management capabilities",
+      "D": "Watermark detection for AI-generated content",
+      "E": "Knowledge base integration"
+    },
+    "answer": [
+      "A",
+      "D"
+    ],
+    "explanation": "Amazon Bedrock Guardrails filter harmful or unwanted content in both prompts and responses, and watermark detection identifies AI-generated content, which supports transparency and helps prevent misuse. Together these two features address content filtering and safety.\nModel customization, prompt management, and knowledge base integration improve a model's capability, reuse, and relevance, but none of them filters content or provides a safety control.",
+    "isMultiAnswer": true,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "Amazon Bedrock Guardrails"
+    ]
+  },
+  {
+    "id": "aif-q053",
+    "question": "A pharmaceutical company will train its own large language model (LLM) on private data and wants to limit the carbon footprint of training. Which Amazon EC2 instance type has the LEAST environmental impact for training LLMs?",
+    "options": {
+      "A": "Amazon EC2 P series",
+      "B": "Amazon EC2 Trn series",
+      "C": "Amazon EC2 G series",
+      "D": "Amazon EC2 C series"
+    },
+    "answer": "B",
+    "explanation": "Amazon EC2 Trn series instances are powered by AWS Trainium, which is purpose-built for energy-efficient training of large models, so it has the least environmental impact of the listed options.\nThe C series is general-purpose and compute-optimized CPU instances that are not specialized for efficient LLM training. The G and P series are GPU instances optimized for performance rather than energy efficiency, so they have a larger environmental footprint for this workload.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon EC2"
+    ]
+  },
+  {
+    "id": "aif-q160",
+    "question": "A gaming community platform uses Amazon Bedrock Guardrails to screen harmful user inputs and model outputs. Which two content categories can the guardrails filter?",
+    "options": {
+      "A": "Politics",
+      "B": "Hate",
+      "C": "Gambling",
+      "D": "Violence"
+    },
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Amazon Bedrock Guardrails include configurable content filters for harmful categories such as Hate and Violence, which can be applied to both user inputs and model outputs.\nPolitics and Gambling are not standard Bedrock Guardrails content-filter categories, so the guardrails do not filter by them.",
+    "isMultiAnswer": true,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q192",
+    "question": "A forum operator wants to stop users from posting discriminatory content and plans to use Amazon Bedrock. How can the operator use Amazon Bedrock to meet this requirement?",
+    "options": {
+      "A": "Restrict user conversations to a set of predefined topics",
+      "B": "Block interactions that relate to predefined disallowed topics",
+      "C": "Let users interact based on their personal preferences",
+      "D": "Offer a range of responses for users to choose from"
+    },
+    "answer": "B",
+    "explanation": "Amazon Bedrock Guardrails let the operator define disallowed topics or categories such as discriminatory or hateful content and automatically block inputs and outputs that fall under them, which prevents that content from being posted.\nRestricting conversations to predefined allowed topics is a different control and would limit normal use rather than block specific harmful content. Letting users interact by preference and offering a range of responses do nothing to filter discriminatory content.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q037",
+    "question": "A team trains a model that generates images of people in various jobs, but imbalanced data skews certain attributes and introduces bias. Which technique addresses this?",
+    "options": {
+      "A": "Monitor the class distribution after deployment",
+      "B": "Augment the data to balance underrepresented classes",
+      "C": "Train for more epochs on the existing imbalanced data",
+      "D": "Apply stronger output filtering to the generated images"
+    },
+    "answer": "B",
+    "explanation": "Augmenting the data to balance underrepresented classes reduces the skew that causes the bias, addressing the problem at its source.\nMonitoring only detects imbalance, training more epochs on the same imbalanced data reinforces the bias, and output filtering screens results without fixing the underlying dataset.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q054",
+    "question": "A company builds an app that creates children's stories with Amazon Bedrock and must keep the content appropriate for young users. Which feature fits?",
+    "options": {
+      "A": "Agents for Amazon Bedrock",
+      "B": "Amazon Bedrock Guardrails",
+      "C": "Amazon Bedrock Prompt Management",
+      "D": "Amazon Bedrock playgrounds"
+    },
+    "answer": "B",
+    "explanation": "Amazon Bedrock Guardrails apply content filters and topic restrictions to model output, keeping generated stories appropriate for children.\nAgents orchestrate tasks, Prompt Management versions prompts, and playgrounds is an experimentation console; none enforces content safety.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock Guardrails",
+      "Agents for Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q123",
+    "question": "An audit found that a bank's fine-tuned loan-approval model favors one demographic group. What is the MOST cost-effective fix?",
+    "options": {
+      "A": "Use Retrieval Augmented Generation (RAG) with the fine-tuned model",
+      "B": "Add more diverse, representative training data and fine-tune again",
+      "C": "Pre-train a brand-new model on more diverse data",
+      "D": "Apply Amazon Bedrock Guardrails to block biased outputs"
+    },
+    "answer": "B",
+    "explanation": "Adding more diverse, representative data and fine-tuning the existing model again teaches it to treat groups fairly, which is the most cost-effective fix.\nRAG adds external context but does not correct learned bias, pre-training a new model is far more expensive, and Guardrails filter unsafe content rather than addressing demographic bias in the decisions.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock Guardrails"
+    ]
+  },
+  {
+    "id": "aif-q169",
+    "question": "A Retrieval Augmented Generation (RAG) newsletter app on Amazon Bedrock is surfacing politically slanted content. Which Amazon Bedrock Guardrails feature can filter this?",
+    "options": {
+      "A": "Word filters",
+      "B": "Content filters",
+      "C": "Denied topics",
+      "D": "Sensitive information filters"
+    },
+    "answer": "C",
+    "explanation": "Denied topics let you define subjects, such as politics, that the model must avoid, and Amazon Bedrock enforces this during generation to filter out politically slanted content.\nWord filters block only specific terms, content filters target categories like hate or violence, and sensitive information filters redact data such as PII.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock Guardrails"
+    ]
+  },
+  {
+    "id": "aif-q249",
+    "question": "An online store's chatbot must filter harmful content from both user prompts and its responses. Which Amazon Bedrock feature fits?",
+    "options": {
+      "A": "Amazon Bedrock Agents",
+      "B": "Amazon Bedrock Guardrails",
+      "C": "Amazon Bedrock Knowledge Bases",
+      "D": "Amazon Bedrock custom models"
+    },
+    "answer": "B",
+    "explanation": "Amazon Bedrock Guardrails filter harmful or inappropriate content in both input prompts and model responses, providing the safeguards the chatbot needs.\nAmazon Bedrock Agents orchestrate tasks, Knowledge Bases retrieve context, and custom models customize behavior; none filters harmful content.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock Guardrails"
+    ]
+  },
+  {
+    "id": "aif-q297",
+    "question": "A company uses large language models (LLMs) for tutoring apps and needs configurable safeguards that enforce standard safety rules with the LEAST effort. Which solution fits?",
+    "options": {
+      "A": "Amazon SageMaker Clarify",
+      "B": "Amazon Bedrock Guardrails",
+      "C": "Amazon Bedrock Model Evaluation",
+      "D": "Amazon SageMaker JumpStart"
+    },
+    "answer": "B",
+    "explanation": "Amazon Bedrock Guardrails provide configurable safeguards that enforce safety rules on LLM inputs and outputs with little setup effort.\nSageMaker Clarify detects bias, Amazon Bedrock Model Evaluation scores models, and SageMaker JumpStart offers pre-trained models; none enforces configurable safety rules.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock Guardrails",
+      "Amazon SageMaker Clarify"
+    ]
+  },
+  {
+    "id": "aif-q311",
+    "question": "A model performs well on training data but poorly on evaluation data. What is the most likely cause?",
+    "options": {
+      "A": "The model is underfit",
+      "B": "The model is overfit",
+      "C": "There is data leakage between the train and test sets",
+      "D": "The model needs more training epochs"
+    },
+    "answer": "B",
+    "explanation": "Overfitting occurs when a model learns the training data too closely, including noise, so it performs well on training data but fails to generalize to unseen evaluation data.\nAn underfit model performs poorly even on training data, data leakage tends to inflate test performance rather than depress it, and adding more epochs would worsen overfitting rather than explain it.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q039",
+    "question": "A bank is adapting a foundation model (FM) to support its lending decisions. Regulators require the model to be transparent and explainable. Which solution will meet these requirements?",
+    "options": {
+      "A": "Configure security and compliance with Amazon Inspector",
+      "B": "Secure and encrypt the training data with Amazon Macie",
+      "C": "Produce metrics, reports, and example explanations with Amazon SageMaker Clarify",
+      "D": "Collect more data and add custom labels with Amazon Rekognition"
+    },
+    "answer": "C",
+    "explanation": "Amazon SageMaker Clarify supports transparency and explainability by producing metrics, reports, and example explanations that show how a model reaches its decisions, which helps satisfy regulatory requirements.\nAmazon Inspector scans for software vulnerabilities and Amazon Macie protects sensitive data, neither of which explains model behavior. Collecting more data and adding labels with Amazon Rekognition addresses image labeling, not model explainability.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Clarify",
+      "Amazon Inspector",
+      "Amazon Macie",
+      "Amazon Rekognition"
+    ]
+  },
+  {
+    "id": "aif-q060",
+    "question": "A company has built a chatbot that answers natural-language questions by returning images. It wants to make sure the chatbot never returns inappropriate or unwanted images. Which solution meets this requirement?",
+    "options": {
+      "A": "Retrain the model on a large public dataset",
+      "B": "Automate the collection of user feedback",
+      "C": "Integrate content moderation APIs",
+      "D": "Carry out model validation"
+    },
+    "answer": "C",
+    "explanation": "Content moderation APIs automatically scan the images the chatbot would return, then detect and block inappropriate, unsafe, or unwanted content before it reaches the user, so integrating them directly enforces the requirement that the chatbot never serves such images.\nRetraining the model on a large public dataset adds no filtering and could even introduce more unwanted content. Carrying out model validation checks that the model behaves as expected during development but does not screen individual responses at runtime. Automating the collection of user feedback gathers input to improve the system over time but does nothing to block inappropriate images as they are served.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q171",
+    "question": "An electronics retailer has built an AI assistant that answers customer questions using its product manuals. Which approach is most likely to increase customers' trust in the assistant's answers?",
+    "options": {
+      "A": "Displaying the model's confidence score with each answer",
+      "B": "Giving the assistant a robotic on-screen avatar",
+      "C": "Linking to the product manual sections that support each answer",
+      "D": "Tuning the assistant to match the brand's tone of voice"
+    },
+    "answer": "C",
+    "explanation": "Linking to the specific product manual sections that support each answer lets customers verify the information for themselves, which builds trust by grounding the response in a citable, authoritative source rather than relying on the model's output alone.\nDisplaying the model's confidence score exposes an internal value that customers are not equipped to interpret, and a high score on a wrong answer would mislead rather than reassure. Giving the assistant a robotic on-screen avatar is a presentation choice that signals the agent is not human but says nothing about the accuracy of its answers. Tuning the assistant to match the brand's tone of voice improves consistency and style but gives customers no way to confirm that the information itself is correct.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q389",
+    "question": "A publishing company uses a generative AI model to create illustrations for its books. The company discovers that some generated images closely resemble copyrighted artwork from other publishers. Which responsible AI concern does this represent?",
+    "options": {
+      "A": "Model hallucination",
+      "B": "Intellectual property infringement",
+      "C": "Data drift",
+      "D": "Overfitting"
+    },
+    "answer": "B",
+    "explanation": "When a generative AI model produces outputs that closely resemble copyrighted works, it raises the risk of intellectual property infringement, which is a legal risk of working with generative AI that companies must address through proper data curation and output review.\nModel hallucination refers to generating plausible but factually incorrect content, not reproducing existing copyrighted material. Data drift describes changes in input data patterns over time. Overfitting means a model memorizes training data too closely and generalizes poorly, which is a different technical problem from IP infringement.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q390",
+    "question": "A bank deploys a generative AI chatbot that provides incorrect financial guidance to several customers, leading to complaints and negative press coverage. Which legal risk of generative AI is the bank experiencing?",
+    "options": {
+      "A": "Sampling bias in training data",
+      "B": "Loss of customer trust",
+      "C": "Model underfitting",
+      "D": "Increased inference latency"
+    },
+    "answer": "B",
+    "explanation": "Loss of customer trust is a recognized legal risk of deploying generative AI, where inaccurate or harmful outputs erode confidence in the organization, lead to customer complaints, and can result in reputational damage and regulatory scrutiny.\nSampling bias is a data quality issue that can cause unfair predictions but is not the legal risk being experienced here. Model underfitting means the model is too simple to learn patterns, which is a technical training issue. Increased inference latency is a performance concern unrelated to customer trust or legal risk.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q391",
+    "question": "A healthcare organization uses an ML model to flag abnormal lab results. To ensure responsible AI practices, it wants medical professionals to review any prediction the model is uncertain about before the result is sent to patients. Which AWS service meets this requirement?",
+    "options": {
+      "A": "Amazon SageMaker Clarify",
+      "B": "Amazon Augmented AI (Amazon A2I)",
+      "C": "Amazon SageMaker Model Monitor",
+      "D": "Amazon Bedrock Guardrails"
+    },
+    "answer": "B",
+    "explanation": "Amazon Augmented AI (Amazon A2I) enables human review workflows where predictions below a confidence threshold are routed to qualified reviewers, so medical professionals can verify uncertain results before they reach patients, supporting responsible AI through human oversight.\nAmazon SageMaker Clarify detects bias and explains predictions but does not route uncertain predictions to human reviewers. Amazon SageMaker Model Monitor detects drift in deployed models rather than enabling human review of individual predictions. Amazon Bedrock Guardrails filter content from generative AI models but do not create human review loops for traditional ML predictions.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon Augmented AI (Amazon A2I)",
+      "Amazon SageMaker Clarify",
+      "Amazon SageMaker Model Monitor",
+      "Amazon Bedrock Guardrails"
+    ]
+  },
+  {
+    "id": "aif-q392",
+    "question": "Which of the following is a legal risk that organizations should consider when deploying generative AI applications to customers?",
+    "options": {
+      "A": "Reduced model training time",
+      "B": "Increased hardware utilization",
+      "C": "Potential harm to end users from inaccurate or biased outputs",
+      "D": "Lower cloud computing costs"
+    },
+    "answer": "C",
+    "explanation": "Potential harm to end users from inaccurate or biased outputs is a legal risk organizations must consider, as customers who receive incorrect advice, biased decisions, or harmful content may suffer real consequences, leading to liability, regulatory penalties, and litigation.\nReduced model training time, increased hardware utilization, and lower cloud computing costs are operational benefits or metrics that do not represent legal risks to end users.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q454",
+    "question": "A company is choosing between several foundation models and wants to minimize the environmental impact of its AI workloads. Which responsible AI practice should guide this decision?",
+    "options": {
+      "A": "Choose the largest model available to maximize accuracy",
+      "B": "Select a model sized appropriately for the task to reduce unnecessary compute and energy consumption",
+      "C": "Always use the most expensive model to ensure quality",
+      "D": "Run inference continuously to keep the endpoint warm"
+    },
+    "answer": "B",
+    "explanation": "Selecting a model appropriately sized for the task avoids wasting compute resources and energy on unnecessary capacity, which directly reduces the environmental footprint of AI workloads and reflects responsible model selection practices focused on sustainability.\nChoosing the largest model wastes resources when a smaller one suffices. Using the most expensive model does not inherently reduce environmental impact. Running inference continuously wastes energy when demand is intermittent.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q455",
+    "question": "A company is deciding between a deep neural network and a decision tree for a customer-facing application. The deep neural network is more accurate, but the company needs to explain every decision to regulators. Which tradeoff does this represent?",
+    "options": {
+      "A": "Cost vs latency",
+      "B": "Interpretability vs performance",
+      "C": "Training time vs accuracy",
+      "D": "Data volume vs model size"
+    },
+    "answer": "B",
+    "explanation": "The interpretability-versus-performance tradeoff means more complex models (like deep neural networks) often achieve higher accuracy but are harder to explain, while simpler models (like decision trees) are easy to interpret but may sacrifice some performance, which is exactly the tension the company faces.\nCost vs latency, training time vs accuracy, and data volume vs model size are different tradeoffs that do not describe the tension between explanation capability and prediction accuracy.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  }
+]

@@ -1,0 +1,229 @@
+---
+/**
+ * About (/about) — genuine prerendered Astro markup.
+ *
+ * Tells the story behind CloudCertPrep: who maintains it, how the question
+ * banks are built, why it is free + open source, and how to get in touch.
+ * Anchors the E-E-A-T signal by linking the visible byline to the Person_Entity
+ * (@id="https://www.cloudcertprep.io/#author") and emitting AboutPage JSON-LD
+ * keyed by @id to the Organization + Person graph in BaseLayout.
+ *
+ * Satisfies: R3.1-R3.6, R8.4, R17.1, R17.2.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro'
+import Breadcrumb from '../components/Breadcrumb.astro'
+import LastUpdatedStamp from '../components/LastUpdatedStamp.astro'
+import { GITHUB_REPO_URL, KOFI_URL } from '../lib/constants'
+import { SITE_URL } from '../lib/seo-data'
+import { serializeJsonLd } from '../lib/jsonld'
+
+const canonical = `${SITE_URL}/about`
+const contributorsUrl = `${GITHUB_REPO_URL}/graphs/contributors`
+const contributingUrl = `${GITHUB_REPO_URL}/blob/main/CONTRIBUTING.md`
+const issuesUrl = `${GITHUB_REPO_URL}/issues`
+
+const breadcrumbItems = [
+  { label: 'Home', to: '/' },
+  { label: 'About' },
+]
+
+const aboutPageJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  '@id': `${SITE_URL}/about#aboutpage`,
+  url: canonical,
+  name: 'About CloudCertPrep',
+  mainEntity: { '@id': `${SITE_URL}/#organization` },
+  author: { '@id': `${SITE_URL}/#author` },
+  publisher: { '@id': `${SITE_URL}/#organization` },
+})
+
+// HowTo JSON-LD describing the study methodology a learner follows when
+// working through the practice banks. Anchored by @id to the same
+// Organization + Person graph as the AboutPage block above.
+const howToJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  '@id': `${SITE_URL}/about#study-methodology`,
+  name: 'How to study with CloudCertPrep practice exams',
+  description:
+    'A repeatable study loop for passing your AWS certification: answer each question, learn from the full explanation, target weak domains with spaced repetition, and rehearse under timed conditions.',
+  author: { '@id': `${SITE_URL}/#author` },
+  publisher: { '@id': `${SITE_URL}/#organization` },
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Read the question',
+      text: 'Read each practice question carefully, noting the scenario and exactly what is being asked, just as you would in the real exam.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Answer before revealing',
+      text: 'Commit to an answer before revealing the solution. Attempting an answer first surfaces what you genuinely know and what you are guessing.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Read the full explanation',
+      text: 'Read the complete explanation: why the correct answer is right and why each distractor is wrong. This is where the real learning happens.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Review weak domains with spaced repetition',
+      text: 'Track which exam-guide domains you score lowest in and revisit them on a spaced-repetition schedule so the material moves into long-term memory.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Take timed mock exams',
+      text: 'Rehearse full-length, timed mock exams that mirror the real question count and time limit to build pacing and stamina before exam day.',
+    },
+  ],
+})
+
+// HowTo JSON-LD describing the question-and-explanation methodology: the
+// editorial process every question goes through before it ships. Distinct
+// from the study-methodology HowTo above (different @id). Mirrors the visible
+// "Question and Explanation Methodology" section. (R23.6 / E-E-A-T)
+const methodologyHowToJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  '@id': `${SITE_URL}/about#question-methodology`,
+  name: 'How CloudCertPrep writes and reviews practice questions',
+  description:
+    'The editorial methodology behind every CloudCertPrep practice question: written against the official AWS exam-guide task statements, never sourced from braindumps; explained with a correct-answer rationale plus a per-distractor rationale; and reviewed through public GitHub pull requests under an MIT license.',
+  author: { '@id': `${SITE_URL}/#author` },
+  publisher: { '@id': `${SITE_URL}/#organization` },
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Write questions aligned to exam-guide task statements',
+      text: 'Each question is authored against a specific task statement in the official AWS exam guide so coverage and difficulty track the scored exam. Questions are original, written from the published exam guide and AWS documentation, and are never sourced from braindumps or exam dumps.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Structure the explanation',
+      text: 'Every question ships with a two-part explanation: a rationale for why the correct answer is right, plus a per-distractor rationale for why each incorrect option is wrong.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Review via pull request and public audit',
+      text: 'Questions are contributed and reviewed through GitHub pull requests, so every edit has a visible author and review trail. The entire bank is publicly auditable by permalink on GitHub and is MIT licensed, free to read, reuse, and improve.',
+    },
+  ],
+})
+
+const sectionHeading = 'text-xl md:text-2xl font-semibold text-text-primary'
+const bodyText = 'text-text-muted text-sm md:text-base leading-relaxed'
+const link = 'text-text-primary hover:text-text-primary/70 underline'
+---
+
+<BaseLayout
+  title="About CloudCertPrep · Free Open-Source AWS Practice Exams"
+  description="CloudCertPrep is a free, open-source, ad-free AWS certification practice platform built and maintained by Alex Santonastaso. Learn how the question banks are built and why the project stays free."
+  canonical={canonical}
+  jsonLd={[aboutPageJsonLd, howToJsonLd, methodologyHowToJsonLd]}
+>
+  <div class="p-4 md:p-8">
+    <div class="max-w-3xl mx-auto">
+      <Breadcrumb items={breadcrumbItems} />
+
+      <div class="space-y-10">
+        {/* Hero */}
+        <header class="space-y-4">
+          <h1 class="text-3xl md:text-4xl font-bold text-text-primary">About CloudCertPrep</h1>
+          <p class={bodyText}>
+            CloudCertPrep is a free, open-source, ad-free platform for preparing for AWS certification exams. No paywalls, no premium tiers, no signup required to practise. It is built and maintained by{' '}
+            <a href="https://santonastaso.me" target="_blank" rel="noopener noreferrer" class={link}>Alex Santonastaso</a>, and the entire codebase and question bank are public on{' '}
+            <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class={link}>GitHub</a>.
+          </p>
+          <LastUpdatedStamp />
+        </header>
+
+        {/* Who maintains it */}
+        <section class="space-y-3">
+          <h2 class={sectionHeading}>Who maintains it</h2>
+          <p class={bodyText}>
+            CloudCertPrep is created and maintained by{' '}
+            <a href="https://santonastaso.me" target="_blank" rel="noopener noreferrer" class={link}>Alex Santonastaso</a>, a software engineer who built the platform to prepare for the AWS Cloud Practitioner exam, then passed it (<a href="https://www.credly.com/badges/a67cce3e-4833-4682-8e9e-314454333667" target="_blank" rel="noopener noreferrer" class={link}>verified Credly badge</a>). The goal is simple: a high-quality, genuinely free study tool that anyone can use, inspect, and improve, without the ads, upsells, and dubious "exam dumps" that clutter the rest of the space.
+          </p>
+        </section>
+
+        {/* Methodology */}
+        <section class="space-y-3">
+          <h2 class={sectionHeading}>How the question banks are built</h2>
+          <p class={bodyText}>
+            Every question is aligned to the official AWS exam guide and its task statements, so the topic coverage and difficulty mirror what you will actually face on exam day. Each question ships with a detailed explanation of why the correct answer is right and why each distractor is wrong. The explanations are where the real learning happens.
+          </p>
+          <p class={bodyText}>
+            Questions are validated by an automated schema checker before they are merged, and the whole bank is publicly auditable on GitHub. Anyone can read a question, cross-reference it against the AWS documentation, report an error, or open a pull request with a correction. Community contributions are reviewed against the validator and the exam guide before they go live.
+          </p>
+        </section>
+
+        {/* Question and explanation methodology */}
+        <section class="space-y-3">
+          <h2 class={sectionHeading}>Question and Explanation Methodology</h2>
+          <p class={bodyText}>
+            Building on how the banks are assembled above, this is the editorial standard every question is held to before it ships.
+          </p>
+          <h3 class="text-base md:text-lg font-semibold text-text-primary">How questions are written</h3>
+          <p class={bodyText}>
+            Each question is authored against a specific task statement in the official AWS exam guide, so coverage and difficulty track the scored exam rather than drifting into trivia. New questions arrive as community contributions through a GitHub pull request, where anyone can propose, discuss, and refine them in the open. Questions are never sourced from braindumps or exam dumps. Reproducing real exam content breaches the AWS certification agreement and teaches recall instead of understanding, so we write original questions from the published exam guide and documentation.
+          </p>
+          <h3 class="text-base md:text-lg font-semibold text-text-primary">How explanations are structured</h3>
+          <p class={bodyText}>
+            Every explanation has two parts: a rationale for the correct answer that explains why it is right, and a per-distractor rationale that explains why each incorrect option is wrong. Reading why the wrong answers are wrong is what turns a practice question into genuine understanding you can carry into the exam.
+          </p>
+          <h3 class="text-base md:text-lg font-semibold text-text-primary">How the banks are reviewed</h3>
+          <p class={bodyText}>
+            Changes are reviewed through GitHub pull requests before merging, so every edit has a visible author and review trail. The entire bank is publicly auditable: each question links to its source file by{' '}
+            <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class={link}>permalink on GitHub</a>, so you can verify any claim against the AWS documentation yourself. Everything is{' '}
+            <a href={`${GITHUB_REPO_URL}/blob/main/LICENSE`} target="_blank" rel="noopener noreferrer" class={link}>MIT licensed</a>, free to read, reuse, and improve.
+          </p>
+        </section>
+
+        {/* Free + open-source rationale */}
+        <section class="space-y-3">
+          <h2 class={sectionHeading}>Why it is free and open source</h2>
+          <p class={bodyText}>
+            CloudCertPrep is MIT licensed with no ads, no paywalls, and no premium tier. Good exam prep should not be locked behind a subscription. The project is sustained by optional{' '}
+            <a href={KOFI_URL} target="_blank" rel="noopener noreferrer" class={link}>Ko-fi donations</a>{' '}
+            and a small number of clearly-labelled affiliate links, which keep hosting paid for while the platform itself stays free and ad-free.
+          </p>
+        </section>
+
+        {/* Contributor credits */}
+        <section class="space-y-3">
+          <h2 class={sectionHeading}>Contributors</h2>
+          <p class={bodyText}>
+            CloudCertPrep is built in the open and welcomes contributions. See the{' '}
+            <a href={contributorsUrl} target="_blank" rel="noopener noreferrer" class={link}>GitHub contributors graph</a>{' '}
+            for everyone who has helped, read{' '}
+            <a href={contributingUrl} target="_blank" rel="noopener noreferrer" class={link}>CONTRIBUTING.md</a>{' '}
+            for the question schema and contribution workflow, or see the{' '}
+            <a href="/contribute" class={link}>ways to contribute</a>.
+          </p>
+        </section>
+
+        {/* Privacy */}
+        <section class="space-y-3">
+          <h2 class={sectionHeading}>Privacy</h2>
+          <p class={bodyText}>
+            CloudCertPrep is GDPR-compliant. Guest users generate no server-side personal data. Authenticated user data is stored in the EU (Supabase, Ireland) and is never sold or shared. Analytics use cookieless, privacy-friendly{' '}
+            <a href="https://umami.is" target="_blank" rel="noopener noreferrer" class={link}>Umami</a>, which sets no cookies and collects no personally identifiable information. Read the full{' '}
+            <a href="/privacy" class={link}>Privacy Policy</a>{' '}for details.
+          </p>
+        </section>
+
+        {/* Contact */}
+        <section class="space-y-3">
+          <h2 class={sectionHeading}>Contact</h2>
+          <p class={bodyText}>
+            Questions, corrections, or ideas? Email{' '}
+            <a href="mailto:alex@cloudcertprep.io" class={link}>alex@cloudcertprep.io</a>, open an issue on{' '}
+            <a href={issuesUrl} target="_blank" rel="noopener noreferrer" class={link}>GitHub Issues</a>, or browse the source at{' '}
+            <a href="https://github.com/nastaso" target="_blank" rel="noopener noreferrer" class={link}>github.com/nastaso</a>.
+          </p>
+        </section>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

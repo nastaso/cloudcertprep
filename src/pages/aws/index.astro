@@ -1,0 +1,23 @@
+---
+/**
+ * /aws — the AWS provider hub.
+ *
+ * Per R1.5, while single-provider mode is confirmed (getActiveProviders()
+ * returns exactly ['aws']), this collapses to `/` with a 301. The Netlify
+ * `_redirects` rule also handles this at the edge, but the Astro redirect
+ * covers the static build output directly.
+ *
+ * When a second provider ships (getActiveProviders().length >= 2), this page
+ * should be replaced with a real Provider_Landing per R1.7.
+ *
+ * Satisfies: R1.5.
+ */
+import { getActiveProviders } from '../../data/certifications'
+
+const providers = getActiveProviders()
+const singleProviderAws = providers.length === 1 && providers[0] === 'aws'
+
+if (singleProviderAws) {
+  return Astro.redirect('/', 301)
+}
+---

@@ -1,0 +1,40 @@
+name: Report a question error
+description: Report an inaccurate, ambiguous, or outdated practice question.
+title: "Question error: <id>"
+labels: ["question-error"]
+body:
+  - type: input
+    id: question_id
+    attributes:
+      label: Question ID
+      description: The ID shown in the bottom-left of the question card (e.g. CLF-D3-0142). The "Report on GitHub" link from inside the app pre-fills this.
+      placeholder: CLF-D3-0142
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is wrong with the question?
+      options:
+        - Wrong answer marked correct
+        - Question phrasing is ambiguous
+        - Question or service is outdated
+        - Typo or formatting issue
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is wrong, what the correct version should be, and (optionally) a link to AWS docs or another authoritative source.
+      placeholder: |
+        The marked answer is "C", but according to https://docs.aws.amazon.com/... the correct answer is "B" because ...
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Authoritative source (optional)
+      description: AWS docs URL, AWS whitepaper, or AWS exam guide reference.
+      placeholder: https://docs.aws.amazon.com/...
