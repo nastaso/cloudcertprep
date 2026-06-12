@@ -73,6 +73,16 @@ Primary key: `(user_id, cert_code, domain_id)`.
 
 **RLS:** enabled. `auth.uid() = user_id`.
 
+> **Known live-schema gotcha (found 2026-06-12):** production carries a CLF-era check constraint
+> `domain_progress_domain_id_check` that **rejects `domain_id = 5`** (23514), so AIF-C01 domain-5
+> progress upserts fail silently (the app only logs). `attempt_questions` is not affected. Fix
+> (pending owner run — see `.kiro/ship-v2/08-owner-action-items.md`):
+>
+> ```sql
+> ALTER TABLE public.domain_progress DROP CONSTRAINT domain_progress_domain_id_check;
+> ALTER TABLE public.domain_progress ADD CONSTRAINT domain_progress_domain_id_check CHECK (domain_id >= 1);
+> ```
+
 ---
 
 ### `platform_stats`

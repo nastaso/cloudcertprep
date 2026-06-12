@@ -149,8 +149,13 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
 
   // Honest aggregates from the complete domain_progress rows (not the capped
   // recent-attempts list): total questions practiced and overall accuracy.
-  const questionsPracticed = domainProgress.reduce((sum, d) => sum + (d.questions_attempted || 0), 0)
-  const questionsCorrect = domainProgress.reduce((sum, d) => sum + (d.questions_correct || 0), 0)
+  // Each row is capped at its domain's current bank size: stale rows written
+  // before a bank trim can carry counts above the live total (the >100% bug).
+  const domainCap = new Map(cert.domains.map(d => [d.id, d.questionCount]))
+  const questionsPracticed = domainProgress.reduce(
+    (sum, d) => sum + Math.min(d.questions_attempted || 0, domainCap.get(d.domain_id) ?? Infinity), 0)
+  const questionsCorrect = domainProgress.reduce(
+    (sum, d) => sum + Math.min(d.questions_correct || 0, domainCap.get(d.domain_id) ?? Infinity), 0)
   const accuracy = questionsPracticed > 0 ? Math.round((questionsCorrect / questionsPracticed) * 100) : 0
   const bestScore = recentAttempts.reduce((max, a) => Math.max(max, a.scaled_score), 0)
 
@@ -240,9 +245,12 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
             {cert.domains.map(domain => {
               const progress = domainProgress.find(d => d.domain_id === domain.id)
-              const mastery = Math.round(progress?.mastery_percent || 0)
-              const attempted = progress?.questions_attempted || 0
-              const correct = progress?.questions_correct || 0
+              // Clamp every displayed figure to the current bank: a stale
+              // domain_progress row (written before a bank trim) must never
+              // render >100% mastery or "91 of 78 practised".
+              const mastery = Math.min(100, Math.round(progress?.mastery_percent || 0))
+              const attempted = Math.min(progress?.questions_attempted || 0, domain.questionCount)
+              const correct = Math.min(progress?.questions_correct || 0, attempted)
               return (
                 <div key={domain.id} className="bg-bg-card border border-border-hairline rounded-2xl p-5 md:p-6">
                   <div className="flex items-start justify-between gap-4">
