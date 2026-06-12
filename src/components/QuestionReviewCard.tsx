@@ -51,7 +51,7 @@ export function QuestionReviewCard({
 
       {/* Domain Badge */}
       <div className="mb-2">
-        <span className="text-xs font-medium px-2 py-0.5 rounded bg-brand text-on-brand">
+        <span className="font-mono text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-bg-dark border border-border-hairline text-text-muted">
           {getCertDomains(certCode)[question.domainId] ?? `Domain ${question.domainId}`}
         </span>
       </div>

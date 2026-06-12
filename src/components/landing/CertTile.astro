@@ -1,0 +1,73 @@
+---
+/**
+ * CertTile.astro — aws.amazon.com "What's new"-style feature card (DSv4.1).
+ *
+ * A full-card link with a generative SVG art header that ZOOMS on hover, a
+ * halo glow ring, and a label whose arrow slides. Per-cert art is composed
+ * inline (no image assets): each certification gets its own abstract
+ * composition in a distinct color field so the grid reads like AWS's
+ * editorial card row.
+ *
+ * The card body carries the cert name, description, and question count —
+ * the whole tile links to the cert landing (preserves the internal link
+ * graph; the home page must keep its hub links to /aws/<cert>).
+ */
+import type { Certification } from '../../data/certifications'
+import { getCertTotalQuestions } from '../../data/certifications'
+import { LEVEL_ACCENT_RGB } from '../../lib/levelAccent'
+
+interface Props {
+  cert: Certification
+}
+
+const { cert } = Astro.props
+const isComingSoon = cert.status === 'coming-soon'
+const href = `/${cert.provider}/${cert.code}`
+const questions = getCertTotalQuestions(cert.code)
+const domains = cert.domains.length
+
+---
+
+<a
+  href={href}
+  class:list={['feature-card halo group', isComingSoon && 'opacity-90']}
+  style={`--halo-color: ${LEVEL_ACCENT_RGB[cert.level]}`}
+  aria-label={`${cert.name}: ${isComingSoon ? 'coming soon' : `${questions.toLocaleString('en-US')}+ practice questions`}`}
+>
+  <div class="feature-art relative" aria-hidden="true">
+    {/* Brand art from the OG pipeline (scripts/generate-og-images.mjs emits
+        /og/card-<code>.webp at prebuild): one visual system for share cards
+        and site tiles. */}
+    <img
+      src={`/og/card-${cert.code}.webp`}
+      alt=""
+      width="720"
+      height="405"
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+
+  <div class="flex flex-1 flex-col gap-2 p-5 md:p-6 bg-bg-card rounded-b-2xl">
+    {isComingSoon && (
+      <span class="self-start inline-flex items-center rounded-md bg-warning/15 px-2 py-0.5 text-[11px] font-medium text-warning">
+        Coming soon
+      </span>
+    )}
+
+    <h3 class="text-lg md:text-xl font-semibold tracking-tight text-text-primary">
+      {cert.name}
+    </h3>
+
+    <p class="text-sm md:text-base leading-relaxed text-text-muted">
+      {isComingSoon
+        ? `${domains} domains. Question bank in development. Watch the repo to follow progress.`
+        : `${questions.toLocaleString('en-US')}+ practice questions across ${domains} domains, with full mock exams and per-question explanations.`}
+    </p>
+
+    <span class="mt-auto pt-2 inline-flex items-center gap-1 text-sm font-medium text-link">
+      {isComingSoon ? 'View roadmap' : 'Start practicing'}
+      <span class="feature-arrow" aria-hidden="true">→</span>
+    </span>
+  </div>
+</a>

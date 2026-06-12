@@ -35,11 +35,11 @@ export function Modal({ isOpen, title, children, onClose }: ModalProps) {
         aria-modal="true"
         aria-labelledby="modal-title"
         tabIndex={-1}
-        className="relative bg-bg-card rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in"
+        className="relative bg-bg-card rounded-2xl border border-border-hairline shadow-overlay max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-text-muted/20">
-          <h2 id="modal-title" className="text-2xl font-bold text-text-primary">{title}</h2>
+        <div className="flex items-center justify-between p-6 border-b border-border-hairline">
+          <h2 id="modal-title" className="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary">{title}</h2>
           <button
             onClick={onClose}
             aria-label="Close dialog"

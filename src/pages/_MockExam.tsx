@@ -1,10 +1,10 @@
 ﻿import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Flag, AlertCircle, ArrowRight } from 'lucide-react'
+import { Flag, AlertCircle, LayoutGrid } from 'lucide-react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
-import { filterChipClass } from '../lib/buttonStyles'
+import { filterChipClass, reviewCellClass } from '../lib/buttonStyles'
 import { useTimer } from '../hooks/useTimer'
 import { useAuth } from '../hooks/useAuth'
 import { useSEO } from '../hooks/useSEO'
@@ -557,11 +557,11 @@ export function MockExam() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
                 <p className="text-text-muted text-sm mb-1">Pass Mark</p>
-                <p className="text-2xl font-bold text-text-primary">{cert.passingScore}/1000</p>
+                <p className="font-mono text-2xl font-semibold tabular-nums text-text-primary">{cert.passingScore}/1000</p>
               </div>
               <div>
                 <p className="text-text-muted text-sm mb-1">Time Taken</p>
-                <p className="text-2xl font-bold text-text-primary">{formatDuration(results!.timeTaken)}</p>
+                <p className="font-mono text-2xl font-semibold tabular-nums text-text-primary">{formatDuration(results!.timeTaken)}</p>
               </div>
             </div>
 
@@ -573,16 +573,14 @@ export function MockExam() {
                 const correct = domainQuestions.filter(r => r.isCorrect).length
                 
                 return (
-                  <div key={domain.id} className="flex items-center justify-between">
-                    <div className="flex-1">
+                  <div key={domain.id} className="flex items-center justify-between gap-4">
+                    <div className="flex-1 min-w-0">
                       <p className="text-text-primary font-medium">{domain.name}</p>
-                      <p className="text-text-muted text-sm">{correct}/{domainQuestions.length} correct</p>
+                      <p className="font-mono text-[12px] text-text-muted">{correct}/{domainQuestions.length} correct</p>
                     </div>
-                    <div className="text-right">
-                      <span className="text-2xl font-bold text-brand">
-                        {score}%
-                      </span>
-                    </div>
+                    <span className={`font-mono text-xl font-semibold tabular-nums ${score < 60 ? 'text-danger' : score < 80 ? 'text-warning' : 'text-success'}`}>
+                      {score}%
+                    </span>
                   </div>
                 )
               })}
@@ -687,16 +685,22 @@ export function MockExam() {
           <div className="max-w-7xl mx-auto flex gap-6">
             {/* Main Content */}
             <div className="flex-1">
-            {/* Mobile Question Navigation Button */}
+            {/* Mobile question-grid trigger. The sticky toolbar already shows
+                "Question X of Y", so this stays a quiet secondary control (no
+                duplicated position, no heavy primary fill competing with the
+                answer options). */}
             <Button
               onClick={() => setShowQuestionNav(true)}
-              variant="primary"
+              variant="secondary"
               size="sm"
               fullWidth
               className="lg:hidden mb-4 !justify-between"
             >
-              <span>Question {currentIndex + 1} of {questions.length}</span>
-              <span className="flex items-center gap-1 text-sm">View all questions <ArrowRight className="w-4 h-4" /></span>
+              <span className="flex items-center gap-2">
+                <LayoutGrid className="w-4 h-4" aria-hidden="true" />
+                View all questions
+              </span>
+              <span className="font-mono text-xs text-text-muted tabular-nums">{answeredCount}/{questions.length}</span>
             </Button>
 
             <Card className="mb-3">
@@ -1023,38 +1027,27 @@ export function MockExam() {
                           disabled={!isInFilteredSet}
                           aria-label={ariaLabel}
                           aria-current={isCurrentQuestion ? 'true' : undefined}
-                          className={`w-8 h-8 md:w-9 md:h-9 rounded text-[10px] md:text-xs font-medium transition-all ${
-                            isCurrentQuestion
-                              ? 'ring-2 ring-brand ring-offset-1 ring-offset-bg-card'
-                              : ''
-                          } ${
-                            !isInFilteredSet
-                              ? 'opacity-30 cursor-not-allowed'
-                              : 'hover:scale-110'
-                          } ${
-                            result.isCorrect
-                              ? 'bg-success text-on-brand'
-                              : 'bg-danger text-on-brand'
-                          } ${
-                            result.wasFlagged
-                              ? 'ring-2 ring-warning'
-                              : ''
-                          }`}
+                          className={reviewCellClass({
+                            correct: result.isCorrect,
+                            current: isCurrentQuestion,
+                            flagged: result.wasFlagged,
+                            inSet: isInFilteredSet,
+                          })}
                         >
                           {idx + 1}
                         </button>
                       )
                     })}
                   </div>
-                  <div className="mt-2 flex items-center justify-center gap-4 text-xs text-text-muted">
-                    <span className="flex items-center gap-1">
-                      <span className="w-3 h-3 bg-success rounded"></span> Correct
+                  <div className="mt-3 flex items-center justify-center gap-4 text-xs text-text-muted">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded bg-success/15 border border-success/30"></span> Correct
                     </span>
-                    <span className="flex items-center gap-1">
-                      <span className="w-3 h-3 bg-danger rounded"></span> Incorrect
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded bg-danger/10 border border-danger/25"></span> Incorrect
                     </span>
-                    <span className="flex items-center gap-1">
-                      <span className="w-3 h-3 bg-bg-dark rounded ring-2 ring-warning"></span> Flagged
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded bg-bg-dark ring-2 ring-warning"></span> Flagged
                     </span>
                   </div>
                 </div>

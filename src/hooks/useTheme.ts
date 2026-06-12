@@ -14,7 +14,7 @@ type Theme = 'light' | 'dark'
 const THEME_KEY = 'cloudcertprep_theme'
 
 function read(): Theme {
-  if (typeof document === 'undefined') return 'light'
+  if (typeof document === 'undefined') return 'dark'
   return document.documentElement.classList.contains('dark') ? 'dark' : 'light'
 }
 
@@ -25,21 +25,11 @@ let initialised = false
 function notify() { listeners.forEach(cb => cb()) }
 
 function init() {
-  if (initialised || typeof window === 'undefined' || !window.matchMedia) return
+  if (initialised || typeof window === 'undefined') return
   initialised = true
-
-  // Follow OS theme changes mid-session, but only when the user has not made
-  // an explicit choice (i.e. localStorage is empty). The pre-paint script in
-  // BaseLayout handles the first paint; this listener handles subsequent OS
-  // toggles for users whose explicit preference is to mirror the OS.
-  const media = window.matchMedia('(prefers-color-scheme: dark)')
-  media.addEventListener('change', e => {
-    if (localStorage.getItem(THEME_KEY)) return
-    const next: Theme = e.matches ? 'dark' : 'light'
-    document.documentElement.classList.toggle('dark', next === 'dark')
-    theme = next
-    notify()
-  })
+  // DSv5.1: the brand is dark-first (pre-paint script defaults to dark; light
+  // only on explicit stored choice). OS-theme mirroring is intentionally
+  // retired with the dark-first default: the OS signal no longer decides.
 }
 
 function subscribe(cb: () => void) {
@@ -49,7 +39,7 @@ function subscribe(cb: () => void) {
 }
 
 function getSnapshot(): Theme { return theme }
-function getServerSnapshot(): Theme { return 'light' }
+function getServerSnapshot(): Theme { return 'dark' }
 
 export function useTheme() {
   const t = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)

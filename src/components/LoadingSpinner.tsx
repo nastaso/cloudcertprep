@@ -18,9 +18,13 @@ export function LoadingSpinner({ size = 'md', text, delayed = false }: LoadingSp
       role="status"
       aria-live="polite"
     >
+      {/* Monochrome ring (track + single rotating head in the primary text
+          colour, theme-aware). The brand orange is reserved for CTAs/active
+          state across the design system, so a neutral spinner reads as premium
+          and coherent rather than a loud accent flash on every island mount. */}
       <div className={`${sizeClasses[size]} relative`}>
-        <div className="absolute inset-0 border-4 border-text-muted/20 rounded-full" />
-        <div className="absolute inset-0 border-4 border-transparent border-t-brand rounded-full animate-spin" />
+        <div className="absolute inset-0 border-[3px] border-text-muted/20 rounded-full" />
+        <div className="absolute inset-0 border-[3px] border-transparent border-t-text-primary/80 rounded-full animate-spin" />
       </div>
       {text && (
         <p className="text-text-muted text-sm animate-pulse">{text}</p>

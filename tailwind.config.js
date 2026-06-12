@@ -7,18 +7,34 @@ export default {
       boxShadow: {
         'card': 'var(--card-shadow)',
         'card-hover': 'var(--shadow-card-hover)',
+        'overlay': 'var(--shadow-overlay)',
       },
       transitionTimingFunction: {
-        // Shared premium "settle" curve (mirrors --ease-out in index.css).
-        // Use `ease-out`/`duration-200` instead of hand-pasting cubic-beziers. (§8 item 9)
+        // Shared premium curves (mirror --ease-* in index.css, DSv4 §1.5).
+        // entrances/settles
         'out': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        // indicator slides (tab underline)
+        'inout': 'cubic-bezier(0.45, 0, 0.15, 1)',
+        // button presses
+        'press': 'cubic-bezier(0.2, 0, 0, 1)',
       },
       transitionDuration: {
         DEFAULT: '200ms',
       },
+      fontFamily: {
+        // DSv6: headings share the system stack (no display webfont). The
+        // `font-display` utility is kept so heading call sites stay explicit.
+        display: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+      },
       colors: {
         'brand': 'rgb(var(--color-brand) / <alpha-value>)',
+        'brand-hover': 'rgb(var(--color-brand-hover) / <alpha-value>)',
         'on-brand': 'rgb(var(--color-on-brand) / <alpha-value>)',
+        'border-hairline': 'rgb(var(--color-border) / <alpha-value>)',
+        'link': 'rgb(var(--color-link) / <alpha-value>)',
+        'cta': 'rgb(var(--color-cta) / <alpha-value>)',
+        'cta-hover': 'rgb(var(--color-cta-hover) / <alpha-value>)',
+        'on-cta': 'rgb(var(--color-on-cta) / <alpha-value>)',
         'header-bg': 'rgb(var(--color-header-bg) / <alpha-value>)',
         'on-header': 'rgb(var(--color-on-header) / <alpha-value>)',
         'bg-dark': 'rgb(var(--color-bg-dark) / <alpha-value>)',

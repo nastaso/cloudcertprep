@@ -12,6 +12,7 @@
  */
 import BaseLayout from '../layouts/BaseLayout.astro'
 import Breadcrumb from '../components/Breadcrumb.astro'
+import HeroMini from '../components/landing/HeroMini.astro'
 import LastUpdatedStamp from '../components/LastUpdatedStamp.astro'
 import { GITHUB_REPO_URL, KOFI_URL } from '../lib/constants'
 import { SITE_URL } from '../lib/seo-data'
@@ -111,7 +112,7 @@ const methodologyHowToJsonLd = serializeJsonLd({
   ],
 })
 
-const sectionHeading = 'text-xl md:text-2xl font-semibold text-text-primary'
+const sectionHeading = 'text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary'
 const bodyText = 'text-text-muted text-sm md:text-base leading-relaxed'
 const link = 'text-text-primary hover:text-text-primary/70 underline'
 ---
@@ -121,22 +122,33 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
   description="CloudCertPrep is a free, open-source, ad-free AWS certification practice platform built and maintained by Alex Santonastaso. Learn how the question banks are built and why the project stays free."
   canonical={canonical}
   jsonLd={[aboutPageJsonLd, howToJsonLd, methodologyHowToJsonLd]}
+  headerOverlay={true}
 >
-  <div class="p-4 md:p-8">
-    <div class="max-w-3xl mx-auto">
-      <Breadcrumb items={breadcrumbItems} />
+  <Breadcrumb items={breadcrumbItems} visuallyHidden />
 
-      <div class="space-y-10">
-        {/* Hero */}
-        <header class="space-y-4">
-          <h1 class="text-3xl md:text-4xl font-bold text-text-primary">About CloudCertPrep</h1>
+  <HeroMini
+    kicker="The project"
+    title="About CloudCertPrep"
+    lede="Free, open-source, ad-free AWS certification practice exams. No paywalls, no premium tiers, no signup required to practise."
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'About' }]}
+    maxWidth="max-w-3xl"
+  >
+    <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 52 211 153;">
+      <LastUpdatedStamp />
+    </div>
+  </HeroMini>
+
+  <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
+    <div class="max-w-3xl mx-auto px-4 md:px-8">
+      <div class="space-y-10 max-w-[68ch] mx-auto">
+        {/* Maintainer + source (E-E-A-T anchor) */}
+        <section class="space-y-3">
           <p class={bodyText}>
-            CloudCertPrep is a free, open-source, ad-free platform for preparing for AWS certification exams. No paywalls, no premium tiers, no signup required to practise. It is built and maintained by{' '}
+            CloudCertPrep is built and maintained by{' '}
             <a href="https://santonastaso.me" target="_blank" rel="noopener noreferrer" class={link}>Alex Santonastaso</a>, and the entire codebase and question bank are public on{' '}
             <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class={link}>GitHub</a>.
           </p>
-          <LastUpdatedStamp />
-        </header>
+        </section>
 
         {/* Who maintains it */}
         <section class="space-y-3">

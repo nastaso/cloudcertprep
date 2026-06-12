@@ -13,6 +13,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import Breadcrumb from '../../components/Breadcrumb.astro'
+import HeroMini from '../../components/landing/HeroMini.astro'
 import PostCard from '../../components/PostCard.astro'
 import { SITE_URL } from '../../lib/seo-data'
 
@@ -33,17 +34,19 @@ const description =
   'Guides, exam-format breakdowns, and study strategy for AWS certification exams from the CloudCertPrep team.'
 ---
 
-<BaseLayout title="Blog · CloudCertPrep" description={description} canonical={canonical} ogImage={`${SITE_URL}/og/og-blog.png`}>
+<BaseLayout title="Blog · CloudCertPrep" description={description} canonical={canonical} ogImage={`${SITE_URL}/og/og-blog.png`} headerOverlay={true}>
+  <Breadcrumb items={breadcrumbItems} visuallyHidden />
 
-  <div class="p-4 md:p-8">
-    <div class="max-w-3xl mx-auto">
-      <Breadcrumb items={breadcrumbItems} />
+  <HeroMini
+    kicker="Blog"
+    title="CloudCertPrep Blog"
+    lede={description}
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'Blog' }]}
+    maxWidth="max-w-3xl"
+  />
 
-      <header class="space-y-2 mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-text-primary">CloudCertPrep Blog</h1>
-        <p class="text-text-muted text-sm md:text-base">{description}</p>
-      </header>
-
+  <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
+    <div class="max-w-3xl mx-auto px-4 md:px-8">
       {sorted.length === 0 ? (
         <p class="text-text-muted">No posts yet. Check back soon.</p>
       ) : (

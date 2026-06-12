@@ -10,6 +10,7 @@
  */
 import BaseLayout from '../layouts/BaseLayout.astro'
 import Breadcrumb from '../components/Breadcrumb.astro'
+import HeroMini from '../components/landing/HeroMini.astro'
 import { GITHUB_REPO_URL, GITHUB_ISSUES_URL } from '../lib/constants'
 import { SITE_URL } from '../lib/seo-data'
 import { serializeJsonLd } from '../lib/jsonld'
@@ -24,7 +25,7 @@ const breadcrumbItems = [
   { label: 'Contribute' },
 ]
 
-const sectionHeading = 'text-xl md:text-2xl font-semibold text-text-primary'
+const sectionHeading = 'text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary'
 const bodyText = 'text-text-muted text-sm md:text-base leading-relaxed'
 const link = 'text-text-primary hover:text-text-primary/70 underline'
 
@@ -75,20 +76,26 @@ const contributeJsonLd = serializeJsonLd({
   description="Help build CloudCertPrep: add or fix practice questions, report errors, write study content, or contribute code. MIT licensed and community-maintained on GitHub."
   canonical={canonical}
   jsonLd={[contributeJsonLd]}
+  headerOverlay={true}
 >
-  <div class="p-4 md:p-8">
-    <div class="max-w-3xl mx-auto">
-      <Breadcrumb items={breadcrumbItems} />
+  <Breadcrumb items={breadcrumbItems} visuallyHidden />
 
-      <div class="space-y-10">
-        <header class="space-y-4">
-          <h1 class="text-3xl md:text-4xl font-bold text-text-primary">Contribute to CloudCertPrep</h1>
-          <p class={bodyText}>
-            CloudCertPrep is MIT licensed and built in the open. Every question, explanation, and line of code is public on{' '}
-            <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class={link}>GitHub</a>, and contributions of every size are welcome, from fixing a single typo to adding a whole certification. The fastest way to start is to pick up a{' '}
-            <a href={goodFirstIssuesUrl} target="_blank" rel="noopener noreferrer" class={link}>good first issue</a>.
-          </p>
-        </header>
+  <HeroMini
+    kicker="Open source"
+    title="Contribute to CloudCertPrep"
+    lede="MIT licensed and built in the open. Contributions of every size are welcome, from fixing a single typo to adding a whole certification."
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'Contribute' }]}
+    maxWidth="max-w-3xl"
+  />
+
+  <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
+    <div class="max-w-3xl mx-auto px-4 md:px-8">
+      <div class="space-y-10 max-w-[68ch] mx-auto">
+        <p class={bodyText}>
+          Every question, explanation, and line of code is public on{' '}
+          <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class={link}>GitHub</a>. The fastest way to start is to pick up a{' '}
+          <a href={goodFirstIssuesUrl} target="_blank" rel="noopener noreferrer" class={link}>good first issue</a>.
+        </p>
 
         <section id="add-questions" class="space-y-3">
           <h2 class={sectionHeading}>Add or improve questions</h2>

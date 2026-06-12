@@ -118,7 +118,7 @@ export function Stats() {
               snapshot for the live island causes no layout shift or flash on
               hydration (a11y finding 2 / Property 6 unaffected). */}
           <header className="space-y-2">
-            <h1 className="text-3xl md:text-4xl font-bold text-text-primary">Community statistics</h1>
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-text-primary">Community statistics</h1>
             <p className="text-text-muted text-sm md:text-base">
               Aggregated, anonymous results from the CloudCertPrep community. Your individual scores stay private to your account.
             </p>
@@ -136,18 +136,18 @@ export function Stats() {
 
             if (cert.status === 'coming-soon') {
               return (
-                <div key={cert.code} className="bg-gradient-to-r from-brand/10 to-brand/5 border border-brand/20 rounded-xl p-4 md:p-6 shadow-card">
+                <div key={cert.code} className="bg-bg-card border border-border-hairline rounded-2xl p-4 md:p-6 shadow-card">
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2 py-1 rounded text-xs font-medium bg-brand text-on-brand">Coming soon</span>
-                        <h2 className="text-lg md:text-xl font-semibold text-text-primary">{cert.shortName}</h2>
+                        <span className="px-2 py-0.5 rounded-full font-mono text-[11px] font-semibold uppercase tracking-wide bg-warning/15 text-warning">Coming soon</span>
+                        <h2 className="text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary">{cert.shortName}</h2>
                       </div>
                       <p className="text-text-muted text-xs md:text-sm">{cert.name}</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <TrendingUp className="w-5 h-5 text-brand flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    <TrendingUp className="w-5 h-5 text-text-muted flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div>
                       <p className="text-text-primary text-sm md:text-base mb-1">
                         {getCertTotalQuestions(cert.code).toLocaleString()} practice questions available
@@ -172,11 +172,11 @@ export function Stats() {
               return (
                 <Card key={cert.code} padding="md">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="px-2 py-1 rounded text-xs font-medium bg-success/20 text-success">ACTIVE</span>
-                    <h2 className="text-lg md:text-xl font-semibold text-text-primary">{cert.shortName}</h2>
+                    <span className="px-2 py-0.5 rounded-full font-mono text-[11px] font-semibold uppercase tracking-wide bg-success/15 text-success">Active</span>
+                    <h2 className="text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary">{cert.shortName}</h2>
                   </div>
                   <p className="text-text-muted text-sm">
-                    Not enough attempts yet — be the first to set the community benchmark.{' '}
+                    Not enough attempts yet. Be the first to set the community benchmark.{' '}
                     <a href={`/aws/${cert.code}/practice-exam`} className="text-text-primary hover:text-text-primary/70 underline">
                       Start practising →
                     </a>
@@ -200,29 +200,29 @@ export function Stats() {
                 {/* Key Metrics */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6">
                   <div>
-                    <p className="text-2xl md:text-3xl font-bold text-text-primary">{cs.total_attempts.toLocaleString()}</p>
+                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_attempts.toLocaleString()}</p>
                     <p className="text-text-muted text-xs md:text-sm mt-1">Total Attempts</p>
                   </div>
                   <div>
-                    <p className="text-2xl md:text-3xl font-bold text-text-primary">{cs.total_passes.toLocaleString()}</p>
+                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_passes.toLocaleString()}</p>
                     <p className="text-text-muted text-xs md:text-sm mt-1">Total Passes</p>
                   </div>
                   <div>
-                    <p className="text-2xl md:text-3xl font-bold text-text-primary">
+                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">
                       {cs.total_attempts > 0 ? Math.round((cs.total_passes / cs.total_attempts) * 100) : 0}%
                     </p>
                     <p className="text-text-muted text-xs md:text-sm mt-1">Pass Rate</p>
                   </div>
                   <div>
-                    <p className="text-2xl md:text-3xl font-bold text-text-primary">{Math.round(cs.avg_score)}</p>
+                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{Math.round(cs.avg_score)}</p>
                     <p className="text-text-muted text-xs md:text-sm mt-1">Avg Score (Passed)</p>
                   </div>
                   <div>
-                    <p className="text-2xl md:text-3xl font-bold text-text-primary">{Math.round(cs.avg_time_minutes)} min</p>
+                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{Math.round(cs.avg_time_minutes)} min</p>
                     <p className="text-text-muted text-xs md:text-sm mt-1">Avg Time (Passed)</p>
                   </div>
                   <div>
-                    <p className="text-2xl md:text-3xl font-bold text-text-primary">
+                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">
                       {cs.fastest_pass_seconds ? formatTime(cs.fastest_pass_seconds) : 'N/A'}
                     </p>
                     <p className="text-text-muted text-xs md:text-sm mt-1">Fastest Pass</p>
@@ -245,11 +245,11 @@ export function Stats() {
                               <span className="text-text-muted text-xs font-medium">#{index + 1}</span>
                               <p className="text-text-primary text-xs md:text-sm font-medium">{domainName}</p>
                             </div>
-                            <p className="text-text-muted text-xs md:text-sm">{Math.round(ds.avg_score)}% avg</p>
+                            <p className="font-mono text-xs md:text-sm text-text-muted tabular-nums">{Math.round(ds.avg_score)}% avg</p>
                           </div>
-                          <div className="h-2 bg-bg-dark rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-bg-dark rounded-full overflow-hidden">
                             <div
-                              className={`h-full transition-all ${ds.avg_score < 60 ? 'bg-danger' : ds.avg_score < 75 ? 'bg-warning' : 'bg-brand'}`}
+                              className={`h-full transition-all ${ds.avg_score < 60 ? 'bg-danger' : ds.avg_score < 75 ? 'bg-warning' : 'bg-success'}`}
                               style={{ width: `${Math.min(100, ds.avg_score)}%` }}
                             />
                           </div>
@@ -270,13 +270,13 @@ export function Stats() {
                     </h3>
                     <div className="space-y-2">
                       {cs.recent_passes.map((pass, i) => (
-                        <div key={i} className="flex items-center justify-between p-3 bg-bg-dark rounded-lg">
+                        <div key={i} className="flex items-center justify-between p-3 bg-bg-dark rounded-xl">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-success/15 flex items-center justify-center">
                               <Check className="w-4 h-4 text-success" />
                             </div>
                             <div>
-                              <p className="text-text-primary font-bold text-sm md:text-base">{pass.scaled_score}/1000</p>
+                              <p className="font-mono text-text-primary font-semibold text-sm md:text-base tabular-nums">{pass.scaled_score}/1000</p>
                               <div className="flex items-center gap-2 text-text-muted text-xs">
                                 <span>{formatRelativeDate(pass.passed_at)}</span>
                                 {pass.time_taken_seconds && (

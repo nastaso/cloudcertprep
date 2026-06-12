@@ -98,7 +98,7 @@ export function CookieConsent() {
         role="dialog"
         aria-modal="false"
         aria-labelledby="cookie-consent-title"
-        className="relative w-full max-w-2xl bg-bg-card border border-text-muted/20 rounded-lg shadow-2xl p-4 md:p-6 pointer-events-auto animate-slide-up"
+        className="relative w-full max-w-2xl bg-bg-card border border-border-hairline rounded-2xl shadow-overlay p-4 md:p-6 pointer-events-auto animate-slide-up"
       >
         {/* Close button (44x44 touch target) */}
         <button
@@ -111,11 +111,11 @@ export function CookieConsent() {
 
         {/* Content */}
         <div className="flex items-start gap-3 md:gap-4 mb-4 pr-8">
-          <div className="flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full bg-brand/20 flex items-center justify-center">
-            <Cookie className="w-5 h-5 md:w-6 md:h-6 text-brand" aria-hidden="true" />
+          <div className="flex-shrink-0 w-10 h-10 md:w-11 md:h-11 rounded-xl bg-bg-dark border border-border-hairline flex items-center justify-center">
+            <Cookie className="w-5 h-5 text-text-primary" aria-hidden="true" />
           </div>
           <div className="flex-1 pt-1">
-            <h2 id="cookie-consent-title" className="text-base md:text-lg font-semibold text-text-primary mb-2">
+            <h2 id="cookie-consent-title" className="text-base md:text-lg font-semibold tracking-[-0.01em] text-text-primary mb-2">
               Help us improve
             </h2>
             <p className="text-text-muted text-xs md:text-sm leading-relaxed">

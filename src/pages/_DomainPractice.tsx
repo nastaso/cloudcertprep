@@ -15,6 +15,7 @@ import { Alert } from '../components/Alert'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { UnlockCTA } from '../components/landing/UnlockCTA'
 import { updateDomainProgress } from '../lib/supabaseUtils'
+import { reviewCellClass } from '../lib/buttonStyles'
 import { goToLogin } from '../lib/navigation'
 import type { Question, OptionKey } from '../types'
 import { loadDomainQuestions } from '../data/questions'
@@ -296,10 +297,10 @@ export function DomainPractice() {
                     key={domain.id}
                     onClick={() => selectDomain(domain.id)}
                     aria-label={`Practice ${domain.name}: ${domain.questionCount} questions`}
-                    className="bg-bg-dark hover:bg-bg-card-hover p-4 md:p-6 rounded-xl border-2 border-transparent hover:border-brand transition-all text-left lift"
+                    className="bg-bg-dark hover:bg-bg-card-hover p-4 md:p-6 rounded-xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-200 text-left"
                   >
                     <div className="flex items-center gap-3 md:gap-4">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold flex-shrink-0 bg-brand text-on-brand">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center font-mono text-lg md:text-xl font-semibold flex-shrink-0 bg-brand/10 text-brand">
                         {domain.id}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -438,15 +439,10 @@ export function DomainPractice() {
                       onClick={() => setSelectedQuestionIndex(idx)}
                       aria-label={ariaLabel}
                       aria-current={selectedQuestionIndex === idx ? 'true' : undefined}
-                      className={`w-8 h-8 md:w-9 md:h-9 rounded text-[10px] md:text-xs font-medium transition-colors ${
-                        selectedQuestionIndex === idx
-                          ? 'ring-2 ring-brand ring-offset-1 ring-offset-bg-card'
-                          : ''
-                      } ${
-                        result.isCorrect
-                          ? 'bg-success text-on-brand hover:bg-success/80'
-                          : 'bg-danger text-on-brand hover:bg-danger/80'
-                      }`}
+                      className={reviewCellClass({
+                        correct: result.isCorrect,
+                        current: selectedQuestionIndex === idx,
+                      })}
                     >
                       {idx + 1}
                     </button>

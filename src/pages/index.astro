@@ -11,11 +11,9 @@
  * Satisfies: R1.2, R16.4, R16.6, R16.7, R16.8
  */
 import BaseLayout from '../layouts/BaseLayout.astro'
-import CertCard from '../components/landing/CertCard.astro'
+import CertTile from '../components/landing/CertTile.astro'
 import AboutCard from '../components/landing/AboutCard.astro'
-import HeroSection from '../components/landing/HeroSection.astro'
-import ValuePropRow from '../components/landing/ValuePropRow.astro'
-import PrimaryExamCTA from '../components/landing/PrimaryExamCTA.astro'
+import HeroStage from '../components/landing/HeroStage.astro'
 import Faq from '../components/Faq.astro'
 import {
   CERTIFICATIONS,
@@ -32,7 +30,11 @@ const totalQuestions = getActiveTotalQuestions()
 const clfCount = getCertTotalQuestions('clf-c02')
 const aifCount = getCertTotalQuestions('aif-c01')
 const defaultCert = CERTIFICATIONS[DEFAULT_CERT_ID]
-const activeCerts = getSortedCerts().filter(c => c.status === 'active')
+// Flagship cert (DEFAULT_CERT_ID) leads the tile row — conversion order, not
+// alphabetical.
+const activeCerts = getSortedCerts()
+  .filter(c => c.status === 'active')
+  .sort((a, b) => (a.code === DEFAULT_CERT_ID ? -1 : b.code === DEFAULT_CERT_ID ? 1 : 0))
 // Coming-soon certs render as greyed cards after the active ones so they are
 // discoverable (their "watch on GitHub" funnel needs an inbound link) and
 // signal an active roadmap — without entering the indexable signals (they stay
@@ -49,17 +51,6 @@ const canonical = 'https://www.cloudcertprep.io/'
 // question-count regexes) so the Build_Time_Citation_Guard passes regardless
 // of the hero's visual treatment.
 const homeFirstParagraph = buildHomeFirstParagraph(clfCount, aifCount)
-
-// Subtle, token-based radial glow behind the hero headline (a "gradient mesh"
-// treatment). No Tailwind utility exists for a
-// multi-stop radial mesh, so it is composed inline from the brand token at low
-// alpha — light+dark aware for free because --color-brand switches with the
-// theme. Purely decorative (aria-hidden) and pointer-transparent.
-const meshBackground = [
-  'radial-gradient(40rem 28rem at 50% -10%, rgb(var(--color-brand) / 0.10), transparent 70%)',
-  'radial-gradient(32rem 24rem at 12% 8%, rgb(var(--color-brand) / 0.06), transparent 70%)',
-  'radial-gradient(32rem 24rem at 88% 12%, rgb(var(--color-brand) / 0.05), transparent 70%)',
-].join(', ')
 
 // ItemList JSON-LD listing both active Cert_Landing URLs
 const itemListJsonLd = serializeJsonLd({
@@ -99,83 +90,48 @@ const softwareAppJsonLd = serializeJsonLd({
 })
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical} jsonLd={[itemListJsonLd, softwareAppJsonLd]}>
-  {/* Hero — "gradient mesh" treatment: a centered
-      column over a subtle token-based radial glow. HOME_H1 is the single
-      page <h1>; the lede carries the locked citation phrases verbatim. */}
-  <div class="relative overflow-hidden">
-    <div
-      class="pointer-events-none absolute inset-0 -z-10"
-      style={`background: ${meshBackground};`}
-      aria-hidden="true"
-    >
-    </div>
+<BaseLayout title={title} description={description} canonical={canonical} jsonLd={[itemListJsonLd, softwareAppJsonLd]} headerOverlay={true}>
+  {/* Billboard hero (aws.amazon.com language, DSv4.1): vivid blue field,
+      floating abstract art, inset periwinkle card carrying the locked SEO
+      copy. HOME_H1 is the single page <h1>; the lede carries the locked
+      citation phrases verbatim. Community social-proof TrustLine stays
+      hidden until the attempt sample is credible. */}
+  {defaultCert && (
+    <HeroStage
+      h1={HOME_H1}
+      subline={`Pass your AWS exam with ${totalQuestions.toLocaleString('en-US')}+ exam-realistic practice questions. Every answer explained, free forever, no signup.`}
+      ctaHref={`/${defaultCert.provider}/${defaultCert.code}/practice-exam`}
+      ctaLabel="Start practicing free"
+      metrics={[`${totalQuestions.toLocaleString('en-US')}+ questions`, `${activeCerts.length} certifications`, '100% free', 'MIT licensed']}
+    />
+  )}
 
-    <HeroSection align="center" width="narrow" class="stagger !py-12 md:!py-16 lg:!py-20">
-      <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-tight text-text-primary">
-        {HOME_H1}
-      </h1>
-      <p class="text-lg md:text-xl text-text-muted max-w-2xl">
-        {homeFirstParagraph}
-      </p>
+  {/* Content sheet slides over the stage with one large rounded corner. */}
+  <div class="sheet-overlap pb-16 md:pb-24 pt-12 md:pt-20">
+    <div class="max-w-6xl mx-auto px-4 md:px-8">
+      <div class="space-y-16 md:space-y-24">
 
-      <ValuePropRow layout="inline" items={['100% Free', 'Open Source', 'No Ads', `${totalQuestions.toLocaleString('en-US')}+ Questions`]} />
-
-      {/* Community social-proof TrustLine is temporarily hidden: the attempt
-          sample is too small to present a credible "community pass rate" yet.
-          To re-enable, re-add the `snapshot` import + the TrustLine component
-          here once volume grows (the snapshot wiring still feeds /stats). */}
-
-      {defaultCert && (
-        <PrimaryExamCTA
-          href={`/${defaultCert.provider}/${defaultCert.code}/practice-exam`}
-          label={`Start ${defaultCert.shortName} Practice Exam`}
-          data-cc-event="cta_start_practice_exam"
-          data-cc-param-location="home_hero"
-          data-cc-param-cert={defaultCert.code}
-        />
-      )}
-    </HeroSection>
-  </div>
-
-  <div class="p-4 md:p-8 pt-0">
-    <div class="max-w-4xl mx-auto">
-      <div class="space-y-8">
-
-        {/* Cert grid */}
-        <section data-reveal>
-          <h2 class="text-xl md:text-2xl font-semibold text-text-primary mb-4">
-            Pick a certification
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-            {activeCerts.map(cert => <CertCard cert={cert} variant="compact" />)}
-            {comingSoonCerts.map(cert => <CertCard cert={cert} variant="compact" />)}
-          </div>
+        {/* Locked citation paragraph + value props — the full SEO lede lives
+            here (not in the hero card) so the page stays scannable while the
+            citation guard still finds every locked phrase verbatim. */}
+        <section class="max-w-3xl border-l-2 border-brand/60 pl-6 md:pl-8" data-reveal>
+          <p class="text-lead">
+            {homeFirstParagraph}
+          </p>
         </section>
 
-        {/* Exam-realism prose (E-E-A-T body copy; not a Locked_Citation_Phrase).
-            Two scannable points instead of one centred wall of text. */}
-        <section class="space-y-4" data-reveal>
-          <h2 class="text-xl md:text-2xl font-semibold text-text-primary">
-            Built to mirror the real exam
+        {/* Cert tile row — editorial card grid with art headers */}
+        <section data-reveal>
+          <p class="kicker" aria-hidden="true">Certifications</p>
+          <h2 class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-2">
+            Pick a certification
           </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-bg-card rounded-xl shadow-card p-5">
-              <h3 class="text-base md:text-lg font-semibold text-text-primary mb-2">
-                Realistic by design
-              </h3>
-              <p class="text-text-muted text-sm md:text-base leading-relaxed">
-                Every question bank mirrors the live AWS exam, so you sit practice exams that match the real question style, scoring scale and time pressure.
-              </p>
-            </div>
-            <div class="bg-bg-card rounded-xl shadow-card p-5">
-              <h3 class="text-base md:text-lg font-semibold text-text-primary mb-2">
-                Aligned and explained
-              </h3>
-              <p class="text-text-muted text-sm md:text-base leading-relaxed">
-                Each question is aligned to the current official exam guide and ships with a detailed explanation of why the correct answer is right and why each distractor is wrong.
-              </p>
-            </div>
+          <p class="text-lead mb-8">
+            Full-length mock exams and domain practice for every certification.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeCerts.map(cert => <CertTile cert={cert} />)}
+            {comingSoonCerts.map(cert => <CertTile cert={cert} />)}
           </div>
         </section>
 

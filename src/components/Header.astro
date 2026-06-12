@@ -23,9 +23,15 @@ interface Props {
   sticky?: boolean
   /** When true, hide the mobile hamburger/drawer (exam shell only). Default false. */
   hideMobileMenu?: boolean
+  /**
+   * Billboard overlay mode (home/cert heroes): the bar starts transparent
+   * with white text over the hero, then frosts in after ~16px of scroll
+   * (Apple pattern). A tiny inline script toggles .hdr-scrolled.
+   */
+  overlay?: boolean
 }
 
-const { showNav = true, sticky = true, hideMobileMenu = false } = Astro.props
+const { showNav = true, sticky = true, hideMobileMenu = false, overlay = false } = Astro.props
 
 // Current request path, resolved at build time for each prerendered page.
 // Passed into the island so the CertSwitcher renders the correct state in the
@@ -42,9 +48,15 @@ const cloudPath = 'M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z'
 const checkPath = 'M20 6 9 17l-5-5'
 ---
 
-<header class:list={[sticky ? "sticky top-0 z-40" : "relative z-30", "bg-gradient-to-b from-header-bg to-header-bg/90 border-b border-white/5 text-on-header"]}>
+{/* Apple-style frosted chrome: translucent, heavy blur+saturate, slim bar.
+    Content scrolls underneath; the bar reads as glass, not a slab. */}
+<header
+  id="site-header"
+  data-overlay={overlay || undefined}
+  class:list={[sticky ? "sticky top-0 z-40" : "relative z-30", "bg-header-bg/70 backdrop-blur-xl backdrop-saturate-150 border-b border-border-hairline/60 text-on-header"]}
+>
   <div class="max-w-7xl mx-auto px-4 md:px-6">
-    <div class="flex items-center justify-between gap-4 h-14 md:h-16">
+    <div class="flex items-center justify-between gap-4 h-12 md:h-14">
       {/* Logo + wordmark. The accessible name carries the platform tagline
           (previously a visible subheader) so the chrome reads as a clean
           single-wordmark (premium) while screen readers and crawlers still get
@@ -54,9 +66,12 @@ const checkPath = 'M20 6 9 17l-5-5'
             cloudcertprep.io mark, preserved on the navy bar for brand
             continuity. The tile stays white in both themes (the header is
             navy in both), so bg-white (not bg-bg-card, which flips dark). */}
-        <div class="w-9 h-9 md:w-10 md:h-10 bg-white rounded-lg flex items-center justify-center shadow-sm group-active:scale-[0.95] transition-transform duration-150 relative">
-          <svg class="w-5 h-5 md:w-6 md:h-6 text-brand" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={cloudPath} /></svg>
-          <svg class="w-3 h-3 md:w-4 md:h-4 text-white absolute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={checkPath} /></svg>
+        {/* Bare brand mark (same glyph as the favicon): orange cloud + white
+            check, no tile. One presentation across favicon, header, and the
+            OG/tile art pipeline. */}
+        <div class="relative w-8 h-8 md:w-9 md:h-9 flex items-center justify-center group-active:scale-[0.95] transition-transform duration-150">
+          <svg class="w-8 h-8 md:w-9 md:h-9 text-brand drop-shadow-[0_1px_6px_rgba(255,153,0,0.35)]" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={cloudPath} /></svg>
+          <svg class="w-[18px] h-[18px] md:w-5 md:h-5 absolute translate-y-[1px]" viewBox="0 0 24 24" fill="none" stroke="#0E1116" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={checkPath} /></svg>
         </div>
         {/* Wordmark: bumped to text-xl/2xl so the cap-height balances the
             40px tile (premium lockups sit cap-height at ~60-70% of the icon,
@@ -68,8 +83,8 @@ const checkPath = 'M20 6 9 17l-5-5'
             ~1px high (descender space reserved at the bottom), so the visible
             letters read high against the tile without it. The
             accessible/visible string stays "CloudCertPrep" verbatim. */}
-        <span class="text-xl md:text-2xl text-on-header tracking-tight leading-none translate-y-[4px]">
-          <span class="font-medium">Cloud</span><span class="font-bold">CertPrep</span>
+        <span class="font-display text-base md:text-lg text-on-header tracking-tight leading-none translate-y-[2px]">
+          <span class="font-medium">Cloud</span><span class="font-semibold">CertPrep</span>
         </span>
       </a>
 
@@ -81,3 +96,24 @@ const checkPath = 'M20 6 9 17l-5-5'
     </div>
   </div>
 </header>
+
+{overlay && (
+  <script is:inline>
+    // Overlay header: frost in after a small scroll. rAF-throttled; runs
+    // before paint settles so there's no flash at non-zero scroll restores.
+    (function () {
+      var hdr = document.getElementById('site-header')
+      if (!hdr) return
+      var ticking = false
+      function apply() {
+        hdr.classList.toggle('hdr-scrolled', window.scrollY > 16)
+        ticking = false
+      }
+      function onScroll() {
+        if (!ticking) { ticking = true; requestAnimationFrame(apply) }
+      }
+      apply()
+      window.addEventListener('scroll', onScroll, { passive: true })
+    })()
+  </script>
+)}

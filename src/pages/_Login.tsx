@@ -186,12 +186,15 @@ export function Login() {
   }
 
   return (
-      <div className="flex-1 flex items-center justify-center px-4">
+      // Top-anchored (items-start) so switching between sign-in / sign-up /
+      // reset / check-email grows the card DOWNWARD from a stable top instead
+      // of re-centering the whole card (which made it visibly jump).
+      <div className="flex-1 flex items-start justify-center px-4 py-10 md:py-16">
         <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
           {/* Left Column - Features/Benefits */}
-          <div className="hidden md:flex flex-col justify-center space-y-6 md:pr-6 lg:pr-8">
+          <div className="hidden md:flex flex-col justify-start space-y-6 md:pr-6 lg:pr-8 md:pt-2">
               <div>
-                <h1 className="text-3xl md:text-4xl font-semibold text-text-primary mb-3">
+                <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-text-primary mb-3">
                   Free AWS certification practice exams
                 </h1>
               </div>
@@ -250,12 +253,12 @@ export function Login() {
             </div>
 
           {/* Right Column - Auth Form */}
-          <Card padding="lg" className="flex flex-col justify-center border border-text-muted/10">
+          <Card padding="lg" className="flex flex-col">
 
           {signUpSuccess ? (
             <div className="text-center">
               <Mail className="w-12 h-12 text-brand mx-auto mb-4" aria-hidden="true" />
-              <h2 className="text-2xl font-semibold text-text-primary mb-2">Check your email</h2>
+              <h2 className="text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-2">Check your email</h2>
               <p className="text-text-muted text-sm leading-relaxed mb-6">
                 We sent a verification link to <span className="text-text-primary font-medium">{email}</span>. Check your spam folder if you don't see it.
               </p>
@@ -270,7 +273,7 @@ export function Login() {
           ) : (
           <>
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-semibold text-text-primary mb-2">
+            <h2 className="text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-2">
               {isForgotPassword ? 'Reset password' : isSignUp ? 'Sign up' : 'Sign in'}
             </h2>
             {isForgotPassword && (

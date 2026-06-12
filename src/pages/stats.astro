@@ -95,7 +95,7 @@ const datasetJsonLd = serializeJsonLd({
   >
     <div class="max-w-6xl mx-auto space-y-6">
       <header class="space-y-2">
-        <h1 class="text-3xl md:text-4xl font-bold text-text-primary">Community statistics</h1>
+        <h1 class="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-text-primary">Community statistics</h1>
         <p class="text-text-muted text-sm md:text-base">
           Aggregated, anonymous results from the CloudCertPrep community. Figures below are as of
           {' '}{snapshot.generatedAt}; live numbers load when the page is interactive.
@@ -105,20 +105,20 @@ const datasetJsonLd = serializeJsonLd({
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card padding="md">
           <p class="text-text-muted text-xs md:text-sm">Community pass rate</p>
-          <p class="text-2xl md:text-3xl font-bold text-text-primary">{overall.passRatePercent}%</p>
+          <p class="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{overall.passRatePercent}%</p>
         </Card>
         <Card padding="md">
           <p class="text-text-muted text-xs md:text-sm">Average scaled score</p>
-          <p class="text-2xl md:text-3xl font-bold text-text-primary">{overall.averageScaledScore}/1000</p>
+          <p class="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{overall.averageScaledScore}/1000</p>
         </Card>
         <Card padding="md">
           <p class="text-text-muted text-xs md:text-sm">Exam attempts completed</p>
-          <p class="text-2xl md:text-3xl font-bold text-text-primary">{overall.attemptsCompleted.toLocaleString('en-US')}</p>
+          <p class="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{overall.attemptsCompleted.toLocaleString('en-US')}</p>
         </Card>
       </div>
 
       <div class="space-y-3">
-        <h2 class="text-xl md:text-2xl font-semibold text-text-primary">By certification</h2>
+        <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary">By certification</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           {certRows.map((c) => (
             <Card padding="md">

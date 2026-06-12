@@ -25,17 +25,17 @@ export function DonateButton({ isExamActive }: DonateButtonProps) {
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => trackEvent('donate_click', { location: 'floating' })}
-        className="flex items-center gap-3 bg-bg-card text-text-primary rounded-full shadow-lg hover:shadow-xl border border-text-muted/15 transition-shadow duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
+        className="flex items-center bg-bg-card/90 backdrop-blur-md text-text-primary rounded-full shadow-card hover:shadow-card-hover border border-border-hairline hover:border-text-muted/40 transition-[box-shadow,transform,border-color] duration-300 ease-out hover:-translate-y-0.5 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
         aria-label="Support CloudCertPrep"
       >
-        <div className="w-12 h-12 flex items-center justify-center">
+        <div className="w-10 h-10 flex items-center justify-center">
           <Heart
-            className="w-5 h-5 text-danger group-hover:scale-110 transition-transform"
+            className="w-[18px] h-[18px] text-danger group-hover:scale-110 transition-transform duration-300 ease-out"
             fill="currentColor"
             aria-hidden="true"
           />
         </div>
-        <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:pr-4 transition-all duration-300 font-medium text-sm">
+        <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:pr-4 transition-all duration-300 ease-out font-medium text-sm">
           Support the developer
         </span>
       </a>

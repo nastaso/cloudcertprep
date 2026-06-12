@@ -86,6 +86,7 @@ const updatedDisplay = data.updated
   ogImage={ogImage}
   ogType="article"
   jsonLd={[blogPostingJsonLd]}
+  headerOverlay={true}
 >
   <Fragment slot="head">
     {/* Article-namespace Open Graph tags (audit W1). og:type=article is set
@@ -100,31 +101,53 @@ const updatedDisplay = data.updated
     ))}
   </Fragment>
 
-  <article class="p-4 md:p-8">
-    <div class="max-w-3xl mx-auto">
-      <Breadcrumb items={breadcrumbItems} />
+  {/* BreadcrumbList JSON-LD only; the long post title would wrap badly in a
+      visible trail on mobile, and it already appears as the H1 below. */}
+  <Breadcrumb items={breadcrumbItems} visuallyHidden />
 
-      <header class="space-y-3 mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-text-primary">{data.title}</h1>
-        <p class="text-sm text-text-muted">
-          By <a href="https://santonastaso.me" class="text-text-primary hover:text-text-primary/70">Alex Santonastaso</a>
-          {' · '}
-          <time datetime={datePublished}>{publishedDisplay}</time>
-          {updatedDisplay && (
-            <span>{' · Updated '}<time datetime={dateModified}>{updatedDisplay}</time></span>
+  {/* Dark-stage article header (coherent with the blog index + about /
+      contribute / legal HeroMini heroes). The post title is the stage H1. */}
+  <article>
+    <section class="stage relative overflow-hidden -mt-[calc(3rem+1px)] md:-mt-[calc(3.5rem+1px)]">
+      {/* pb clears the .sheet-overlap (-3rem) so the tags/byline are never
+          clipped by the content sheet sliding up over the header. */}
+      <div class="relative max-w-3xl mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-16 md:pb-20">
+        <header class="stagger max-w-[68ch] mx-auto">
+          <nav class="font-mono text-[12px] tracking-wide text-[#8B95A3]" aria-hidden="true">
+            <a href="/" class="hover:text-[#C9D2DC] transition-colors">Home</a>
+            <span class="mx-1.5 text-white/25">›</span>
+            <a href="/blog" class="hover:text-[#C9D2DC] transition-colors">Blog</a>
+          </nav>
+
+          <p class="mt-5 font-mono text-[12px] tracking-wide text-[#8B95A3]">
+            <time datetime={datePublished}>{publishedDisplay}</time>
+            {updatedDisplay && (
+              <span>{' · Updated '}<time datetime={dateModified}>{updatedDisplay}</time></span>
+            )}
+          </p>
+
+          <h1 class="font-display mt-3 text-[1.75rem] leading-[1.12] md:text-[2.5rem] font-bold tracking-[-0.025em] text-[#F4F6F8]">{data.title}</h1>
+
+          <p class="mt-4 text-sm text-[#9AA6B2]">
+            By <a href="https://santonastaso.me" class="text-[#C9D2DC] underline underline-offset-2 hover:text-white transition-colors">Alex Santonastaso</a>
+          </p>
+
+          {data.tags && data.tags.length > 0 && (
+            <ul class="mt-5 flex flex-wrap gap-2 list-none p-0 m-0">
+              {data.tags.map((tag) => (
+                <li class="font-mono text-[11px] px-2.5 py-1 rounded-full bg-white/[0.05] border border-white/12 text-[#C9D2DC]">#{tag}</li>
+              ))}
+            </ul>
           )}
-        </p>
-        {data.tags && data.tags.length > 0 && (
-          <ul class="flex flex-wrap gap-2 list-none p-0 m-0">
-            {data.tags.map((tag) => (
-              <li class="text-xs px-2 py-1 rounded bg-brand text-on-brand">#{tag}</li>
-            ))}
-          </ul>
-        )}
-      </header>
+        </header>
+      </div>
+    </section>
 
-      <div class="blog-content max-w-none">
-        <slot />
+    <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
+      <div class="max-w-3xl mx-auto px-4 md:px-8">
+        <div class="blog-content max-w-[68ch] mx-auto">
+          <slot />
+        </div>
       </div>
     </div>
   </article>

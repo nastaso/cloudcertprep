@@ -42,6 +42,13 @@ export default defineConfig({
     // (R10.8); the netlify.toml strip-slash rule that was meant to fix that
     // was invalid and force-redirect-looped the whole site (see netlify.toml).
     format: 'file',
+    // Inline the single ~59KB CSS bundle into each page's <head> instead of a
+    // render-blocking <link>. On simulated mobile this removes the ~150ms
+    // render-blocking round-trip that gated LCP (text-LCP pages sat at 99),
+    // taking every page to a clean 100. CSP already allows style-src
+    // 'unsafe-inline', so inline <style> is policy-safe (it never touches the
+    // inline-SCRIPT hashing the csp:hash postbuild guard depends on).
+    inlineStylesheets: 'always',
   },
   integrations: [react()],
   vite: {

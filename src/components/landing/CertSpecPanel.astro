@@ -1,0 +1,83 @@
+---
+/**
+ * CertSpecPanel.astro — the cert-hub hero panel (DSv6 wayfinding).
+ *
+ * Replaces the ExamMockup on /aws/[cert] heroes so each funnel level has its
+ * own signature: home = exam-UI mockup billboard, cert hub = this exam
+ * blueprint (domain weights in the level color + exam facts), domain/content
+ * pages = themed headers with no stage. Decorative panel: the interactive
+ * domain links live in the #domains grid below, so this stays aria-hidden
+ * like the mockup it replaces.
+ *
+ * Shares the mockup's window-chrome language (same radius, border, surface,
+ * glow bed) so the brand stays one family while the content differs.
+ */
+import type { Certification } from '../../data/certifications'
+import { getCertTotalQuestions } from '../../data/certifications'
+
+interface Props {
+  cert: Certification
+  /** Level accent hex for bars + code chip. */
+  accent: string
+  /** Glow hue under the panel, as an "R G B" triplet. */
+  glowRgb: string
+}
+
+const { cert, accent, glowRgb } = Astro.props
+
+const examMinutes = Math.round(cert.examTimeSeconds / 60)
+const totalQuestions = getCertTotalQuestions(cert.code)
+const maxProportion = Math.max(...cert.domains.map(d => d.examProportion))
+---
+
+<div class="relative hidden sm:block" aria-hidden="true">
+  {/* Glow bed under the panel (same recipe as ExamMockup) */}
+  <div
+    class="absolute -inset-10 rounded-[3rem] blur-md"
+    style={`background: radial-gradient(closest-side, rgb(${glowRgb} / 0.26), rgb(${glowRgb} / 0.08) 55%, transparent 75%);`}
+  >
+  </div>
+
+  <div class="relative rounded-2xl border border-white/12 bg-[#151A22] shadow-overlay">
+    {/* Window chrome */}
+    <div class="flex items-center justify-between border-b border-white/10 px-5 py-3">
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-[11px] uppercase tracking-[0.18em]" style={`color: ${accent};`}>{cert.shortName}</span>
+        <span class="text-[12px] text-[#8B95A3]">Exam blueprint</span>
+      </div>
+      <span class="font-mono text-[12px] text-[#C9D2DC]">{cert.domains.length} domains</span>
+    </div>
+
+    {/* Domain weight map */}
+    <div class="px-5 py-5">
+      <div class="space-y-4">
+        {cert.domains.map(d => (
+          <div>
+            <div class="flex items-baseline justify-between gap-4">
+              <span class="text-[14px] font-medium leading-snug text-[#F4F6F8]">{d.name}</span>
+              <span class="font-mono text-[12px] text-[#C9D2DC] whitespace-nowrap">{Math.round(d.examProportion * 100)}%</span>
+            </div>
+            <div class="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+              <div
+                class="h-full rounded-full"
+                style={`width: ${Math.round((d.examProportion / maxProportion) * 100)}%; background-color: ${accent};`}
+              >
+              </div>
+            </div>
+            <p class="mt-1 font-mono text-[11px] text-[#8B95A3]">{d.questionCount}+ questions</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Exam facts footer */}
+    <div class="border-t border-white/10 px-5 py-3">
+      <ul class="flex flex-wrap items-center gap-x-3 gap-y-1 list-none font-mono text-[12px] text-[#8B95A3] [&>li+li]:before:content-['·'] [&>li+li]:before:mr-3 [&>li+li]:before:text-white/25">
+        <li class="whitespace-nowrap">{cert.examQuestionCount} questions</li>
+        <li class="whitespace-nowrap">{examMinutes} min</li>
+        <li class="whitespace-nowrap">pass {cert.passingScore}/1000</li>
+        <li class="whitespace-nowrap">{totalQuestions.toLocaleString('en-US')}+ bank</li>
+      </ul>
+    </div>
+  </div>
+</div>

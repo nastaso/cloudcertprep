@@ -77,17 +77,18 @@ const examFormat = cert.examFormat
 
   return (
     <section aria-labelledby="exam-realism-heading" class="mt-8 md:mt-12">
-      <h2 id="exam-realism-heading" class="text-xl md:text-2xl font-semibold text-text-primary mb-2">
+      <p class="kicker" aria-hidden="true">Exam realism</p>
+      <h2 id="exam-realism-heading" class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-2">
         How Our Practice Exams Match the Real Exam
       </h2>
-      <p class="text-text-muted text-sm md:text-base mb-4 max-w-2xl">
+      <p class="text-lead mb-6 max-w-2xl">
         Our {cert.shortName} mock exams mirror the format of the real {cert.name} exam, sourced from the official AWS exam guide.
       </p>
 
-      <div class="bg-bg-card rounded-xl shadow-card overflow-x-auto">
+      <div class="bg-bg-card rounded-2xl border border-border-hairline shadow-card overflow-x-auto">
         <table class="w-full text-left border-collapse text-sm md:text-base">
           <thead>
-            <tr class="border-b border-text-muted/20">
+            <tr class="border-b border-border-hairline">
               <th scope="col" class="px-4 md:px-6 py-3 font-semibold text-text-primary">Feature</th>
               <th scope="col" class="px-4 md:px-6 py-3 font-semibold text-text-primary">Real Exam</th>
               <th scope="col" class="px-4 md:px-6 py-3 font-semibold text-text-primary">CloudCertPrep</th>
@@ -95,12 +96,12 @@ const examFormat = cert.examFormat
           </thead>
           <tbody>
             {rows.map((row, i) => (
-              <tr class={i < rows.length - 1 ? 'border-b border-text-muted/10' : ''}>
-                <th scope="row" class="px-4 md:px-6 py-3 font-medium text-text-primary align-top">
+              <tr class={i < rows.length - 1 ? 'border-b border-border-hairline/60' : ''}>
+                <th scope="row" class="px-4 md:px-6 py-3.5 font-medium text-text-primary align-top">
                   {row.feature}
                 </th>
-                <td class="px-4 md:px-6 py-3 text-text-muted align-top">{row.real}</td>
-                <td class="px-4 md:px-6 py-3 text-text-muted align-top">{row.ours}</td>
+                <td class="px-4 md:px-6 py-3.5 align-top font-mono text-[13px] md:text-sm text-text-muted">{row.real}</td>
+                <td class="px-4 md:px-6 py-3.5 align-top font-mono text-[13px] md:text-sm text-text-muted">{row.ours}</td>
               </tr>
             ))}
           </tbody>

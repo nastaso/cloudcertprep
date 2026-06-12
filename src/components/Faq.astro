@@ -81,41 +81,52 @@ function splitLinks(text: string): Array<{ text: string; isLink: boolean }> {
 const chevron = '<polyline points="6 9 12 15 18 9"></polyline>'
 ---
 
-<section aria-labelledby={headingId} class="mt-8 md:mt-12">
+<section aria-labelledby={headingId} class="mt-8 md:mt-12 max-w-3xl mx-auto">
   <script type="application/ld+json" set:html={faqJsonLd} />
-  <h2 id={headingId} class="text-xl md:text-2xl font-semibold text-text-primary mb-4">
-    {headingLabel}
-  </h2>
+  <div class="text-center mb-10 md:mb-12">
+    <p class="kicker" aria-hidden="true">FAQ</p>
+    <h2 id={headingId} class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary">
+      {headingLabel}
+    </h2>
+    <p class="mt-4 text-base leading-relaxed text-text-muted max-w-[42ch] mx-auto">
+      Something not covered? <a href="https://github.com/nastaso/cloudcertprep/issues" target="_blank" rel="noopener noreferrer" class="text-link underline underline-offset-2 hover:text-link/80">Open an issue</a> and we will answer it.
+    </p>
+  </div>
 
+  <div>
   {useCustom ? (
-    <div class="space-y-2">
+    <div class="border-t border-border-hairline">
       {customEntries!.map(entry => (
-        <details class="group bg-bg-card rounded-xl shadow-card overflow-hidden">
-          <summary class="flex items-center justify-between gap-4 px-4 md:px-6 py-3 md:py-4 cursor-pointer list-none text-text-primary font-medium text-sm md:text-base hover:bg-bg-card-hover transition-colors">
+        <details class="group border-b border-border-hairline" name={headingId}>
+          <summary class="flex items-center justify-between gap-6 py-5 md:py-6 cursor-pointer list-none text-base md:text-lg font-medium text-text-primary/90 hover:text-text-primary transition-colors duration-200 focus-visible:outline-none focus-visible:text-brand">
             <span>{entry.question}</span>
-            <svg class="w-4 h-4 md:w-5 md:h-5 text-text-muted flex-shrink-0 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={chevron} />
+            <span class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-border-hairline text-text-muted transition-[transform,color,border-color] duration-300 ease-out group-open:rotate-180 group-hover:border-text-muted/60">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" set:html={chevron} />
+            </span>
           </summary>
-          <div class="px-4 md:px-6 pb-4 md:pb-5 text-text-muted text-sm md:text-base leading-relaxed">
+          <div class="pb-6 md:pb-7 pr-12 text-sm md:text-base leading-relaxed text-text-muted max-w-3xl">
             <p>{entry.answer}</p>
           </div>
         </details>
       ))}
     </div>
   ) : (
-    <div class="space-y-6 md:space-y-8">
+    <div class="space-y-12">
       {grouped.map(({ category, entries }) => (
         <div>
-          <h3 class="text-base md:text-lg font-semibold text-text-primary mb-2 md:mb-3">
+          <h3 class="font-mono text-[12px] uppercase tracking-[0.18em] text-text-muted mb-2">
             {FAQ_CATEGORY_LABEL[category]}
           </h3>
-          <div class="space-y-2">
+          <div class="border-t border-border-hairline">
             {entries.map(entry => (
-              <details class="group bg-bg-card rounded-xl shadow-card overflow-hidden">
-                <summary class="flex items-center justify-between gap-4 px-4 md:px-6 py-3 md:py-4 cursor-pointer list-none text-text-primary font-medium text-sm md:text-base hover:bg-bg-card-hover transition-colors">
+              <details class="group border-b border-border-hairline" name={`faq-${category}`}>
+                <summary class="flex items-center justify-between gap-6 py-5 md:py-6 cursor-pointer list-none text-base md:text-lg font-medium text-text-primary/90 hover:text-text-primary transition-colors duration-200 focus-visible:outline-none focus-visible:text-brand">
                   <span>{entry.question}</span>
-                  <svg class="w-4 h-4 md:w-5 md:h-5 text-text-muted flex-shrink-0 transition-transform group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={chevron} />
+                  <span class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-border-hairline text-text-muted transition-[transform,color,border-color] duration-300 ease-out group-open:rotate-180 group-hover:border-text-muted/60">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" set:html={chevron} />
+                  </span>
                 </summary>
-                <div class="px-4 md:px-6 pb-4 md:pb-5 text-text-muted text-sm md:text-base leading-relaxed space-y-3">
+                <div class="pb-6 md:pb-7 pr-12 text-sm md:text-base leading-relaxed text-text-muted max-w-3xl space-y-3">
                   {entry.steps ? (
                     <>
                       <p>{entry.steps.intro}</p>
@@ -123,7 +134,7 @@ const chevron = '<polyline points="6 9 12 15 18 9"></polyline>'
                         {entry.steps.items.map(item => (
                           <li>
                             {splitLinks(item).map(frag => frag.isLink
-                              ? <a href={frag.text} target="_blank" rel="noopener noreferrer" class="text-text-primary hover:text-text-primary/70 underline break-all">{frag.text}</a>
+                              ? <a href={frag.text} target="_blank" rel="noopener noreferrer" class="text-link underline underline-offset-2 hover:text-link/80 break-all">{frag.text}</a>
                               : <span>{frag.text}</span>
                             )}
                           </li>
@@ -134,7 +145,7 @@ const chevron = '<polyline points="6 9 12 15 18 9"></polyline>'
                   ) : (
                     <p>
                       {splitLinks(entry.answer).map(frag => frag.isLink
-                        ? <a href={frag.text} target="_blank" rel="noopener noreferrer" class="text-text-primary hover:text-text-primary/70 underline break-all">{frag.text}</a>
+                        ? <a href={frag.text} target="_blank" rel="noopener noreferrer" class="text-link underline underline-offset-2 hover:text-link/80 break-all">{frag.text}</a>
                         : <span>{frag.text}</span>
                       )}
                     </p>
@@ -147,4 +158,5 @@ const chevron = '<polyline points="6 9 12 15 18 9"></polyline>'
       ))}
     </div>
   )}
+  </div>
 </section>

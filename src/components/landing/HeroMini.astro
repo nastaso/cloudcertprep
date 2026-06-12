@@ -1,0 +1,78 @@
+---
+/**
+ * HeroMini.astro — DSv6 compact stage hero for editorial/utility pages
+ * (blog index, about, contribute, 404). Same fixed-dark `.stage` surface and
+ * type ladder as the home/cert heroes, one size down, no product mockup.
+ *
+ * The page content below should sit in a `.sheet-overlap` wrapper so the
+ * themed sheet slides over the stage exactly like the other stage pages.
+ * Pages using this must pass `headerOverlay={true}` to BaseLayout.
+ */
+interface Crumb {
+  label: string
+  href?: string
+}
+
+interface Props {
+  /** Mono kicker above the title (uppercase). */
+  kicker?: string
+  title: string
+  lede?: string
+  /** Optional mono breadcrumb trail rendered above the kicker. */
+  crumbs?: Crumb[]
+  /** Glow hue ("R G B"); defaults to brand orange. */
+  glowRgb?: string
+  /** Max width utility for the inner container. */
+  maxWidth?: string
+}
+
+const {
+  kicker,
+  title,
+  lede,
+  crumbs,
+  glowRgb = '255 153 0',
+  maxWidth = 'max-w-4xl',
+} = Astro.props
+---
+
+<section class="stage relative overflow-hidden -mt-[calc(3rem+1px)] md:-mt-[calc(3.5rem+1px)]" style={`--stage-glow: ${glowRgb}`}>
+  {/* pb clears the `.sheet-overlap` (-3rem / -48px) that slides up over this
+      hero, so the lede's last line is never clipped by the content sheet. */}
+  <div class={`relative ${maxWidth} mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-16 md:pb-20`}>
+    <div class="stagger max-w-[68ch] mx-auto">
+      {crumbs && crumbs.length > 0 && (
+        <nav class="mb-6 font-mono text-[12px] tracking-wide text-[#8B95A3]" aria-hidden="true">
+          {crumbs.map((c, i) => (
+            <>
+              {i > 0 && <span class="mx-1.5 text-white/25">›</span>}
+              {c.href ? (
+                <a href={c.href} class="hover:text-[#C9D2DC] transition-colors">{c.label}</a>
+              ) : (
+                <span class="text-[#C9D2DC]">{c.label}</span>
+              )}
+            </>
+          ))}
+        </nav>
+      )}
+
+      {kicker && (
+        <p class="font-mono text-[12px] font-bold uppercase tracking-[0.22em] text-[#FF9900]">
+          {kicker}
+        </p>
+      )}
+
+      <h1 class="font-display mt-3 text-[2rem] leading-[1.08] md:text-[2.5rem] font-bold tracking-[-0.025em] text-[#F4F6F8]">
+        {title}
+      </h1>
+
+      {lede && (
+        <p class="mt-4 text-lg md:text-xl leading-relaxed text-[#9AA6B2]">
+          {lede}
+        </p>
+      )}
+
+      <slot />
+    </div>
+  </div>
+</section>

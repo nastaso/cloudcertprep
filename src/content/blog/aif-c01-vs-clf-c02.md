@@ -12,6 +12,19 @@ AWS now has two foundational certifications: the long-established **Cloud Practi
 
 Both are entry-level and neither requires hands-on lab work. They follow AWS's standard certification experience, though AIF-C01 introduces a couple of extra question formats. The main difference is entirely in the subject matter.
 
+## CLF-C02 vs AIF-C01 at a glance
+
+| | CLF-C02 | AIF-C01 |
+| --- | --- | --- |
+| Focus | The AWS Cloud, broadly | AI and ML on AWS |
+| Level | Foundational | Foundational |
+| Questions | 65 | 65 |
+| Time | 90 minutes | 90 minutes |
+| Passing score | 700 / 1000 | 700 / 1000 |
+| Domains | 4 | 5 |
+| Question formats | Multiple choice, multiple response | Multiple choice and response, plus ordering and matching |
+| Prerequisites | None | None |
+
 ## The headline difference: cloud breadth vs AI focus
 
 CLF-C02 validates a broad, foundational understanding of the AWS Cloud as a whole: core compute, storage, networking and database services, security and the shared responsibility model, pricing, and support. It is the natural first step into the AWS certification track and assumes no prior cloud knowledge.

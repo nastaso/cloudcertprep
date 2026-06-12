@@ -188,8 +188,8 @@ export function CertSwitcher({ variant, onSelect, initialPathname }: CertSwitche
                     <span className="ml-2 text-xs text-text-muted">{c.name}</span>
                   </span>
                   {isComingSoon && (
-                    <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] md:text-xs font-medium bg-brand text-on-brand">
-                      Coming soon
+                    <span className="ml-2 px-2 py-0.5 rounded-full font-mono text-[10px] font-semibold uppercase tracking-wide bg-warning/15 text-warning">
+                      Soon
                     </span>
                   )}
                   {isActive && <Check className="w-4 h-4 text-brand ml-2" />}
@@ -241,6 +241,12 @@ export function CertSwitcher({ variant, onSelect, initialPathname }: CertSwitche
   // progressive enhancement (preventDefault only for plain left-clicks so
   // modified clicks keep their native open-in-new-tab behaviour).
   const activeCerts = allCerts.filter(c => c.status === 'active')
+  // The current cert is always represented, even when it is coming-soon (e.g.
+  // the SAA-C03 page): otherwise the control shows no active segment and the
+  // user has no header indication of which cert they are viewing.
+  const segments = activeCerts.some(c => c.code === cert.code)
+    ? activeCerts
+    : [...activeCerts, cert]
 
   if (examActive) {
     // During an exam, render a static (non-interactive) pill of the current
@@ -248,40 +254,48 @@ export function CertSwitcher({ variant, onSelect, initialPathname }: CertSwitche
     return (
       <span
         title="Cert switching is disabled while an exam is in progress."
-        className="inline-flex items-center px-4 py-1.5 rounded-full text-sm lg:text-base font-medium bg-on-header/10 text-on-header/50 cursor-not-allowed"
+        className="inline-flex items-center h-8 px-3 rounded-full font-mono text-[12px] font-semibold tracking-wide bg-on-header/[0.07] text-on-header/40 cursor-not-allowed"
       >
         {cert.shortName}
       </span>
     )
   }
 
+  // Refined segmented control (DSv6): a slim hairline track with a quiet
+  // elevated active segment, instead of the chunky high-contrast inverted pill.
+  // Mono labels match the site's code/metric voice; the active segment carries
+  // a soft frosted fill rather than a full colour inversion, so it reads as
+  // premium restraint and not a toggle button.
   return (
     <div
       role="group"
       aria-label="Switch certification"
-      className="inline-flex items-center gap-1 p-1 rounded-full bg-on-header/10 border border-on-header/20"
+      className="inline-flex items-center p-0.5 rounded-full bg-on-header/[0.06] border border-on-header/10"
     >
-      {activeCerts.map(c => {
+      {segments.map(c => {
         const isActive = c.code === cert.code
+        const isComingSoon = c.status === 'coming-soon'
         return (
           <a
             key={c.code}
             href={certTargetPath(c, pathname)}
             aria-current={isActive ? 'page' : undefined}
-            title={c.name}
+            title={isComingSoon ? `${c.name} (coming soon)` : c.name}
             onClick={(e) => {
               if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return
               e.preventDefault()
               selectCert(c)
             }}
-            className={`inline-flex items-center gap-1 min-h-[44px] px-3.5 lg:px-4 py-1.5 rounded-full text-sm lg:text-base font-medium transition-colors active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header ${
+            className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full font-mono text-[12px] tracking-wide transition-[background-color,color] duration-200 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header/60 ${
               isActive
-                ? 'bg-on-header text-header-bg shadow-sm'
-                : 'text-on-header/80 hover:text-on-header hover:bg-on-header/10'
+                ? 'bg-on-header/[0.14] text-on-header font-semibold'
+                : 'text-on-header/50 hover:text-on-header/80 font-medium'
             }`}
           >
-            {isActive && <Check className="w-3.5 h-3.5" aria-hidden="true" />}
             {c.shortName}
+            {isComingSoon && (
+              <span className="text-[9px] uppercase tracking-wider text-on-header/45">Soon</span>
+            )}
           </a>
         )
       })}

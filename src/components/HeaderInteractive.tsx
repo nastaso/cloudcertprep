@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useFocusTrap } from '../hooks/useFocusTrap'
 import { useSignOut } from '../hooks/useSignOut'
 import { trackEvent } from '../lib/analytics'
@@ -59,7 +60,7 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
       {!hideMobileMenu && (
         <button
           onClick={() => (mobileMenuOpen ? closeMobileMenu() : setMobileMenuOpen(true))}
-          className="md:hidden inline-flex items-center justify-center w-11 h-11 text-on-header hover:bg-white/10 rounded-full transition-colors active:scale-[0.92]"
+          className="md:hidden inline-flex items-center justify-center w-11 h-11 text-on-header hover:bg-on-header/10 rounded-full transition-colors active:scale-[0.92]"
           aria-label="Toggle menu"
           aria-expanded={mobileMenuOpen}
           aria-controls={mobileMenuOpen ? 'mobile-menu' : undefined}
@@ -76,19 +77,19 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
         <nav className="flex items-center gap-5 lg:gap-7">
           <a
             href="/about"
-            className="hdr-link hidden lg:inline-block text-on-header font-medium transition-colors text-sm lg:text-base rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
+            className="hdr-link hidden lg:inline-block text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
           >
             About
           </a>
           <a
             href="/blog"
-            className="hdr-link hidden lg:inline-block text-on-header font-medium transition-colors text-sm lg:text-base rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
+            className="hdr-link hidden lg:inline-block text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
           >
             Blog
           </a>
           <a
             href="/history"
-            className="hdr-link cc-auth-in text-on-header font-medium transition-colors text-sm lg:text-base rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
+            className="hdr-link cc-auth-in text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
           >
             History
           </a>
@@ -110,6 +111,7 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
         <Button
           onClick={signOut}
           variant="secondary"
+          size="sm"
           className="cc-auth-in whitespace-nowrap"
         >
           Sign out
@@ -117,6 +119,7 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
         <Button
           onClick={() => { if (!guardExamLeave('/login')) window.location.assign('/login') }}
           variant="primary"
+          size="sm"
           className="cc-auth-out whitespace-nowrap"
         >
           Sign in
@@ -124,8 +127,13 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
       </div>
 
       {/* Mobile drawer. Also gated on !hideMobileMenu so it can never mount on
-          the exam shell even if state were somehow set. */}
-      {!hideMobileMenu && mobileMenuOpen && (
+          the exam shell even if state were somehow set. PORTALED to <body>:
+          the header has `backdrop-blur-xl` (a backdrop-filter), which makes it
+          the containing block for `fixed` descendants — so an in-header drawer
+          gets clipped to the 48px header bar on non-overlay pages (e.g. /login).
+          Rendering into <body> escapes that containing block so the overlay +
+          panel cover the full viewport everywhere. */}
+      {!hideMobileMenu && mobileMenuOpen && typeof document !== 'undefined' && createPortal(
         <>
           <button
             type="button"
@@ -260,7 +268,8 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
               </a>
             </div>
           </div>
-        </>
+        </>,
+        document.body,
       )}
     </>
   )

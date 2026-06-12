@@ -37,6 +37,8 @@ import {
 import { SITE_URL } from '../../lib/seo-data'
 import { serializeJsonLd } from '../../lib/jsonld'
 import snapshot from '../../lib/generated/stats-snapshot.json'
+import CertSpecPanel from '../../components/landing/CertSpecPanel.astro'
+import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB } from '../../lib/levelAccent'
 import { getCollection, type CollectionEntry } from 'astro:content'
 import PostCard from '../../components/PostCard.astro'
 
@@ -195,6 +197,13 @@ const heroLede = secondaryKeyword
   ? `Looking for a free ${secondaryKeyword}? Practise realistic ${providerLabel} exam questions with adaptive domain mastery, randomised exams, and unlimited free attempts.`
   : `Practise realistic ${providerLabel} exam questions with adaptive domain mastery, randomised exams, and unlimited free attempts.`
 
+// DSv6 wayfinding: the exam-UI mockup is the HOME page's exclusive hero
+// signature. Cert hubs show the exam blueprint (CertSpecPanel: domain weights
+// in the level color + exam facts) so each funnel level reads differently at
+// a glance.
+const levelAccent = LEVEL_ACCENT_HEX[cert.level]
+const levelGlow = LEVEL_ACCENT_RGB[cert.level]
+
 // Per-domain landing links. These keyword-rich pages are the indexable SEO
 // surface for each exam domain; linking them here creates the
 // Home -> Cert -> Domain crawl path and makes them reachable by users.
@@ -228,138 +237,193 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
   ogImage={ogImage}
   robots={robots}
   jsonLd={[courseJsonLd]}
+  headerOverlay={true}
 >
-  <div class="p-4 md:p-8">
-    <div class="max-w-4xl mx-auto">
-      {/* BreadcrumbList JSON-LD only (visuallyHidden) */}
-      <Breadcrumb items={breadcrumbItems} visuallyHidden />
+  {/* BreadcrumbList JSON-LD only (visuallyHidden); the visible mono trail
+      renders inside the stage hero. */}
+  <Breadcrumb items={breadcrumbItems} visuallyHidden />
 
-      {/* Static GUEST view — visible to crawlers and logged-out users.
-          CertDashboardIsland hides this for authenticated users. */}
-      <div id="cert-guest-view" class="space-y-8">
-        {/* Guest hero */}
-        <div class="text-center py-4 md:py-8">
-          <h1 class="text-3xl md:text-5xl font-bold text-text-primary mb-4 md:mb-6">
-            Free {cert.name} <span class="whitespace-nowrap">({cert.shortName})</span>
-            <span class="block text-text-primary mt-2">Practice Exams</span>
-          </h1>
-          <p class="text-lg md:text-xl text-text-muted mb-6 md:mb-8 max-w-2xl mx-auto">
-            {heroLede}
-          </p>
+  {/* Static GUEST view (stage hero + content sheet) — visible to crawlers and
+      logged-out users. CertDashboardIsland hides this for authenticated users. */}
+  <div id="cert-guest-view">
+    {/* ---- Stage hero, glow in the cert's official LEVEL color ---- */}
+    <section class="stage relative overflow-hidden -mt-[calc(3rem+1px)] md:-mt-[calc(3.5rem+1px)]" style={`--stage-glow: ${levelGlow}`}>
+      <div class="relative max-w-6xl mx-auto px-4 md:px-8 pt-28 md:pt-36 pb-16 md:pb-24">
+        <div class="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-10 items-center">
+          <div class="stagger max-w-xl">
+            <nav aria-label="Breadcrumb" class="font-mono text-[12px] tracking-wide text-[#8B95A3]">
+              <a href="/" class="hover:text-[#F4F6F8] transition-colors duration-200">Home</a>
+              <span class="mx-2 text-white/25">›</span>
+              <span class="text-[#C9D2DC]">{cert.shortName}</span>
+            </nav>
 
-          {isComingSoon ? (
-            <div class="mb-6 md:mb-8 text-left">
-              <ComingSoonBanner cert={cert} />
-            </div>
-          ) : (
-            <div class="flex justify-center mb-4 md:mb-6">
-              <Button
-                href={`${certPath}/practice-exam`}
-                size="lg"
-                arrow
-                data-cc-event="cta_start_practice_exam"
-                data-cc-param-location="cert_landing_hero"
-                data-cc-param-cert={cert.code}
-              >
-                Start Practice Exam
-              </Button>
-            </div>
-          )}
+            <p class="mt-6 font-mono text-[12px] font-bold uppercase tracking-[0.22em]" style={`color: ${levelAccent}`}>
+              {levelLabel}
+            </p>
 
-          {heroBullets.length > 0 && (
-            <ul class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-text-muted text-sm md:text-base mb-3 list-none p-0">
-              {heroBullets.map(label => (
-                <li class="inline-flex items-center gap-1.5">
-                  <svg class="w-4 h-4 text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={checkIcon} />
-                  {label}
-                </li>
-              ))}
-            </ul>
-          )}
+            <h1 class="font-display mt-3 text-[2rem] leading-[1.05] md:text-[2.5rem] lg:text-[3rem] font-bold tracking-[-0.025em] text-[#F4F6F8]">
+              Free {cert.name} <span class="whitespace-nowrap">({cert.shortName})</span> Practice Exams
+            </h1>
 
-          {isActive && (
-            <div class="flex justify-center">
-              <LastUpdatedStamp examGuideVersion={cert.examGuideVersion} examGuideUrl={cert.examGuideUrl} />
-            </div>
+            <p class="mt-5 text-lg md:text-xl leading-relaxed text-[#9AA6B2]">
+              {heroLede}
+            </p>
+
+            {!isComingSoon && (
+              <div class="mt-8 flex flex-wrap items-center gap-4">
+                <a
+                  href={`${certPath}/practice-exam`}
+                  class="halo chev-link inline-flex min-h-[48px] items-center justify-center rounded-full bg-[#FF9900] px-7 py-3 text-base font-semibold text-[#16191F] transition-[background-color,transform] duration-200 ease-press hover:bg-[#FFAD33] active:scale-[0.97] active:duration-[80ms] focus:outline-none"
+                  data-cc-event="cta_start_practice_exam"
+                  data-cc-param-location="cert_landing_hero"
+                  data-cc-param-cert={cert.code}
+                >
+                  Start practice exam<span class="chev" aria-hidden="true">›</span>
+                </a>
+                <a
+                  href="#domains"
+                  class="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-medium text-[#F4F6F8] transition-[border-color,background-color,transform] duration-200 ease-press hover:border-white/40 hover:bg-white/5 active:scale-[0.97] active:duration-[80ms] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                >
+                  Practice by domain
+                </a>
+              </div>
+            )}
+
+            {!isComingSoon && (
+              <ul class="mt-10 grid grid-cols-2 gap-x-6 gap-y-2 sm:flex sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-1.5 list-none font-mono text-[13px] tracking-wide text-[#8B95A3] sm:[&>li+li]:before:content-['·'] sm:[&>li+li]:before:mr-3 sm:[&>li+li]:before:text-white/25">
+                <li class="whitespace-nowrap">{cert.examQuestionCount} questions</li>
+                <li class="whitespace-nowrap">{examMinutes} minutes</li>
+                <li class="whitespace-nowrap">pass {cert.passingScore}/1000</li>
+                <li class="whitespace-nowrap">{totalQuestionsLabel}+ question bank</li>
+              </ul>
+            )}
+
+            {isActive && (
+              <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 52 211 153;">
+                <LastUpdatedStamp examGuideVersion={cert.examGuideVersion} examGuideUrl={cert.examGuideUrl} />
+              </div>
+            )}
+          </div>
+
+          {!isComingSoon && (
+            <CertSpecPanel cert={cert} accent={levelAccent} glowRgb={levelGlow} />
           )}
         </div>
+      </div>
+    </section>
 
-        {/* Guest About card (active certs only) */}
-        {!isComingSoon && <AboutCard />}
+    {/* ---- Content sheet ---- */}
+    <div class="sheet-overlap pb-16 md:pb-24 pt-12 md:pt-20">
+      <div class="max-w-6xl mx-auto px-4 md:px-8">
+        <div class="space-y-16 md:space-y-24">
 
-        {/* Practice by exam domain — links to the per-domain keyword landing
-            pages so they are reachable by users and crawlers (Home -> Cert ->
-            Domain). Active certs only. */}
-        {domainLinks.length > 0 && (
-          <section>
-            <h2 class="text-xl md:text-2xl font-semibold text-text-primary mb-4">
-              {secondaryKeyword ? `Build your ${secondaryKeyword} by domain` : 'Practice by exam domain'}
-            </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {domainLinks.map(d => (
-                <a
-                  href={d.href}
-                  class="block bg-bg-card hover:bg-bg-card-hover rounded-xl shadow-card p-4 transition-colors border-2 border-transparent hover:border-brand lift focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
-                >
-                  <span class="block text-text-primary font-medium text-sm md:text-base">{d.name}</span>
-                  <span class="block text-text-muted text-xs md:text-sm mt-1">{d.questionCount}+ practice questions</span>
-                </a>
-              ))}
-            </div>
-          </section>
-        )}
+          {isComingSoon && <ComingSoonBanner cert={cert} />}
 
-        {/* Exam realism + explanation showcase (active certs with a verified
-            examFormat / question bank; both self-guard and render nothing
-            otherwise). Mounted after the hero block, before the FAQ. (R23.1, R23.2) */}
-        <ExamRealismTable cert={cert} />
-        <ExplanationShowcase cert={cert} />
+          {/* Practice by exam domain — links to the per-domain keyword landing
+              pages (Home -> Cert -> Domain crawl path). Active certs only. */}
+          {domainLinks.length > 0 && (
+            <section id="domains" data-reveal>
+              <p class="kicker" aria-hidden="true">Practice by domain</p>
+              <h2 class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-2">
+                {secondaryKeyword ? `Build your ${secondaryKeyword} by domain` : 'Practice by exam domain'}
+              </h2>
+              <p class="text-lead mb-8">
+                Focused question sets for every exam domain, weighted like the real exam.
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {cert.domains.map(d => (
+                  <a
+                    href={`/${cert.provider}/${cert.code}/${getCertDomainSlug(cert, d.id)}`}
+                    class="halo group flex flex-col gap-2 rounded-2xl border border-border-hairline bg-bg-card p-5 md:p-6 shadow-card transition-[background-color,border-color] duration-200 ease-out hover:bg-bg-card-hover focus:outline-none"
+                    style={`--halo-color: ${levelGlow}`}
+                  >
+                    <span class="flex items-baseline justify-between gap-4">
+                      <span class="text-base md:text-lg font-semibold text-text-primary">{d.name}</span>
+                      <span class="font-mono text-[12px] text-text-muted whitespace-nowrap">{Math.round(d.examProportion * 100)}%</span>
+                    </span>
+                    <span class="h-1 w-full overflow-hidden rounded-full bg-border-hairline/60">
+                      <span class="block h-full rounded-full" style={`width: ${Math.round(d.examProportion * 100)}%; background-color: ${levelAccent}`}></span>
+                    </span>
+                    <span class="flex items-center justify-between text-sm text-text-muted">
+                      <span>{d.questionCount}+ practice questions</span>
+                      <span class="feature-arrow text-link" aria-hidden="true">→</span>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
 
-        {/* Latest from the blog (audit W13) — internal links from the
-            highest-authority indexable page to the blog. Only rendered when a
-            post exists. */}
-        {latestPosts.length > 0 && (
-          <section>
-            <h2 class="text-xl md:text-2xl font-semibold text-text-primary mb-4">Latest from the blog</h2>
-            <div class="grid grid-cols-1 gap-4">
-              {latestPosts.map((post: CollectionEntry<'blog'>) => (
-                <PostCard data={post.data} slug={post.data.slug} />
-              ))}
-            </div>
-            <p class="mt-4 text-sm">
-              <a href="/blog" class="text-text-primary hover:text-text-primary/70 underline font-medium">Read all articles →</a>
-            </p>
-          </section>
-        )}
+          {/* Platform pillars (shared with home) */}
+          {!isComingSoon && <div data-reveal><AboutCard /></div>}
 
-        {/* Per-cert FAQ + FAQPage JSON-LD */}
-        <Faq certCode={cert.code} />
+          {/* Exam realism + explanation showcase (self-guarding). (R23.1, R23.2) */}
+          <ExamRealismTable cert={cert} />
+          <ExplanationShowcase cert={cert} />
+
+          {/* Latest from the blog (audit W13) */}
+          {latestPosts.length > 0 && (
+            <section data-reveal>
+              <p class="kicker" aria-hidden="true">Guides</p>
+              <h2 class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-8">Latest from the blog</h2>
+              <div class="grid grid-cols-1 gap-6">
+                {latestPosts.map((post: CollectionEntry<'blog'>) => (
+                  <PostCard data={post.data} slug={post.data.slug} />
+                ))}
+              </div>
+              <p class="mt-6">
+                <a href="/blog" class="chev-link text-sm md:text-base font-medium text-link hover:underline underline-offset-4">Read all articles<span class="chev" aria-hidden="true">›</span></a>
+              </p>
+            </section>
+          )}
+
+          {/* Per-cert FAQ + FAQPage JSON-LD */}
+          <Faq certCode={cert.code} />
+        </div>
       </div>
     </div>
-
-    {/* Authenticated dashboard island. Renders null + keeps guest view
-        visible for logged-out users; hides guest view + shows dashboard
-        for logged-in users. */}
-    <CertDashboardIsland cert={certForIsland} client:only="react" />
   </div>
+
+  {/* Authenticated dashboard island. ACTIVE certs only: a coming-soon cert has
+      no question bank, so a logged-in visitor must keep seeing the coming-soon
+      guest view (Watch on GitHub) rather than a practice dashboard whose CTAs
+      lead to non-existent exam routes. */}
+  {isActive && (
+    <div class="px-4 md:px-8">
+      <CertDashboardIsland cert={certForIsland} client:only="react" />
+    </div>
+  )}
 
   {/*
     Synchronous guest-view pre-hide. Runs before paint (and on bfcache
     restore via pageshow) so a logged-in user never sees the prerendered
     guest landing flash before CertDashboardIsland hydrates. Reuses the
     `window.__ccHasSession` helper installed by the BaseLayout pre-paint
-    script (single source of truth for the localStorage scan). Stale tokens
-    self-correct once the island resolves auth and re-shows the guest view.
-    Only meaningful on this cert landing (the only page with #cert-guest-view).
+    script. Stale tokens self-correct once the island resolves auth.
+
+    Also drops the header's overlay mode for signed-in visitors: the
+    transparent white-text overlay state assumes the dark stage hero is
+    behind it, but the dashboard view hides that stage, so in light theme
+    the overlay would paint white-on-white. Removing data-overlay restores
+    the standard frosted themed header before first paint.
+
+    Coming-soon certs never mount the dashboard, so this pre-hide is gated to
+    active certs (otherwise a signed-in visitor would see the guest view
+    hidden with nothing to replace it).
   */}
-  <script is:inline>
-    (function () {
-      function apply() {
-        var el = document.getElementById('cert-guest-view')
-        if (el && window.__ccHasSession && window.__ccHasSession()) el.style.display = 'none'
-      }
-      apply()
-      window.addEventListener('pageshow', apply)
-    })()
-  </script>
+  {isActive && (
+    <script is:inline>
+      (function () {
+        function apply() {
+          if (!(window.__ccHasSession && window.__ccHasSession())) return
+          var el = document.getElementById('cert-guest-view')
+          if (el) el.style.display = 'none'
+          var hdr = document.getElementById('site-header')
+          if (hdr) hdr.removeAttribute('data-overlay')
+        }
+        apply()
+        window.addEventListener('pageshow', apply)
+      })()
+    </script>
+  )}
 </BaseLayout>

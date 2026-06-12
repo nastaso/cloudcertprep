@@ -1,8 +1,11 @@
 ---
 /**
- * AboutCard.astro — "About CloudCertPrep" card with a 4-icon list.
- * Astro port of the React AboutCard + DEFAULT_ABOUT_ITEMS with identical
- * Tailwind classes. Icons are inlined lucide SVG paths.
+ * AboutCard.astro — "Built to mirror the real exam" feature grid (DSv5.2).
+ * The single platform-pillars section on the home page: the old "Built to
+ * mirror" pair and the "About CloudCertPrep" grid said the same things in the
+ * same layout back to back, so they are merged and deduplicated here. Open
+ * 2x2 grid of icon rows (one feature language page-wide), with the
+ * free/open-source line + project link as the section footer.
  */
 import { GITHUB_REPO_URL } from '../../lib/constants'
 
@@ -10,56 +13,56 @@ interface Props {
   heading?: string
 }
 
-const { heading = 'About CloudCertPrep' } = Astro.props
+const { heading = 'Built to mirror the real exam' } = Astro.props
 
 // lucide icon path data (24x24, stroke-based)
 const icons = {
-  fileText: '<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line>',
+  target: '<circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle>',
+  bookCheck: '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path><path d="m9 9.5 2 2 4-4"></path>',
   repeat: '<polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path>',
   barChart: '<line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line>',
-  github: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>',
 }
+
+const features = [
+  {
+    icon: icons.target,
+    title: 'Realistic exam simulation',
+    body: "Full-length, timed mock exams that mirror the live AWS exam: question style, scoring scale, duration, and passing score read from each cert's exam guide.",
+  },
+  {
+    icon: icons.bookCheck,
+    title: 'Every answer explained',
+    body: 'Each question is aligned to the current official exam guide and ships with a detailed explanation of why the correct answer is right and why each distractor is wrong.',
+  },
+  {
+    icon: icons.repeat,
+    title: 'Adaptive spaced repetition',
+    body: 'Domain practice prioritises questions you have got wrong or have not seen, weighted by your past performance.',
+  },
+  {
+    icon: icons.barChart,
+    title: 'Domain mastery analytics',
+    body: 'Track performance across every exam domain. Identify weak areas, focus practice where it matters most, and watch your scores climb over time.',
+  },
+]
 ---
 
 <section>
-  <h2 class="text-xl md:text-2xl font-semibold text-text-primary mb-4">{heading}</h2>
-  <div class="bg-bg-card rounded-xl p-4 md:p-6 shadow-card">
-    <div class="space-y-3 md:space-y-4">
-      <div class="flex items-start gap-3">
-        <svg class="w-5 h-5 md:w-6 md:h-6 text-text-muted flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icons.fileText} />
-        <div>
-          <p class="text-text-primary font-medium text-sm md:text-base">Realistic Exam Simulation</p>
-          <p class="text-text-muted text-xs md:text-sm">Full-length, timed mock exams that mirror the real vendor format for each certification. Questions, duration, and passing score read from each cert's exam guide.</p>
-        </div>
+  <p class="kicker" aria-hidden="true">The platform</p>
+  <h2 class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-10">{heading}</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+    {features.map((f, i) => (
+      <div class="border-t border-border-hairline pt-5">
+        <span class="font-mono text-[13px] font-semibold tracking-widest text-text-muted" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+        <h3 class="mt-2 text-lg md:text-xl font-semibold text-text-primary">{f.title}</h3>
+        <p class="mt-2 text-base leading-relaxed text-text-muted">{f.body}</p>
       </div>
-      <div class="flex items-start gap-3">
-        <svg class="w-5 h-5 md:w-6 md:h-6 text-text-muted flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icons.repeat} />
-        <div>
-          <p class="text-text-primary font-medium text-sm md:text-base">Adaptive Spaced Repetition</p>
-          <p class="text-text-muted text-xs md:text-sm">Domain practice prioritises questions you have got wrong or have not seen, weighted by your past performance.</p>
-        </div>
-      </div>
-      <div class="flex items-start gap-3">
-        <svg class="w-5 h-5 md:w-6 md:h-6 text-text-muted flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icons.barChart} />
-        <div>
-          <p class="text-text-primary font-medium text-sm md:text-base">Domain Mastery Analytics</p>
-          <p class="text-text-muted text-xs md:text-sm">Track performance across every exam domain. Identify weak areas, focus practice where it matters most, and watch your scores climb over time.</p>
-        </div>
-      </div>
-      <div class="flex items-start gap-3">
-        <svg class="w-5 h-5 md:w-6 md:h-6 text-text-muted flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icons.github} />
-        <div>
-          <p class="text-text-primary font-medium text-sm md:text-base">100% Free and Open Source</p>
-          <p class="text-text-muted text-xs md:text-sm">
-            MIT licensed. No ads, no paywalls, no premium tiers. Codebase on
-            <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class="text-text-primary hover:text-text-primary/70 underline">GitHub</a>.
-          </p>
-        </div>
-      </div>
-    </div>
-    <p class="mt-4 text-sm">
-      <a href="/about" class="text-text-primary hover:text-text-primary/70 underline font-medium">Learn more about the project →</a>
-    </p>
-    <slot name="footer" />
+    ))}
   </div>
+  <p class="mt-8 flex flex-wrap items-center gap-x-2 text-sm md:text-base text-text-muted">
+    <span>MIT licensed, no ads, no paywalls. Codebase on
+      <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class="text-link underline underline-offset-2 hover:text-link/80">GitHub</a>.</span>
+    <a href="/about" class="chev-link font-medium text-link hover:underline underline-offset-4">Learn more about the project<span class="chev" aria-hidden="true">›</span></a>
+  </p>
+  <slot name="footer" />
 </section>

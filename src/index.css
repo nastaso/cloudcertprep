@@ -153,6 +153,210 @@ html.cc-js [data-reveal].is-revealed {
 html.cc-authed .cc-auth-in { display: unset; }
 html.cc-authed .cc-auth-out { display: none; }
 
+/* ---- DSv4 interaction primitives ---- */
+
+/* Chevron link (AWS signature): `<a class="chev-link">Label<span class="chev">›</span></a>`
+   The chevron slides 4px right on hover/focus. */
+.chev-link .chev {
+  display: inline-block;
+  margin-left: 0.35em;
+  transition: transform 0.2s var(--ease-out);
+}
+.chev-link:hover .chev,
+.chev-link:focus-visible .chev { transform: translateX(4px); }
+
+/* Tab row with a sliding underline indicator (DSv4 §2 tabs — the "stuck tab"
+   fix). Markup: a relatively-positioned container with [data-tab] buttons and
+   one .tab-indicator element; a tiny script (or React state) sets
+   --tab-x/--tab-w from the active tab's offsetLeft/offsetWidth. The indicator
+   GLIDES between tabs instead of snapping. */
+.tab-row { position: relative; }
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: rgb(var(--color-brand));
+  transform: translateX(var(--tab-x, 0)) scaleX(1);
+  width: var(--tab-w, 0px);
+  transition: transform 0.25s var(--ease-inout), width 0.25s var(--ease-inout);
+  pointer-events: none;
+}
+
+/* Instant tap feedback for chips/tabs/list rows on touch (DSv4 motion rule:
+   every interactive element answers within 80ms). */
+.press {
+  transition: transform 0.2s var(--ease-press), background-color 0.2s var(--ease-press);
+}
+.press:active { transform: scale(0.97); transition-duration: 80ms; }
+
+/* Lead paragraph (DSv4 type scale): opener under an h1/h2. */
+.text-lead {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: rgb(var(--color-text-muted));
+}
+@media (min-width: 768px) {
+  .text-lead { font-size: 1.375rem; }
+}
+
+/* Editorial section kicker (DSv5.3): mono micro-label with a brand dash,
+   above every section heading. One systemic voice across the site. */
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgb(var(--color-text-muted));
+  margin-bottom: 0.875rem;
+}
+.kicker::before {
+  content: '';
+  width: 22px;
+  height: 2px;
+  border-radius: 1px;
+  background: rgb(var(--color-brand));
+}
+
+/* ---- DSv4.1 "billboard" language (aws.amazon.com production patterns) ---- */
+
+/* Feature card with an art header that ZOOMS on hover + halo ring + arrow
+   slide. Markup: <a class="feature-card"><div class="feature-art">SVG</div>
+   <div>body … <span class="feature-arrow">→</span></div></a> */
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  background: rgb(var(--color-bg-card));
+  border: 1px solid rgb(var(--color-border));
+  box-shadow: var(--card-shadow);
+  transition: box-shadow 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+}
+.feature-card:hover,
+.feature-card:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+}
+.feature-art {
+  overflow: hidden;
+  border-radius: 15px 15px 0 0; /* card radius minus 1px border */
+  aspect-ratio: 16 / 9;
+}
+.feature-art > svg,
+.feature-art > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: transform 0.6s var(--ease-out);
+}
+.feature-card:hover .feature-art > svg,
+.feature-card:hover .feature-art > img,
+.feature-card:focus-visible .feature-art > svg,
+.feature-card:focus-visible .feature-art > img {
+  transform: scale(1.06);
+}
+.feature-arrow {
+  display: inline-block;
+  transition: transform 0.25s var(--ease-out);
+}
+.feature-card:hover .feature-arrow,
+.feature-card:focus-visible .feature-arrow { transform: translateX(6px); }
+
+/* DSv5 hero stage: near-black ink with a single brand glow + faint dot grid.
+   Fixed surface in both themes (marketing stage, not a themed section). */
+.stage {
+  /* Glow hue is themeable per page (cert landings use the official AWS level
+     color); defaults to brand orange. */
+  --stage-glow: 255 153 0;
+  background-color: #0E1116;
+  background-image:
+    radial-gradient(52rem 30rem at 78% -12%, rgb(var(--stage-glow) / 0.16), transparent 62%),
+    radial-gradient(40rem 26rem at -8% 110%, rgb(var(--stage-glow) / 0.07), transparent 60%),
+    radial-gradient(rgb(255 255 255 / 0.055) 1px, transparent 1px);
+  background-size: auto, auto, 28px 28px;
+}
+
+.sheet-overlap {
+  border-top-right-radius: clamp(2rem, 6vw, 4rem);
+  margin-top: -3rem;
+  position: relative;
+  background: rgb(var(--color-bg-dark));
+}
+
+/* ANIMATED CONIC HALO (the production "wow" ring — Linear/Raycast/AWS
+   pattern): a rotating multi-hue gradient ring blooms around the element on
+   hover/focus. Implemented as a blurred ::before behind the element; the
+   element's own background covers the centre so only the ring + glow show.
+   Browsers without @property still get the static gradient ring (it just
+   doesn't rotate); reduced-motion kills the spin via the global override. */
+/* HALO (DSv5.2): ONE coherent hover language, single-hue. A soft brand bloom
+   grows around the element; intensity carries the hierarchy (primary CTA
+   strongest, cards quieter via --halo-color alpha). No rainbow rings, no
+   spinners: Apple/Linear-grade restraint. */
+.halo {
+  --halo-color: 255 153 0;
+  transition:
+    box-shadow 0.3s var(--ease-out),
+    border-color 0.2s var(--ease-out),
+    background-color 0.2s var(--ease-press),
+    transform 0.2s var(--ease-press);
+}
+.halo:hover,
+.halo:focus-visible {
+  box-shadow:
+    0 0 0 1px rgb(var(--halo-color) / 0.55),
+    0 0 22px 2px rgb(var(--halo-color) / 0.35),
+    0 0 56px 8px rgb(var(--halo-color) / 0.18);
+}
+
+/* Aurora drift on the stage: two soft color fields slowly breathing behind
+   the art. GPU-only (transform), reduced-motion safe. */
+.stage::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  background:
+    radial-gradient(34% 44% at 76% 18%, rgb(255 153 0 / 0.10), transparent 70%),
+    radial-gradient(26% 38% at 14% 86%, rgb(255 153 0 / 0.05), transparent 70%);
+  animation: aurora-drift 18s ease-in-out infinite alternate;
+}
+@keyframes aurora-drift {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to   { transform: translate3d(3%, 3%, 0) scale(1.08); }
+}
+
+/* Header overlay mode (Apple pattern): transparent over the billboard at the
+   top of the page — white text, no bar — then frosts in as you scroll.
+   Header.astro adds [data-overlay] + a tiny scroll script toggles
+   .hdr-scrolled. The !important overrides beat the utility classes that
+   style the default (frosted) state. */
+header[data-overlay] {
+  transition: background-color 0.35s var(--ease-out), border-color 0.35s var(--ease-out);
+}
+header[data-overlay]:not(.hdr-scrolled) {
+  --color-on-header: 255 255 255;
+  background-color: transparent !important;
+  border-color: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Stage grain: subtle film noise so the gradient reads printed, not
+   vector-flat. Pure CSS data-URI — zero JS. */
+.stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 /* THEME TOKENS
    ============
    Brand: AWS orange #FF9900 — single value, light + dark.
@@ -166,46 +370,65 @@ html.cc-authed .cc-auth-out { display: none; }
    active states. Body links are neutral with an underline. */
 :root {
   --color-brand: 255 153 0;          /* #FF9900 */
-  --color-on-brand: 28 25 23;        /* #1C1917 */
-  --color-header-bg: 35 47 62;       /* #232F3E AWS Console navy */
-  --color-on-header: 255 255 255;    /* white text on navy */
-  --color-bg-dark: 245 245 244;      /* #F5F5F4 */
+  --color-brand-hover: 236 114 17;   /* #EC7211 — AWS CTA hover orange (DSv4) */
+  --color-on-brand: 22 25 31;        /* #16191F squid ink on orange (9.4:1) */
+  /* DSv4.1: white marketing nav (aws.amazon.com) — header chrome is themed
+     now (white in light, ink tier in dark) instead of fixed navy. */
+  --color-header-bg: 255 255 255;
+  --color-on-header: 22 25 31;
+  /* Ink CTA (AWS "Create account" pill) — the single primary button color. */
+  --color-cta: 22 29 38;             /* #161D26 */
+  --color-cta-hover: 35 47 62;       /* #232F3E */
+  --color-on-cta: 255 255 255;
+  --color-bg-dark: 248 249 250;      /* #F8F9FA cool page gray (DSv4: AWS marketing) */
   --color-bg-card: 255 255 255;      /* #FFFFFF */
-  --color-bg-card-hover: 250 250 249;/* #FAFAF9 */
+  --color-bg-card-hover: 250 251 252;/* #FAFBFC */
+  --color-border: 233 235 237;       /* #E9EBED hairline (DSv4) */
+  --color-link: 0 115 187;           /* #0073BB AWS link blue, 5.1:1 on white (DSv4) */
   --color-success: 22 163 74;        /* #16A34A — passes 4.5:1 on white */
   --color-danger: 220 38 38;         /* #DC2626 — passes 4.5:1 on white */
-  --color-warning: 217 119 6;        /* #D97706 — passes 4.5:1 on white */
-  --color-text-primary: 28 25 23;    /* #1C1917 */
-  --color-text-muted: 87 83 78;      /* #57534E — 7.34:1 on bg-dark */
+  --color-warning: 180 83 9;         /* #B45309 — 4.6:1 on white */
+  --color-text-primary: 22 25 31;    /* #16191F AWS squid ink (DSv4) */
+  --color-text-muted: 84 91 100;     /* #545B64 AWS gray — 6.5:1 on white */
 }
 
-/* Theme: Dark mode — warm charcoal twin of the warm light mode, so the orange
-   brand reads as a warm glow rather than clashing. Header keeps the same navy
-   (it's chrome, not a theme surface). */
+/* Theme: Dark mode — squid-ink surface tiers (DSv4): elevation = lighter
+   surface, page → card → hover each one step brighter. Header keeps the same
+   navy (it's chrome, not a theme surface). */
 .dark {
-  --color-bg-dark: 28 25 23;         /* #1C1917 */
-  --color-bg-card: 41 37 36;         /* #292524 */
-  --color-bg-card-hover: 50 46 43;   /* #322E2B */
+  --color-bg-dark: 22 25 31;         /* #16191F */
+  --color-bg-card: 28 35 47;         /* #1C232F */
+  --color-header-bg: 22 25 31;       /* header follows the dark ink tier */
+  --color-on-header: 244 246 248;
+  --color-cta: 244 246 248;          /* inverted ink pill on dark */
+  --color-cta-hover: 255 255 255;
+  --color-on-cta: 22 25 31;
+  --color-bg-card-hover: 35 47 62;   /* #232F3E */
+  --color-border: 50 60 73;          /* #323C49 hairline on dark */
+  --color-link: 68 156 214;          /* #449CD6 — 5.4:1 on card */
   --color-success: 74 222 128;       /* #4ADE80 — passes 4.5:1 on dark */
   --color-danger: 248 113 113;       /* #F87171 — passes 4.5:1 on dark */
   --color-warning: 251 191 36;       /* #FBBF24 — passes 4.5:1 on dark */
-  --color-text-primary: 250 250 249; /* #FAFAF9 */
-  --color-text-muted: 168 162 158;   /* #A8A29E — 5.85:1 on bg-card */
+  --color-text-primary: 244 246 248; /* #F4F6F8 */
+  --color-text-muted: 141 153 168;   /* #8D99A8 — 5.6:1 on card */
 }
 
-/* Light mode: subtle card shadows for visual separation. */
+/* Elevation tiers (DSv4 §1.4) — cool ink-tinted shadows in light mode. */
 :root {
-  --card-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
-  --shadow-card-hover: 0 10px 25px -5px rgb(0 0 0 / 0.10), 0 4px 10px -4px rgb(0 0 0 / 0.08);
-  /* Shared easing curve (premium "settle": quick out, no bounce). Tokenised
-     so CSS utilities and tailwind.config reference one value. (§8 item 9) */
+  --card-shadow: 0 1px 3px rgb(15 25 35 / 0.06), 0 1px 2px rgb(15 25 35 / 0.04);
+  --shadow-card-hover: 0 8px 24px -8px rgb(15 25 35 / 0.14), 0 2px 8px -2px rgb(15 25 35 / 0.08);
+  --shadow-overlay: 0 24px 64px -16px rgb(15 25 35 / 0.24);
+  /* Motion tokens (DSv4 §1.5). ease-out = entrances/settles; ease-inout =
+     indicator slides (tab underline); ease-press = button push. */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-inout: cubic-bezier(0.45, 0, 0.15, 1);
+  --ease-press: cubic-bezier(0.2, 0, 0, 1);
 }
 .dark {
   --card-shadow: none;
-  /* Dark cards are flat at rest; the lift hover adds a deeper, tinted shadow
-     so elevation still reads on charcoal. */
-  --shadow-card-hover: 0 10px 30px -5px rgb(0 0 0 / 0.55), 0 4px 12px -4px rgb(0 0 0 / 0.45);
+  /* Dark elevation = lighter surface + ring; hover shadow deepens it. */
+  --shadow-card-hover: 0 0 0 1px rgb(255 255 255 / 0.08), 0 10px 30px -5px rgb(0 0 0 / 0.55);
+  --shadow-overlay: 0 0 0 1px rgb(255 255 255 / 0.08), 0 24px 64px -16px rgb(0 0 0 / 0.7);
 }
 
 /* Disable transitions during theme switch to prevent flash. */
@@ -214,13 +437,36 @@ html.cc-authed .cc-auth-out { display: none; }
   transition: none !important;
 }
 
+/* DSv6: system stack only, zero webfonts. Headline presence comes from the
+   locked type ladder (scale + weight + tracking pairs, DESIGN_SYSTEM_v6 §3),
+   not a display face. Headings wrap balanced where supported (progressive). */
+h1,
+h2 {
+  text-wrap: balance;
+}
+
 /* Apple San Francisco font stack — applied to entire site. */
+/* html carries the theme bg too (not just body): the stage hero uses a
+   rem-based negative margin to slide under the overlay header, and at large
+   root font sizes (17-18px >=1280px) that rounds to a 1px gap at the very top
+   which would otherwise expose the white browser canvas. */
+html {
+  background-color: rgb(var(--color-bg-dark));
+}
 body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: rgb(var(--color-bg-dark));
   color: rgb(var(--color-text-primary));
+}
+/* DSv5.3 type scale: large displays get a bigger base so the site never
+   reads "small" on 1440p/4K (rem-based sizes scale with this). */
+@media (min-width: 1280px) {
+  html { font-size: 17px; }
+}
+@media (min-width: 1920px) {
+  html { font-size: 18px; }
 }
 
 /* Blog article typography. Project intentionally does not depend on
@@ -292,4 +538,44 @@ body {
   padding-left: 1rem;
   color: rgb(var(--color-text-muted));
   font-style: italic;
+}
+
+/* Markdown tables — premium hairline grid in a rounded card. Wrapped to scroll
+   horizontally on narrow screens so a comparison table never overflows the
+   page on mobile. Token-aware for both themes. */
+.blog-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  display: block;
+  overflow-x: auto;
+  border: 1px solid rgb(var(--color-border));
+  border-radius: 0.875rem;
+}
+.blog-content thead th {
+  background-color: rgb(var(--color-bg-card));
+  color: rgb(var(--color-text-primary));
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+.blog-content th,
+.blog-content td {
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid rgb(var(--color-border) / 0.6);
+  vertical-align: top;
+}
+.blog-content tbody th {
+  color: rgb(var(--color-text-primary));
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+.blog-content tbody td {
+  color: rgb(var(--color-text-muted));
+}
+.blog-content tbody tr:last-child th,
+.blog-content tbody tr:last-child td {
+  border-bottom: 0;
 }

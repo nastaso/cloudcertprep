@@ -11,6 +11,11 @@
  * (encoded in data-correct), and the explanation in the static HTML — the JS
  * only controls reveal timing, not content (R6.7).
  *
+ * DSv6: option rows mirror the ExamMockup chrome (12px radius, hairline
+ * border, mono option letter, state via border + tint). The reveal script
+ * toggles LITERAL Tailwind class names below — markup and script class sets
+ * must stay in sync when restyling.
+ *
  * The interactive AnswerButton.tsx stays in service for the MockExam /
  * DomainPractice islands; this component is import-only from the Domain_Landing
  * template.
@@ -66,11 +71,11 @@ const explanationParagraphs = (explanation ?? '')
 ---
 
 <div
-  class="sample-question bg-bg-card rounded-xl shadow-card p-4 md:p-6"
+  class="sample-question bg-bg-card rounded-2xl border border-border-hairline shadow-card p-4 md:p-6"
   data-answer-count={correctKeys.size}
 >
   <div class="flex items-start gap-2 mb-3">
-    <span class="flex-shrink-0 text-xs md:text-sm font-semibold text-text-muted">Q{index}.</span>
+    <span class="flex-shrink-0 font-mono text-xs md:text-sm font-semibold text-text-muted pt-px">Q{index}.</span>
     <p class="text-text-primary text-sm md:text-base font-medium">{question}</p>
   </div>
 
@@ -78,27 +83,27 @@ const explanationParagraphs = (explanation ?? '')
     <p class="text-xs text-text-muted mb-2">Select {correctKeys.size} answers.</p>
   )}
 
-  <div class="space-y-2" role="group">
+  <div class="space-y-2.5" role="group">
     {optionEntries.map(([key, text]) => {
       const isCorrect = correctKeys.has(key)
       return (
         <button
           type="button"
-          class="sample-option w-full border-2 rounded-lg text-left flex items-start p-2 md:p-2.5 gap-2 text-xs md:text-sm transition-colors duration-200 border-text-muted/30 bg-bg-card hover:border-text-muted/50 hover:bg-bg-card-hover"
+          class="sample-option w-full border rounded-xl text-left flex items-start p-2.5 md:p-3 gap-2.5 text-xs md:text-sm transition-[border-color,background-color] duration-200 border-border-hairline bg-bg-card hover:border-text-muted/50 hover:bg-bg-card-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           data-correct={isCorrect ? 'true' : 'false'}
           aria-pressed="false"
         >
-          <span class="sample-badge flex-shrink-0 rounded-full flex items-center justify-center font-bold w-6 h-6 text-xs bg-bg-dark text-text-primary">
+          <span class="sample-badge flex-shrink-0 font-mono font-semibold text-[11px] md:text-[12px] pt-[3px] text-text-muted" aria-hidden="true">
             {key}
           </span>
-          <span class="flex-1 text-text-primary pt-0.5">{text}</span>
+          <span class="flex-1 text-text-primary">{text}</span>
         </button>
       )
     })}
   </div>
 
   {explanationParagraphs.length > 0 && (
-    <div class="sample-explanation mt-3 hidden border-l-2 border-success/40 pl-3">
+    <div class="sample-explanation mt-4 hidden rounded-xl border border-border-hairline bg-bg-dark/60 px-4 py-3">
       <p class="text-xs md:text-sm font-semibold text-text-primary mb-1">Explanation</p>
       <div class="space-y-2">
         {explanationParagraphs.map(para => (
@@ -127,6 +132,7 @@ const explanationParagraphs = (explanation ?? '')
   // Click-to-reveal behaviour aligned with the React AnswerButton states:
   // selected (brand) -> on resolve, correct options turn success-green and a
   // wrong pick turns danger-red, then the explanation is shown.
+  // NOTE: the class strings below mirror the markup above LITERALLY.
   function initSampleQuestions() {
     const cards = document.querySelectorAll<HTMLElement>('.sample-question:not([data-ready])')
     cards.forEach((card) => {
@@ -141,15 +147,15 @@ const explanationParagraphs = (explanation ?? '')
         const badge = btn.querySelector<HTMLElement>('.sample-badge')
         btn.setAttribute('aria-pressed', on ? 'true' : 'false')
         if (on) {
-          btn.classList.remove('border-text-muted/30', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover')
+          btn.classList.remove('border-border-hairline', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover')
           btn.classList.add('border-brand', 'bg-brand/10')
-          badge?.classList.remove('bg-bg-dark', 'text-text-primary')
-          badge?.classList.add('bg-brand', 'text-on-brand')
+          badge?.classList.remove('text-text-muted')
+          badge?.classList.add('text-brand')
         } else {
-          btn.classList.add('border-text-muted/30', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover')
+          btn.classList.add('border-border-hairline', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover')
           btn.classList.remove('border-brand', 'bg-brand/10')
-          badge?.classList.add('bg-bg-dark', 'text-text-primary')
-          badge?.classList.remove('bg-brand', 'text-on-brand')
+          badge?.classList.add('text-text-muted')
+          badge?.classList.remove('text-brand')
         }
       }
 
@@ -161,19 +167,19 @@ const explanationParagraphs = (explanation ?? '')
           const wasSelected = selected.has(btn)
           // Clear interim/default styling.
           btn.classList.remove(
-            'border-text-muted/30', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover',
+            'border-border-hairline', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover',
             'border-brand', 'bg-brand/10',
           )
-          badge?.classList.remove('bg-bg-dark', 'text-text-primary', 'bg-brand', 'text-on-brand')
+          badge?.classList.remove('text-text-muted', 'text-brand')
           if (isCorrect) {
             btn.classList.add('border-success', 'bg-success/10')
-            badge?.classList.add('bg-success', 'text-on-brand')
+            badge?.classList.add('text-success')
           } else if (wasSelected) {
             btn.classList.add('border-danger', 'bg-danger/10')
-            badge?.classList.add('bg-danger', 'text-on-brand')
+            badge?.classList.add('text-danger')
           } else {
-            btn.classList.add('border-text-muted/30', 'bg-bg-card', 'opacity-60')
-            badge?.classList.add('bg-bg-dark', 'text-text-primary')
+            btn.classList.add('border-border-hairline', 'bg-bg-card', 'opacity-60')
+            badge?.classList.add('text-text-muted')
           }
           btn.disabled = true
           btn.setAttribute('aria-pressed', wasSelected ? 'true' : 'false')

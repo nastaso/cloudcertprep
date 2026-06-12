@@ -1,0 +1,98 @@
+---
+/**
+ * ExamMockup.astro — decorative product mockup of the exam UI (DSv5.2).
+ * The hero "art" across marketing pages: a static, aria-hidden rendering of
+ * the real practice-exam interface (chrome, question, options, explanation,
+ * progress). Accent + content are props so each cert page shows its own
+ * sample in its own level color.
+ */
+interface Props {
+  code: string
+  qLabel?: string
+  timer?: string
+  question: string
+  options: [string, string, string, string]
+  correctIndex: 0 | 1 | 2 | 3
+  why: string
+  /** Accent hex for the code chip + progress bar. Default brand orange. */
+  accent?: string
+  /** Glow hue under the card, as an "R G B" triplet. Default brand orange. */
+  glowRgb?: string
+  progressPct?: number
+}
+
+const {
+  code,
+  qLabel = 'Question 17 of 65',
+  timer = '82:14',
+  question,
+  options,
+  correctIndex,
+  why,
+  accent = '#FF9900',
+  glowRgb = '255 153 0',
+  progressPct = 26,
+} = Astro.props
+
+const letters = ['A', 'B', 'C', 'D'] as const
+---
+
+<div class="relative hidden sm:block" aria-hidden="true">
+  {/* Glow bed under the mockup */}
+  <div
+    class="absolute -inset-10 rounded-[3rem] blur-md"
+    style={`background: radial-gradient(closest-side, rgb(${glowRgb} / 0.26), rgb(${glowRgb} / 0.08) 55%, transparent 75%);`}
+  >
+  </div>
+
+  <div class="relative rounded-2xl border border-white/12 bg-[#151A22] shadow-overlay">
+    {/* Window chrome */}
+    <div class="flex items-center justify-between border-b border-white/10 px-5 py-3">
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-[11px] uppercase tracking-[0.18em]" style={`color: ${accent};`}>{code}</span>
+        <span class="text-[12px] text-[#8B95A3]">{qLabel}</span>
+      </div>
+      <div class="flex items-center gap-2 font-mono text-[12px] text-[#C9D2DC]">
+        <svg class="h-3.5 w-3.5 text-[#8B95A3]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        {timer}
+      </div>
+    </div>
+
+    {/* Question body */}
+    <div class="px-5 py-5">
+      <p class="text-[15px] font-medium leading-snug text-[#F4F6F8]">
+        {question}
+      </p>
+
+      <div class="mt-4 space-y-2.5">
+        {options.map((opt, i) => i === correctIndex ? (
+          <div class="relative flex items-center gap-3 rounded-xl border border-[#34D399]/60 bg-[#34D399]/10 px-4 py-3 text-[14px] font-medium text-[#E7FBF3]">
+            <span class="font-mono text-[12px] text-[#34D399]">{letters[i]}</span> {opt}
+            <span class="ml-auto inline-flex items-center gap-1 rounded-full bg-[#34D399]/15 px-2 py-0.5 text-[11px] font-semibold text-[#34D399]">
+              <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              Correct
+            </span>
+          </div>
+        ) : (
+          <div class="flex items-center gap-3 rounded-xl border border-white/10 px-4 py-3 text-[14px] text-[#C9D2DC]">
+            <span class="font-mono text-[12px] text-[#8B95A3]">{letters[i]}</span> {opt}
+          </div>
+        ))}
+      </div>
+
+      {/* Explanation strip */}
+      <div class="mt-4 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+        <p class="text-[12px] leading-relaxed text-[#9AA6B2]">
+          <span class="font-semibold text-[#C9D2DC]">Why:</span> {why}
+        </p>
+      </div>
+    </div>
+
+    {/* Progress footer */}
+    <div class="border-t border-white/10 px-5 py-3">
+      <div class="h-1 w-full overflow-hidden rounded-full bg-white/10">
+        <div class="h-full rounded-full" style={`width: ${progressPct}%; background-color: ${accent};`}></div>
+      </div>
+    </div>
+  </div>
+</div>

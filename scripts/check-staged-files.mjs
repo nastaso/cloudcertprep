@@ -6,17 +6,21 @@
 import { execSync } from 'node:child_process';
 
 // cert-context.ts removed (C1): file was deleted from the codebase and is untracked, so asserting it blocked the squash; cookie-consent.ts stays — it exists on disk and is git-tracked.
-// jsonld.ts + the four landing components are imported by tracked pages
-// (index.astro, [cert].astro, Faq/Breadcrumb/SchemaOrgJsonLd/BlogLayout, etc.);
-// if they ship untracked the remote build breaks. Assert them here so the
-// squash can never drop an imported-but-untracked source file. (B1)
+// jsonld.ts + the DSv6 landing components are imported by tracked pages
+// (index.astro, [cert].astro, blog/about/contribute, Faq/Breadcrumb/
+// SchemaOrgJsonLd/BlogLayout, etc.); if they ship untracked the remote build
+// breaks. Assert them here so a squash can never drop an imported-but-
+// untracked source file. (B1) The v4-era HeroSection/PrimaryExamCTA/
+// TrustLine/ValuePropRow components were deleted in the v6 redesign.
 const REQUIRED_FILES = [
   'src/components/cookie-consent.ts',
   'src/lib/jsonld.ts',
-  'src/components/landing/HeroSection.astro',
-  'src/components/landing/PrimaryExamCTA.astro',
-  'src/components/landing/TrustLine.astro',
-  'src/components/landing/ValuePropRow.astro',
+  'src/components/landing/HeroStage.astro',
+  'src/components/landing/HeroMini.astro',
+  'src/components/landing/ExamMockup.astro',
+  'src/components/landing/CertSpecPanel.astro',
+  'src/components/landing/CertTile.astro',
+  'src/components/landing/AboutCard.astro',
   // locationChange.ts is imported by tracked CertSwitcher.tsx + useCert.ts;
   // generate-csp-hashes.mjs is wired into the postbuild script chain. (R4)
   'src/lib/locationChange.ts',

@@ -10,6 +10,7 @@
  * Satisfies: R1.2, R5.6
  */
 import BaseLayout from '../layouts/BaseLayout.astro'
+import HeroMini from '../components/landing/HeroMini.astro'
 ---
 
 <!-- Google OAuth data fields: email, name, profile picture URL. No other data requested, no tokens stored. (R5.6, expanded in Phase 13) -->
@@ -18,17 +19,25 @@ import BaseLayout from '../layouts/BaseLayout.astro'
   title="Privacy Policy · CloudCertPrep"
   description="CloudCertPrep privacy policy. GDPR-compliant, EU-hosted (Ireland), no data sold. Guest users generate no personal data."
   canonical="https://www.cloudcertprep.io/privacy"
+  headerOverlay={true}
 >
-  <div class="p-4 md:p-8">
-    <div class="max-w-3xl mx-auto">
-      <h1 class="text-2xl md:text-3xl font-semibold text-text-primary mb-2">Privacy Policy</h1>
-      <p class="text-text-muted text-sm mb-8">Last updated: May 2026</p>
+  <HeroMini
+    kicker="Legal"
+    title="Privacy Policy"
+    lede="GDPR-compliant, EU-hosted, no data sold. Guest users generate no personal data."
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'Privacy' }]}
+    maxWidth="max-w-3xl"
+  />
 
-      <div class="space-y-8">
+  <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
+    <div class="max-w-3xl mx-auto px-4 md:px-8">
+      <p class="font-mono text-[12px] tracking-wide text-text-muted mb-8">Last updated: May 2026</p>
+
+      <div class="space-y-8 max-w-[68ch] mx-auto">
         <section>
           <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Data Controller</h2>
           <p class="text-text-muted text-sm leading-relaxed">
-            CloudCertPrep is operated by Alex Santonastaso (the "Data Controller") based in the United Kingdom. For any data protection enquiries, contact us at <a href="mailto:alex@cloudcertprep.io" class="text-text-primary hover:text-text-primary/70 hover:underline transition-colors">alex@cloudcertprep.io</a>.
+            CloudCertPrep is operated by Alex Santonastaso (the "Data Controller") based in the United Kingdom. For any data protection enquiries, contact us at <a href="mailto:alex@cloudcertprep.io" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">alex@cloudcertprep.io</a>.
           </p>
         </section>
 
@@ -63,7 +72,7 @@ import BaseLayout from '../layouts/BaseLayout.astro'
         <section>
           <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Bot protection (Cloudflare Turnstile)</h2>
           <p class="text-text-muted text-sm leading-relaxed">
-            Our sign-in, sign-up, and password-reset forms use <a href="https://www.cloudflare.com/products/turnstile/" target="_blank" rel="noopener noreferrer" class="text-text-primary hover:text-text-primary/70 hover:underline transition-colors">Cloudflare Turnstile</a>, a privacy-preserving CAPTCHA alternative, to block automated abuse. Turnstile runs a challenge in your browser and may read signals such as your IP address and browser characteristics to tell humans from bots. It does not use tracking cookies and is not used to profile you or serve ads. The challenge token is sent to our authentication provider (Supabase) for one-time server-side verification and is then discarded.
+            Our sign-in, sign-up, and password-reset forms use <a href="https://www.cloudflare.com/products/turnstile/" target="_blank" rel="noopener noreferrer" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">Cloudflare Turnstile</a>, a privacy-preserving CAPTCHA alternative, to block automated abuse. Turnstile runs a challenge in your browser and may read signals such as your IP address and browser characteristics to tell humans from bots. It does not use tracking cookies and is not used to profile you or serve ads. The challenge token is sent to our authentication provider (Supabase) for one-time server-side verification and is then discarded.
           </p>
         </section>
 
@@ -125,7 +134,7 @@ import BaseLayout from '../layouts/BaseLayout.astro'
         <section>
           <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Where data is stored</h2>
           <p class="text-text-muted text-sm leading-relaxed">
-            Authentication and database are handled by <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" class="text-text-primary hover:text-text-primary/70 hover:underline transition-colors">Supabase</a>, hosted on AWS infrastructure in the EU West region (Ireland). All data is encrypted at rest and in transit. Your data does not leave the European Economic Area.
+            Authentication and database are handled by <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">Supabase</a>, hosted on AWS infrastructure in the EU West region (Ireland). All data is encrypted at rest and in transit. Your data does not leave the European Economic Area.
           </p>
         </section>
 
@@ -157,14 +166,14 @@ import BaseLayout from '../layouts/BaseLayout.astro'
             </li>
           </ul>
           <p class="text-text-muted text-sm leading-relaxed mt-3">
-            To exercise any of these rights, email <a href="mailto:alex@cloudcertprep.io" class="text-text-primary hover:text-text-primary/70 hover:underline transition-colors">alex@cloudcertprep.io</a>. We will respond within 30 days.
+            To exercise any of these rights, email <a href="mailto:alex@cloudcertprep.io" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">alex@cloudcertprep.io</a>. We will respond within 30 days.
           </p>
         </section>
 
         <section>
           <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Right to complain</h2>
           <p class="text-text-muted text-sm leading-relaxed">
-            If you are unhappy with how we handle your data, you have the right to lodge a complaint with the UK Information Commissioner's Office (ICO). Visit <a href="https://ico.org.uk/make-a-complaint/" target="_blank" rel="noopener noreferrer" class="text-text-primary hover:text-text-primary/70 hover:underline transition-colors">ico.org.uk/make-a-complaint</a> for more information. If you are in the EU/EEA, you may also complain to your local supervisory authority.
+            If you are unhappy with how we handle your data, you have the right to lodge a complaint with the UK Information Commissioner's Office (ICO). Visit <a href="https://ico.org.uk/make-a-complaint/" target="_blank" rel="noopener noreferrer" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">ico.org.uk/make-a-complaint</a> for more information. If you are in the EU/EEA, you may also complain to your local supervisory authority.
           </p>
         </section>
 
@@ -200,7 +209,7 @@ import BaseLayout from '../layouts/BaseLayout.astro'
             </li>
             <li class="flex items-start gap-2">
               <span class="text-text-muted mt-0.5">-</span>
-              <span><strong class="text-text-primary">Google Analytics 4 (GA4) (requires consent)</strong>: a more detailed analytics tool. GA4 sets cookies (such as <code class="text-xs bg-bg-dark px-1 py-0.5 rounded">_ga</code> and <code class="text-xs bg-bg-dark px-1 py-0.5 rounded">_ga_*</code>) to track anonymous usage patterns. <strong class="text-text-primary">GA4 only loads if you click "Accept" on the cookie consent banner.</strong> No personally identifiable information is sent to Google, and we do not link analytics data to your account. You can change your preference using the "Cookie Preferences" link in the footer, or use the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer" class="text-text-primary hover:text-text-primary/70 hover:underline transition-colors">Google Analytics Opt-out Add-on</a>.</span>
+              <span><strong class="text-text-primary">Google Analytics 4 (GA4) (requires consent)</strong>: a more detailed analytics tool. GA4 sets cookies (such as <code class="text-xs bg-bg-dark px-1 py-0.5 rounded">_ga</code> and <code class="text-xs bg-bg-dark px-1 py-0.5 rounded">_ga_*</code>) to track anonymous usage patterns. <strong class="text-text-primary">GA4 only loads if you click "Accept" on the cookie consent banner.</strong> No personally identifiable information is sent to Google, and we do not link analytics data to your account. You can change your preference using the "Cookie Preferences" link in the footer, or use the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">Google Analytics Opt-out Add-on</a>.</span>
             </li>
           </ul>
         </section>
@@ -214,7 +223,7 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 
         <div class="pt-4 border-t border-text-muted/20">
           <p class="text-text-muted text-sm">
-            Questions? Email <a href="mailto:alex@cloudcertprep.io" class="text-text-primary hover:text-text-primary/70 hover:underline transition-colors">alex@cloudcertprep.io</a> or read our <a href="/terms" class="text-text-primary hover:text-text-primary/70 hover:underline transition-colors">Terms of Service</a>.
+            Questions? Email <a href="mailto:alex@cloudcertprep.io" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">alex@cloudcertprep.io</a> or read our <a href="/terms" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">Terms of Service</a>.
           </p>
         </div>
       </div>

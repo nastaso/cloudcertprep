@@ -18,7 +18,7 @@ import { TrendingUp, Check, X, Trash2, AlertTriangle, ChevronDown, ChevronRight 
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
-import { filterChipClass, inputClass } from '../lib/buttonStyles'
+import { filterChipClass, inputClass, reviewCellClass } from '../lib/buttonStyles'
 
 interface AttemptQuestionRow {
   question_id: string
@@ -135,11 +135,12 @@ function AttemptReviewPanel({
               disabled={!isInFiltered}
               aria-label={ariaLabel}
               aria-current={isCurrent ? 'true' : undefined}
-              className={`w-8 h-8 md:w-9 md:h-9 rounded text-[10px] md:text-xs font-medium transition-all ${
-                isCurrent ? 'ring-2 ring-brand ring-offset-1 ring-offset-bg-card' : ''
-              } ${!isInFiltered ? 'opacity-30 cursor-not-allowed' : 'hover:scale-110'} ${
-                aq.is_correct ? 'bg-success text-on-brand' : 'bg-danger text-on-brand'
-              } ${aq.was_flagged ? 'ring-2 ring-warning' : ''}`}
+              className={reviewCellClass({
+                correct: aq.is_correct,
+                current: isCurrent,
+                flagged: aq.was_flagged,
+                inSet: isInFiltered,
+              })}
             >
               {idx + 1}
             </button>
@@ -147,9 +148,9 @@ function AttemptReviewPanel({
         })}
       </div>
       <div className="flex items-center justify-center gap-4 text-xs text-text-muted">
-        <span className="flex items-center gap-1"><span className="w-3 h-3 bg-success rounded"></span> Correct</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-3 bg-danger rounded"></span> Incorrect</span>
-        <span className="flex items-center gap-1"><span className="w-3 h-3 bg-bg-dark rounded ring-2 ring-warning"></span> Flagged</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-success/15 border border-success/30"></span> Correct</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-danger/10 border border-danger/25"></span> Incorrect</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-bg-dark ring-2 ring-warning"></span> Flagged</span>
       </div>
 
       {/* Current Question Display */}
@@ -412,7 +413,7 @@ export function History() {
     <div className="p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4 md:mb-6">
-            <h1 className="text-xl md:text-2xl font-semibold text-text-primary">Exam History</h1>
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-[-0.02em] text-text-primary">Exam History</h1>
             {user && attempts.length > 0 && (
               <Button
                 onClick={() => setShowResetModal(true)}
@@ -509,20 +510,23 @@ export function History() {
             </div>
           )}
 
-          {/* Guest User: only sign-in CTA, no misleading empty-state card. */}
+          {/* Guest User: a calm neutral sign-in funnel (no warning styling —
+              nothing is wrong, it's just gated). The CTA carries the action. */}
           {!user ? (
-            <Alert tone="warning" className="p-6">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-5 h-5 text-warning" />
-                <p className="text-warning font-semibold">Track your progress</p>
+            <div className="bg-bg-card border border-border-hairline rounded-2xl p-6 md:p-8">
+              <div className="flex items-center gap-2.5 mb-2">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-bg-dark border border-border-hairline">
+                  <TrendingUp className="w-4 h-4 text-text-primary" aria-hidden="true" />
+                </span>
+                <p className="text-text-primary font-semibold tracking-[-0.01em]">Track your progress</p>
               </div>
-              <p className="text-text-muted text-sm mb-4">
-                Sign in to track your practice exam history and monitor your progress over time.
+              <p className="text-text-muted text-sm mb-5 max-w-md">
+                Sign in to track your practice exam history and see your domain mastery improve over time. Practising as a guest works without an account.
               </p>
-              <Button onClick={() => goToLogin(navigate, location)} variant="primary" size="sm">
+              <Button onClick={() => goToLogin(navigate, location)} variant="primary" size="md">
                 Sign in
               </Button>
-            </Alert>
+            </div>
           ) : (
             <>
               {filteredAttempts.length > 0 && (
@@ -566,28 +570,30 @@ export function History() {
                               )}
                             </div>
                             <div>
-                              <div className="flex items-center gap-2 flex-wrap">
+                              {/* Line 1: status + cert chip. Line 2: mono meta
+                                  (date · duration) so middots never orphan at a
+                                  wrapped line start on mobile. */}
+                              <div className="flex items-center gap-2">
                                 <h3 className="text-sm md:text-base font-semibold text-text-primary">
                                   {attempt.passed ? 'Passed' : 'Failed'}
                                 </h3>
                                 {attemptCert && (
-                                  <span className="px-2 py-0.5 rounded text-[10px] md:text-xs font-medium bg-brand text-on-brand uppercase tracking-wide">
+                                  <span className="px-2 py-0.5 rounded-full font-mono text-[10px] md:text-[11px] font-semibold bg-bg-dark border border-border-hairline text-text-muted uppercase tracking-wide">
                                     {attemptCert.shortName}
                                   </span>
                                 )}
-                                <span className="text-text-muted text-xs">·</span>
-                                <span className="text-text-muted text-xs">{formatRelativeDate(attempt.attempted_at)}</span>
-                                <span className="text-text-muted text-xs">·</span>
-                                <span className="text-text-muted text-xs">{formatDuration(attempt.time_taken_seconds)}</span>
                               </div>
+                              <p className="mt-1 font-mono text-[12px] text-text-muted">
+                                {formatRelativeDate(attempt.attempted_at)} · {formatDuration(attempt.time_taken_seconds)}
+                              </p>
                               <p className="text-text-muted text-xs md:text-sm mt-0.5">
                                 {attempt.correct_answers}/{attempt.total_questions} correct ({Math.round(attempt.score_percent)}%)
                               </p>
                             </div>
                           </div>
                           <div className="text-right flex-shrink-0">
-                            <p className="text-xl md:text-2xl font-bold text-text-primary">{attempt.scaled_score}</p>
-                            <p className="text-text-muted text-[10px]">/ 1000</p>
+                            <p className="font-mono text-xl md:text-2xl font-semibold tabular-nums text-text-primary">{attempt.scaled_score}</p>
+                            <p className="font-mono text-text-muted text-[10px]">/ 1000</p>
                           </div>
                         </div>
 
@@ -680,10 +686,10 @@ export function History() {
                           onClick={() => setCurrentPage(pageNum)}
                           aria-label={`Go to page ${pageNum}`}
                           aria-current={safeCurrentPage === pageNum ? 'page' : undefined}
-                          className={`w-11 h-11 rounded-full font-medium transition-all duration-150 active:scale-[0.97] text-sm ${
+                          className={`w-11 h-11 rounded-full font-medium transition-[background-color,border-color,color] duration-200 active:scale-[0.97] text-sm border ${
                             safeCurrentPage === pageNum
-                            ? 'bg-brand text-on-brand'
-                              : 'bg-bg-card hover:bg-bg-card-hover text-text-primary'
+                              ? 'bg-header-bg text-on-header border-header-bg'
+                              : 'bg-bg-card hover:bg-bg-card-hover text-text-primary border-border-hairline'
                           }`}
                         >
                           {pageNum}

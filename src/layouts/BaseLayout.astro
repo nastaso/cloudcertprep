@@ -27,6 +27,8 @@ interface Props {
   showChrome?: boolean
   /** Whether the Header shows its full nav (cert switcher + links). Default true. */
   headerShowNav?: boolean
+  /** Billboard overlay header (transparent → frosted on scroll). Hero pages only. */
+  headerOverlay?: boolean
   /**
    * Whether the Header sticks to the top of the viewport on scroll. Default
    * true. Disabled on the mock-exam shell, whose in-page exam toolbar already
@@ -61,6 +63,7 @@ const {
   jsonLd = [],
   showChrome = true,
   headerShowNav = true,
+  headerOverlay = false,
   headerSticky = true,
   headerHideMobileMenu = false,
   noscriptDirectory = false,
@@ -201,7 +204,9 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
   <body>
     <!-- FOUC prevention: DO NOT REMOVE -->
     <script is:inline>
-      (function(){var t=localStorage.getItem('cloudcertprep_theme');if(t==='dark'){document.documentElement.classList.add('dark')}else if(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.classList.add('dark')}})();
+      /* DSv5.1: dark-first brand. Dark unless the user explicitly chose light
+         (stored only on explicit toggle, never auto-persisted). */
+      (function(){var t=localStorage.getItem('cloudcertprep_theme');if(t!=='light'){document.documentElement.classList.add('dark')}})();
     </script>
 
     <!-- Auth pre-paint: define a shared hasSession() helper on window, then
@@ -223,7 +228,7 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
         Skip to main content
       </a>
 
-      {showChrome && <Header showNav={headerShowNav} sticky={headerSticky} hideMobileMenu={headerHideMobileMenu} />}
+      {showChrome && <Header showNav={headerShowNav} sticky={headerSticky} hideMobileMenu={headerHideMobileMenu} overlay={headerOverlay} />}
 
       <main id="main" class="flex-1 flex flex-col">
         <slot />

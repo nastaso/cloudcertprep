@@ -9,19 +9,28 @@
  * Satisfies: R1.2
  */
 import BaseLayout from '../layouts/BaseLayout.astro'
+import HeroMini from '../components/landing/HeroMini.astro'
 ---
 
 <BaseLayout
   title="Terms of Service · CloudCertPrep"
   description="CloudCertPrep terms of service. Free to use, no warranty, open source under MIT license."
   canonical="https://www.cloudcertprep.io/terms"
+  headerOverlay={true}
 >
-  <div class="p-4 md:p-8">
-    <div class="max-w-3xl mx-auto">
-      <h1 class="text-2xl md:text-3xl font-semibold text-text-primary mb-2">Terms of Service</h1>
-      <p class="text-text-muted text-sm mb-8">Last updated: May 2026</p>
+  <HeroMini
+    kicker="Legal"
+    title="Terms of Service"
+    lede="A free study tool, provided as-is, open source under the MIT license."
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'Terms' }]}
+    maxWidth="max-w-3xl"
+  />
 
-      <div class="space-y-8">
+  <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
+    <div class="max-w-3xl mx-auto px-4 md:px-8">
+      <p class="font-mono text-[12px] tracking-wide text-text-muted mb-8">Last updated: May 2026</p>
+
+      <div class="space-y-8 max-w-[68ch] mx-auto">
         <section>
           <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">The short version</h2>
           <p class="text-text-muted text-sm leading-relaxed">
@@ -119,7 +128,7 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 
         <div class="pt-4 border-t border-text-muted/20">
           <p class="text-text-muted text-sm">
-            Questions? Email <a href="mailto:alex@cloudcertprep.io" class="text-text-primary hover:text-text-primary/70 hover:underline transition-colors">alex@cloudcertprep.io</a> or read our <a href="/privacy" class="text-text-primary hover:text-text-primary/70 hover:underline transition-colors">Privacy Policy</a>.
+            Questions? Email <a href="mailto:alex@cloudcertprep.io" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">alex@cloudcertprep.io</a> or read our <a href="/privacy" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">Privacy Policy</a>.
           </p>
         </div>
       </div>
