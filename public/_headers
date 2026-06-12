@@ -6,20 +6,35 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cloud.umami.is https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://cloud.umami.is https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
 
-# CSP NOTE: the `'unsafe-inline'` token in script-src above is a BUILD-TIME
-# PLACEHOLDER. The postbuild step `scripts/generate-csp-hashes.mjs` rewrites the
-# dist/_headers copy of this CSP, replacing `'unsafe-inline'` with the exhaustive
-# set of `'sha256-...'` hashes of every inline <script> in dist/**/*.html. The
-# host-source allowlists (googletagmanager / umami / cloudflare) stay so the
+# CSP NOTE: the `'unsafe-inline'` tokens in script-src AND style-src above are
+# BUILD-TIME PLACEHOLDERS. The postbuild step `scripts/generate-csp-hashes.mjs`
+# rewrites the dist/_headers copy of this CSP:
+#   - script-src: 'unsafe-inline' -> exhaustive 'sha256-...' hashes of every
+#     inline <script> in dist/**/*.html (security V2/V13).
+#   - style-src: 'unsafe-inline' -> 'unsafe-hashes' + 'sha256-...' hashes of
+#     every inline <style> ELEMENT and every style="" ATTRIBUTE value in the
+#     built HTML. 'unsafe-hashes' lets the attr hashes match (Chrome 69+,
+#     Firefox 109+, Safari 15.4+); older browsers degrade cosmetically only
+#     (halo/progress-bar inline styles), never functionally. style-src-elem/
+#     -attr split was rejected: Safari shipped style-src-elem only in 26.2,
+#     so the split would regress most Safari users to the style-src fallback.
+#   - connect-src: the https://*.supabase.co + wss://*.supabase.co wildcards
+#     are pinned to the exact project host derived from VITE_SUPABASE_URL
+#     (shrinks the exfil surface if XSS ever slips the hash CSP).
+# The host-source allowlists (googletagmanager / umami / cloudflare) stay so the
 # dynamically-injected GA loader, Umami, and Turnstile scripts keep loading.
-# Edit inline scripts freely; the hashes regenerate on every build. (security V2/V13)
+# Edit inline scripts/styles freely; hashes regenerate on every build.
 
-# Static assets have content-hashed filenames (e.g. index-A8f2k3.js), so they
+# Static assets have content-hashed filenames (e.g. index.A8f2k3.js), so they
 # are safe to cache forever. New deploys produce new hashes => new filenames.
+# Astro emits ALL hashed assets under /_astro/ (there is no dist/assets/) —
+# a previous /assets/* rule here matched nothing and every hashed chunk missed
+# the immutable cache.
 # NOTE: no `/*` Cache-Control rule is set. Netlify MERGES every matching rule's
 # headers rather than letting a more specific path override, so a `/*`
 # `max-age=0` would combine with this immutable rule and defeat long-term
 # caching of hashed assets. HTML routes fall back to Netlify's default
 # (revalidated) caching, which is correct for one-HTML-file-per-route output.
-/assets/*
+# (public/fonts/og/ is satori build input only — never client-served, no rule.)
+/_astro/*
   Cache-Control: public, max-age=31536000, immutable

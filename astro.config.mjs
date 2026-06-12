@@ -45,9 +45,13 @@ export default defineConfig({
     // Inline the single ~59KB CSS bundle into each page's <head> instead of a
     // render-blocking <link>. On simulated mobile this removes the ~150ms
     // render-blocking round-trip that gated LCP (text-LCP pages sat at 99),
-    // taking every page to a clean 100. CSP already allows style-src
-    // 'unsafe-inline', so inline <style> is policy-safe (it never touches the
-    // inline-SCRIPT hashing the csp:hash postbuild guard depends on).
+    // taking every page to a clean 100. Re-measured 2026-06-13 with the
+    // /_astro/* immutable cache in place: 'auto' (linked CSS)
+    // regressed cold mobile LCP (home 1.1s -> 1.7s, cert hub 1.8s -> 2.0s and
+    // 100 -> 99), so 'always' stays — cold first-paint beats cross-page CSS
+    // caching for a mostly single-page-visit funnel. CSP no longer needs
+    // style-src 'unsafe-inline' for this: the csp:hash postbuild now hashes
+    // inline <style> elements (and style="" attrs) into style-src.
     inlineStylesheets: 'always',
   },
   integrations: [react()],

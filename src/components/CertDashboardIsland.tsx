@@ -113,7 +113,9 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
         .eq('cert_code', cert.code),
       supabase
         .from('exam_attempts')
-        .select('*', { count: 'exact' })
+        // Only the columns RecentAttempt renders — keeps the domain_scores
+        // JSONB out of the list-view egress.
+        .select('id, attempted_at, score_percent, scaled_score, passed, time_taken_seconds', { count: 'exact' })
         .eq('user_id', user.id)
         .eq('cert_code', cert.code)
         .order('attempted_at', { ascending: false })

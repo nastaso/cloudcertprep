@@ -240,7 +240,10 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
 
     <CookieConsentIsland client:idle />
     <AccountLinkNoticeIsland client:idle />
-    <AnalyticsBootstrap client:load />
+    {/* client:idle (was client:load): analytics is non-critical, keep its
+        hydration off the critical path. Inline consumers of
+        window.trackEvent must tolerate late exposure (404.astro polls). */}
+    <AnalyticsBootstrap client:idle />
 
     {/* Progressive-enhancement motion bootstrap (§8 item 3): marks <html> with
         `cc-js` so the scroll-reveal CSS only applies when JS runs (no-JS users

@@ -21,6 +21,8 @@ import Button from '../components/Button.astro'
   </div>
 
   <script is:inline>
-    (function(){if(window.trackEvent){window.trackEvent('page_not_found',{path:location.pathname})}else{window.addEventListener('load',function(){if(window.trackEvent){window.trackEvent('page_not_found',{path:location.pathname})}})}})();
+    // AnalyticsBootstrap hydrates client:idle, which can land AFTER the load
+    // event — poll briefly instead of racing it.
+    (function(){var n=0,t=setInterval(function(){if(window.trackEvent){clearInterval(t);window.trackEvent('page_not_found',{path:location.pathname})}else if(++n>40){clearInterval(t)}},250)})();
   </script>
 </BaseLayout>

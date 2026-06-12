@@ -15,6 +15,7 @@ import { Alert } from '../components/Alert'
 import { Turnstile, type TurnstileHandle } from '../components/Turnstile'
 import { getActiveTotalQuestions } from '../data/certifications'
 import { safeFrom } from '../lib/navigation'
+import { authErrorMessage } from '../lib/authErrors'
 
 export function Login() {
   const location = useLocation()
@@ -117,7 +118,9 @@ export function Login() {
         window.location.assign(from)
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      // Generic, non-enumerating copy — raw Supabase messages can confirm
+      // whether an email is registered.
+      setError(authErrorMessage(err, isSignUp ? 'sign-up' : 'sign-in'))
       // Token is single-use; re-arm the widget so the user can retry.
       resetCaptcha()
     } finally {

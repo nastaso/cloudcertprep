@@ -27,6 +27,7 @@
 // Wired into `prebuild` after generate-seo-assets.mjs and before astro build.
 
 import { writeFileSync, readFileSync, mkdirSync, copyFileSync, existsSync, statSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import satori from 'satori'
@@ -40,6 +41,26 @@ const FONT_REGULAR = resolve(__dirname, '../public/fonts/og/Inter-Regular.ttf')
 const FONT_BOLD = resolve(__dirname, '../public/fonts/og/Inter-Bold.ttf')
 
 const strict = process.argv.includes('--strict')
+
+// Build-cost gate: satori+resvg rasterization is the prebuild
+// bottleneck, yet its output depends ONLY on these inputs. Hash them into a
+// stamp (under the gitignored .astro/ cache dir — NOT public/, which Astro
+// copies into dist/) and skip regeneration when nothing changed and every
+// expected output already exists. `--force` overrides.
+const STAMP_PATH = resolve(__dirname, '../.astro/og-build-stamp.json')
+const STAMP_INPUTS = [
+  fileURLToPath(import.meta.url), // this script (templates/palette live here)
+  CERT_REGISTRY_PATH,
+  FONT_REGULAR,
+  FONT_BOLD,
+]
+const force = process.argv.includes('--force')
+
+function computeInputHash() {
+  const h = createHash('sha256')
+  for (const p of STAMP_INPUTS) h.update(readFileSync(p))
+  return h.digest('hex')
+}
 
 // Brand palette — DSv5 "big OSS project" identity: near-black ink stage with
 // an orange glow (the same hero stage the site renders), one accent hue per
@@ -372,36 +393,6 @@ async function renderCardPng(spec, fonts) {
 async function main() {
   mkdirSync(OG_DIR, { recursive: true })
 
-  const fonts = [
-    { name: 'Inter', data: readFileSync(FONT_REGULAR), weight: 400, style: 'normal' },
-    { name: 'Inter', data: readFileSync(FONT_BOLD), weight: 700, style: 'normal' },
-  ]
-
-  // Bare brand mark (matches the favicon and the site header): orange cloud +
-  // white check, NO tile. Built inline so the art never depends on the email
-  // asset (logo-email.svg keeps its white tile for email-client rendering).
-  const glyphSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" fill="${AWS_ORANGE}" stroke="${AWS_ORANGE}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M16.2 9.6 11.4 14.4 9 12" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`
-  const logoDataUri = `data:image/svg+xml;base64,${Buffer.from(glyphSvg, 'utf8').toString('base64')}`
-
-  // Platform root card (public/og-image.png): cert-AGNOSTIC default used by
-  // BaseLayout's fallback on home/about/stats and any page without a per-cert
-  // composite. Rendered through the SAME satori pipeline so one template/font/
-  // palette covers every card (§7 items 4 + 5). Render it FIRST so the refreshed
-  // file is also the fallback source for any composite that fails below.
-  try {
-    const rootPng = await renderPng(
-      { title: 'Free AWS Certification Practice Exams', tagline: 'Open source · No signup · No ads', domainName: null, logoDataUri },
-      fonts,
-    )
-    writeFileSync(FALLBACK_OG, rootPng)
-    console.log('✓ platform root og-image.png regenerated through satori pipeline')
-  } catch (err) {
-    console.warn(`⚠ platform root og-image.png render failed (keeping existing): ${err.message}`)
-  }
-
   const certs = parseCertRegistry()
   // Enumerate every (cert) and (cert, domain) pair — including coming-soon
   // certs, so they get a themed image if their landing is ever shared.
@@ -435,6 +426,62 @@ async function main() {
         level: cert.level,
       })
     }
+  }
+
+  // Skip the whole satori/resvg render when inputs are byte-identical to the
+  // last successful run AND every expected output is on disk. CI/deploy builds
+  // start from a clean checkout (no gitignored .astro/ stamp), so they always
+  // render fully — the gate only accelerates local/agent rebuilds.
+  const inputHash = computeInputHash()
+  const expectedFiles = [
+    ...targets.map(t => t.file),
+    ...certs.map(c => `card-${c.code}.webp`),
+  ]
+  if (!force && existsSync(STAMP_PATH)) {
+    let prevHash = null
+    try {
+      prevHash = JSON.parse(readFileSync(STAMP_PATH, 'utf8')).hash
+    } catch {
+      prevHash = null
+    }
+    if (
+      prevHash === inputHash &&
+      existsSync(FALLBACK_OG) &&
+      expectedFiles.every(f => existsSync(resolve(OG_DIR, f)))
+    ) {
+      console.log(`✓ OG images: inputs unchanged (${inputHash.slice(0, 12)}…) and all ${expectedFiles.length + 1} outputs present — render skipped (pass --force to regenerate)`)
+      return
+    }
+  }
+
+  const fonts = [
+    { name: 'Inter', data: readFileSync(FONT_REGULAR), weight: 400, style: 'normal' },
+    { name: 'Inter', data: readFileSync(FONT_BOLD), weight: 700, style: 'normal' },
+  ]
+
+  // Bare brand mark (matches the favicon and the site header): orange cloud +
+  // white check, NO tile. Built inline so the art never depends on the email
+  // asset (logo-email.svg keeps its white tile for email-client rendering).
+  const glyphSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" fill="${AWS_ORANGE}" stroke="${AWS_ORANGE}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M16.2 9.6 11.4 14.4 9 12" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`
+  const logoDataUri = `data:image/svg+xml;base64,${Buffer.from(glyphSvg, 'utf8').toString('base64')}`
+
+  // Platform root card (public/og-image.png): cert-AGNOSTIC default used by
+  // BaseLayout's fallback on home/about/stats and any page without a per-cert
+  // composite. Rendered through the SAME satori pipeline so one template/font/
+  // palette covers every card (§7 items 4 + 5). Render it FIRST so the refreshed
+  // file is also the fallback source for any composite that fails below.
+  try {
+    const rootPng = await renderPng(
+      { title: 'Free AWS Certification Practice Exams', tagline: 'Open source · No signup · No ads', domainName: null, logoDataUri },
+      fonts,
+    )
+    writeFileSync(FALLBACK_OG, rootPng)
+    console.log('✓ platform root og-image.png regenerated through satori pipeline')
+  } catch (err) {
+    console.warn(`⚠ platform root og-image.png render failed (keeping existing): ${err.message}`)
   }
 
   let rendered = 0
@@ -471,6 +518,12 @@ async function main() {
     } catch (err) {
       failures.push(`card-${cert.code}.webp: ${err.message}`)
     }
+  }
+
+  // Stamp only a fully clean render: a run that used fallbacks must NOT be
+  // frozen, or a transient satori failure would be skipped past forever.
+  if (failures.length === 0) {
+    writeFileSync(STAMP_PATH, JSON.stringify({ hash: inputHash, at: new Date().toISOString() }, null, 2))
   }
 
   // Assert every expected file now exists on disk (R6.14).

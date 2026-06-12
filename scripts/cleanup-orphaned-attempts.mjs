@@ -1,4 +1,4 @@
-// One-time cleanup of orphaned attempt_questions rows (ship-v2 task 02).
+// One-time cleanup of orphaned attempt_questions rows.
 //
 // Questions live in JSON banks (src/data/<cert>/domainN.json), not Postgres,
 // and attempt_questions.question_id has no FK to them. When questions are

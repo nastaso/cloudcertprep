@@ -3,7 +3,7 @@ import { updateDomainProgress } from './supabaseUtils'
 import { getCertDomainCounts } from '../data/certifications'
 
 /**
- * Regression guard for the ">100% mastery" bug (ship-v2 task 02): historical
+ * Regression guard for the ">100% mastery" bug: historical
  * attempt_questions rows for questions later DELETED from the JSON banks must
  * not count toward domain progress. These tests seed exactly that stale-row
  * shape and assert the recomputed aggregates stay within the current bank.

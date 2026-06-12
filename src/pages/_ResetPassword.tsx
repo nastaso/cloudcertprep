@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { validatePassword, isPasswordStrongEnough } from '../lib/validation'
+import { useAuth } from '../hooks/useAuth'
 import { useSEO } from '../hooks/useSEO'
+import { LoadingSpinner } from '../components/LoadingSpinner'
 import { PasswordInput } from '../components/PasswordInput'
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter'
 import { Button } from '../components/Button'
@@ -16,12 +18,45 @@ export function ResetPassword() {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  // Recovery-session guard: the email link's code is exchanged
+  // for a session by supabase-js during client init (detectSessionInUrl), and
+  // useAuth's loading stays true until that settles. No session afterwards
+  // means the link was invalid/expired (or the page was opened directly) —
+  // show that instead of letting updateUser() fail with a raw
+  // "Auth session missing!". A normally signed-in user passes the guard,
+  // which is correct: changing your own password while signed in is fine.
+  const { user, loading: authLoading } = useAuth()
 
   useSEO({
     title: 'Reset password · CloudCertPrep',
     description: 'Reset your CloudCertPrep account password.',
     canonical: null,
   })
+
+  if (authLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center px-4">
+        <LoadingSpinner />
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="flex-1 flex items-center justify-center px-4">
+        <Card padding="lg" className="max-w-md w-full">
+          <h1 className="text-xl font-semibold text-text-primary mb-2">Reset link invalid or expired</h1>
+          <p className="text-text-muted mb-8">
+            Password reset links are single-use and expire after a short time.
+            Request a new one from the sign-in page.
+          </p>
+          <Button onClick={() => navigate('/login')} fullWidth>
+            Back to sign in
+          </Button>
+        </Card>
+      </div>
+    )
+  }
 
 
   const handleResetPassword = async (e: React.FormEvent) => {

@@ -156,6 +156,18 @@ export function MockExam() {
   // away mid-exam via the router). Ensures Footer/CertSwitcher are restored.
   useEffect(() => () => { delete document.body.dataset.examActive }, [])
 
+  // Warm the question-bank chunks as soon as the intro screen mounts.
+  // Landing on /practice-exam is a strong start signal, and the banks are the
+  // multi-second wait behind "Loading questions..." on mobile (CLF ~1.3 MB raw
+  // across 4 domain chunks). Dynamic-import caching dedupes this with the
+  // startExam() call, which stays authoritative and retries on failure
+  // (same pattern as DomainPractice's selection preload).
+  useEffect(() => {
+    loadAllQuestions(cert.code).catch(() => {
+      // Silently fail — startExam will retry and surface a real error.
+    })
+  }, [cert.code])
+
   // Track exam abandonment - fires when user leaves during active exam.
   // Also triggers the native "Leave site?" dialog while exam is in progress.
   // The native dialog is the last-resort net for browser-level exits (tab
