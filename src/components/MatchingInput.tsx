@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import { Check, X } from 'lucide-react'
+import { ArrowRight, Check, X } from 'lucide-react'
 
 interface MatchingInputProps {
   /** Left column: option key -> item text (already shuffled by the caller). */
@@ -105,13 +105,14 @@ export function MatchingInput({ options, targets, value, correctMatches, mode, o
     <ul className="space-y-2.5">
       {lefts.map(key => (
         <li key={key} className={`${rowGap} w-full border border-border-hairline bg-bg-card rounded-xl ${pad}`}>
-          <label htmlFor={`${uid}-${key}`} className="flex-1 text-text-primary font-medium cursor-pointer">{options[key]}</label>
+          <label htmlFor={`${uid}-${key}`} className="flex-1 min-w-0 text-text-primary font-medium cursor-pointer">{options[key]}</label>
+          <ArrowRight className="hidden sm:block w-4 h-4 text-text-muted/70 flex-shrink-0" aria-hidden="true" />
           <select
             id={`${uid}-${key}`}
             value={selected[key] ?? ''}
             onChange={e => setMatch(key, e.target.value)}
             aria-label={`Match for: ${options[key]}`}
-            className="flex-1 min-h-[44px] bg-bg-dark border border-border-hairline rounded-lg px-3 py-2 text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+            className="flex-1 min-w-0 min-h-[44px] bg-bg-dark border border-border-hairline rounded-lg px-3 py-2 text-text-primary hover:border-text-muted/50 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
             <option value="">Select a match...</option>
             {rights.map(tk => (

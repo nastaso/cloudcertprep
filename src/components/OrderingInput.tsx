@@ -39,6 +39,16 @@ export function OrderingInput({ options, value, correctOrder, mode, onChange, co
   const clearTimer = useRef<ReturnType<typeof setTimeout>>()
   useEffect(() => () => clearTimeout(clearTimer.current), [])
   const pad = compact ? 'p-2.5 gap-2.5 text-xs md:text-sm' : 'p-3 md:p-3.5 text-sm md:text-base'
+  // Numbered step badge (DSv6 numbered-row language, §7) — a chip, not a bare
+  // digit, so the sequence reads as deliberate steps in both themes. Tint
+  // carries the graded state in result mode; neutral well in input mode.
+  const stepBadge = (tint: string) =>
+    `flex-shrink-0 grid place-items-center font-mono font-semibold rounded-lg border ${compact ? 'w-6 h-6 text-[11px]' : 'w-7 h-7 text-xs md:text-sm'} ${tint}`
+  // Reorder controls read as real buttons (resting hairline well) instead of
+  // floating icons. Hover = border-brighten + surface tier (Astro pattern) and
+  // the sanctioned arrow slide (§6); press = 80ms scale. 44px touch target.
+  const reorderBtn =
+    'group w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-lg border border-border-hairline bg-bg-dark/40 text-text-muted hover:text-text-primary hover:border-text-muted/60 hover:bg-bg-card-hover transition-[color,border-color,background-color,transform] duration-200 ease-press active:scale-95 active:duration-[80ms] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-bg-dark/40 disabled:hover:border-border-hairline disabled:hover:text-text-muted disabled:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand'
 
   if (mode === 'result') {
     const userOrder = value ?? []
@@ -56,7 +66,7 @@ export function OrderingInput({ options, value, correctOrder, mode, onChange, co
                     key={`${key}-${i}`}
                     className={`${rowBase} ${pad} ${isRight ? 'border-success bg-success/10' : 'border-danger bg-danger/10'}`}
                   >
-                    <span className={`flex-shrink-0 font-mono font-semibold ${compact ? 'text-[11px]' : 'text-xs md:text-sm'} ${isRight ? 'text-success' : 'text-danger'}`}>
+                    <span aria-hidden="true" className={stepBadge(isRight ? 'bg-bg-card border-success/40 text-success' : 'bg-bg-card border-danger/40 text-danger')}>
                       {i + 1}
                     </span>
                     <span className="flex-1 text-text-primary">{options[key] ?? key}</span>
@@ -74,7 +84,7 @@ export function OrderingInput({ options, value, correctOrder, mode, onChange, co
           <ol className="space-y-1.5">
             {(correctOrder ?? defaultOrder(options)).map((key, i) => (
               <li key={`${key}-${i}`} className={`${rowBase} ${pad} border-success bg-success/10`}>
-                <span className={`flex-shrink-0 font-mono font-semibold ${compact ? 'text-[11px]' : 'text-xs md:text-sm'} text-success`}>
+                <span aria-hidden="true" className={stepBadge('bg-bg-card border-success/40 text-success')}>
                   {i + 1}
                 </span>
                 <span className="flex-1 text-text-primary">{options[key] ?? key}</span>
@@ -105,28 +115,28 @@ export function OrderingInput({ options, value, correctOrder, mode, onChange, co
       <ul className="space-y-2">
         {order.map((key, i) => (
           <li key={key} className={`${rowBase} ${pad} border-border-hairline bg-bg-card`}>
-            <span className={`flex-shrink-0 font-mono font-semibold ${compact ? 'text-[11px]' : 'text-xs md:text-sm'} text-text-muted`} aria-hidden="true">
+            <span aria-hidden="true" className={stepBadge('bg-bg-dark border-border-hairline text-text-muted')}>
               {i + 1}
             </span>
             <span className="flex-1 text-text-primary">{options[key]}</span>
-            <span className="flex items-center gap-1 flex-shrink-0">
+            <span className="flex items-center gap-1.5 flex-shrink-0">
               <button
                 type="button"
                 onClick={() => move(i, i - 1)}
                 disabled={i === 0}
                 aria-label={`Move "${options[key]}" up`}
-                className="w-11 h-11 flex items-center justify-center rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-card-hover transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                className={reorderBtn}
               >
-                <ArrowUp className="w-4 h-4 md:w-5 md:h-5" aria-hidden="true" />
+                <ArrowUp className="w-4 h-4 md:w-[18px] md:h-[18px] transition-transform duration-200 ease-press group-hover:-translate-y-0.5" aria-hidden="true" />
               </button>
               <button
                 type="button"
                 onClick={() => move(i, i + 1)}
                 disabled={i === order.length - 1}
                 aria-label={`Move "${options[key]}" down`}
-                className="w-11 h-11 flex items-center justify-center rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-card-hover transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                className={reorderBtn}
               >
-                <ArrowDown className="w-4 h-4 md:w-5 md:h-5" aria-hidden="true" />
+                <ArrowDown className="w-4 h-4 md:w-[18px] md:h-[18px] transition-transform duration-200 ease-press group-hover:translate-y-0.5" aria-hidden="true" />
               </button>
             </span>
           </li>

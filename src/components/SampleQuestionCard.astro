@@ -2,17 +2,21 @@
 /**
  * SampleQuestionCard.astro — server-rendered sample question that behaves like
  * the React SPA: the correct answer is NOT revealed up front. The visitor
- * clicks an option; the card then reveals the correct/wrong states (matching
- * AnswerButton's success/danger styling) and the explanation.
+ * attempts the question, then the card grades it and reveals the explanation.
+ * Single/multi: click an option. Ordering: reorder the steps with the move
+ * buttons, then Check. Matching: pick a target per item, then Check. Each then
+ * shows correct/wrong states (matching AnswerButton's success/danger styling).
  *
  * The interaction is driven by a single bundled <script> (Astro dedupes it
  * across every card instance on the page), so there is no per-card inline JS.
- * Crawlers still read the full question text, all options, the correct answer
- * (encoded in data-correct), and the explanation in the static HTML — the JS
- * only controls reveal timing, not content (R6.7).
+ * Crawlers still read the full question text, all options, and the correct
+ * answer in the static HTML — single/multi encode it in data-correct; ordering
+ * in data-correct-order plus the revealed "Correct order" list; matching in
+ * each row's data-correct-target plus the revealed "Correct matches" list —
+ * the JS only controls grading/reveal timing, not content (R6.7).
  *
  * DSv6: option rows mirror the ExamMockup chrome (12px radius, hairline
- * border, mono option letter, state via border + tint). The reveal script
+ * border, mono option letter, state via border + tint). The grading script
  * toggles LITERAL Tailwind class names below — markup and script class sets
  * must stay in sync when restyling.
  *
@@ -29,9 +33,8 @@ interface Props {
   index: number
   /**
    * Response format. Absent => inferred single/multi from `answer`. Ordering and
-   * matching render as a static, answer-revealed block (no click-to-reveal): the
-   * sequence / pairing IS the answer, so it lives in static HTML for crawlers
-   * (R6.7) and needs no interaction model.
+   * matching render as interactive attempt-then-Check cards (like single/multi),
+   * with the correct sequence/pairing kept in the static HTML for crawlers (R6.7).
    */
   type?: 'single' | 'multi' | 'ordering' | 'matching'
   /** Ordering only: correct sequence of option keys. */
@@ -52,12 +55,28 @@ interface Props {
 
 const { question, options, answer, explanation, index, type, correctOrder, targets, correctMatches, certCode, domainSlug, questionId } = Astro.props
 
-// Response format. Ordering/matching get a static answer-revealed layout below.
+// Response format. Ordering/matching render as interactive attempt-then-check
+// cards (like the MCQ sample), with the correct answer kept in the static HTML.
 const qType = type ?? (Array.isArray(answer) ? 'multi' : 'single')
-const isStaticType = qType === 'ordering' || qType === 'matching'
-// Matching pairs in stable left-key order.
+// Matching pairs in stable left-key order (used for the revealed answer block).
 const matchPairs = qType === 'matching' && correctMatches
   ? Object.keys(correctMatches).sort().map(k => ({ left: options[k] ?? k, right: targets?.[correctMatches[k]] ?? correctMatches[k] }))
+  : []
+
+// Interactive sample state.
+// Ordering: a DETERMINISTIC starting order that is NOT the correct order (so the
+// answer is never given away), with the correct sequence encoded for grading.
+const orderDisplayKeys = (() => {
+  if (qType !== 'ordering') return []
+  const keys = Object.keys(options).filter(k => options[k] !== undefined && options[k] !== '').sort()
+  if (keys.join(',') === (correctOrder ?? []).join(',')) keys.reverse()
+  return keys
+})()
+const matchLeftKeys = qType === 'matching'
+  ? Object.keys(options).filter(k => options[k] !== undefined && options[k] !== '').sort()
+  : []
+const matchTargetKeys = qType === 'matching'
+  ? Object.keys(targets ?? {}).filter(k => targets?.[k] !== undefined && targets[k] !== '').sort()
   : []
 
 // Pre-filled GitHub new-issue URL for reporting an error on this exact
@@ -91,42 +110,105 @@ const explanationParagraphs = (explanation ?? '')
   .filter(Boolean)
 ---
 
-{isStaticType ? (
-  <div class="bg-bg-card rounded-2xl border border-border-hairline shadow-card p-4 md:p-6">
+{qType === 'ordering' ? (
+  <div class="sample-ordering bg-bg-card rounded-2xl border border-border-hairline shadow-card p-4 md:p-6" data-correct-order={(correctOrder ?? []).join(',')}>
     <div class="flex items-start gap-2 mb-3">
       <span class="flex-shrink-0 font-mono text-xs md:text-sm font-semibold text-text-muted pt-px">Q{index}.</span>
-      <p class="text-text-primary text-sm md:text-base font-medium">{question}</p>
+      <p class="text-text-primary text-sm md:text-base font-medium">{question} <span class="font-semibold whitespace-nowrap">(Put in order)</span></p>
     </div>
-    <p class="text-xs text-text-muted mb-2">{qType === 'ordering' ? 'Correct order:' : 'Correct matches:'}</p>
-    {qType === 'ordering' ? (
+    <p class="text-xs text-text-muted mb-2.5">Use the arrows to order the steps, then check your answer.</p>
+    <ol class="sample-ord-list space-y-2 mb-3">
+      {orderDisplayKeys.map((key, i) => (
+        <li class="sample-ord-row flex items-center gap-2.5 md:gap-3 border border-border-hairline bg-bg-card rounded-xl p-2.5 md:p-3 text-xs md:text-sm" data-key={key}>
+          <span class="sample-ord-badge flex-shrink-0 grid place-items-center w-6 h-6 rounded-lg bg-bg-dark border border-border-hairline font-mono font-semibold text-[11px] text-text-muted">{i + 1}</span>
+          <span class="flex-1 text-text-primary">{options[key]}</span>
+          <span class="flex items-center gap-1.5 flex-shrink-0">
+            <button type="button" class="sample-ord-up group flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border border-border-hairline bg-bg-dark/40 text-text-muted hover:text-text-primary hover:border-text-muted/60 hover:bg-bg-card-hover transition-[color,border-color,background-color,transform] duration-200 ease-press active:scale-95 active:duration-[80ms] disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-brand" aria-label="Move up">
+              <svg class="w-4 h-4 transition-transform duration-200 ease-press group-hover:-translate-y-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            </button>
+            <button type="button" class="sample-ord-down group flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border border-border-hairline bg-bg-dark/40 text-text-muted hover:text-text-primary hover:border-text-muted/60 hover:bg-bg-card-hover transition-[color,border-color,background-color,transform] duration-200 ease-press active:scale-95 active:duration-[80ms] disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-brand" aria-label="Move down">
+              <svg class="w-4 h-4 transition-transform duration-200 ease-press group-hover:translate-y-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            </button>
+          </span>
+        </li>
+      ))}
+    </ol>
+    <button type="button" class="sample-ord-check w-full inline-flex items-center justify-center rounded-full bg-brand text-on-brand px-5 py-2.5 text-xs md:text-sm font-semibold hover:bg-brand-hover transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card">Check answer</button>
+    <div class="sample-answer hidden mt-4">
+      <p class="flex items-center gap-1.5 text-xs text-text-muted mb-2.5">
+        <svg class="w-3.5 h-3.5 text-success flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+        <span>Correct order</span>
+      </p>
       <ol class="space-y-2">
         {(correctOrder ?? []).map((key, i) => (
-          <li class="flex items-start gap-2.5 border border-success/40 bg-success/10 rounded-xl p-2.5 md:p-3 text-xs md:text-sm">
-            <span class="flex-shrink-0 font-mono font-semibold text-[11px] md:text-[12px] pt-[3px] text-success">{i + 1}</span>
+          <li class="flex items-center gap-2.5 md:gap-3 border border-success/40 bg-success/10 rounded-xl p-2.5 md:p-3 text-xs md:text-sm">
+            <span class="flex-shrink-0 grid place-items-center w-6 h-6 rounded-lg bg-bg-card border border-success/40 font-mono font-semibold text-[11px] text-success">{i + 1}</span>
             <span class="flex-1 text-text-primary">{options[key]}</span>
           </li>
         ))}
       </ol>
-    ) : (
+      {explanationParagraphs.length > 0 && (
+        <div class="mt-4 rounded-xl border border-border-hairline bg-bg-dark/60 px-4 py-3">
+          <p class="text-xs md:text-sm font-semibold text-text-primary mb-1">Explanation</p>
+          <div class="space-y-2">
+            {explanationParagraphs.map(para => (
+              <p class="text-text-muted text-xs md:text-sm leading-relaxed">{para}</p>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+    {suggestFixUrl && (
+      <p class="mt-3 text-right">
+        <a href={suggestFixUrl} target="_blank" rel="noopener noreferrer" class="text-[11px] md:text-xs text-text-muted hover:text-text-primary underline">Suggest a fix on GitHub</a>
+      </p>
+    )}
+  </div>
+) : qType === 'matching' ? (
+  <div class="sample-matching bg-bg-card rounded-2xl border border-border-hairline shadow-card p-4 md:p-6">
+    <div class="flex items-start gap-2 mb-3">
+      <span class="flex-shrink-0 font-mono text-xs md:text-sm font-semibold text-text-muted pt-px">Q{index}.</span>
+      <p class="text-text-primary text-sm md:text-base font-medium">{question} <span class="font-semibold whitespace-nowrap">(Match each item)</span></p>
+    </div>
+    <p class="text-xs text-text-muted mb-2.5">Pick a match for each item, then check your answer.</p>
+    <ul class="space-y-2.5 mb-3">
+      {matchLeftKeys.map(k => (
+        <li class="sample-mat-row flex flex-col sm:flex-row sm:items-center sm:gap-3 border border-border-hairline bg-bg-card rounded-xl p-2.5 md:p-3 text-xs md:text-sm" data-key={k} data-correct-target={correctMatches?.[k] ?? ''}>
+          <span class="flex-1 min-w-0 text-text-primary font-medium">{options[k]}</span>
+          <svg class="hidden sm:block w-4 h-4 text-text-muted/70 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          <select class="sample-mat-select flex-1 min-w-0 min-h-[40px] bg-bg-dark border border-border-hairline rounded-lg px-3 py-2 text-text-primary hover:border-text-muted/50 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand" aria-label={`Match for: ${options[k]}`}>
+            <option value="">Select a match...</option>
+            {matchTargetKeys.map(tk => (<option value={tk}>{targets?.[tk]}</option>))}
+          </select>
+        </li>
+      ))}
+    </ul>
+    <button type="button" class="sample-mat-check w-full inline-flex items-center justify-center rounded-full bg-brand text-on-brand px-5 py-2.5 text-xs md:text-sm font-semibold hover:bg-brand-hover transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card">Check answer</button>
+    <div class="sample-answer hidden mt-4">
+      <p class="flex items-center gap-1.5 text-xs text-text-muted mb-2.5">
+        <svg class="w-3.5 h-3.5 text-success flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+        <span>Correct matches</span>
+      </p>
       <dl class="space-y-2">
         {matchPairs.map(pair => (
-          <div class="flex flex-col sm:flex-row sm:gap-3 border border-success/40 bg-success/10 rounded-xl p-2.5 md:p-3 text-xs md:text-sm">
-            <dt class="flex-1 text-text-primary font-medium">{pair.left}</dt>
-            <dd class="flex-1 text-text-muted">{pair.right}</dd>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:gap-3 border border-success/40 bg-success/10 rounded-xl p-2.5 md:p-3 text-xs md:text-sm">
+            <dt class="flex-1 min-w-0 text-text-primary font-medium">{pair.left}</dt>
+            <svg class="hidden sm:block w-4 h-4 text-success/70 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            <dd class="flex-1 min-w-0 text-text-primary">{pair.right}</dd>
           </div>
         ))}
       </dl>
-    )}
-    {explanationParagraphs.length > 0 && (
-      <div class="mt-4 rounded-xl border border-border-hairline bg-bg-dark/60 px-4 py-3">
-        <p class="text-xs md:text-sm font-semibold text-text-primary mb-1">Explanation</p>
-        <div class="space-y-2">
-          {explanationParagraphs.map(para => (
-            <p class="text-text-muted text-xs md:text-sm leading-relaxed">{para}</p>
-          ))}
+      {explanationParagraphs.length > 0 && (
+        <div class="mt-4 rounded-xl border border-border-hairline bg-bg-dark/60 px-4 py-3">
+          <p class="text-xs md:text-sm font-semibold text-text-primary mb-1">Explanation</p>
+          <div class="space-y-2">
+            {explanationParagraphs.map(para => (
+              <p class="text-text-muted text-xs md:text-sm leading-relaxed">{para}</p>
+            ))}
+          </div>
         </div>
-      </div>
-    )}
+      )}
+    </div>
     {suggestFixUrl && (
       <p class="mt-3 text-right">
         <a href={suggestFixUrl} target="_blank" rel="noopener noreferrer" class="text-[11px] md:text-xs text-text-muted hover:text-text-primary underline">Suggest a fix on GitHub</a>
@@ -274,7 +356,89 @@ const explanationParagraphs = (explanation ?? '')
     })
   }
 
-  initSampleQuestions()
+  // Interactive ORDERING sample: reorder rows with the arrow buttons, then
+  // "Check answer" grades each row (right vs wrong position) and reveals the
+  // correct order + explanation. The correct order lives in data-correct-order
+  // and the reveal block, so crawlers read it regardless of interaction (R6.7).
+  function initSampleOrdering() {
+    document.querySelectorAll<HTMLElement>('.sample-ordering:not([data-ready])').forEach((card) => {
+      card.dataset.ready = 'true'
+      const list = card.querySelector<HTMLElement>('.sample-ord-list')
+      const check = card.querySelector<HTMLButtonElement>('.sample-ord-check')
+      const answer = card.querySelector<HTMLElement>('.sample-answer')
+      const correct = (card.dataset.correctOrder || '').split(',')
+      if (!list || !check) return
+      const rows = () => Array.from(list.querySelectorAll<HTMLElement>('.sample-ord-row'))
+
+      function renumber() {
+        const rs = rows()
+        rs.forEach((row, i) => {
+          const badge = row.querySelector<HTMLElement>('.sample-ord-badge')
+          if (badge) badge.textContent = String(i + 1)
+          const up = row.querySelector<HTMLButtonElement>('.sample-ord-up')
+          const down = row.querySelector<HTMLButtonElement>('.sample-ord-down')
+          if (up) up.disabled = i === 0
+          if (down) down.disabled = i === rs.length - 1
+        })
+      }
+      renumber()
+
+      list.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest('button')
+        if (!btn || !list.contains(btn)) return
+        const row = btn.closest<HTMLElement>('.sample-ord-row')
+        if (!row) return
+        if (btn.classList.contains('sample-ord-up') && row.previousElementSibling) {
+          list.insertBefore(row, row.previousElementSibling)
+          renumber()
+        } else if (btn.classList.contains('sample-ord-down') && row.nextElementSibling) {
+          list.insertBefore(row.nextElementSibling, row)
+          renumber()
+        }
+      })
+
+      check.addEventListener('click', () => {
+        rows().forEach((row, i) => {
+          const right = row.dataset.key === correct[i]
+          const badge = row.querySelector<HTMLElement>('.sample-ord-badge')
+          row.classList.remove('border-border-hairline', 'bg-bg-card')
+          row.classList.add(right ? 'border-success' : 'border-danger', right ? 'bg-success/10' : 'bg-danger/10')
+          badge?.classList.remove('bg-bg-dark', 'border-border-hairline', 'text-text-muted')
+          badge?.classList.add('bg-bg-card', right ? 'border-success/40' : 'border-danger/40', right ? 'text-success' : 'text-danger')
+          row.querySelectorAll('button').forEach((b) => { (b as HTMLButtonElement).disabled = true })
+        })
+        answer?.classList.remove('hidden')
+        check.classList.add('hidden')
+      })
+    })
+  }
+
+  // Interactive MATCHING sample: pick a target per item, then "Check answer"
+  // grades each row against data-correct-target and reveals the correct pairing
+  // + explanation (also in the static HTML for crawlers).
+  function initSampleMatching() {
+    document.querySelectorAll<HTMLElement>('.sample-matching:not([data-ready])').forEach((card) => {
+      card.dataset.ready = 'true'
+      const check = card.querySelector<HTMLButtonElement>('.sample-mat-check')
+      const answer = card.querySelector<HTMLElement>('.sample-answer')
+      const rows = Array.from(card.querySelectorAll<HTMLElement>('.sample-mat-row'))
+      if (!check) return
+      check.addEventListener('click', () => {
+        rows.forEach((row) => {
+          const select = row.querySelector<HTMLSelectElement>('.sample-mat-select')
+          const right = !!select && select.value !== '' && select.value === row.dataset.correctTarget
+          row.classList.remove('border-border-hairline', 'bg-bg-card')
+          row.classList.add(right ? 'border-success' : 'border-danger', right ? 'bg-success/10' : 'bg-danger/10')
+          if (select) select.disabled = true
+        })
+        answer?.classList.remove('hidden')
+        check.classList.add('hidden')
+      })
+    })
+  }
+
+  function initSamples() { initSampleQuestions(); initSampleOrdering(); initSampleMatching() }
+  initSamples()
   // Re-init after bfcache restore (Back navigation).
-  window.addEventListener('pageshow', initSampleQuestions)
+  window.addEventListener('pageshow', initSamples)
 </script>
