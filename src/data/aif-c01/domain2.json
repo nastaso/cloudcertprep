@@ -181,7 +181,7 @@
       "D": "Residual neural network"
     },
     "answer": "C",
-    "explanation": "A generative adversarial network (GAN) is built from two competing neural networks, a generator that creates synthetic samples resembling the real data and a discriminator that tries to tell real from generated, and through this competition it learns to produce realistic synthetic data based on an existing dataset, which is exactly what the company needs.\nXGBoost is a gradient-boosting algorithm for supervised classification and regression, not for generating new data. A residual neural network (ResNet) is a deep convolutional architecture used mainly for image recognition and classification. WaveNet is a generative model, but it is specialised for synthesising raw audio such as speech rather than producing general synthetic data from an arbitrary existing dataset.",
+    "explanation": "A generative adversarial network (GAN) is built from two competing neural networks, a generator that creates synthetic samples resembling the real data and a discriminator that tries to tell real from generated, and through this competition it learns to produce realistic synthetic data based on an existing dataset, which is exactly what the company needs.\nXGBoost is a gradient-boosting algorithm for supervised classification and regression, not for generating new data. A residual neural network (ResNet) is a deep convolutional architecture used mainly for image recognition and classification. WaveNet is a generative model, but it is specialized for synthesising raw audio such as speech rather than producing general synthetic data from an arbitrary existing dataset.",
     "isMultiAnswer": false,
     "taskStatement": "2.1",
     "lastVerified": "2026-06-02",
@@ -1284,7 +1284,7 @@
       "D": "AWS eliminates the need for any data governance policies"
     },
     "answer": "B",
-    "explanation": "AWS infrastructure provides security controls, compliance certifications (such as HIPAA eligibility), and data protection features that regulated industries like healthcare require to deploy AI applications responsibly and meet legal obligations.\nNo provider guarantees the lowest latency globally in all cases. No AI system can guarantee it never produces incorrect outputs. AWS does not eliminate the need for data governance — organizations must still implement their own policies.",
+    "explanation": "AWS infrastructure provides security controls, compliance certifications (such as HIPAA eligibility), and data protection features that regulated industries like healthcare require to deploy AI applications responsibly and meet legal obligations.\nNo provider guarantees the lowest latency globally in all cases. No AI system can guarantee it never produces incorrect outputs. AWS does not eliminate the need for data governance; organizations must still implement their own policies.",
     "isMultiAnswer": false,
     "taskStatement": "2.3",
     "lastVerified": "2026-06-03",

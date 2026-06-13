@@ -236,7 +236,7 @@
   },
   {
     "id": "aif-q124",
-    "question": "A company must record every call to its Amazon Bedrock API and keep those records safely for five years as cheaply as possible. Which two choices — one AWS service and one S3 storage class — should it combine to meet these requirements?",
+    "question": "A company must record every call to its Amazon Bedrock API and keep those records safely for five years as cheaply as possible. Which two choices (one AWS service and one S3 storage class) should it combine to meet these requirements?",
     "options": {
       "A": "Amazon CloudWatch",
       "B": "AWS CloudTrail",
@@ -534,7 +534,7 @@
       "D": "The company's development framework is ISO certified."
     },
     "answer": "D",
-    "explanation": "ISO accreditation certifies that the company's development framework, processes, and controls for managing AI meet the requirements of the relevant ISO standard, reflecting that the organisation has demonstrated responsible and risk-aware AI governance practices at a structural level.\nAll members of the company being ISO certified is incorrect because organisational accreditation does not automatically certify every individual employee; personal ISO certification is a separate process that individuals undertake independently. All AI systems being ISO certified is incorrect because the accreditation applies to the framework and processes used to develop and govern AI, not to the individual systems or models produced within it. All AI application team members being ISO certified is incorrect for the same reason, as individual employees require separate certification and are not automatically certified by the organisation achieving accreditation.",
+    "explanation": "ISO accreditation certifies that the company's development framework, processes, and controls for managing AI meet the requirements of the relevant ISO standard, reflecting that the organization has demonstrated responsible and risk-aware AI governance practices at a structural level.\nAll members of the company being ISO certified is incorrect because organizational accreditation does not automatically certify every individual employee; personal ISO certification is a separate process that individuals undertake independently. All AI systems being ISO certified is incorrect because the accreditation applies to the framework and processes used to develop and govern AI, not to the individual systems or models produced within it. All AI application team members being ISO certified is incorrect for the same reason, as individual employees require separate certification and are not automatically certified by the organization achieving accreditation.",
     "isMultiAnswer": false,
     "taskStatement": "5.2",
     "lastVerified": "2026-06-01",
@@ -658,9 +658,9 @@
     "id": "aif-q133",
     "question": "Which option describes a characteristic of AI governance frameworks that help build trust and deploy human-centered AI?",
     "options": {
-      "A": "Expanding initiatives across business units to create long-term value",
-      "B": "Aligning with business standards, revenue goals, and stakeholder expectations",
-      "C": "Overcoming challenges to drive business transformation and growth",
+      "A": "Expanding AI initiatives across business units to maximize long-term value",
+      "B": "Aligning AI projects with revenue goals and stakeholder expectations",
+      "C": "Driving business transformation and competitive growth through AI",
       "D": "Developing policies and guidelines for data, transparency, responsible AI, and compliance"
     },
     "answer": "D",

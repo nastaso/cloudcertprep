@@ -1,7 +1,7 @@
 [
   {
     "id": "q004",
-    "question": "Which of the below options are related to the reliability of AWS?",
+    "question": "Which of the following options are related to the reliability of AWS?",
     "options": {
       "A": "Applying the principle of least privilege to all AWS resources",
       "B": "Automatically provisioning new resources to meet demand",
@@ -26,7 +26,7 @@
       "D": "Deploying new Amazon EC2 instances in a Region located in the US"
     },
     "answer": "D",
-    "explanation": "Deploying EC2 instances in a US Region places compute resources physically closer to US users, directly reducing network latency at minimal additional cost.\nApplying a Route 53 latency-based routing policy directs users to the Region with the lowest latency, but this only optimises routing and does not itself reduce latency if all compute resources remain in Tokyo. Registering a new US domain name changes how users reach the application by name but does not move any compute resources closer to US users or reduce network latency. Building a new data center in the US and implementing a hybrid model introduces significant capital expenditure and operational complexity, contradicting the requirement to minimise costs.",
+    "explanation": "Deploying EC2 instances in a US Region places compute resources physically closer to US users, directly reducing network latency at minimal additional cost.\nApplying a Route 53 latency-based routing policy directs users to the Region with the lowest latency, but this only optimizes routing and does not itself reduce latency if all compute resources remain in Tokyo. Registering a new US domain name changes how users reach the application by name but does not move any compute resources closer to US users or reduce network latency. Building a new data center in the US and implementing a hybrid model introduces significant capital expenditure and operational complexity, contradicting the requirement to minimize costs.",
     "isMultiAnswer": false
   },
   {
@@ -39,7 +39,7 @@
       "D": "Adopt monolithic architecture"
     },
     "answer": "C",
-    "explanation": "Elasticity is the cloud best practice of dynamically adjusting compute capacity up or down in response to demand, avoiding over-provisioning during low-traffic periods and under-provisioning during peaks, which directly reduces cost.\nBuild security in every layer is the Defence in Depth principle from the Security pillar of the Well-Architected Framework, which addresses threat protection rather than capacity management. Parallelising tasks is a performance design principle that distributes workloads across multiple smaller components to increase throughput, not a mechanism for dynamically adjusting capacity to control costs. Adopting monolithic architecture consolidates all application components into a single tightly coupled unit, which is the opposite of a cloud best practice and does not support dynamic scaling.",
+    "explanation": "Elasticity is the cloud best practice of dynamically adjusting compute capacity up or down in response to demand, avoiding over-provisioning during low-traffic periods and under-provisioning during peaks, which directly reduces cost.\nBuild security in every layer is the Defense in Depth principle from the Security pillar of the Well-Architected Framework, which addresses threat protection rather than capacity management. Parallelizing tasks is a performance design principle that distributes workloads across multiple smaller components to increase throughput, not a mechanism for dynamically adjusting capacity to control costs. Adopting monolithic architecture consolidates all application components into a single tightly coupled unit, which is the opposite of a cloud best practice and does not support dynamic scaling.",
     "isMultiAnswer": false
   },
   {
@@ -56,7 +56,7 @@
       "A",
       "E"
     ],
-    "explanation": "AWS increases speed and agility by allowing customers to provision resources in minutes rather than weeks, and handles physical security along with most data and network security so customers can focus on building applications rather than managing infrastructure.\nUnlimited free storage is not an AWS benefit, as storage services such as Amazon S3 and EBS are billed based on the amount of data stored and retrieved. Complete control over physical infrastructure is not available to AWS customers, as AWS owns and manages all physical hardware, data centres, and networking equipment on the customer's behalf. Operating applications on behalf of customers is not an AWS benefit, as customers remain responsible for building, deploying, and managing their own applications under the shared responsibility model.",
+    "explanation": "AWS increases speed and agility by allowing customers to provision resources in minutes rather than weeks, and handles physical security along with most data and network security so customers can focus on building applications rather than managing infrastructure.\nUnlimited free storage is not an AWS benefit, as storage services such as Amazon S3 and EBS are billed based on the amount of data stored and retrieved. Complete control over physical infrastructure is not available to AWS customers, as AWS owns and manages all physical hardware, data centers, and networking equipment on the customer's behalf. Operating applications on behalf of customers is not an AWS benefit, as customers remain responsible for building, deploying, and managing their own applications under the shared responsibility model.",
     "isMultiAnswer": true
   },
   {
@@ -74,7 +74,7 @@
   },
   {
     "id": "q019",
-    "question": "One of the most important AWS best-practices to follow is the cloud architecture principle of elasticity. How does this principle improve your architecture’s design?",
+    "question": "One of the most important AWS best-practices to follow is the cloud architecture principle of elasticity. How does this principle improve your architecture's design?",
     "options": {
       "A": "By automatically scaling your on-premises resources based on changes in demand",
       "B": "By automatically scaling your AWS resources using an Elastic Load Balancer",
@@ -95,7 +95,7 @@
       "D": "Networking as a Service (NaaS)"
     },
     "answer": "D",
-    "explanation": "The three recognised AWS cloud computing service models are IaaS, PaaS, and SaaS. Networking as a Service is not one of them and does not exist as a defined cloud computing model in the AWS framework.\nPlatform as a Service is one of the three recognised cloud computing models, providing customers with a managed platform for developing and deploying applications without managing the underlying infrastructure. Infrastructure as a Service is one of the three recognised cloud computing models, giving customers virtualised compute, storage, and networking resources they manage themselves. Software as a Service is one of the three recognised cloud computing models, delivering fully managed applications to end users over the internet without any infrastructure or platform management required.",
+    "explanation": "The three recognized AWS cloud computing service models are IaaS, PaaS, and SaaS. Networking as a Service is not one of them and does not exist as a defined cloud computing model in the AWS framework.\nPlatform as a Service is one of the three recognized cloud computing models, providing customers with a managed platform for developing and deploying applications without managing the underlying infrastructure. Infrastructure as a Service is one of the three recognized cloud computing models, giving customers virtualized compute, storage, and networking resources they manage themselves. Software as a Service is one of the three recognized cloud computing models, delivering fully managed applications to end users over the internet without any infrastructure or platform management required.",
     "isMultiAnswer": false
   },
   {
@@ -104,11 +104,11 @@
     "options": {
       "A": "Use tightly coupled components",
       "B": "Use loosely coupled components",
-      "C": "Use infrequently coupled components",
-      "D": "Use frequently coupled components"
+      "C": "Use monolithic components",
+      "D": "Use stateful components"
     },
     "answer": "B",
-    "explanation": "Using loosely coupled components means each part of an application can scale, fail, and be updated independently without cascading failures to other components, which is the foundational AWS best practice for building resilient and scalable architectures.\nUsing tightly coupled components creates direct dependencies between parts of an application so that a failure or change in one component directly affects others, increasing the risk of cascading failures and making the system harder to scale and maintain independently. Infrequently coupled components is not a recognised architectural pattern or AWS design principle, and does not describe a meaningful approach to structuring application components. Frequently coupled components is similarly not a recognised architectural concept, and conflating coupling frequency with coupling tightness does not reflect any established AWS or cloud architecture best practice.",
+    "explanation": "Using loosely coupled components means each part of an application can scale, fail, and be updated independently without cascading failures to other components, which is the foundational AWS best practice for building resilient and scalable architectures.\nUsing tightly coupled components creates direct dependencies between parts of an application so that a failure or change in one component directly affects others, increasing the risk of cascading failures and making the system harder to scale and maintain independently. A monolithic design combines all components into a single unit that is difficult to scale or update independently, which is the opposite of the modular approach AWS recommends. Stateful components store session data locally on a specific instance, which prevents requests from being distributed freely across instances and undermines horizontal scaling and resilience.",
     "isMultiAnswer": false
   },
   {
@@ -118,7 +118,7 @@
       "A": "It supplies an online IT ticketing platform for resource requests",
       "B": "It supports automatic code validation services",
       "C": "It provides the ability to programmatically provision existing resources",
-      "D": "It automates the resource request process from a company’s IT vendor list"
+      "D": "It automates the resource request process from a company's IT vendor list"
     },
     "answer": "C",
     "explanation": "AWS allows resources to be provisioned programmatically through APIs, CloudFormation templates, and SDKs, drastically reducing the time to deploy infrastructure compared to traditional procurement and physical setup.\nAWS does not operate an IT ticketing platform for resource requests. Resources are provisioned on demand through self-service APIs and consoles without requiring formal request and approval workflows. AWS does not shorten provisioning time through code validation services, which are a software quality tool unrelated to how quickly infrastructure can be deployed. AWS does not automate requests from a company's existing IT vendor list, as it replaces traditional vendor procurement entirely by providing infrastructure directly through its own platform.",
@@ -134,7 +134,7 @@
       "D": "Infrastructure as a service"
     },
     "answer": "C",
-    "explanation": "When applications in the AWS Cloud communicate with a legacy application in a corporate data center, this is a hybrid architecture that combines on-premises and cloud resources in a single solution.\nCloud-native describes applications designed and built entirely to run in the cloud, with no dependency on on-premises infrastructure or legacy systems. Partner network refers to the AWS Partner Network, which is a programme for technology and consulting companies that build solutions on AWS, and is not a deployment model. Infrastructure as a Service is a cloud service model that provides virtualised compute, storage, and networking resources, and does not describe the combination of cloud and on-premises components in a single architecture.",
+    "explanation": "When applications in the AWS Cloud communicate with a legacy application in a corporate data center, this is a hybrid architecture that combines on-premises and cloud resources in a single solution.\nCloud-native describes applications designed and built entirely to run in the cloud, with no dependency on on-premises infrastructure or legacy systems. Partner network refers to the AWS Partner Network, which is a program for technology and consulting companies that build solutions on AWS, and is not a deployment model. Infrastructure as a Service is a cloud service model that provides virtualized compute, storage, and networking resources, and does not describe the combination of cloud and on-premises components in a single architecture.",
     "isMultiAnswer": false
   },
   {
@@ -194,7 +194,7 @@
     "question": "One of the advantages to moving infrastructure from an on-premises data center to the AWS Cloud is:",
     "options": {
       "A": "It allows the business to eliminate IT bills",
-      "B": "It allows the business to put a server in each customer’s data center",
+      "B": "It allows the business to put a server in each customer's data center",
       "C": "It allows the business to focus on business activities",
       "D": "It allows the business to leave servers unpatched"
     },
@@ -217,13 +217,13 @@
   },
   {
     "id": "q146",
-    "question": "A customer is deploying a new application and needs to choose an AWS Region. Which of the following factors could influence the customer’s decision?",
+    "question": "A customer is deploying a new application and needs to choose an AWS Region. Which of the following factors could influence the customer's decision?",
     "options": {
       "A": "Reduced latency to users",
-      "B": "The application’s presentation in the local language",
+      "B": "The application's presentation in the local language",
       "C": "Data sovereignty compliance",
       "D": "Cooling costs in hotter climates",
-      "E": "Proximity to the customer’s office for on-site visits"
+      "E": "Proximity to the customer's office for on-site visits"
     },
     "answer": [
       "A",
@@ -259,7 +259,7 @@
       "B",
       "D"
     ],
-    "explanation": "AWS Professional Services provides expert consulting engagements to help evaluate and plan migrations, and AWS Partner Network partners offer specialised migration expertise through certified consulting and technology firms.\nAWS Trusted Advisor scans existing AWS environments for best practice recommendations across cost, performance, security, and fault tolerance, but does not evaluate whether an application is suitable for migration to the cloud. AWS Systems Manager is an operational management service for configuring, patching, and managing AWS resources at scale, and is not a migration advisory or evaluation service. AWS Secrets Manager is a service for storing and rotating application secrets such as database credentials and API keys, and has no role in evaluating applications for cloud migration.",
+    "explanation": "AWS Professional Services provides expert consulting engagements to help evaluate and plan migrations, and AWS Partner Network partners offer specialized migration expertise through certified consulting and technology firms.\nAWS Trusted Advisor scans existing AWS environments for best practice recommendations across cost, performance, security, and fault tolerance, but does not evaluate whether an application is suitable for migration to the cloud. AWS Systems Manager is an operational management service for configuring, patching, and managing AWS resources at scale, and is not a migration advisory or evaluation service. AWS Secrets Manager is a service for storing and rotating application secrets such as database credentials and API keys, and has no role in evaluating applications for cloud migration.",
     "isMultiAnswer": true
   },
   {
@@ -401,7 +401,7 @@
       "D",
       "E"
     ],
-    "explanation": "Automating wherever possible reduces manual errors and speeds recovery, and removing single points of failure through redundancy ensures continued operation if one component fails, both being core AWS design principles.\nAlways using Global Services rather than Regional Services is not a recognised design principle, as the choice between global and regional services depends on the specific workload requirements and is not a blanket architectural rule. Always choosing to pay as you go is a billing model characteristic rather than a system design principle, and pricing decisions are made based on cost optimisation goals rather than architectural patterns. Treating servers as fixed resources contradicts the cloud design principle of elasticity, which calls for treating infrastructure as disposable and dynamically scalable rather than permanent and static.",
+    "explanation": "Automating wherever possible reduces manual errors and speeds recovery, and removing single points of failure through redundancy ensures continued operation if one component fails, both being core AWS design principles.\nAlways using Global Services rather than Regional Services is not a recognized design principle, as the choice between global and regional services depends on the specific workload requirements and is not a blanket architectural rule. Always choosing to pay as you go is a billing model characteristic rather than a system design principle, and pricing decisions are made based on cost optimization goals rather than architectural patterns. Treating servers as fixed resources contradicts the cloud design principle of elasticity, which calls for treating infrastructure as disposable and dynamically scalable rather than permanent and static.",
     "isMultiAnswer": true
   },
   {
@@ -418,7 +418,7 @@
       "B",
       "C"
     ],
-    "explanation": "Cloud computing eliminates single points of failure through redundancy across multiple data centres, and its geographically distributed infrastructure means no single physical failure can take down the entire system, both of which are structural advantages over traditional data centres.\nReserved compute capacity requires upfront commitment to fixed resources and exists in both cloud and traditional environments, so it is not a differentiating advantage of cloud. Virtualized compute resources are used in traditional data centres as well as in the cloud, making virtualization itself a shared characteristic rather than a cloud advantage. Dedicated hosting allocates physical hardware exclusively to one customer and is available in both cloud and traditional environments, so it does not represent an advantage of cloud computing over traditional infrastructure.",
+    "explanation": "Cloud computing eliminates single points of failure through redundancy across multiple data centers, and its geographically distributed infrastructure means no single physical failure can take down the entire system, both of which are structural advantages over traditional data centers.\nReserved compute capacity requires upfront commitment to fixed resources and exists in both cloud and traditional environments, so it is not a differentiating advantage of cloud. Virtualized compute resources are used in traditional data centers as well as in the cloud, making virtualization itself a shared characteristic rather than a cloud advantage. Dedicated hosting allocates physical hardware exclusively to one customer and is available in both cloud and traditional environments, so it does not represent an advantage of cloud computing over traditional infrastructure.",
     "isMultiAnswer": true
   },
   {
@@ -457,7 +457,7 @@
       "D": "PaaS"
     },
     "answer": "B",
-    "explanation": "Amazon EC2 is IaaS because AWS provides the virtualised compute infrastructure while the customer manages the operating system, middleware, and applications above it.\nIaaS and SaaS combined is not a recognised classification for any single service, as each service falls under one model rather than spanning two. SaaS delivers fully managed software applications to end users with no infrastructure or platform management required, whereas EC2 requires customers to manage everything above the hypervisor. PaaS provides a managed platform where customers deploy application code without managing the underlying infrastructure, whereas EC2 gives customers direct control over the operating system and runtime environment.",
+    "explanation": "Amazon EC2 is IaaS because AWS provides the virtualized compute infrastructure while the customer manages the operating system, middleware, and applications above it.\nIaaS and SaaS combined is not a recognized classification for any single service, as each service falls under one model rather than spanning two. SaaS delivers fully managed software applications to end users with no infrastructure or platform management required, whereas EC2 requires customers to manage everything above the hypervisor. PaaS provides a managed platform where customers deploy application code without managing the underlying infrastructure, whereas EC2 gives customers direct control over the operating system and runtime environment.",
     "isMultiAnswer": false
   },
   {
@@ -475,7 +475,7 @@
   },
   {
     "id": "q261",
-    "question": "Your application has recently experienced significant global growth, and international users are complaining of high latency. What is the AWS characteristic that can help improve your international users’ experience?",
+    "question": "Your application has recently experienced significant global growth, and international users are complaining of high latency. What is the AWS characteristic that can help improve your international users' experience?",
     "options": {
       "A": "Elasticity",
       "B": "Global reach",
@@ -514,7 +514,7 @@
   },
   {
     "id": "q276",
-    "question": "Which of the following statements describes the AWS Cloud’s agility?",
+    "question": "Which of the following statements describes the AWS Cloud's agility?",
     "options": {
       "A": "AWS allows you to host your applications in multiple regions around the world",
       "B": "AWS provides customizable hardware at the lowest possible cost",
@@ -522,7 +522,7 @@
       "D": "AWS allows you to pay upfront to reduce costs"
     },
     "answer": "C",
-    "explanation": "AWS Cloud agility refers to the ability to provision infrastructure resources in minutes through the console, CLI, or API, dramatically faster than the weeks or months required for on-premises hardware procurement.\nHosting applications in multiple Regions describes global reach, which is a separate cloud benefit from agility. AWS providing customisable hardware at the lowest possible cost misrepresents how AWS works, as customers do not configure or own the underlying hardware. Paying upfront to reduce costs describes Reserved Instance pricing, which is the opposite of the pay-as-you-go model that defines cloud economics.",
+    "explanation": "AWS Cloud agility refers to the ability to provision infrastructure resources in minutes through the console, CLI, or API, dramatically faster than the weeks or months required for on-premises hardware procurement.\nHosting applications in multiple Regions describes global reach, which is a separate cloud benefit from agility. AWS providing customizable hardware at the lowest possible cost misrepresents how AWS works, as customers do not configure or own the underlying hardware. Paying upfront to reduce costs describes Reserved Instance pricing, which is the opposite of the pay-as-you-go model that defines cloud economics.",
     "isMultiAnswer": false
   },
   {
@@ -612,7 +612,7 @@
       "D": "Amazon EFS"
     },
     "answer": "C",
-    "explanation": "The AWS Cloud Adoption Framework is a guidance framework created by AWS Professional Services that helps organisations plan and execute their cloud adoption journey across six perspectives: Business, People, Governance, Platform, Security, and Operations.\nAWS Secrets Manager stores, rotates, and manages access to secrets such as database credentials and API keys, and is a security service for credential management with no connection to cloud adoption planning or road map development. AWS WAF is a web application firewall that filters malicious HTTP requests based on defined rules to protect web applications from common exploits, and is a security service with no connection to cloud adoption frameworks or strategic road maps. Amazon EFS is a managed shared network file system that provides concurrent file access from multiple compute instances, and is a storage service with no connection to cloud adoption planning or strategic frameworks.",
+    "explanation": "The AWS Cloud Adoption Framework is a guidance framework created by AWS Professional Services that helps organizations plan and execute their cloud adoption journey across six perspectives: Business, People, Governance, Platform, Security, and Operations.\nAWS Secrets Manager stores, rotates, and manages access to secrets such as database credentials and API keys, and is a security service for credential management with no connection to cloud adoption planning or road map development. AWS WAF is a web application firewall that filters malicious HTTP requests based on defined rules to protect web applications from common exploits, and is a security service with no connection to cloud adoption frameworks or strategic road maps. Amazon EFS is a managed shared network file system that provides concurrent file access from multiple compute instances, and is a storage service with no connection to cloud adoption planning or strategic frameworks.",
     "isMultiAnswer": false
   },
   {
@@ -625,7 +625,7 @@
     "D": "Image classification"
   },
   "answer": "C",
-  "explanation": "Clustering customer segments is an example of unsupervised learning because the algorithm groups data points based on similarity without being given any labelled examples or predefined categories to learn from. The model discovers the structure in the data on its own.\nPredicting house prices uses labelled training data where each example has a known price, making it a supervised regression task. Spam detection trains a model on emails already labelled as spam or not spam, making it a supervised classification task. Image classification trains a model on images with known labels, such as cat or dog, also making it a supervised classification task.",
+  "explanation": "Clustering customer segments is an example of unsupervised learning because the algorithm groups data points based on similarity without being given any labeled examples or predefined categories to learn from. The model discovers the structure in the data on its own.\nPredicting house prices uses labeled training data where each example has a known price, making it a supervised regression task. Spam detection trains a model on emails already labeled as spam or not spam, making it a supervised classification task. Image classification trains a model on images with known labels, such as cat or dog, also making it a supervised classification task.",
   "isMultiAnswer": false,
   "taskStatement": "1.1",
   "lastVerified": "2026-05-30",
@@ -645,7 +645,7 @@
       "C",
       "E"
     ],
-    "explanation": "Startups prefer AWS because they can replace large upfront capital expenditure with low variable pay-as-you-go costs, and reduce time-to-market by focusing on product development rather than building and managing data centres.\nAWS allows them to pay later when their business succeeds is false. AWS requires payment for resources as they are used, not deferred until a business becomes profitable. AWS can build complete data centers faster than any other cloud provider is false and not a stated AWS value proposition. AWS removes the need to invest in operational expenditure is false. Operational expenditure still exists on AWS; the key shift is from upfront capital expenditure to ongoing variable costs.",
+    "explanation": "Startups prefer AWS because they can replace large upfront capital expenditure with low variable pay-as-you-go costs, and reduce time-to-market by focusing on product development rather than building and managing data centers.\nAWS allows them to pay later when their business succeeds is false. AWS requires payment for resources as they are used, not deferred until a business becomes profitable. AWS can build complete data centers faster than any other cloud provider is false and not a stated AWS value proposition. AWS removes the need to invest in operational expenditure is false. Operational expenditure still exists on AWS; the key shift is from upfront capital expenditure to ongoing variable costs.",
     "isMultiAnswer": true
   },
   {
@@ -662,7 +662,7 @@
       "A",
       "C"
     ],
-    "explanation": "As part of the AWS Migration Acceleration Program, AWS provides access to AWS Partners including consulting and technology partners with migration expertise, and AWS Professional Services which works directly with customers on cloud adoption and migration projects. Both are core components of the MAP programme.\nAWS Artifact is a self-service portal for accessing AWS compliance reports and security agreements, and is a compliance documentation resource rather than a component of the Migration Acceleration Program. Amazon Athena is a serverless query service that analyses data stored in Amazon S3 using SQL, and is an analytics service with no role in enterprise cloud adoption acceleration or migration support. Amazon Pinpoint is a customer engagement service for sending targeted messages via email, SMS, and push notifications, and is a marketing communications tool with no connection to enterprise cloud migration acceleration.",
+    "explanation": "As part of the AWS Migration Acceleration Program, AWS provides access to AWS Partners including consulting and technology partners with migration expertise, and AWS Professional Services which works directly with customers on cloud adoption and migration projects. Both are core components of the MAP program.\nAWS Artifact is a self-service portal for accessing AWS compliance reports and security agreements, and is a compliance documentation resource rather than a component of the Migration Acceleration Program. Amazon Athena is a serverless query service that analyzes data stored in Amazon S3 using SQL, and is an analytics service with no role in enterprise cloud adoption acceleration or migration support. Amazon Pinpoint is a customer engagement service for sending targeted messages via email, SMS, and push notifications, and is a marketing communications tool with no connection to enterprise cloud migration acceleration.",
     "isMultiAnswer": true
   },
   {
@@ -675,7 +675,7 @@
       "D": "Multi-threading"
     },
     "answer": "C",
-    "explanation": "Fault tolerance is the ability of a system to continue operating without interruption when one or more components fail, achieved through redundancy across Availability Zones and automatic failover, directly minimising the risk of costly outages.\nLeast privilege is a security principle that restricts user and service permissions to the minimum required to perform their function, and has no bearing on system availability or outage prevention. Pilot light is a disaster recovery strategy that keeps a minimal version of the environment running in a secondary Region, which addresses recovery after an outage rather than preventing one through redundancy. Multi-threading is a software programming technique that allows concurrent execution of multiple tasks within a single application, and is unrelated to cloud architecture design for availability.",
+    "explanation": "Fault tolerance is the ability of a system to continue operating without interruption when one or more components fail, achieved through redundancy across Availability Zones and automatic failover, directly minimizing the risk of costly outages.\nLeast privilege is a security principle that restricts user and service permissions to the minimum required to perform their function, and has no bearing on system availability or outage prevention. Pilot light is a disaster recovery strategy that keeps a minimal version of the environment running in a secondary Region, which addresses recovery after an outage rather than preventing one through redundancy. Multi-threading is a software programming technique that allows concurrent execution of multiple tasks within a single application, and is unrelated to cloud architecture design for availability.",
     "isMultiAnswer": false
   },
   {
@@ -718,7 +718,7 @@
       "D": "Tightly coupling"
     },
     "answer": "B",
-    "explanation": "Loose coupling is the design practice of minimizing dependencies between application components so that a failure in one component does not cascade to others, improving overall system resilience.\nElastic coupling is not a recognised cloud design principle or architectural term, and may cause confusion with Amazon EC2 Auto Scaling or Elastic Load Balancing, which are services rather than coupling patterns. Scalable coupling is not a recognised architectural concept, and scalability is a separate design goal achieved through practices such as horizontal scaling rather than a type of component coupling. Tight coupling is the opposite of the correct answer, describing an architecture where components are highly dependent on each other, meaning a failure in one component is more likely to cascade and impact others.",
+    "explanation": "Loose coupling is the design practice of minimizing dependencies between application components so that a failure in one component does not cascade to others, improving overall system resilience.\nElastic coupling is not a recognized cloud design principle or architectural term, and may cause confusion with Amazon EC2 Auto Scaling or Elastic Load Balancing, which are services rather than coupling patterns. Scalable coupling is not a recognized architectural concept, and scalability is a separate design goal achieved through practices such as horizontal scaling rather than a type of component coupling. Tight coupling is the opposite of the correct answer, describing an architecture where components are highly dependent on each other, meaning a failure in one component is more likely to cascade and impact others.",
     "isMultiAnswer": false
   },
   {
@@ -735,7 +735,7 @@
       "D",
       "E"
     ],
-    "explanation": "AWS eliminates the need to guess infrastructure capacity through on-demand scaling, and enables customers to trade large upfront capital expenses for smaller variable operational expenses based on actual usage.\nCustomers remain responsible for monitoring their own servers and applications, as AWS provides the tools but does not perform monitoring on the customer's behalf. Compliance and auditing responsibilities are shared, with customers accountable for their own data, access controls, and application-level compliance regardless of using AWS. AWS does not provide custom hardware to individual customer specifications, as customers select from standardised instance types and managed services within the shared infrastructure.",
+    "explanation": "AWS eliminates the need to guess infrastructure capacity through on-demand scaling, and enables customers to trade large upfront capital expenses for smaller variable operational expenses based on actual usage.\nCustomers remain responsible for monitoring their own servers and applications, as AWS provides the tools but does not perform monitoring on the customer's behalf. Compliance and auditing responsibilities are shared, with customers accountable for their own data, access controls, and application-level compliance regardless of using AWS. AWS does not provide custom hardware to individual customer specifications, as customers select from standardized instance types and managed services within the shared infrastructure.",
     "isMultiAnswer": true
   },
   {
@@ -748,7 +748,7 @@
       "D": "Cloud"
     },
     "answer": "C",
-    "explanation": "A hybrid deployment model connects cloud-based resources with existing infrastructure not located in the cloud, such as on-premises data centers, allowing organisations to extend their environment into AWS while keeping some workloads running locally.\nOn-premises is a deployment model where all infrastructure is hosted and managed within an organisation's own facilities with no cloud integration, which is the opposite of connecting cloud and non-cloud resources. Mixed is not a recognised cloud computing deployment model and does not appear in the AWS framework alongside on-premises, hybrid, and cloud. Cloud is a deployment model where all infrastructure and applications run entirely within the cloud provider's environment with no dependency on locally hosted resources, meaning there are no existing non-cloud resources to connect to.",
+    "explanation": "A hybrid deployment model connects cloud-based resources with existing infrastructure not located in the cloud, such as on-premises data centers, allowing organizations to extend their environment into AWS while keeping some workloads running locally.\nOn-premises is a deployment model where all infrastructure is hosted and managed within an organization's own facilities with no cloud integration, which is the opposite of connecting cloud and non-cloud resources. Mixed is not a recognized cloud computing deployment model and does not appear in the AWS framework alongside on-premises, hybrid, and cloud. Cloud is a deployment model where all infrastructure and applications run entirely within the cloud provider's environment with no dependency on locally hosted resources, meaning there are no existing non-cloud resources to connect to.",
     "isMultiAnswer": false
   },
   {
@@ -804,7 +804,7 @@
       "B",
       "D"
     ],
-    "explanation": "Loose coupling minimises dependencies between components so that failures do not cascade, and treating resources as disposable means designing for failure by replacing instances rather than fixing them, enabling rapid recovery.\nReserved capacity instead of on demand is the opposite of a cloud design principle, as cloud encourages provisioning resources dynamically based on actual need. Servers instead of managed services contradicts the cloud principle of offloading operational burden to AWS wherever possible. Multi-AZ versus multi-region is not a recognised AWS design principle and presents a false trade-off, as both are valid availability strategies depending on the use case.",
+    "explanation": "Loose coupling minimizes dependencies between components so that failures do not cascade, and treating resources as disposable means designing for failure by replacing instances rather than fixing them, enabling rapid recovery.\nReserved capacity instead of on demand is the opposite of a cloud design principle, as cloud encourages provisioning resources dynamically based on actual need. Servers instead of managed services contradicts the cloud principle of offloading operational burden to AWS wherever possible. Multi-AZ versus multi-region is not a recognized AWS design principle and presents a false trade-off, as both are valid availability strategies depending on the use case.",
     "isMultiAnswer": true
   },
   {
@@ -822,7 +822,7 @@
   },
   {
     "id": "q514",
-    "question": "How can you increase your application’s fault-tolerance while it is being hosted in AWS?",
+    "question": "How can you increase your application's fault-tolerance while it is being hosted in AWS?",
     "options": {
       "A": "Deploy your application across multiple EC2 instances",
       "B": "Deploy your application across multiple Availability Zones",
@@ -856,7 +856,7 @@
       "D": "Cloud"
     },
     "answer": "D",
-    "explanation": "The cloud deployment model eliminates the need to run and maintain physical data centers entirely, as all infrastructure is hosted and managed by the cloud provider in their facilities.\nOn-premises is a deployment model where all infrastructure is owned and operated within an organisation's own facilities, which is the opposite of eliminating physical data center management. IaaS is a cloud service model that provides virtualised compute, storage, and networking resources, and is not a deployment model that addresses where or how infrastructure is physically managed. PaaS is a cloud service model that provides a managed platform for application development and deployment, and is similarly not a deployment model that determines physical data center responsibility.",
+    "explanation": "The cloud deployment model eliminates the need to run and maintain physical data centers entirely, as all infrastructure is hosted and managed by the cloud provider in their facilities.\nOn-premises is a deployment model where all infrastructure is owned and operated within an organization's own facilities, which is the opposite of eliminating physical data center management. IaaS is a cloud service model that provides virtualized compute, storage, and networking resources, and is not a deployment model that addresses where or how infrastructure is physically managed. PaaS is a cloud service model that provides a managed platform for application development and deployment, and is similarly not a deployment model that determines physical data center responsibility.",
     "isMultiAnswer": false
   },
   {
@@ -895,7 +895,7 @@
       "D": "Use a monolithic application that handles all operations"
     },
     "answer": "C",
-    "explanation": "Designing an application to accommodate the failure of any single component, through redundancy, health checks, and automatic failover, is the core principle of designing for failure and is the recommended pattern for achieving high availability on AWS.\nEnsuring low-latency network connectivity is a performance optimisation consideration that improves user experience, but low latency alone does not protect an application from component failures or maintain availability during an outage. Running enough EC2 instances to handle peak load addresses capacity planning but does not build in redundancy or fault tolerance, meaning a single component failure could still bring down the application. A monolithic application that handles all operations consolidates functionality into a single unit, which creates a single point of failure and is the opposite of a highly available architecture that can survive individual component failures.",
+    "explanation": "Designing an application to accommodate the failure of any single component, through redundancy, health checks, and automatic failover, is the core principle of designing for failure and is the recommended pattern for achieving high availability on AWS.\nEnsuring low-latency network connectivity is a performance optimization consideration that improves user experience, but low latency alone does not protect an application from component failures or maintain availability during an outage. Running enough EC2 instances to handle peak load addresses capacity planning but does not build in redundancy or fault tolerance, meaning a single component failure could still bring down the application. A monolithic application that handles all operations consolidates functionality into a single unit, which creates a single point of failure and is the opposite of a highly available architecture that can survive individual component failures.",
     "isMultiAnswer": false
   },
   {
@@ -938,7 +938,7 @@
       "D": "Choice of specific cloud hardware vendors"
     },
     "answer": "B",
-    "explanation": "AWS offloads infrastructure management to its own teams, freeing customers from data centre operations so they can redirect time and resources toward product development, customer engagement, and other revenue-generating activities.\nPermissive security is not an AWS benefit and directly contradicts AWS's security model, which is built on the principle of least privilege and layered access controls. Control over cloud network hardware is not available to customers, as AWS manages all physical networking infrastructure on their behalf. Choice of specific cloud hardware vendors is not offered to customers, as AWS selects and manages its own hardware independently of customer preferences.",
+    "explanation": "AWS offloads infrastructure management to its own teams, freeing customers from data center operations so they can redirect time and resources toward product development, customer engagement, and other revenue-generating activities.\nPermissive security is not an AWS benefit and directly contradicts AWS's security model, which is built on the principle of least privilege and layered access controls. Control over cloud network hardware is not available to customers, as AWS manages all physical networking infrastructure on their behalf. Choice of specific cloud hardware vendors is not offered to customers, as AWS selects and manages its own hardware independently of customer preferences.",
     "isMultiAnswer": false
   },
   {
@@ -964,7 +964,7 @@
       "D": "Use commercial database software"
     },
     "answer": "B",
-    "explanation": "Loosely coupling components means designing them to interact through well-defined interfaces such as queues or APIs, so that changes or failures in one component do not directly impact others.\nScaling up not out describes vertical scaling, which is an on-premises approach that cloud best practices discourage in favour of horizontal scaling through adding more instances. Building monolithic systems consolidates all application components into a single tightly coupled unit, which is the opposite of the cloud design principle of breaking applications into loosely coupled, independently deployable components. Using commercial database software is a technology procurement decision rather than an architectural design principle, and cloud best practices favour managed and purpose-built database services over proprietary commercial software where appropriate.",
+    "explanation": "Loosely coupling components means designing them to interact through well-defined interfaces such as queues or APIs, so that changes or failures in one component do not directly impact others.\nScaling up not out describes vertical scaling, which is an on-premises approach that cloud best practices discourage in favor of horizontal scaling through adding more instances. Building monolithic systems consolidates all application components into a single tightly coupled unit, which is the opposite of the cloud design principle of breaking applications into loosely coupled, independently deployable components. Using commercial database software is a technology procurement decision rather than an architectural design principle, and cloud best practices favor managed and purpose-built database services over proprietary commercial software where appropriate.",
     "isMultiAnswer": false
   },
   {
@@ -981,7 +981,7 @@
       "A",
       "C"
     ],
-    "explanation": "AWS reduces Total Cost of Ownership by eliminating data centre capital expenses, and reduces operational expenditure through pay-as-you-go pricing and managed services that lower staffing and maintenance costs.\nIncreased capital expenditure describes the opposite of an AWS financial benefit. Moving to AWS replaces large upfront hardware investments with variable operational costs, reducing rather than increasing capital expenditure. Deferred payment plans for startups is not a standard AWS financial benefit. AWS charges are billed monthly based on actual usage, and there are no deferred payment arrangements offered as a general benefit to startup customers. Business credit lines for startups are not provided by AWS as a standard financial benefit. AWS does have programmes such as AWS Activate that provide credits to startups, but these are promotional credits rather than credit lines or financing arrangements.",
+    "explanation": "AWS reduces Total Cost of Ownership by eliminating data center capital expenses, and reduces operational expenditure through pay-as-you-go pricing and managed services that lower staffing and maintenance costs.\nIncreased capital expenditure describes the opposite of an AWS financial benefit. Moving to AWS replaces large upfront hardware investments with variable operational costs, reducing rather than increasing capital expenditure. Deferred payment plans for startups is not a standard AWS financial benefit. AWS charges are billed monthly based on actual usage, and there are no deferred payment arrangements offered as a general benefit to startup customers. Business credit lines for startups are not provided by AWS as a standard financial benefit. AWS does have programs such as AWS Activate that provide credits to startups, but these are promotional credits rather than credit lines or financing arrangements.",
     "isMultiAnswer": true
   },
   {
@@ -1007,7 +1007,7 @@
       "D": "Provision extra capacity"
     },
     "answer": "A",
-    "explanation": "Using multiple Availability Zones ensures high availability by distributing your application across physically isolated data centres, so that a failure in any single zone does not take the entire application offline.\nUsing tightly coupled components is an anti-pattern in cloud architecture, as tight dependencies between components mean a failure in one can cascade and bring down others. Using open source software is a development and licensing choice that has no bearing on cloud architectural design principles for availability or resilience. Provisioning extra capacity contradicts the cloud principle of elasticity, which favours scaling dynamically based on actual demand rather than guessing and over-provisioning upfront.",
+    "explanation": "Using multiple Availability Zones ensures high availability by distributing your application across physically isolated data centers, so that a failure in any single zone does not take the entire application offline.\nUsing tightly coupled components is an anti-pattern in cloud architecture, as tight dependencies between components mean a failure in one can cascade and bring down others. Using open source software is a development and licensing choice that has no bearing on cloud architectural design principles for availability or resilience. Provisioning extra capacity contradicts the cloud principle of elasticity, which favors scaling dynamically based on actual demand rather than guessing and over-provisioning upfront.",
     "isMultiAnswer": false
   },
   {
@@ -1080,7 +1080,7 @@
       "B",
       "C"
     ],
-    "explanation": "Elasticity allows resources to automatically scale up and down based on demand, and agility enables rapid provisioning and experimentation without long procurement cycles. Both are core advantages of the AWS Cloud over traditional infrastructure.\nUnlimited uptime is not a guaranteed or marketed AWS benefit, as AWS services are subject to availability SLAs but not unconditional uptime. Colocation refers to housing your own physical servers in a third-party data centre, which is a traditional infrastructure model rather than a cloud benefit. Capital expenses are a cost of traditional on-premises infrastructure that AWS replaces with variable operational expenditure, making them a disadvantage of the old model, not a benefit of the cloud.",
+    "explanation": "Elasticity allows resources to automatically scale up and down based on demand, and agility enables rapid provisioning and experimentation without long procurement cycles. Both are core advantages of the AWS Cloud over traditional infrastructure.\nUnlimited uptime is not a guaranteed or marketed AWS benefit, as AWS services are subject to availability SLAs but not unconditional uptime. Colocation refers to housing your own physical servers in a third-party data center, which is a traditional infrastructure model rather than a cloud benefit. Capital expenses are a cost of traditional on-premises infrastructure that AWS replaces with variable operational expenditure, making them a disadvantage of the old model, not a benefit of the cloud.",
     "isMultiAnswer": true
   },
   {
@@ -1114,7 +1114,7 @@
       "A",
       "B"
     ],
-    "explanation": "Scaling EC2 instances horizontally based on traffic and resizing RDS instances vertically as business needs change both demonstrate elasticity, which is the ability to adapt resource capacity dynamically to match demand.\nAutomatically directing traffic to less-utilised EC2 instances describes load balancing, which optimises resource utilisation but does not change the amount of resources provisioned. Using AWS compliance documents to accelerate the compliance process describes the concept of inherited compliance, not elasticity. Having the ability to create and govern environments using code describes infrastructure as code, which is a separate cloud principle unrelated to dynamic resource scaling.",
+    "explanation": "Scaling EC2 instances horizontally based on traffic and resizing RDS instances vertically as business needs change both demonstrate elasticity, which is the ability to adapt resource capacity dynamically to match demand.\nAutomatically directing traffic to less-utilized EC2 instances describes load balancing, which optimizes resource utilization but does not change the amount of resources provisioned. Using AWS compliance documents to accelerate the compliance process describes the concept of inherited compliance, not elasticity. Having the ability to create and govern environments using code describes infrastructure as code, which is a separate cloud principle unrelated to dynamic resource scaling.",
     "isMultiAnswer": true
   },
   {
@@ -1144,7 +1144,7 @@
       "D": "Platform as a service"
     },
     "answer": "C",
-    "explanation": "The cloud deployment model fully replaces upfront capital expenditure on hardware and facilities with variable operational expenses based on actual usage, eliminating the need to own or maintain physical infrastructure.\nAn on-premises deployment requires the organisation to purchase, own, and maintain all physical hardware and facilities, which preserves rather than eliminates capital expenditure and offers no conversion to operational expenses. A hybrid deployment combines on-premises infrastructure with cloud resources, meaning capital expenditure on owned hardware is retained alongside operational cloud costs rather than being fully traded for operational expenses. Platform as a service is a cloud service delivery model in which a provider manages a platform for building and running applications, and is not a deployment model describing where infrastructure is hosted.",
+    "explanation": "The cloud deployment model fully replaces upfront capital expenditure on hardware and facilities with variable operational expenses based on actual usage, eliminating the need to own or maintain physical infrastructure.\nAn on-premises deployment requires the organization to purchase, own, and maintain all physical hardware and facilities, which preserves rather than eliminates capital expenditure and offers no conversion to operational expenses. A hybrid deployment combines on-premises infrastructure with cloud resources, meaning capital expenditure on owned hardware is retained alongside operational cloud costs rather than being fully traded for operational expenses. Platform as a service is a cloud service delivery model in which a provider manages a platform for building and running applications, and is not a deployment model describing where infrastructure is hosted.",
     "isMultiAnswer": false
   },
   {
@@ -1196,7 +1196,7 @@
       "D": "Users can avoid audits by using reports from AWS"
     },
     "answer": "A",
-    "explanation": "AWS eliminates the need to guess future capacity needs by providing on-demand scaling, allowing organisations to provision exactly what they need and adjust in minutes rather than committing to fixed hardware infrastructure months or years in advance.\nUtilising existing hardware contracts for purchases is a characteristic of traditional on-premises procurement rather than an advantage of AWS; on the cloud, customers avoid hardware contracts entirely by paying only for what they consume. Fixing costs regardless of traffic is not an advantage of AWS; cloud costs scale with usage, and AWS offers variable pricing that adjusts to actual demand rather than fixed costs, which is one of its financial advantages over traditional fixed-capacity infrastructure. Avoiding audits using AWS reports is not a valid advantage; while AWS Artifact provides compliance reports that support customer audits, customers remain subject to their own regulatory audit requirements and cannot avoid audits by virtue of using AWS.",
+    "explanation": "AWS eliminates the need to guess future capacity needs by providing on-demand scaling, allowing organizations to provision exactly what they need and adjust in minutes rather than committing to fixed hardware infrastructure months or years in advance.\nUtilizing existing hardware contracts for purchases is a characteristic of traditional on-premises procurement rather than an advantage of AWS; on the cloud, customers avoid hardware contracts entirely by paying only for what they consume. Fixing costs regardless of traffic is not an advantage of AWS; cloud costs scale with usage, and AWS offers variable pricing that adjusts to actual demand rather than fixed costs, which is one of its financial advantages over traditional fixed-capacity infrastructure. Avoiding audits using AWS reports is not a valid advantage; while AWS Artifact provides compliance reports that support customer audits, customers remain subject to their own regulatory audit requirements and cannot avoid audits by virtue of using AWS.",
     "isMultiAnswer": false
   },
   {
@@ -1209,7 +1209,7 @@
       "D": "AWS has no limits on the number of resources that can be created"
     },
     "answer": "B",
-    "explanation": "AWS offers a pay-as-you-go pricing model with no long-term contracts required for most services, allowing companies to avoid large upfront capital expenditure and pay only for the resources they actually consume.\nAWS does not provide users with full control over the underlying physical resources; AWS manages the hardware, hypervisor, and physical infrastructure, while customers manage their workloads and data. AWS does not have edge locations in every country; AWS has edge locations in many countries for services like CloudFront, but coverage is not universal across every nation, and this is not a core reason to choose AWS over a traditional data centre. While AWS has very high service limits, there are limits on the number of resources that can be created per account per Region; customers can request limit increases, but resources are not truly unlimited, making this statement inaccurate.",
+    "explanation": "AWS offers a pay-as-you-go pricing model with no long-term contracts required for most services, allowing companies to avoid large upfront capital expenditure and pay only for the resources they actually consume.\nAWS does not provide users with full control over the underlying physical resources; AWS manages the hardware, hypervisor, and physical infrastructure, while customers manage their workloads and data. AWS does not have edge locations in every country; AWS has edge locations in many countries for services like CloudFront, but coverage is not universal across every nation, and this is not a core reason to choose AWS over a traditional data center. While AWS has very high service limits, there are limits on the number of resources that can be created per account per Region; customers can request limit increases, but resources are not truly unlimited, making this statement inaccurate.",
     "isMultiAnswer": false
   },
   {
@@ -1248,7 +1248,7 @@
       "D": "Operating system administration"
     },
     "answer": "A",
-    "explanation": "Data center security costs such as physical access controls, surveillance, and guards are part of on-premises TCO that are eliminated when migrating to AWS, where physical security is included in the service.\nBusiness analysis is a professional function that evaluates organisational needs and solutions, and is not a physical infrastructure cost included in an on-premises TCO comparison. Project management is a professional service cost associated with planning and executing initiatives, and is not a data center infrastructure expense factored into TCO. Operating system administration is a labour cost that customers retain responsibility for under the Shared Responsibility Model regardless of whether they are on-premises or on AWS, so it is not eliminated by migration and does not differentiate the two TCO models.",
+    "explanation": "Data center security costs such as physical access controls, surveillance, and guards are part of on-premises TCO that are eliminated when migrating to AWS, where physical security is included in the service.\nBusiness analysis is a professional function that evaluates organizational needs and solutions, and is not a physical infrastructure cost included in an on-premises TCO comparison. Project management is a professional service cost associated with planning and executing initiatives, and is not a data center infrastructure expense factored into TCO. Operating system administration is a labour cost that customers retain responsibility for under the Shared Responsibility Model regardless of whether they are on-premises or on AWS, so it is not eliminated by migration and does not differentiate the two TCO models.",
     "isMultiAnswer": false
   },
   {
@@ -1261,7 +1261,7 @@
       "D": "AWS manages compliance needs"
     },
     "answer": "C",
-    "explanation": "AWS eliminates the need to guess capacity needs by providing on-demand scaling, so organisations can provision exactly what they need and adjust in minutes rather than purchasing hardware based on peak capacity forecasts.\nAWS does not audit user data; AWS has strict policies and controls against accessing customer data without authorisation, and the customer remains responsible for the privacy and governance of data stored in their AWS environment. Data stored in AWS is not automatically secure; customers must actively configure encryption, access controls, and security settings for their own data, as the shared responsibility model requires customers to protect the data they put in the cloud. AWS does not manage the compliance needs of individual customers; while AWS provides compliance certifications for its infrastructure and tools through Artifact to support customer compliance efforts, each customer is responsible for applying those frameworks to their own workloads and meeting their specific regulatory requirements.",
+    "explanation": "AWS eliminates the need to guess capacity needs by providing on-demand scaling, so organizations can provision exactly what they need and adjust in minutes rather than purchasing hardware based on peak capacity forecasts.\nAWS does not audit user data; AWS has strict policies and controls against accessing customer data without authorisation, and the customer remains responsible for the privacy and governance of data stored in their AWS environment. Data stored in AWS is not automatically secure; customers must actively configure encryption, access controls, and security settings for their own data, as the shared responsibility model requires customers to protect the data they put in the cloud. AWS does not manage the compliance needs of individual customers; while AWS provides compliance certifications for its infrastructure and tools through Artifact to support customer compliance efforts, each customer is responsible for applying those frameworks to their own workloads and meeting their specific regulatory requirements.",
     "isMultiAnswer": false
   },
   {
@@ -1278,7 +1278,7 @@
       "A",
       "B"
     ],
-    "explanation": "Designing for automated failure recovery ensures systems self-heal without manual intervention, and deploying across multiple Availability Zones protects against AZ-level failures, both being core reliability principles.\nManaging changes via documented processes is an Operational Excellence principle focused on controlled change management, not a reliability architecture principle. Testing for moderate demand does not reflect a recognised reliability principle, as the Well-Architected Framework recommends testing recovery procedures and scaling under peak and failure conditions rather than moderate load. Backing up recovery to an on-premises environment introduces a dependency on local infrastructure, which contradicts the cloud reliability principle of eliminating single points of failure and keeping recovery within the AWS environment.",
+    "explanation": "Designing for automated failure recovery ensures systems self-heal without manual intervention, and deploying across multiple Availability Zones protects against AZ-level failures, both being core reliability principles.\nManaging changes via documented processes is an Operational Excellence principle focused on controlled change management, not a reliability architecture principle. Testing for moderate demand does not reflect a recognized reliability principle, as the Well-Architected Framework recommends testing recovery procedures and scaling under peak and failure conditions rather than moderate load. Backing up recovery to an on-premises environment introduces a dependency on local infrastructure, which contradicts the cloud reliability principle of eliminating single points of failure and keeping recovery within the AWS environment.",
     "isMultiAnswer": true
   },
   {
@@ -1321,7 +1321,7 @@
       "A",
       "C"
     ],
-    "explanation": "AWS requires no upfront hardware commitments, allowing organisations to pay only for what they consume, and resources can be provisioned on demand in minutes allowing businesses to scale quickly without waiting for hardware procurement and installation.\nAWS does not manage all security in the cloud; under the shared responsibility model, AWS secures the underlying infrastructure while customers are responsible for securing their applications, data, and configurations that run on top of that infrastructure. Users do not have access to free and unlimited storage on AWS; storage services such as S3 and EBS are priced based on usage, and while there are free tier limits for new accounts, storage is not free or unlimited in general. Users do not have control over the physical infrastructure; one of the trade-offs of moving to the cloud is that customers give up physical access to and control of the underlying hardware, trusting AWS to manage it securely and reliably.",
+    "explanation": "AWS requires no upfront hardware commitments, allowing organizations to pay only for what they consume, and resources can be provisioned on demand in minutes allowing businesses to scale quickly without waiting for hardware procurement and installation.\nAWS does not manage all security in the cloud; under the shared responsibility model, AWS secures the underlying infrastructure while customers are responsible for securing their applications, data, and configurations that run on top of that infrastructure. Users do not have access to free and unlimited storage on AWS; storage services such as S3 and EBS are priced based on usage, and while there are free tier limits for new accounts, storage is not free or unlimited in general. Users do not have control over the physical infrastructure; one of the trade-offs of moving to the cloud is that customers give up physical access to and control of the underlying hardware, trusting AWS to manage it securely and reliably.",
     "isMultiAnswer": true
   },
   {
@@ -1338,7 +1338,7 @@
       "A",
       "C"
     ],
-    "explanation": "Deploying across multiple AWS Regions places resources physically closer to international users, and CloudFront's global edge locations cache content near end users worldwide, both directly reducing latency for global customers.\nAmazon Translate is a machine translation service for converting text between languages and does not automatically translate website interfaces without custom integration. Amazon Comprehend is a natural language processing service for analysing and extracting meaning from text, not a tool for enabling multilingual application responses. Elastic Load Balancing distributes traffic across targets within a single Region and cannot route traffic between Regions to reduce geographic latency.",
+    "explanation": "Deploying across multiple AWS Regions places resources physically closer to international users, and CloudFront's global edge locations cache content near end users worldwide, both directly reducing latency for global customers.\nAmazon Translate is a machine translation service for converting text between languages and does not automatically translate website interfaces without custom integration. Amazon Comprehend is a natural language processing service for analyzing and extracting meaning from text, not a tool for enabling multilingual application responses. Elastic Load Balancing distributes traffic across targets within a single Region and cannot route traffic between Regions to reduce geographic latency.",
     "isMultiAnswer": true
   },
   {
@@ -1450,7 +1450,7 @@
       "D": "Some resources run on-premises and some run in the AWS Cloud"
     },
     "answer": "D",
-    "explanation": "A hybrid cloud architecture means some resources run on-premises in existing data centres while other resources run in the AWS Cloud, connected through services such as AWS VPN or AWS Direct Connect.\nRunning all resources using on-premises infrastructure describes a fully on-premises deployment with no cloud involvement, which is the opposite of a cloud architecture. Running some resources on-premises and some in a colocation centre describes a split between owned and rented physical data centre space, but does not involve any cloud provider and therefore does not constitute a hybrid cloud architecture. Running all resources in the AWS Cloud describes a fully cloud-native deployment, which is a public cloud architecture rather than a hybrid one.",
+    "explanation": "A hybrid cloud architecture means some resources run on-premises in existing data centers while other resources run in the AWS Cloud, connected through services such as AWS VPN or AWS Direct Connect.\nRunning all resources using on-premises infrastructure describes a fully on-premises deployment with no cloud involvement, which is the opposite of a cloud architecture. Running some resources on-premises and some in a colocation center describes a split between owned and rented physical data center space, but does not involve any cloud provider and therefore does not constitute a hybrid cloud architecture. Running all resources in the AWS Cloud describes a fully cloud-native deployment, which is a public cloud architecture rather than a hybrid one.",
     "isMultiAnswer": false
   },
   {
@@ -1467,7 +1467,7 @@
       "B",
       "C"
     ],
-    "explanation": "AWS eliminates the need to guess capacity requirements by providing on-demand scaling, and increases speed to market by enabling rapid provisioning of resources in minutes rather than weeks.\nFixed rate monthly cost is the opposite of how AWS pricing works. AWS uses a variable pay-as-you-go model, not fixed monthly billing. Increased upfront capital expenditure is also the opposite of an AWS advantage. One of the core benefits of cloud is replacing upfront capital expenditure with variable operational costs. Physical access to cloud data centres is not available to customers and is not an AWS advantage.",
+    "explanation": "AWS eliminates the need to guess capacity requirements by providing on-demand scaling, and increases speed to market by enabling rapid provisioning of resources in minutes rather than weeks.\nFixed rate monthly cost is the opposite of how AWS pricing works. AWS uses a variable pay-as-you-go model, not fixed monthly billing. Increased upfront capital expenditure is also the opposite of an AWS advantage. One of the core benefits of cloud is replacing upfront capital expenditure with variable operational costs. Physical access to cloud data centers is not available to customers and is not an AWS advantage.",
     "isMultiAnswer": true
   },
   {
@@ -1484,7 +1484,7 @@
       "B",
       "C"
     ],
-    "explanation": "The cost of purchasing and installing physical server hardware on-premises, and the ongoing administrative cost of managing infrastructure including OS installations, patching, backups, and failure recovery, are both direct costs of maintaining on-premises infrastructure that disappear when migrating to AWS and should be included in a TCO comparison.\nCredit card processing fees for application transactions are a business operational cost that exists regardless of whether the infrastructure is on-premises or in the cloud, as they are determined by the payment processor rather than the hosting environment and are therefore not relevant to a cloud versus on-premises TCO comparison. Third-party penetration testing costs may apply in both on-premises and cloud environments depending on the organisation's security requirements, and are not a distinguishing cost factor that differentiates on-premises TCO from cloud architecture costs. Advertising costs for enterprise-wide campaigns are a marketing expense entirely unrelated to the infrastructure hosting model, and have no connection to the cost comparison between on-premises data centre infrastructure and cloud architecture.",
+    "explanation": "The cost of purchasing and installing physical server hardware on-premises, and the ongoing administrative cost of managing infrastructure including OS installations, patching, backups, and failure recovery, are both direct costs of maintaining on-premises infrastructure that disappear when migrating to AWS and should be included in a TCO comparison.\nCredit card processing fees for application transactions are a business operational cost that exists regardless of whether the infrastructure is on-premises or in the cloud, as they are determined by the payment processor rather than the hosting environment and are therefore not relevant to a cloud versus on-premises TCO comparison. Third-party penetration testing costs may apply in both on-premises and cloud environments depending on the organization's security requirements, and are not a distinguishing cost factor that differentiates on-premises TCO from cloud architecture costs. Advertising costs for enterprise-wide campaigns are a marketing expense entirely unrelated to the infrastructure hosting model, and have no connection to the cost comparison between on-premises data center infrastructure and cloud architecture.",
     "isMultiAnswer": true
   },
   {
@@ -1510,7 +1510,7 @@
       "D": "Customers can permanently run enough instances to handle peak workloads"
     },
     "answer": "C",
-    "explanation": "EC2 instances can be launched on demand when needed and terminated when no longer required, so you only pay for compute during actual usage rather than maintaining hardware sized for peak capacity at all times.\nAmazon EC2 costs are not billed on a monthly basis. Linux-based EC2 instances are billed per second with a one-minute minimum, meaning you pay only for the exact compute time consumed rather than a fixed monthly charge. Customers retaining full administrative access to their EC2 instances is a capability that gives customers control over their environment, but administrative access is not itself a reason why AWS is more economical than traditional data centres. Permanently running enough instances to handle peak workloads describes the traditional data centre approach of over-provisioning for maximum anticipated load, which is exactly the model that makes traditional infrastructure less economical than the elastic, on-demand AWS model.",
+    "explanation": "EC2 instances can be launched on demand when needed and terminated when no longer required, so you only pay for compute during actual usage rather than maintaining hardware sized for peak capacity at all times.\nAmazon EC2 costs are not billed on a monthly basis. Linux-based EC2 instances are billed per second with a one-minute minimum, meaning you pay only for the exact compute time consumed rather than a fixed monthly charge. Customers retaining full administrative access to their EC2 instances is a capability that gives customers control over their environment, but administrative access is not itself a reason why AWS is more economical than traditional data centers. Permanently running enough instances to handle peak workloads describes the traditional data center approach of over-provisioning for maximum anticipated load, which is exactly the model that makes traditional infrastructure less economical than the elastic, on-demand AWS model.",
     "isMultiAnswer": false
   },
   {
@@ -1523,7 +1523,7 @@
       "D": "By replacing the repeated scaling of virtual servers with a simpler fixed-scale model"
     },
     "answer": "B",
-    "explanation": "Moving to AWS replaces large upfront capital investments in hardware and facilities with lower, variable pay-as-you-go costs based on actual resource consumption.\nReplacing large variable costs with lower capital investments describes the opposite of the AWS model. Traditional data centres often have both large upfront capital costs and ongoing variable operational costs, while AWS eliminates the capital component and replaces it with variable usage-based charges. Allowing the provisioning of compute and storage at a fixed level to meet peak demand describes the traditional on-premises approach of purchasing maximum anticipated capacity upfront, which is a model AWS specifically moves customers away from. Replacing the repeated scaling of virtual servers with a simpler fixed-scale model describes a static capacity model that is the opposite of the AWS approach, which enables dynamic scaling rather than replacing it with a fixed scale.",
+    "explanation": "Moving to AWS replaces large upfront capital investments in hardware and facilities with lower, variable pay-as-you-go costs based on actual resource consumption.\nReplacing large variable costs with lower capital investments describes the opposite of the AWS model. Traditional data centers often have both large upfront capital costs and ongoing variable operational costs, while AWS eliminates the capital component and replaces it with variable usage-based charges. Allowing the provisioning of compute and storage at a fixed level to meet peak demand describes the traditional on-premises approach of purchasing maximum anticipated capacity upfront, which is a model AWS specifically moves customers away from. Replacing the repeated scaling of virtual servers with a simpler fixed-scale model describes a static capacity model that is the opposite of the AWS approach, which enables dynamic scaling rather than replacing it with a fixed scale.",
     "isMultiAnswer": false
   },
   {
@@ -1562,7 +1562,7 @@
       "D": "Placement groups"
     },
     "answer": "B",
-    "explanation": "Availability Zones are isolated data centre locations within a single AWS Region connected by low-latency links. Deploying EC2 instances across at least two AZs in the same Region provides high availability and meets the geographic restriction requirement.\nAWS Regions are separate geographic areas, each containing multiple AZs. Deploying across multiple Regions would violate the requirement that all instances remain in a single geographic area, making this option non-compliant. Subnets are subdivisions of a VPC and can exist within a single AZ; spreading instances across subnets within the same AZ does not provide protection against an AZ-level failure. Placement groups control how instances are physically placed within an AZ for low latency or spread placement, but they do not provide cross-AZ fault isolation and are not a high-availability mechanism for surviving AZ outages.",
+    "explanation": "Availability Zones are isolated data center locations within a single AWS Region connected by low-latency links. Deploying EC2 instances across at least two AZs in the same Region provides high availability and meets the geographic restriction requirement.\nAWS Regions are separate geographic areas, each containing multiple AZs. Deploying across multiple Regions would violate the requirement that all instances remain in a single geographic area, making this option non-compliant. Subnets are subdivisions of a VPC and can exist within a single AZ; spreading instances across subnets within the same AZ does not provide protection against an AZ-level failure. Placement groups control how instances are physically placed within an AZ for low latency or spread placement, but they do not provide cross-AZ fault isolation and are not a high-availability mechanism for surviving AZ outages.",
     "isMultiAnswer": false
   },
   {
@@ -1579,7 +1579,7 @@
       "A",
       "C"
     ],
-    "explanation": "AWS manages the maintenance of cloud infrastructure including hardware, networking, and facilities, and manages capacity planning for physical servers, freeing customers from these operational burdens and allowing them to focus on their applications and business objectives.\nAWS does not manage the security of applications built on AWS, as application-level security including code vulnerabilities, access controls, and data protection remain the customer's responsibility under the Shared Responsibility Model. AWS does not manage the development of applications on AWS, as customers are solely responsible for designing, building, and maintaining their own applications regardless of which AWS services they run on. AWS does not manage cost planning for virtual servers, as customers are responsible for selecting the right instance types, monitoring usage, and optimising their own spending through tools like Cost Explorer and AWS Budgets.",
+    "explanation": "AWS manages the maintenance of cloud infrastructure including hardware, networking, and facilities, and manages capacity planning for physical servers, freeing customers from these operational burdens and allowing them to focus on their applications and business objectives.\nAWS does not manage the security of applications built on AWS, as application-level security including code vulnerabilities, access controls, and data protection remain the customer's responsibility under the Shared Responsibility Model. AWS does not manage the development of applications on AWS, as customers are solely responsible for designing, building, and maintaining their own applications regardless of which AWS services they run on. AWS does not manage cost planning for virtual servers, as customers are responsible for selecting the right instance types, monitoring usage, and optimizing their own spending through tools like Cost Explorer and AWS Budgets.",
     "isMultiAnswer": true
   },
   {
@@ -1635,7 +1635,7 @@
       "D": "Implement the least permissive rules for security groups"
     },
     "answer": "C",
-    "explanation": "Designing loosely coupled components means systems are built so that individual components can fail or be replaced without causing cascading failures, which is a core AWS Well-Architected design principle for building resilient, maintainable cloud architectures.\nThinking of servers as non-disposable resources is the opposite of an AWS design principle; the cloud encourages treating infrastructure as disposable and automating replacements, allowing failed instances to be terminated and new ones launched automatically rather than being manually repaired. Using synchronous integration of services increases tight coupling and means a failure in one service blocks others waiting for a response; AWS design principles favour asynchronous and event-driven patterns where components can operate independently without waiting for each other. Implementing the least permissive rules for security groups is a security best practice for network access control but is not a cloud architecture design principle; it relates to security hardening rather than the broader system architecture pattern described by the Well-Architected Framework.",
+    "explanation": "Designing loosely coupled components means systems are built so that individual components can fail or be replaced without causing cascading failures, which is a core AWS Well-Architected design principle for building resilient, maintainable cloud architectures.\nThinking of servers as non-disposable resources is the opposite of an AWS design principle; the cloud encourages treating infrastructure as disposable and automating replacements, allowing failed instances to be terminated and new ones launched automatically rather than being manually repaired. Using synchronous integration of services increases tight coupling and means a failure in one service blocks others waiting for a response; AWS design principles favor asynchronous and event-driven patterns where components can operate independently without waiting for each other. Implementing the least permissive rules for security groups is a security best practice for network access control but is not a cloud architecture design principle; it relates to security hardening rather than the broader system architecture pattern described by the Well-Architected Framework.",
     "isMultiAnswer": false
   },
   {
@@ -1648,7 +1648,7 @@
       "D": "Run the application on a bare metal EC2 instance"
     },
     "answer": "C",
-    "explanation": "Distributing the workload across multiple EC2 instances and running in parallel applies horizontal scaling, which handles consistently growing demand by adding more machines rather than relying on a single larger instance that will eventually hit capacity limits.\nRunning the application on a bigger EC2 instance applies vertical scaling, which has an upper size limit and creates a single point of failure, making it unsuitable for consistently doubling workloads over time. Switching to a different EC2 instance family optimises for workload characteristics such as compute or memory intensity, but does not address the problem of consistently growing processing volume. Running on a bare metal EC2 instance provides direct access to physical hardware without a hypervisor layer, which can improve performance for certain workloads but does not scale to handle doubling data volumes.",
+    "explanation": "Distributing the workload across multiple EC2 instances and running in parallel applies horizontal scaling, which handles consistently growing demand by adding more machines rather than relying on a single larger instance that will eventually hit capacity limits.\nRunning the application on a bigger EC2 instance applies vertical scaling, which has an upper size limit and creates a single point of failure, making it unsuitable for consistently doubling workloads over time. Switching to a different EC2 instance family optimizes for workload characteristics such as compute or memory intensity, but does not address the problem of consistently growing processing volume. Running on a bare metal EC2 instance provides direct access to physical hardware without a hypervisor layer, which can improve performance for certain workloads but does not scale to handle doubling data volumes.",
     "isMultiAnswer": false
   },
   {
@@ -1687,7 +1687,7 @@
       "D": "Automatically adjust the required compute capacity to maintain consistent performance"
     },
     "answer": "D",
-    "explanation": "Elasticity automatically adjusts compute capacity in response to changing demand, scaling out during traffic peaks and scaling in during quiet periods to maintain consistent performance without manual intervention.\nSpreading web traffic across multiple Regions describes global load balancing or DNS routing, which is a separate capability unrelated to dynamically adjusting compute capacity. Automatically archiving log data to minimise storage costs describes a data lifecycle management function, not a characteristic of elasticity. Automatically selecting the most cost-effective services is not a feature AWS provides on behalf of customers, as service selection remains the customer's responsibility.",
+    "explanation": "Elasticity automatically adjusts compute capacity in response to changing demand, scaling out during traffic peaks and scaling in during quiet periods to maintain consistent performance without manual intervention.\nSpreading web traffic across multiple Regions describes global load balancing or DNS routing, which is a separate capability unrelated to dynamically adjusting compute capacity. Automatically archiving log data to minimize storage costs describes a data lifecycle management function, not a characteristic of elasticity. Automatically selecting the most cost-effective services is not a feature AWS provides on behalf of customers, as service selection remains the customer's responsibility.",
     "isMultiAnswer": false
   },
   {
@@ -1726,7 +1726,7 @@
       "D": "Purchasing for the maximum possible load"
     },
     "answer": "A",
-    "explanation": "The pay-as-you-go model optimises costs by ensuring you only pay for the resources you actually consume, eliminating waste from over-provisioning or purchasing hardware in advance of actual need.\nPurchasing hardware before it is needed describes the traditional capital expenditure model of procuring infrastructure ahead of demand, which leads to over-provisioning and wasted spend rather than optimising costs. Manually provisioning cloud resources introduces human effort and potential delays in responding to demand changes, and does not optimise costs compared to automated scaling that matches capacity precisely to actual usage. Purchasing for the maximum possible load means over-provisioning infrastructure to handle the worst-case demand scenario, which maximises costs by paying for capacity that sits idle during normal usage periods rather than scaling with actual demand.",
+    "explanation": "The pay-as-you-go model optimizes costs by ensuring you only pay for the resources you actually consume, eliminating waste from over-provisioning or purchasing hardware in advance of actual need.\nPurchasing hardware before it is needed describes the traditional capital expenditure model of procuring infrastructure ahead of demand, which leads to over-provisioning and wasted spend rather than optimizing costs. Manually provisioning cloud resources introduces human effort and potential delays in responding to demand changes, and does not optimize costs compared to automated scaling that matches capacity precisely to actual usage. Purchasing for the maximum possible load means over-provisioning infrastructure to handle the worst-case demand scenario, which maximizes costs by paying for capacity that sits idle during normal usage periods rather than scaling with actual demand.",
     "isMultiAnswer": false
   },
   {
@@ -1752,7 +1752,7 @@
       "D": "Edge locations"
     },
     "answer": "B",
-    "explanation": "AWS Regions are geographically separate areas around the world, making them the correct choice for replicating data across different physical locations to satisfy disaster recovery requirements.\nAWS Accounts are a logical boundary for managing resources and billing, not a geographic infrastructure component. Availability Zones are isolated data centre clusters within a single Region, so replicating between AZs does not achieve geographic separation across different areas of the world. Edge locations are points of presence used for content delivery and caching, not designed for data replication or disaster recovery purposes.",
+    "explanation": "AWS Regions are geographically separate areas around the world, making them the correct choice for replicating data across different physical locations to satisfy disaster recovery requirements.\nAWS Accounts are a logical boundary for managing resources and billing, not a geographic infrastructure component. Availability Zones are isolated data center clusters within a single Region, so replicating between AZs does not achieve geographic separation across different areas of the world. Edge locations are points of presence used for content delivery and caching, not designed for data replication or disaster recovery purposes.",
     "isMultiAnswer": false
   },
   {
@@ -1778,7 +1778,7 @@
       "D": "A data center location with a single source of power and networking"
     },
     "answer": "A",
-    "explanation": "An Availability Zone consists of one or more physical data centres, each with independent power, cooling, and networking, designed so that a failure in one AZ does not affect others in the same Region.\nA completely isolated geographic location describes an AWS Region, not an Availability Zone; Regions are the large geographic areas, and AZs are the isolated facilities within a Region. Edge locations are Points of Presence used by services such as CloudFront to cache content close to users; they are not Availability Zones and have no hosting relationship with EC2 instances or core AWS services. A description of a single source of power and networking is the opposite of what an AZ provides; AZs are specifically designed with redundant power and networking to protect against single points of failure.",
+    "explanation": "An Availability Zone consists of one or more physical data centers, each with independent power, cooling, and networking, designed so that a failure in one AZ does not affect others in the same Region.\nA completely isolated geographic location describes an AWS Region, not an Availability Zone; Regions are the large geographic areas, and AZs are the isolated facilities within a Region. Edge locations are Points of Presence used by services such as CloudFront to cache content close to users; they are not Availability Zones and have no hosting relationship with EC2 instances or core AWS services. A description of a single source of power and networking is the opposite of what an AZ provides; AZs are specifically designed with redundant power and networking to protect against single points of failure.",
     "isMultiAnswer": false
   },
   {
@@ -1791,7 +1791,7 @@
       "D": "Private cloud"
     },
     "answer": "C",
-    "explanation": "A hybrid cloud architecture distributes workloads between on-premises servers and the AWS Cloud, combining existing data center infrastructure with cloud resources connected via VPN or Direct Connect.\nA virtual private network is a connectivity technology that creates encrypted tunnels between networks, and is not itself an architecture type describing how workloads are distributed between cloud and on-premises environments. A virtual private cloud is a logically isolated network environment within AWS, and describes a networking construct rather than a deployment model that spans both cloud and on-premises infrastructure. A private cloud is a deployment model where all infrastructure is dedicated to a single organisation and hosted either on-premises or by a third party, with no shared public cloud component.",
+    "explanation": "A hybrid cloud architecture distributes workloads between on-premises servers and the AWS Cloud, combining existing data center infrastructure with cloud resources connected via VPN or Direct Connect.\nA virtual private network is a connectivity technology that creates encrypted tunnels between networks, and is not itself an architecture type describing how workloads are distributed between cloud and on-premises environments. A virtual private cloud is a logically isolated network environment within AWS, and describes a networking construct rather than a deployment model that spans both cloud and on-premises infrastructure. A private cloud is a deployment model where all infrastructure is dedicated to a single organization and hosted either on-premises or by a third party, with no shared public cloud component.",
     "isMultiAnswer": false
   },
   {
@@ -1929,7 +1929,7 @@
       "D": "Economies of scale"
     },
     "answer": "D",
-    "explanation": "Economies of scale allow AWS to lower variable costs for customers by aggregating demand across millions of users, giving AWS far greater purchasing power than any individual organisation could achieve on its own.\nPay-as-you-go pricing is a billing model that charges customers only for what they consume, which is a separate cloud benefit unrelated to purchase volume driving down costs. High availability refers to designing systems to remain operational during failures, which is an architectural benefit rather than a cost benefit derived from purchasing power. Global reach refers to the ability to deploy infrastructure in multiple geographic locations worldwide, which is an infrastructure benefit rather than an economic one.",
+    "explanation": "Economies of scale allow AWS to lower variable costs for customers by aggregating demand across millions of users, giving AWS far greater purchasing power than any individual organization could achieve on its own.\nPay-as-you-go pricing is a billing model that charges customers only for what they consume, which is a separate cloud benefit unrelated to purchase volume driving down costs. High availability refers to designing systems to remain operational during failures, which is an architectural benefit rather than a cost benefit derived from purchasing power. Global reach refers to the ability to deploy infrastructure in multiple geographic locations worldwide, which is an infrastructure benefit rather than an economic one.",
     "isMultiAnswer": false
   },
   {
@@ -1968,7 +1968,7 @@
       "D": "Sustainability"
     },
     "answer": "C",
-    "explanation": "The Performance Efficiency pillar focuses on using computing resources efficiently to meet workload requirements, including selecting the right resource types and sizes and maintaining efficiency as demand changes over time.\nReliability focuses on ensuring a workload performs its intended function correctly and recovers from failures, not on resource selection. Cost Optimization focuses on eliminating unnecessary spend and reducing overall costs, which overlaps with right-sizing but is not the pillar that specifically defines it as a design principle. Sustainability focuses on reducing the environmental impact of cloud workloads by minimising energy consumption and maximising resource utilisation.",
+    "explanation": "The Performance Efficiency pillar focuses on using computing resources efficiently to meet workload requirements, including selecting the right resource types and sizes and maintaining efficiency as demand changes over time.\nReliability focuses on ensuring a workload performs its intended function correctly and recovers from failures, not on resource selection. Cost Optimization focuses on eliminating unnecessary spend and reducing overall costs, which overlaps with right-sizing but is not the pillar that specifically defines it as a design principle. Sustainability focuses on reducing the environmental impact of cloud workloads by minimizing energy consumption and maximizing resource utilization.",
     "isMultiAnswer": false
   },
   {
@@ -2007,7 +2007,7 @@
       "D": "Performance Efficiency"
     },
     "answer": "A",
-    "explanation": "The Cost Optimization pillar focuses on avoiding unnecessary costs, selecting the most appropriate resource types, and scaling without overspending.\nSustainability focuses on reducing environmental impact of cloud workloads, such as minimising energy consumption. Operational Excellence focuses on running and monitoring systems to deliver business value and improving processes. Performance Efficiency focuses on using compute resources efficiently to meet performance requirements.",
+    "explanation": "The Cost Optimization pillar focuses on avoiding unnecessary costs, selecting the most appropriate resource types, and scaling without overspending.\nSustainability focuses on reducing environmental impact of cloud workloads, such as minimizing energy consumption. Operational Excellence focuses on running and monitoring systems to deliver business value and improving processes. Performance Efficiency focuses on using compute resources efficiently to meet performance requirements.",
     "isMultiAnswer": false
   },
   {
@@ -2024,12 +2024,12 @@
       "A",
       "C"
     ],
-    "explanation": "The AWS CAF organises guidance into six perspectives: Business, People, Governance, Platform, Security, and Operations. Governance focuses on orchestrating cloud initiatives while maximising organisational benefits and minimising transformation-related risks, and People focuses on developing an organisation-wide change management strategy and building cloud skills across the workforce.\nFinancial is not one of the six AWS CAF perspectives; financial and cost-related guidance falls within the Business perspective, which addresses how cloud adoption drives business value and return on investment rather than existing as its own separate financial perspective. Infrastructure is not one of the six AWS CAF perspectives; guidance on building and provisioning the technology foundation for cloud workloads falls under the Platform perspective rather than a perspective named Infrastructure. Agility is a benefit and characteristic of cloud computing but is not one of the six CAF perspectives; it does not appear in the CAF framework structure alongside Business, People, Governance, Platform, Security, and Operations.",
+    "explanation": "The AWS CAF organizes guidance into six perspectives: Business, People, Governance, Platform, Security, and Operations. Governance focuses on orchestrating cloud initiatives while maximizing organizational benefits and minimizing transformation-related risks, and People focuses on developing an organization-wide change management strategy and building cloud skills across the workforce.\nFinancial is not one of the six AWS CAF perspectives; financial and cost-related guidance falls within the Business perspective, which addresses how cloud adoption drives business value and return on investment rather than existing as its own separate financial perspective. Infrastructure is not one of the six AWS CAF perspectives; guidance on building and provisioning the technology foundation for cloud workloads falls under the Platform perspective rather than a perspective named Infrastructure. Agility is a benefit and characteristic of cloud computing but is not one of the six CAF perspectives; it does not appear in the CAF framework structure alongside Business, People, Governance, Platform, Security, and Operations.",
     "isMultiAnswer": true
   },
   {
     "id": "q1061",
-    "question": "According to the AWS Cloud Adoption Framework (AWS CAF), which TWO of the following are benefits that organisations can achieve through successful cloud adoption?",
+    "question": "According to the AWS Cloud Adoption Framework (AWS CAF), which TWO of the following are benefits that organizations can achieve through successful cloud adoption?",
     "options": {
       "A": "Reduced business risk",
       "B": "Elimination of all operational expenditure",
@@ -2041,7 +2041,7 @@
       "A",
       "C"
     ],
-    "explanation": "The AWS CAF identifies four key benefits of cloud adoption: reduced business risk through improved reliability, increased performance, and enhanced security posture; improved ESG performance through reduced carbon footprint and greater energy efficiency enabled by cloud infrastructure; increased revenue through the ability to develop and deliver new products faster; and increased operational efficiency through optimised cost structures and workforce productivity.\nElimination of all operational expenditure is not an AWS CAF benefit; moving to the cloud converts large upfront capital expenditure to variable operational expenditure rather than eliminating ongoing costs, as customers continue to pay for cloud services based on actual consumption and operational costs such as staffing and tooling remain. Immediate compliance with all regulatory requirements is not a benefit the CAF promises; while AWS provides compliance certifications and tools to support customers' compliance programmes, each customer is still responsible for applying the appropriate controls to their own workloads and meeting their specific regulatory obligations. Guaranteed elimination of all security vulnerabilities is not a CAF-defined benefit; while cloud adoption can improve the security posture of an organisation through shared responsibility and access to advanced security services, the CAF does not promise that cloud migration eliminates all security risk.",
+    "explanation": "The AWS CAF identifies four key benefits of cloud adoption: reduced business risk through improved reliability, increased performance, and enhanced security posture; improved ESG performance through reduced carbon footprint and greater energy efficiency enabled by cloud infrastructure; increased revenue through the ability to develop and deliver new products faster; and increased operational efficiency through optimized cost structures and workforce productivity.\nElimination of all operational expenditure is not an AWS CAF benefit; moving to the cloud converts large upfront capital expenditure to variable operational expenditure rather than eliminating ongoing costs, as customers continue to pay for cloud services based on actual consumption and operational costs such as staffing and tooling remain. Immediate compliance with all regulatory requirements is not a benefit the CAF promises; while AWS provides compliance certifications and tools to support customers' compliance programs, each customer is still responsible for applying the appropriate controls to their own workloads and meeting their specific regulatory obligations. Guaranteed elimination of all security vulnerabilities is not a CAF-defined benefit; while cloud adoption can improve the security posture of an organization through shared responsibility and access to advanced security services, the CAF does not promise that cloud migration eliminates all security risk.",
     "isMultiAnswer": true
   },
   {
@@ -2080,7 +2080,7 @@
       "D": "Repurchase"
     },
     "answer": "C",
-    "explanation": "Rehosting, commonly referred to as lift-and-shift, involves moving an application to the cloud without making any changes to the application code or architecture, making it the fastest migration approach that allows organisations to realise cloud benefits quickly with minimal upfront migration effort.\nReplatforming involves making targeted optimisations during migration, such as moving from a self-managed database to a managed service, to gain cloud benefits while leaving the core application architecture unchanged; this requires some changes and therefore more effort than a pure rehost. Refactoring involves re-architecting the application to fully leverage cloud-native capabilities such as microservices and serverless computing, providing the greatest long-term benefits but requiring the most time and development investment of any migration strategy. Repurchasing involves replacing the existing application entirely with a different product, typically a SaaS solution, which requires learning a new platform and migrating data rather than simply moving the existing application to new infrastructure.",
+    "explanation": "Rehosting, commonly referred to as lift-and-shift, involves moving an application to the cloud without making any changes to the application code or architecture, making it the fastest migration approach that allows organizations to realize cloud benefits quickly with minimal upfront migration effort.\nReplatforming involves making targeted optimizations during migration, such as moving from a self-managed database to a managed service, to gain cloud benefits while leaving the core application architecture unchanged; this requires some changes and therefore more effort than a pure rehost. Refactoring involves re-architecting the application to fully leverage cloud-native capabilities such as microservices and serverless computing, providing the greatest long-term benefits but requiring the most time and development investment of any migration strategy. Repurchasing involves replacing the existing application entirely with a different product, typically a SaaS solution, which requires learning a new platform and migrating data rather than simply moving the existing application to new infrastructure.",
     "isMultiAnswer": false
   },
   {
@@ -2093,7 +2093,7 @@
       "D": "Refactor"
     },
     "answer": "C",
-    "explanation": "Replatforming, also known as lift-tinker-and-shift, involves making targeted optimisations during migration to take advantage of cloud-managed capabilities, such as moving from a self-managed database to Amazon RDS to gain automated backups, patching, and scaling, without re-architecting the core application or changing its code.\nRehosting moves an application to the cloud with no changes to architecture or code, making it a pure lift-and-shift; switching from a self-managed database to Amazon RDS represents a change to managed infrastructure and therefore goes beyond a simple rehost. Repurchasing replaces an existing application with a fundamentally different product, such as moving to a third-party SaaS database; moving to Amazon RDS uses the same MySQL engine in managed form rather than replacing the application with a different product from a different vendor. Refactoring involves re-architecting the application to use cloud-native services and patterns such as serverless functions or microservices, which represents a far more significant change to the application design than simply migrating the database to a managed service.",
+    "explanation": "Replatforming, also known as lift-tinker-and-shift, involves making targeted optimizations during migration to take advantage of cloud-managed capabilities, such as moving from a self-managed database to Amazon RDS to gain automated backups, patching, and scaling, without re-architecting the core application or changing its code.\nRehosting moves an application to the cloud with no changes to architecture or code, making it a pure lift-and-shift; switching from a self-managed database to Amazon RDS represents a change to managed infrastructure and therefore goes beyond a simple rehost. Repurchasing replaces an existing application with a fundamentally different product, such as moving to a third-party SaaS database; moving to Amazon RDS uses the same MySQL engine in managed form rather than replacing the application with a different product from a different vendor. Refactoring involves re-architecting the application to use cloud-native services and patterns such as serverless functions or microservices, which represents a far more significant change to the application design than simply migrating the database to a managed service.",
     "isMultiAnswer": false
   },
   {
@@ -2106,7 +2106,7 @@
       "D": "Replatform"
     },
     "answer": "C",
-    "explanation": "Retiring involves decommissioning applications that are no longer needed or that provide no business value, which reduces the scope and cost of migration by eliminating unnecessary workloads rather than spending effort and money moving them to the cloud where they would continue to consume resources.\nRetaining involves keeping certain applications running in their current on-premises environment, typically because they are not yet ready to migrate due to technical or compliance constraints, but this strategy still incurs ongoing maintenance costs rather than eliminating the burden of applications with no business purpose. Rehosting moves applications to the cloud with no changes, which would still consume cloud resources and generate ongoing costs for applications that have no business value; decommissioning is the correct choice when there is no reason to preserve the application at all. Replatforming involves optimising applications during migration by moving to managed services, which requires migration effort and ongoing cloud resource costs that would be wasted entirely on applications that serve no business purpose.",
+    "explanation": "Retiring involves decommissioning applications that are no longer needed or that provide no business value, which reduces the scope and cost of migration by eliminating unnecessary workloads rather than spending effort and money moving them to the cloud where they would continue to consume resources.\nRetaining involves keeping certain applications running in their current on-premises environment, typically because they are not yet ready to migrate due to technical or compliance constraints, but this strategy still incurs ongoing maintenance costs rather than eliminating the burden of applications with no business purpose. Rehosting moves applications to the cloud with no changes, which would still consume cloud resources and generate ongoing costs for applications that have no business value; decommissioning is the correct choice when there is no reason to preserve the application at all. Replatforming involves optimizing applications during migration by moving to managed services, which requires migration effort and ongoing cloud resource costs that would be wasted entirely on applications that serve no business purpose.",
     "isMultiAnswer": false
   },
   {
@@ -2119,7 +2119,7 @@
       "D": "AWS Shared Responsibility Model"
     },
     "answer": "B",
-    "explanation": "The AWS Cloud Adoption Framework organizes guidance into six perspectives, Business, People, Governance, Platform, Security, and Operations, to help organizations identify skill gaps, process improvements, and technical requirements for successful cloud transformation.\nThe AWS Well-Architected Framework provides best practices for designing and operating workloads in the cloud across six pillars, but it is focused on workload architecture rather than organizational cloud adoption planning. The AWS Migration Acceleration Program is a consulting and technology engagement programme that helps customers accelerate their migration to AWS, but it is not a framework of perspectives for cloud transformation planning. The AWS Shared Responsibility Model defines the division of security responsibilities between AWS and the customer, and is a security governance concept rather than a cloud adoption planning framework.",
+    "explanation": "The AWS Cloud Adoption Framework organizes guidance into six perspectives, Business, People, Governance, Platform, Security, and Operations, to help organizations identify skill gaps, process improvements, and technical requirements for successful cloud transformation.\nThe AWS Well-Architected Framework provides best practices for designing and operating workloads in the cloud across six pillars, but it is focused on workload architecture rather than organizational cloud adoption planning. The AWS Migration Acceleration Program is a consulting and technology engagement program that helps customers accelerate their migration to AWS, but it is not a framework of perspectives for cloud transformation planning. The AWS Shared Responsibility Model defines the division of security responsibilities between AWS and the customer, and is a security governance concept rather than a cloud adoption planning framework.",
     "isMultiAnswer": false
   },
   {
@@ -2132,7 +2132,7 @@
       "D": "Platform"
     },
     "answer": "B",
-    "explanation": "The People perspective of the AWS CAF focuses on evaluating organizational structures, roles, and skills to ensure the workforce is ready for cloud adoption, including training, change management, and career development.\nThe Business perspective focuses on ensuring that cloud investments are aligned with business outcomes and that stakeholders can articulate the business case for cloud adoption, rather than workforce readiness. The Operations perspective focuses on defining how day-to-day cloud operations will be managed, monitored, and improved, rather than workforce skills assessment. The Platform perspective focuses on building a scalable cloud platform architecture including networking, compute, and storage design, rather than people and organisational readiness.",
+    "explanation": "The People perspective of the AWS CAF focuses on evaluating organizational structures, roles, and skills to ensure the workforce is ready for cloud adoption, including training, change management, and career development.\nThe Business perspective focuses on ensuring that cloud investments are aligned with business outcomes and that stakeholders can articulate the business case for cloud adoption, rather than workforce readiness. The Operations perspective focuses on defining how day-to-day cloud operations will be managed, monitored, and improved, rather than workforce skills assessment. The Platform perspective focuses on building a scalable cloud platform architecture including networking, compute, and storage design, rather than people and organizational readiness.",
     "isMultiAnswer": false
   },
   {
@@ -2149,7 +2149,7 @@
       "B",
       "D"
     ],
-    "explanation": "The AWS CAF groups its six perspectives into two categories: business capabilities (Business, People, Governance) and technical capabilities (Platform, Security, Operations). Platform and Operations both fall under technical capabilities.\nBusiness is a business capability perspective focused on aligning cloud investments with business outcomes, not a technical capability. People is a business capability perspective focused on organisational readiness, culture, and workforce skills. Governance is a business capability perspective focused on orchestrating cloud initiatives, maximising benefits, and minimising transformation risks.",
+    "explanation": "The AWS CAF groups its six perspectives into two categories: business capabilities (Business, People, Governance) and technical capabilities (Platform, Security, Operations). Platform and Operations both fall under technical capabilities.\nBusiness is a business capability perspective focused on aligning cloud investments with business outcomes, not a technical capability. People is a business capability perspective focused on organizational readiness, culture, and workforce skills. Governance is a business capability perspective focused on orchestrating cloud initiatives, maximizing benefits, and minimizing transformation risks.",
     "isMultiAnswer": true
   },
   {
@@ -2162,7 +2162,7 @@
       "D": "Operations"
     },
     "answer": "C",
-    "explanation": "The Governance perspective of the AWS CAF focuses on orchestrating cloud initiatives while maximising organisational benefits and minimising transformation-related risks, including aligning cloud strategy with regulatory and compliance requirements.\nThe Security perspective focuses on achieving the confidentiality, integrity, and availability of data and cloud workloads through security controls, rather than broader transformation risk management and regulatory alignment. The Business perspective focuses on ensuring cloud investments deliver measurable business outcomes, rather than risk management and regulatory compliance. The Operations perspective focuses on ensuring cloud services are delivered at a level that meets the needs of the business on a day-to-day basis, rather than strategic risk and compliance alignment.",
+    "explanation": "The Governance perspective of the AWS CAF focuses on orchestrating cloud initiatives while maximizing organizational benefits and minimizing transformation-related risks, including aligning cloud strategy with regulatory and compliance requirements.\nThe Security perspective focuses on achieving the confidentiality, integrity, and availability of data and cloud workloads through security controls, rather than broader transformation risk management and regulatory alignment. The Business perspective focuses on ensuring cloud investments deliver measurable business outcomes, rather than risk management and regulatory compliance. The Operations perspective focuses on ensuring cloud services are delivered at a level that meets the needs of the business on a day-to-day basis, rather than strategic risk and compliance alignment.",
     "isMultiAnswer": false
   },
   {
@@ -2188,7 +2188,7 @@
       "D": "Governance"
     },
     "answer": "B",
-    "explanation": "The Business perspective of the AWS CAF helps stakeholders understand how cloud adoption can accelerate business outcomes, articulate a compelling business case, and ensure that cloud investments are tied to measurable business value.\nThe People perspective focuses on organisational readiness, skills development, and change management rather than building a financial or strategic business case for migration. The Platform perspective focuses on designing the cloud infrastructure architecture including compute, networking, and storage, which is a technical concern rather than a business justification activity. The Governance perspective focuses on managing risks and aligning cloud initiatives with compliance requirements, which supports the business case but is not the perspective directly responsible for articulating it.",
+    "explanation": "The Business perspective of the AWS CAF helps stakeholders understand how cloud adoption can accelerate business outcomes, articulate a compelling business case, and ensure that cloud investments are tied to measurable business value.\nThe People perspective focuses on organizational readiness, skills development, and change management rather than building a financial or strategic business case for migration. The Platform perspective focuses on designing the cloud infrastructure architecture including compute, networking, and storage, which is a technical concern rather than a business justification activity. The Governance perspective focuses on managing risks and aligning cloud initiatives with compliance requirements, which supports the business case but is not the perspective directly responsible for articulating it.",
     "isMultiAnswer": false
   },
   {
@@ -2201,7 +2201,7 @@
       "D": "People"
     },
     "answer": "C",
-    "explanation": "The Platform perspective focuses on building an enterprise-grade, scalable cloud platform by designing the target architecture for networking, compute, storage, and database services, and establishing patterns for provisioning and managing cloud resources.\nThe Operations perspective focuses on delivering and managing cloud services to meet day-to-day business needs through monitoring, incident management, and process improvement, not on designing the underlying platform architecture. The Security perspective focuses on protecting data and workloads through identity management, threat detection, and security controls, rather than designing the cloud infrastructure platform. The People perspective focuses on workforce readiness, organisational change, and skills development, which is unrelated to technical platform architecture.",
+    "explanation": "The Platform perspective focuses on building an enterprise-grade, scalable cloud platform by designing the target architecture for networking, compute, storage, and database services, and establishing patterns for provisioning and managing cloud resources.\nThe Operations perspective focuses on delivering and managing cloud services to meet day-to-day business needs through monitoring, incident management, and process improvement, not on designing the underlying platform architecture. The Security perspective focuses on protecting data and workloads through identity management, threat detection, and security controls, rather than designing the cloud infrastructure platform. The People perspective focuses on workforce readiness, organizational change, and skills development, which is unrelated to technical platform architecture.",
     "isMultiAnswer": false
   },
   {
@@ -2245,7 +2245,7 @@
       "C",
       "E"
     ],
-    "explanation": "The AWS CAF categorises Business, People, and Governance as business capability perspectives, which focus on strategic alignment, organisational readiness, workforce skills, change management, risk governance, and ensuring cloud investments deliver business value.\nPlatform is a technical capability perspective that focuses on designing and building the cloud environment architecture, not on business alignment or organisational readiness. Security is a technical capability perspective that focuses on protecting data confidentiality, integrity, and availability through technical security controls, not on business-level planning or governance.",
+    "explanation": "The AWS CAF categorizes Business, People, and Governance as business capability perspectives, which focus on strategic alignment, organizational readiness, workforce skills, change management, risk governance, and ensuring cloud investments deliver business value.\nPlatform is a technical capability perspective that focuses on designing and building the cloud environment architecture, not on business alignment or organizational readiness. Security is a technical capability perspective that focuses on protecting data confidentiality, integrity, and availability through technical security controls, not on business-level planning or governance.",
     "isMultiAnswer": true
   },
   {
@@ -2253,12 +2253,12 @@
     "question": "A company is evaluating its cloud readiness and discovers that its IT staff lacks experience with AWS services. According to the AWS Cloud Adoption Framework (AWS CAF), which action should the company take?",
     "options": {
       "A": "Delay migration until all staff are fully trained",
-      "B": "Invest in training and upskilling programmes aligned with the People perspective",
+      "B": "Invest in training and upskilling programs aligned with the People perspective",
       "C": "Outsource all cloud operations to a third party permanently",
       "D": "Proceed with migration without any training to save time"
     },
     "answer": "B",
-    "explanation": "The People perspective of the AWS CAF recommends investing in training, upskilling, and organisational change management to close skill gaps and prepare the workforce for cloud adoption, ensuring sustainable internal capability rather than dependency on external resources.\nDelaying migration indefinitely until all staff are fully trained is impractical and unnecessary, as the CAF recommends iterative learning alongside migration rather than waiting for complete readiness. Outsourcing all operations permanently does not build internal capability and creates long-term dependency, which contradicts the People perspective's goal of developing organisational cloud skills. Proceeding without training risks operational failures, security incidents, and inefficient resource usage, and ignores the People perspective's emphasis on workforce readiness.",
+    "explanation": "The People perspective of the AWS CAF recommends investing in training, upskilling, and organizational change management to close skill gaps and prepare the workforce for cloud adoption, ensuring sustainable internal capability rather than dependency on external resources.\nDelaying migration indefinitely until all staff are fully trained is impractical and unnecessary, as the CAF recommends iterative learning alongside migration rather than waiting for complete readiness. Outsourcing all operations permanently does not build internal capability and creates long-term dependency, which contradicts the People perspective's goal of developing organizational cloud skills. Proceeding without training risks operational failures, security incidents, and inefficient resource usage, and ignores the People perspective's emphasis on workforce readiness.",
     "isMultiAnswer": false
   },
   {
@@ -2271,7 +2271,7 @@
       "D": "Configuring identity and access management controls"
     },
     "answer": "B",
-    "explanation": "The Governance perspective focuses on orchestrating cloud initiatives to maximise organisational benefits while minimising transformation risks, including budget management, portfolio management, compliance alignment, and risk mitigation strategies.\nDesigning the target cloud architecture is a focus of the Platform perspective, which handles infrastructure, networking, and compute design decisions. Monitoring application performance after deployment is a focus of the Operations perspective, which manages day-to-day service delivery, observability, and incident management. Configuring identity and access management controls is a focus of the Security perspective, which handles identity management, permissions, and threat detection.",
+    "explanation": "The Governance perspective focuses on orchestrating cloud initiatives to maximize organizational benefits while minimizing transformation risks, including budget management, portfolio management, compliance alignment, and risk mitigation strategies.\nDesigning the target cloud architecture is a focus of the Platform perspective, which handles infrastructure, networking, and compute design decisions. Monitoring application performance after deployment is a focus of the Operations perspective, which manages day-to-day service delivery, observability, and incident management. Configuring identity and access management controls is a focus of the Security perspective, which handles identity management, permissions, and threat detection.",
     "isMultiAnswer": false
   },
   {
@@ -2284,7 +2284,7 @@
       "D": "Compute"
     },
     "answer": "A",
-    "explanation": "The AWS CAF identifies four transformation domains: Technology, Process, Organisation, and Product. The Technology domain covers migration and modernisation of infrastructure, applications, and data platforms to leverage cloud capabilities.\nNetworking is a component within the Platform perspective and Technology transformation domain, but it is not itself one of the four transformation domains defined by the CAF. Database is a specific service category within cloud technology, not one of the four transformation domains that the CAF uses to structure cloud adoption activities. Compute is a specific resource type within cloud infrastructure, not one of the four high-level transformation domains defined by the CAF.",
+    "explanation": "The AWS CAF identifies four transformation domains: Technology, Process, Organization, and Product. The Technology domain covers migration and modernisation of infrastructure, applications, and data platforms to leverage cloud capabilities.\nNetworking is a component within the Platform perspective and Technology transformation domain, but it is not itself one of the four transformation domains defined by the CAF. Database is a specific service category within cloud technology, not one of the four transformation domains that the CAF uses to structure cloud adoption activities. Compute is a specific resource type within cloud infrastructure, not one of the four high-level transformation domains defined by the CAF.",
     "isMultiAnswer": false
   },
   {
@@ -2301,7 +2301,7 @@
       "A",
       "C"
     ],
-    "explanation": "The AWS CAF defines four transformation domains: Technology, Process, Organisation, and Product. Process focuses on digitising, automating, and optimising business operations, while Product focuses on reimagining the business model using new capabilities enabled by cloud.\nSecurity is one of the six CAF perspectives, not one of the four transformation domains, and it provides guidance on protecting data and workloads rather than defining a transformation pathway. Infrastructure is a component within the Technology transformation domain and the Platform perspective, but it is not itself one of the four transformation domains. Compliance is an area addressed by the Governance perspective, but it is not one of the four transformation domains defined by the CAF.",
+    "explanation": "The AWS CAF defines four transformation domains: Technology, Process, Organization, and Product. Process focuses on digitising, automating, and optimizing business operations, while Product focuses on reimagining the business model using new capabilities enabled by cloud.\nSecurity is one of the six CAF perspectives, not one of the four transformation domains, and it provides guidance on protecting data and workloads rather than defining a transformation pathway. Infrastructure is a component within the Technology transformation domain and the Platform perspective, but it is not itself one of the four transformation domains. Compliance is an area addressed by the Governance perspective, but it is not one of the four transformation domains defined by the CAF.",
     "isMultiAnswer": true
   },
   {
@@ -2314,7 +2314,7 @@
       "D": "Scale phase"
     },
     "answer": "B",
-    "explanation": "The Align phase of the AWS CAF focuses on identifying capability gaps, evaluating cross-organisational dependencies, and assessing application readiness to create a detailed action plan for cloud adoption, making it the phase where migration readiness is determined.\nThe Envision phase focuses on identifying how cloud can accelerate business outcomes and creating a shared vision for transformation, which happens before readiness assessment. The Launch phase focuses on delivering pilot initiatives and demonstrating incremental business value through initial cloud deployments, which occurs after readiness has been assessed. The Scale phase focuses on expanding cloud adoption across the organisation and optimising operating models for long-term scale, which comes after initial launches have been proven successful.",
+    "explanation": "The Align phase of the AWS CAF focuses on identifying capability gaps, evaluating cross-organizational dependencies, and assessing application readiness to create a detailed action plan for cloud adoption, making it the phase where migration readiness is determined.\nThe Envision phase focuses on identifying how cloud can accelerate business outcomes and creating a shared vision for transformation, which happens before readiness assessment. The Launch phase focuses on delivering pilot initiatives and demonstrating incremental business value through initial cloud deployments, which occurs after readiness has been assessed. The Scale phase focuses on expanding cloud adoption across the organization and optimizing operating models for long-term scale, which comes after initial launches have been proven successful.",
     "isMultiAnswer": false
   },
   {
@@ -2327,12 +2327,12 @@
       "D": "Envision, Launch, Align, Scale"
     },
     "answer": "B",
-    "explanation": "The AWS CAF defines the cloud transformation journey in four phases: Envision (identify how cloud accelerates business outcomes), Align (identify capability gaps and create an action plan), Launch (deliver pilot initiatives), and Scale (expand adoption across the organisation).\nStarting with Align before Envision skips the critical first step of establishing a shared vision for why the organisation is adopting cloud, which is needed to guide the alignment activities. Starting with Launch before Align means deploying to the cloud without first assessing readiness or creating an action plan, which risks uncoordinated and unsuccessful migrations. Placing Align after Launch means assessing readiness after already deploying workloads, which reverses the logical order of planning before execution.",
+    "explanation": "The AWS CAF defines the cloud transformation journey in four phases: Envision (identify how cloud accelerates business outcomes), Align (identify capability gaps and create an action plan), Launch (deliver pilot initiatives), and Scale (expand adoption across the organization).\nStarting with Align before Envision skips the critical first step of establishing a shared vision for why the organization is adopting cloud, which is needed to guide the alignment activities. Starting with Launch before Align means deploying to the cloud without first assessing readiness or creating an action plan, which risks uncoordinated and unsuccessful migrations. Placing Align after Launch means assessing readiness after already deploying workloads, which reverses the logical order of planning before execution.",
     "isMultiAnswer": false
   },
   {
     "id": "q1128",
-    "question": "A company is using the AWS Cloud Adoption Framework (AWS CAF) and wants to establish a Cloud Centre of Excellence (CCoE). Which phase of the CAF transformation journey typically involves this activity?",
+    "question": "A company is using the AWS Cloud Adoption Framework (AWS CAF) and wants to establish a Cloud Center of Excellence (CCoE). Which phase of the CAF transformation journey typically involves this activity?",
     "options": {
       "A": "Envision",
       "B": "Align",
@@ -2340,7 +2340,7 @@
       "D": "Scale"
     },
     "answer": "C",
-    "explanation": "The Launch phase of the AWS CAF involves delivering pilot initiatives, building a Cloud Centre of Excellence to provide guidance and best practices, and demonstrating incremental business value through initial cloud deployments that establish the foundation for broader adoption.\nThe Envision phase focuses on creating a shared transformation vision and identifying how cloud can drive business outcomes, which occurs before establishing operational structures like a CCoE. The Align phase focuses on assessing readiness, identifying gaps, and creating an action plan, which is planning work that precedes the hands-on launch activities. The Scale phase focuses on expanding adoption across the entire organisation after the CCoE and initial patterns have already been established during the Launch phase.",
+    "explanation": "The Launch phase of the AWS CAF involves delivering pilot initiatives, building a Cloud Center of Excellence to provide guidance and best practices, and demonstrating incremental business value through initial cloud deployments that establish the foundation for broader adoption.\nThe Envision phase focuses on creating a shared transformation vision and identifying how cloud can drive business outcomes, which occurs before establishing operational structures like a CCoE. The Align phase focuses on assessing readiness, identifying gaps, and creating an action plan, which is planning work that precedes the hands-on launch activities. The Scale phase focuses on expanding adoption across the entire organization after the CCoE and initial patterns have already been established during the Launch phase.",
     "isMultiAnswer": false
   },
   {
@@ -2353,7 +2353,7 @@
       "D": "Repurchase"
     },
     "answer": "C",
-    "explanation": "Rehosting, also known as lift and shift, involves moving an application to the cloud without making any changes to the application code or architecture, making it the fastest migration strategy for getting workloads into AWS.\nReplatforming involves making targeted optimisations during migration, such as moving a database to a managed service like Amazon RDS, which requires some changes beyond a simple lift and shift. Refactoring involves redesigning the application to take advantage of cloud-native features such as serverless computing or microservices, which requires significant development effort and is not a minimal-change approach. Repurchasing involves replacing the existing application with a different product, typically a SaaS solution, which is not a strategy for moving existing code to AWS.",
+    "explanation": "Rehosting, also known as lift and shift, involves moving an application to the cloud without making any changes to the application code or architecture, making it the fastest migration strategy for getting workloads into AWS.\nReplatforming involves making targeted optimizations during migration, such as moving a database to a managed service like Amazon RDS, which requires some changes beyond a simple lift and shift. Refactoring involves redesigning the application to take advantage of cloud-native features such as serverless computing or microservices, which requires significant development effort and is not a minimal-change approach. Repurchasing involves replacing the existing application with a different product, typically a SaaS solution, which is not a strategy for moving existing code to AWS.",
     "isMultiAnswer": false
   },
   {
@@ -2379,7 +2379,7 @@
       "D": "Rehost"
     },
     "answer": "B",
-    "explanation": "Repurchasing involves moving to a different product, typically replacing an existing application with a cloud-based SaaS alternative, which is exactly what switching from an on-premises email system to Amazon WorkMail represents.\nReplatforming involves making targeted optimisations to an existing application during migration, such as moving a self-managed database to Amazon RDS, rather than replacing the entire application with a different product. Refactoring involves redesigning the existing application architecture to leverage cloud-native features, not replacing the application with a completely different product. Rehosting involves moving the existing application as-is to the cloud, which would mean running the same on-premises email system on EC2 rather than switching to a SaaS replacement.",
+    "explanation": "Repurchasing involves moving to a different product, typically replacing an existing application with a cloud-based SaaS alternative, which is exactly what switching from an on-premises email system to Amazon WorkMail represents.\nReplatforming involves making targeted optimizations to an existing application during migration, such as moving a self-managed database to Amazon RDS, rather than replacing the entire application with a different product. Refactoring involves redesigning the existing application architecture to leverage cloud-native features, not replacing the application with a completely different product. Rehosting involves moving the existing application as-is to the cloud, which would mean running the same on-premises email system on EC2 rather than switching to a SaaS replacement.",
     "isMultiAnswer": false
   },
   {
@@ -2392,7 +2392,7 @@
       "D": "Retain"
     },
     "answer": "B",
-    "explanation": "Replatforming, also known as lift, tinker, and shift, involves making targeted optimisations during migration without changing the core application architecture, such as moving a self-managed database to a managed service like Amazon RDS to benefit from automated patching and backups.\nRehosting would mean moving the MySQL database to an EC2 instance and continuing to manage it manually, which does not take advantage of managed database features. Refactoring would involve redesigning the application to use a fundamentally different database approach, such as migrating from a relational database to a NoSQL service like DynamoDB, which goes beyond targeted optimisation. Retaining means keeping the workload in its current on-premises environment, which does not involve any migration to AWS.",
+    "explanation": "Replatforming, also known as lift, tinker, and shift, involves making targeted optimizations during migration without changing the core application architecture, such as moving a self-managed database to a managed service like Amazon RDS to benefit from automated patching and backups.\nRehosting would mean moving the MySQL database to an EC2 instance and continuing to manage it manually, which does not take advantage of managed database features. Refactoring would involve redesigning the application to use a fundamentally different database approach, such as migrating from a relational database to a NoSQL service like DynamoDB, which goes beyond targeted optimization. Retaining means keeping the workload in its current on-premises environment, which does not involve any migration to AWS.",
     "isMultiAnswer": false
   },
   {
@@ -2405,7 +2405,7 @@
       "D": "Refactor"
     },
     "answer": "D",
-    "explanation": "Refactoring, also known as re-architecting, involves fundamentally redesigning an application to leverage cloud-native capabilities such as AWS Lambda for serverless computing, Amazon SQS for decoupled messaging, and containerised microservices, typically delivering the greatest long-term cloud benefits at the highest initial effort.\nRehosting moves an application to the cloud without any architectural changes, preserving the existing design rather than adopting cloud-native patterns. Replatforming makes targeted optimisations during migration, such as switching to managed services, but does not involve a full architectural redesign. Repurchasing replaces the existing application with a different product, typically a SaaS solution, rather than redesigning the existing application architecture.",
+    "explanation": "Refactoring, also known as re-architecting, involves fundamentally redesigning an application to leverage cloud-native capabilities such as AWS Lambda for serverless computing, Amazon SQS for decoupled messaging, and containerised microservices, typically delivering the greatest long-term cloud benefits at the highest initial effort.\nRehosting moves an application to the cloud without any architectural changes, preserving the existing design rather than adopting cloud-native patterns. Replatforming makes targeted optimizations during migration, such as switching to managed services, but does not involve a full architectural redesign. Repurchasing replaces the existing application with a different product, typically a SaaS solution, rather than redesigning the existing application architecture.",
     "isMultiAnswer": false
   },
   {
@@ -2435,7 +2435,7 @@
       "A",
       "C"
     ],
-    "explanation": "Rehost and Repurchase are two of the seven migration strategies (7 Rs) defined in the AWS Cloud Adoption Framework: Rehost, Replatform, Refactor, Repurchase, Retire, Retain, and Relocate.\nRevalidate is not a recognised migration strategy in the AWS CAF or any standard AWS migration framework. Redistribute is not a recognised migration strategy in the AWS CAF and does not correspond to any defined cloud migration approach. Reconfigure is not a recognised migration strategy in the AWS CAF; the closest strategy involving changes is Replatform, which makes targeted optimisations during migration.",
+    "explanation": "Rehost and Repurchase are two of the seven migration strategies (7 Rs) defined in the AWS Cloud Adoption Framework: Rehost, Replatform, Refactor, Repurchase, Retire, Retain, and Relocate.\nRevalidate is not a recognized migration strategy in the AWS CAF or any standard AWS migration framework. Redistribute is not a recognized migration strategy in the AWS CAF and does not correspond to any defined cloud migration approach. Reconfigure is not a recognized migration strategy in the AWS CAF; the closest strategy involving changes is Replatform, which makes targeted optimizations during migration.",
     "isMultiAnswer": true
   },
   {
@@ -2448,7 +2448,7 @@
       "D": "Refactor"
     },
     "answer": "C",
-    "explanation": "Relocating involves moving infrastructure to AWS without purchasing new hardware, rewriting applications, or modifying existing operations, such as migrating VMware-based workloads to VMware Cloud on AWS where the existing VMware environment continues to function with minimal changes.\nRehosting involves moving individual applications to AWS infrastructure such as EC2 instances, which requires converting virtual machines rather than preserving the existing VMware management layer. Replatforming involves making targeted optimisations during migration such as switching to managed services, which goes beyond simply moving the existing VMware environment as-is. Refactoring involves redesigning the application architecture to use cloud-native services, which is the opposite of preserving the existing VMware-based infrastructure.",
+    "explanation": "Relocating involves moving infrastructure to AWS without purchasing new hardware, rewriting applications, or modifying existing operations, such as migrating VMware-based workloads to VMware Cloud on AWS where the existing VMware environment continues to function with minimal changes.\nRehosting involves moving individual applications to AWS infrastructure such as EC2 instances, which requires converting virtual machines rather than preserving the existing VMware management layer. Replatforming involves making targeted optimizations during migration such as switching to managed services, which goes beyond simply moving the existing VMware environment as-is. Refactoring involves redesigning the application architecture to use cloud-native services, which is the opposite of preserving the existing VMware-based infrastructure.",
     "isMultiAnswer": false
   },
   {
@@ -2461,7 +2461,7 @@
       "D": "Eight"
     },
     "answer": "C",
-    "explanation": "The AWS CAF defines seven migration strategies known as the 7 Rs: Rehost, Replatform, Refactor (Re-architect), Repurchase, Retire, Retain, and Relocate, each representing a different approach to handling workloads during a cloud migration.\nFive Rs was an earlier version of the migration strategies that did not include Relocate and Retain, and does not reflect the current AWS CAF guidance. Six Rs is another historical version that predates the addition of the Relocate strategy, and is no longer the complete set defined by the current AWS CAF. Eight Rs exceeds the number of strategies defined by the AWS CAF, which recognises exactly seven distinct migration approaches.",
+    "explanation": "The AWS CAF defines seven migration strategies known as the 7 Rs: Rehost, Replatform, Refactor (Re-architect), Repurchase, Retire, Retain, and Relocate, each representing a different approach to handling workloads during a cloud migration.\nFive Rs was an earlier version of the migration strategies that did not include Relocate and Retain, and does not reflect the current AWS CAF guidance. Six Rs is another historical version that predates the addition of the Relocate strategy, and is no longer the complete set defined by the current AWS CAF. Eight Rs exceeds the number of strategies defined by the AWS CAF, which recognizes exactly seven distinct migration approaches.",
     "isMultiAnswer": false
   },
   {
@@ -2474,7 +2474,7 @@
       "D": "Repurchase"
     },
     "answer": "C",
-    "explanation": "Migrating from a relational Oracle database to a NoSQL service like Amazon DynamoDB requires fundamentally redesigning the data model and application logic, which is a refactoring or re-architecting strategy that leverages cloud-native capabilities for improved scalability and cost.\nReplatforming would involve moving Oracle to Amazon RDS for Oracle or a compatible managed relational database, making targeted optimisations without changing the fundamental database paradigm. Rehosting would mean running Oracle on an EC2 instance exactly as it ran on-premises, with no changes to the database engine or architecture. Repurchasing would mean replacing the application with a completely different commercial product or SaaS solution, not redesigning the database layer to use a different AWS-native service.",
+    "explanation": "Migrating from a relational Oracle database to a NoSQL service like Amazon DynamoDB requires fundamentally redesigning the data model and application logic, which is a refactoring or re-architecting strategy that leverages cloud-native capabilities for improved scalability and cost.\nReplatforming would involve moving Oracle to Amazon RDS for Oracle or a compatible managed relational database, making targeted optimizations without changing the fundamental database paradigm. Rehosting would mean running Oracle on an EC2 instance exactly as it ran on-premises, with no changes to the database engine or architecture. Repurchasing would mean replacing the application with a completely different commercial product or SaaS solution, not redesigning the database layer to use a different AWS-native service.",
     "isMultiAnswer": false
   },
   {
@@ -2500,7 +2500,7 @@
       "D": "AWS Config"
     },
     "answer": "C",
-    "explanation": "AWS Migration Hub provides a single dashboard to discover existing servers, plan migrations, and track the status of application migrations across AWS migration tools such as Application Migration Service, Database Migration Service, and partner solutions.\nAWS Application Migration Service performs the actual server replication and migration to AWS, but it handles the migration execution rather than providing a centralised tracking dashboard across multiple tools. AWS CloudTrail records API calls and management events for auditing purposes, and is an activity logging service rather than a migration progress tracking tool. AWS Config records and evaluates resource configurations for compliance, and monitors the state of AWS resources rather than tracking migration progress.",
+    "explanation": "AWS Migration Hub provides a single dashboard to discover existing servers, plan migrations, and track the status of application migrations across AWS migration tools such as Application Migration Service, Database Migration Service, and partner solutions.\nAWS Application Migration Service performs the actual server replication and migration to AWS, but it handles the migration execution rather than providing a centralized tracking dashboard across multiple tools. AWS CloudTrail records API calls and management events for auditing purposes, and is an activity logging service rather than a migration progress tracking tool. AWS Config records and evaluates resource configurations for compliance, and monitors the state of AWS resources rather than tracking migration progress.",
     "isMultiAnswer": false
   },
   {
@@ -2526,12 +2526,12 @@
       "D": "Relocate"
     },
     "answer": "C",
-    "explanation": "Refactoring or re-architecting an application to use cloud-native services such as serverless computing, managed databases, and event-driven architectures delivers the greatest long-term benefits in scalability, performance, and cost efficiency, but requires the most significant investment in development time and effort.\nRehosting provides the fastest migration path with minimal effort but does not take advantage of cloud-native features, meaning long-term benefits are limited to infrastructure-level improvements only. Replatforming provides moderate cloud benefits with moderate effort by making targeted optimisations, but does not achieve the full potential of cloud-native architecture. Relocating preserves the existing infrastructure environment and provides the least cloud-native benefit, as workloads continue to run in their original configuration.",
+    "explanation": "Refactoring or re-architecting an application to use cloud-native services such as serverless computing, managed databases, and event-driven architectures delivers the greatest long-term benefits in scalability, performance, and cost efficiency, but requires the most significant investment in development time and effort.\nRehosting provides the fastest migration path with minimal effort but does not take advantage of cloud-native features, meaning long-term benefits are limited to infrastructure-level improvements only. Replatforming provides moderate cloud benefits with moderate effort by making targeted optimizations, but does not achieve the full potential of cloud-native architecture. Relocating preserves the existing infrastructure environment and provides the least cloud-native benefit, as workloads continue to run in their original configuration.",
     "isMultiAnswer": false
   },
   {
     "id": "q1136",
-    "question": "A company is migrating to AWS and wants to assess its on-premises infrastructure to understand server dependencies and utilisation. Which AWS service should they use?",
+    "question": "A company is migrating to AWS and wants to assess its on-premises infrastructure to understand server dependencies and utilization. Which AWS service should they use?",
     "options": {
       "A": "AWS Migration Hub",
       "B": "AWS Application Discovery Service",
@@ -2539,7 +2539,7 @@
       "D": "AWS Trusted Advisor"
     },
     "answer": "B",
-    "explanation": "AWS Application Discovery Service collects detailed information about on-premises servers including configuration, utilisation, and network dependencies, helping companies plan their migration by understanding what they have and how applications are interconnected.\nAWS Migration Hub provides a central dashboard for tracking migration progress across multiple tools, but it relies on discovery tools like Application Discovery Service to gather the underlying infrastructure data. AWS Application Migration Service performs the actual server migration by replicating and launching instances on AWS, but it does not discover or assess on-premises infrastructure. AWS Trusted Advisor provides best-practice recommendations for existing AWS environments across security, cost, and performance, but it does not discover or assess on-premises infrastructure.",
+    "explanation": "AWS Application Discovery Service collects detailed information about on-premises servers including configuration, utilization, and network dependencies, helping companies plan their migration by understanding what they have and how applications are interconnected.\nAWS Migration Hub provides a central dashboard for tracking migration progress across multiple tools, but it relies on discovery tools like Application Discovery Service to gather the underlying infrastructure data. AWS Application Migration Service performs the actual server migration by replicating and launching instances on AWS, but it does not discover or assess on-premises infrastructure. AWS Trusted Advisor provides best-practice recommendations for existing AWS environments across security, cost, and performance, but it does not discover or assess on-premises infrastructure.",
     "isMultiAnswer": false
   },
   {
@@ -2590,12 +2590,12 @@
     "question": "Which of the following BEST describes the difference between rehosting and replatforming as migration strategies?",
     "options": {
       "A": "Rehosting changes the application code while replatforming does not",
-      "B": "Rehosting moves the application as-is while replatforming makes targeted optimisations",
+      "B": "Rehosting moves the application as-is while replatforming makes targeted optimizations",
       "C": "Rehosting replaces the application with SaaS while replatforming keeps the original",
       "D": "Rehosting is slower than replatforming because it requires more testing"
     },
     "answer": "B",
-    "explanation": "Rehosting, or lift and shift, moves the application to AWS without any changes to the code or architecture, while replatforming, or lift, tinker, and shift, makes targeted optimisations during migration such as switching to a managed database or changing the caching layer, without fundamentally redesigning the application.\nRehosting does not change any application code, and replatforming makes only targeted changes, so the first option reverses the relationship between the two strategies. Rehosting moves the existing application to the cloud rather than replacing it with SaaS, which would be the repurchase strategy. Rehosting is generally faster than replatforming because it requires fewer changes and less testing, not slower, since the application is moved without modification.",
+    "explanation": "Rehosting, or lift and shift, moves the application to AWS without any changes to the code or architecture, while replatforming, or lift, tinker, and shift, makes targeted optimizations during migration such as switching to a managed database or changing the caching layer, without fundamentally redesigning the application.\nRehosting does not change any application code, and replatforming makes only targeted changes, so the first option reverses the relationship between the two strategies. Rehosting moves the existing application to the cloud rather than replacing it with SaaS, which would be the repurchase strategy. Rehosting is generally faster than replatforming because it requires fewer changes and less testing, not slower, since the application is moved without modification.",
     "isMultiAnswer": false
   }
 ]

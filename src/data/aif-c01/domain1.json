@@ -59,7 +59,7 @@
       "D": "Write simple code that calculates the probability using basic arithmetic rules"
     },
     "answer": "D",
-    "explanation": "The probability here is a deterministic calculation of favourable outcomes divided by total outcomes, so a few lines of code applying basic arithmetic produce an exact answer with no data to gather, no model to train, and no endpoint to host, giving the least operational overhead.\nThe three machine learning options all stand up an unnecessary pipeline of data collection, training, tuning, and hosting for a problem that already has a known closed-form answer. Beyond that shared waste, supervised regression would only approximate a value that can be computed exactly; unsupervised learning is meant to uncover structure in unlabelled data, which is irrelevant when the formula is known; and reinforcement learning is designed for sequential decision-making guided by rewards in an environment, not for answering a static arithmetic question.",
+    "explanation": "The probability here is a deterministic calculation of favorable outcomes divided by total outcomes, so a few lines of code applying basic arithmetic produce an exact answer with no data to gather, no model to train, and no endpoint to host, giving the least operational overhead.\nThe three machine learning options all stand up an unnecessary pipeline of data collection, training, tuning, and hosting for a problem that already has a known closed-form answer. Beyond that shared waste, supervised regression would only approximate a value that can be computed exactly; unsupervised learning is meant to uncover structure in unlabeled data, which is irrelevant when the formula is known; and reinforcement learning is designed for sequential decision-making guided by rewards in an environment, not for answering a static arithmetic question.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-01",
@@ -107,7 +107,7 @@
       "D": "Set up a named entity recognition system using Natural Language Processing (NLP)"
     },
     "answer": "B",
-    "explanation": "An anomaly detection system learns what normal traffic and behaviour look like and flags activity that deviates from those patterns, so it can pick out IP addresses that behave suspiciously or differ from legitimate sources, directly meeting the goal of protecting the application from threats.\nA speech recognition system converts spoken audio into text and has nothing to do with analysing IP addresses. A named entity recognition system based on NLP extracts entities such as names and places from text, not network threat signals. A fraud forecasting system predicts future fraud volumes or trends rather than flagging an individual suspicious IP as it arrives.",
+    "explanation": "An anomaly detection system learns what normal traffic and behavior look like and flags activity that deviates from those patterns, so it can pick out IP addresses that behave suspiciously or differ from legitimate sources, directly meeting the goal of protecting the application from threats.\nA speech recognition system converts spoken audio into text and has nothing to do with analyzing IP addresses. A named entity recognition system based on NLP extracts entities such as names and places from text, not network threat signals. A fraud forecasting system predicts future fraud volumes or trends rather than flagging an individual suspicious IP as it arrives.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-02",
@@ -135,7 +135,7 @@
   },
   {
     "id": "aif-q031",
-    "question": "A wildlife researcher has a large collection of animal photos and wants to automatically identify and categorise the animals in each image without manual effort. Which strategy meets this requirement?",
+    "question": "A wildlife researcher has a large collection of animal photos and wants to automatically identify and categorize the animals in each image without manual effort. Which strategy meets this requirement?",
     "options": {
       "A": "Named entity recognition",
       "B": "Inpainting",
@@ -143,7 +143,7 @@
       "D": "Anomaly detection"
     },
     "answer": "C",
-    "explanation": "Object detection is a Computer Vision technique that automatically finds and classifies the objects within an image, so it can locate each animal in a photo and assign it to a category without manual effort, which is exactly what the researcher needs.\nAnomaly detection flags data points that deviate from normal patterns, not the contents of an image. Named entity recognition is a Natural Language Processing (NLP) technique that extracts entities such as names and places from text rather than from photos. Inpainting is a generative Computer Vision technique that fills in missing or removed regions of an image, rather than identifying and categorising what is in it.",
+    "explanation": "Object detection is a Computer Vision technique that automatically finds and classifies the objects within an image, so it can locate each animal in a photo and assign it to a category without manual effort, which is exactly what the researcher needs.\nAnomaly detection flags data points that deviate from normal patterns, not the contents of an image. Named entity recognition is a Natural Language Processing (NLP) technique that extracts entities such as names and places from text rather than from photos. Inpainting is a generative Computer Vision technique that fills in missing or removed regions of an image, rather than identifying and categorizing what is in it.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-02",
@@ -200,13 +200,13 @@
     "id": "aif-q058",
     "question": "A company is building a customer support chatbot that should keep getting better at responding by learning from its previous conversations. Which AI learning strategy provides this self-improvement capability?",
     "options": {
-      "A": "Supervised learning using a hand-labelled set of good and bad example responses",
+      "A": "Supervised learning using a hand-labeled set of good and bad example responses",
       "B": "Unsupervised learning to group similar customer questions into clusters",
       "C": "Reinforcement learning that rewards responses which gain positive customer feedback",
       "D": "Supervised learning driven by a regularly updated FAQ knowledge base"
     },
     "answer": "C",
-    "explanation": "Reinforcement Learning trains a model by rewarding desirable outcomes and penalising undesirable ones, enabling the chatbot to continuously improve its responses based on real signals such as positive customer feedback without requiring a manually prepared labelled dataset for each update.\nSupervised Learning with a manually curated dataset of good and bad responses requires ongoing human effort to label training examples and does not enable autonomous self-improvement from live interactions. Unsupervised Learning identifies patterns and clusters in unlabelled data, which could help group similar customer questions but provides no mechanism for improving response quality based on feedback signals. Supervised Learning with a continuously updated FAQ database also relies on manual maintenance of the underlying dataset rather than autonomous learning from customer interactions.",
+    "explanation": "Reinforcement Learning trains a model by rewarding desirable outcomes and penalising undesirable ones, enabling the chatbot to continuously improve its responses based on real signals such as positive customer feedback without requiring a manually prepared labeled dataset for each update.\nSupervised Learning with a manually curated dataset of good and bad responses requires ongoing human effort to label training examples and does not enable autonomous self-improvement from live interactions. Unsupervised Learning identifies patterns and clusters in unlabeled data, which could help group similar customer questions but provides no mechanism for improving response quality based on feedback signals. Supervised Learning with a continuously updated FAQ database also relies on manual maintenance of the underlying dataset rather than autonomous learning from customer interactions.",
     "isMultiAnswer": false,
     "taskStatement": "1.1",
     "lastVerified": "2026-06-02",
@@ -277,7 +277,7 @@
       "D": "Feature engineering"
     },
     "answer": "B",
-    "explanation": "Exploratory data analysis is the stage where a team summarises a dataset through statistics, visualisations, and correlation matrices to understand its structure, distribution, and relationships before any modelling begins, which is exactly what the team is doing.\nModel training is a later stage where an algorithm learns patterns from prepared data, not where the raw dataset is examined. Data collection is the earlier stage of gathering the raw data; although the data was just gathered, the activities described are about analysing it rather than collecting it. Feature engineering creates or selects input variables to improve model performance, which happens after the data is understood.",
+    "explanation": "Exploratory data analysis is the stage where a team summarizes a dataset through statistics, visualisations, and correlation matrices to understand its structure, distribution, and relationships before any modeling begins, which is exactly what the team is doing.\nModel training is a later stage where an algorithm learns patterns from prepared data, not where the raw dataset is examined. Data collection is the earlier stage of gathering the raw data; although the data was just gathered, the activities described are about analyzing it rather than collecting it. Feature engineering creates or selects input variables to improve model performance, which happens after the data is understood.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-01",
@@ -287,13 +287,13 @@
     "id": "aif-q073",
     "question": "A company recovered a set of text documents after a database error, but some words are missing. It wants an ML model that can predict the most likely word for each gap. Which type of model is suitable?",
     "options": {
-      "A": "Topic modelling",
+      "A": "Topic modeling",
       "B": "Clustering models",
       "C": "BERT-based models",
       "D": "Prescriptive analytics models"
     },
     "answer": "C",
-    "explanation": "BERT-based models are transformer language models trained with masked language modelling, so they predict a missing token by drawing on the context that surrounds it on both sides, which is exactly what suggesting words to fill the gaps requires.\nTopic modelling discovers the themes present across a collection of documents but does not predict individual missing words. Clustering models group similar items together in an unsupervised way and produce no word-level predictions. Prescriptive analytics models recommend which action to take given a predicted outcome and have nothing to do with text completion.",
+    "explanation": "BERT-based models are transformer language models trained with masked language modeling, so they predict a missing token by drawing on the context that surrounds it on both sides, which is exactly what suggesting words to fill the gaps requires.\nTopic modeling discovers the themes present across a collection of documents but does not predict individual missing words. Clustering models group similar items together in an unsupervised way and produce no word-level predictions. Prescriptive analytics models recommend which action to take given a predicted outcome and have nothing to do with text completion.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-01",
@@ -349,7 +349,7 @@
   },
   {
     "id": "aif-q115",
-    "question": "A wildlife research team wants to train a model that identifies the animal species shown in camera-trap photos. It has a large set of images that are already tagged with the correct species and will not be labelling any more. Which type of learning should it use?",
+    "question": "A wildlife research team wants to train a model that identifies the animal species shown in camera-trap photos. It has a large set of images that are already tagged with the correct species and will not be labeling any more. Which type of learning should it use?",
     "options": {
       "A": "Reinforcement learning",
       "B": "Supervised learning",
@@ -357,7 +357,7 @@
       "D": "Unsupervised learning"
     },
     "answer": "B",
-    "explanation": "Supervised learning is the right choice because the team already has a large dataset in which every image is paired with a known label identifying the species. The model learns to map inputs to the correct output labels from this labelled training data, which is the defining characteristic of supervised learning.\nUnsupervised learning is used when no labelled data is available and the model must discover patterns or groupings on its own, which does not apply here because labelled data already exists. Reinforcement learning trains an agent to take actions in an environment to maximise a cumulative reward through trial and error, and is not suited to classifying images from a static labelled dataset. Active learning is a strategy that iteratively selects the most uncertain examples and requests human labellers to annotate them, reducing the total labelling effort needed; however, the team has explicitly stated they will not be labelling any more data, so active learning's core mechanism cannot be used and it offers no benefit in this scenario.",
+    "explanation": "Supervised learning is the right choice because the team already has a large dataset in which every image is paired with a known label identifying the species. The model learns to map inputs to the correct output labels from this labeled training data, which is the defining characteristic of supervised learning.\nUnsupervised learning is used when no labeled data is available and the model must discover patterns or groupings on its own, which does not apply here because labeled data already exists. Reinforcement learning trains an agent to take actions in an environment to maximize a cumulative reward through trial and error, and is not suited to classifying images from a static labeled dataset. Active learning is a strategy that iteratively selects the most uncertain examples and requests human labelers to annotate them, reducing the total labeling effort needed; however, the team has explicitly stated they will not be labeling any more data, so active learning's core mechanism cannot be used and it offers no benefit in this scenario.",
     "isMultiAnswer": false,
     "taskStatement": "1.1",
     "lastVerified": "2026-06-01",
@@ -373,7 +373,7 @@
       "D": "Use Amazon CloudWatch to examine customer orders"
     },
     "answer": "C",
-    "explanation": "Amazon SageMaker AI is a fully managed ML platform that supports the complete model development lifecycle, including building, training, and deploying models. Retraining on newer data lets the model continuously learn from recent patterns in food demand and waste, directly improving accuracy over time as conditions change.\nAmazon Personalize delivers personalised product and content recommendations and is not a general-purpose platform for training custom regression or forecasting models; relying on historical data only would also stop the model adapting to recent changes. Amazon CloudWatch is a monitoring and observability service for metrics, logs, and alarms on AWS resources, so it cannot examine customer orders or train ML models. Amazon Rekognition is a Computer Vision service for image and video analysis such as object detection and facial recognition, which does not apply to a demand-planning model for reducing food waste.",
+    "explanation": "Amazon SageMaker AI is a fully managed ML platform that supports the complete model development lifecycle, including building, training, and deploying models. Retraining on newer data lets the model continuously learn from recent patterns in food demand and waste, directly improving accuracy over time as conditions change.\nAmazon Personalize delivers personalized product and content recommendations and is not a general-purpose platform for training custom regression or forecasting models; relying on historical data only would also stop the model adapting to recent changes. Amazon CloudWatch is a monitoring and observability service for metrics, logs, and alarms on AWS resources, so it cannot examine customer orders or train ML models. Amazon Rekognition is a Computer Vision service for image and video analysis such as object detection and facial recognition, which does not apply to a demand-planning model for reducing food waste.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-02",
@@ -416,7 +416,7 @@
       "D": "Image processing"
     },
     "answer": "C",
-    "explanation": "Computer Vision is the field of AI that enables machines to interpret and analyse visual information from images and videos, making it the technology behind automated inspection systems that detect product damage or defects on a production line.\nA recommendation system analyses user behaviour and preferences to suggest relevant products or content, which is unrelated to visual defect detection. Natural Language Processing (NLP) focuses on understanding and generating human language in text or speech, not on analysing images. Image processing refers to low-level manipulation of images such as resizing, filtering, or enhancing them; while it can be part of a vision pipeline, it does not involve the AI-driven interpretation and classification required for defect detection.",
+    "explanation": "Computer Vision is the field of AI that enables machines to interpret and analyze visual information from images and videos, making it the technology behind automated inspection systems that detect product damage or defects on a production line.\nA recommendation system analyzes user behavior and preferences to suggest relevant products or content, which is unrelated to visual defect detection. Natural Language Processing (NLP) focuses on understanding and generating human language in text or speech, not on analyzing images. Image processing refers to low-level manipulation of images such as resizing, filtering, or enhancing them; while it can be part of a vision pipeline, it does not involve the AI-driven interpretation and classification required for defect detection.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-01",
@@ -432,7 +432,7 @@
       "D": "Amazon SageMaker AI"
     },
     "answer": "D",
-    "explanation": "Amazon SageMaker AI is a fully managed ML platform whose Automatic Model Tuning (hyperparameter optimisation) feature automatically searches for the best hyperparameters and tunes the model with no manual effort, which is exactly the fully automated tuning the company needs for its customer-satisfaction model.\nAmazon Personalize is a managed service for generating personalised recommendations, not for training and tuning a custom prediction model. Amazon Athena is an interactive query service for analysing data in Amazon S3 with SQL and has no model-tuning capability. Amazon Comprehend is a Natural Language Processing (NLP) service for extracting insights from text and does not train or tune custom ML models.",
+    "explanation": "Amazon SageMaker AI is a fully managed ML platform whose Automatic Model Tuning (hyperparameter optimization) feature automatically searches for the best hyperparameters and tunes the model with no manual effort, which is exactly the fully automated tuning the company needs for its customer-satisfaction model.\nAmazon Personalize is a managed service for generating personalized recommendations, not for training and tuning a custom prediction model. Amazon Athena is an interactive query service for analyzing data in Amazon S3 with SQL and has no model-tuning capability. Amazon Comprehend is a Natural Language Processing (NLP) service for extracting insights from text and does not train or tune custom ML models.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-02",
@@ -514,7 +514,7 @@
   },
   {
     "id": "aif-q170",
-    "question": "An online retailer has built a system that flags orders as potentially fraudulent, and a team manually reviews each flagged order. The company wants to reduce the time the team wastes reviewing flagged orders that turn out to be legitimate. Which evaluation metric should it optimise for?",
+    "question": "An online retailer has built a system that flags orders as potentially fraudulent, and a team manually reviews each flagged order. The company wants to reduce the time the team wastes reviewing flagged orders that turn out to be legitimate. Which evaluation metric should it optimize for?",
     "options": {
       "A": "Recall",
       "B": "Precision",
@@ -522,7 +522,7 @@
       "D": "Accuracy"
     },
     "answer": "B",
-    "explanation": "Precision is the proportion of flagged cases that are genuinely fraudulent, calculated as TP / (TP + FP). Optimising for precision minimises false positives, which are exactly the legitimate orders wrongly flagged that waste the team's review time, so it directly targets the company's goal.\nRecall measures how much of the actual fraud the system catches, TP / (TP + FN); maximising it reduces missed fraud but does nothing to limit false positives and can even increase them. Accuracy is the share of all predictions that are correct, which is misleading on imbalanced fraud data where most transactions are legitimate. F1 score is the harmonic mean of precision and recall and balances both, rather than specifically reducing the false positives that drive the review burden.",
+    "explanation": "Precision is the proportion of flagged cases that are genuinely fraudulent, calculated as TP / (TP + FP). Optimizing for precision minimizes false positives, which are exactly the legitimate orders wrongly flagged that waste the team's review time, so it directly targets the company's goal.\nRecall measures how much of the actual fraud the system catches, TP / (TP + FN); maximizing it reduces missed fraud but does nothing to limit false positives and can even increase them. Accuracy is the share of all predictions that are correct, which is misleading on imbalanced fraud data where most transactions are legitimate. F1 score is the harmonic mean of precision and recall and balances both, rather than specifically reducing the false positives that drive the review burden.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-01",
@@ -538,7 +538,7 @@
       "D": "IaC minimizes overall expenses by deploying only low-cost instances"
     },
     "answer": "C",
-    "explanation": "IaC allows infrastructure to be defined, versioned, and automated in code, enabling repeatable and consistent provisioning of ML environments across development, testing, and production stages, which directly supports the MLOps principles of scalable systems and repeatable processes.\nHyperparameter tuning is a model optimisation activity that adjusts parameters such as learning rate and batch size during training to improve model performance; it is entirely separate from infrastructure provisioning, so IaC cannot eliminate it. IaC does not inherently provision powerful or low-cost instances, as it simply provisions whatever resources are defined in the configuration code; the choice of instance type and cost profile is determined by the engineer writing the template, not by IaC itself.",
+    "explanation": "IaC allows infrastructure to be defined, versioned, and automated in code, enabling repeatable and consistent provisioning of ML environments across development, testing, and production stages, which directly supports the MLOps principles of scalable systems and repeatable processes.\nHyperparameter tuning is a model optimization activity that adjusts parameters such as learning rate and batch size during training to improve model performance; it is entirely separate from infrastructure provisioning, so IaC cannot eliminate it. IaC does not inherently provision powerful or low-cost instances, as it simply provisions whatever resources are defined in the configuration code; the choice of instance type and cost profile is determined by the engineer writing the template, not by IaC itself.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-01",
@@ -554,7 +554,7 @@
       "D": "Diffusion"
     },
     "answer": "B",
-    "explanation": "Binary classification predicts which of exactly two categories an input belongs to, so it is the right model type for labelling each transaction as one of two outcomes, fraudulent or legitimate, based on its features.\nMulti-class classification assigns inputs to one of three or more categories, which is unnecessary when there are only two possible outcomes. Regression predicts continuous numeric values rather than discrete categories. Diffusion models are generative models that create new content such as images, not models that classify transactions.",
+    "explanation": "Binary classification predicts which of exactly two categories an input belongs to, so it is the right model type for labeling each transaction as one of two outcomes, fraudulent or legitimate, based on its features.\nMulti-class classification assigns inputs to one of three or more categories, which is unnecessary when there are only two possible outcomes. Regression predicts continuous numeric values rather than discrete categories. Diffusion models are generative models that create new content such as images, not models that classify transactions.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-02",
@@ -684,7 +684,7 @@
   },
   {
     "id": "aif-q217",
-    "question": "An online retailer wants to divide its customers into segments based on their buying behaviour and preferences so it can tailor the app experience to each segment. Which ML technique should it use?",
+    "question": "An online retailer wants to divide its customers into segments based on their buying behavior and preferences so it can tailor the app experience to each segment. Which ML technique should it use?",
     "options": {
       "A": "Classification",
       "B": "Regression",
@@ -692,7 +692,7 @@
       "D": "Content Generation"
     },
     "answer": "C",
-    "explanation": "Clustering is an unsupervised technique that automatically groups customers with similar purchase histories and preferences into segments without any predefined labels, which is exactly what the retailer needs in order to personalise the experience for each segment.\nClassification is a supervised technique that assigns items to predefined categories, which would require the segments to be labelled in advance, but they are not. Regression is a supervised technique that predicts a continuous numeric value such as expected spend, not groups of similar customers. Content generation produces new content such as text or images and does not segment customers at all.",
+    "explanation": "Clustering is an unsupervised technique that automatically groups customers with similar purchase histories and preferences into segments without any predefined labels, which is exactly what the retailer needs in order to personalize the experience for each segment.\nClassification is a supervised technique that assigns items to predefined categories, which would require the segments to be labeled in advance, but they are not. Regression is a supervised technique that predicts a continuous numeric value such as expected spend, not groups of similar customers. Content generation produces new content such as text or images and does not segment customers at all.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-01",
@@ -708,7 +708,7 @@
       "D": "Forecasting"
     },
     "answer": "B",
-    "explanation": "Reading support emails and routing each one into a topic is a Natural Language Processing task, specifically text classification, because it requires interpreting human language in text and assigning it to a predefined category.\nSpeech Recognition converts spoken audio into text and deals with the spoken word rather than analysing and categorising existing written text. Computer Vision interprets images and video rather than language, so it does not apply to email content. Forecasting predicts future numerical values from historical data, which is unrelated to sorting written messages by topic.",
+    "explanation": "Reading support emails and routing each one into a topic is a Natural Language Processing task, specifically text classification, because it requires interpreting human language in text and assigning it to a predefined category.\nSpeech Recognition converts spoken audio into text and deals with the spoken word rather than analyzing and categorizing existing written text. Computer Vision interprets images and video rather than language, so it does not apply to email content. Forecasting predicts future numerical values from historical data, which is unrelated to sorting written messages by topic.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-01",
@@ -716,7 +716,7 @@
   },
   {
     "id": "aif-q232",
-    "question": "A company is building an application that must automatically organise customers and products into groups of similar items based on their attributes. Which ML strategy should the company use to meet this requirement?",
+    "question": "A company is building an application that must automatically organize customers and products into groups of similar items based on their attributes. Which ML strategy should the company use to meet this requirement?",
     "options": {
       "A": "Supervised learning",
       "B": "Reinforcement learning",
@@ -740,7 +740,7 @@
       "D": "Use the real-time document processing feature of Amazon Textract"
     },
     "answer": "B",
-    "explanation": "Amazon Translate provides fast, high-quality language translation of text, making it the right choice for automatically converting course materials from English into multiple other languages.\nAmazon Transcribe is an automatic speech recognition service that converts spoken audio into text, which does not translate content between languages. Amazon Personalize generates personalised recommendations based on user behaviour, which is unrelated to translating content. Amazon Textract extracts text and structured data from scanned documents and images, which addresses document data extraction rather than language translation.",
+    "explanation": "Amazon Translate provides fast, high-quality language translation of text, making it the right choice for automatically converting course materials from English into multiple other languages.\nAmazon Transcribe is an automatic speech recognition service that converts spoken audio into text, which does not translate content between languages. Amazon Personalize generates personalized recommendations based on user behavior, which is unrelated to translating content. Amazon Textract extracts text and structured data from scanned documents and images, which addresses document data extraction rather than language translation.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-01",
@@ -782,10 +782,10 @@
       "A": "Apply the trained model to predict whether a patient will be readmitted",
       "B": "Collect historical patient readmission records",
       "C": "Measure the model's performance using suitable evaluation metrics",
-      "D": "Analyse the data to uncover patterns and correlations among patients"
+      "D": "Analyze the data to uncover patterns and correlations among patients"
     },
     "answer": "A",
-    "explanation": "Model inference is the stage of applying an already-trained model to new data to generate predictions, so using the trained model to predict whether a patient will be readmitted is the task that represents inference in this scenario.\nCollecting historical readmission records is the data collection stage that happens before training. Measuring the model's performance with evaluation metrics is the evaluation stage, which assesses a model rather than serving predictions. Analysing the data to uncover patterns and correlations is exploratory analysis carried out before or during model building, not the act of generating predictions from a finished model.",
+    "explanation": "Model inference is the stage of applying an already-trained model to new data to generate predictions, so using the trained model to predict whether a patient will be readmitted is the task that represents inference in this scenario.\nCollecting historical readmission records is the data collection stage that happens before training. Measuring the model's performance with evaluation metrics is the evaluation stage, which assesses a model rather than serving predictions. Analyzing the data to uncover patterns and correlations is exploratory analysis carried out before or during model building, not the act of generating predictions from a finished model.",
     "isMultiAnswer": false,
     "taskStatement": "1.1",
     "lastVerified": "2026-06-02",
@@ -801,7 +801,7 @@
       "D": "AWS Audit Manager"
     },
     "answer": "C",
-    "explanation": "Amazon Augmented AI (Amazon A2I) is purpose-built for adding human review of ML predictions, letting the bank set confidence thresholds that decide when a prediction is sent to a human reviewer and tune those thresholds over time.\nAmazon SageMaker Ground Truth also relies on human workers, but it is for labelling training datasets rather than reviewing live model predictions against confidence thresholds. Amazon Inspector is an automated security service that scans workloads for vulnerabilities, and AWS Audit Manager automates the collection of evidence for compliance audits; neither has anything to do with human review of ML predictions.",
+    "explanation": "Amazon Augmented AI (Amazon A2I) is purpose-built for adding human review of ML predictions, letting the bank set confidence thresholds that decide when a prediction is sent to a human reviewer and tune those thresholds over time.\nAmazon SageMaker Ground Truth also relies on human workers, but it is for labeling training datasets rather than reviewing live model predictions against confidence thresholds. Amazon Inspector is an automated security service that scans workloads for vulnerabilities, and AWS Audit Manager automates the collection of evidence for compliance audits; neither has anything to do with human review of ML predictions.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-01",
@@ -843,7 +843,7 @@
       "D": "Unique product IDs and corresponding user IDs"
     },
     "answer": "A",
-    "explanation": "Diverse conversations that use relevant terminology provide the contextual, domain-specific language an AI assistant needs to learn how to understand and respond accurately within the targeted content area, making this the appropriate training dataset.\nTime series data of general purpose historical sales is structured numerical data suited to forecasting trends over time, not to training a conversational assistant in a specialised subject. Sentiment analysis of news articles produces classifications of positive or negative tone rather than the conversational examples needed to teach an assistant how to interact. Unique product IDs and corresponding user IDs are identifiers used for tasks such as recommendation systems, and contain no linguistic or contextual content from which an assistant could learn to converse.",
+    "explanation": "Diverse conversations that use relevant terminology provide the contextual, domain-specific language an AI assistant needs to learn how to understand and respond accurately within the targeted content area, making this the appropriate training dataset.\nTime series data of general purpose historical sales is structured numerical data suited to forecasting trends over time, not to training a conversational assistant in a specialized subject. Sentiment analysis of news articles produces classifications of positive or negative tone rather than the conversational examples needed to teach an assistant how to interact. Unique product IDs and corresponding user IDs are identifiers used for tasks such as recommendation systems, and contain no linguistic or contextual content from which an assistant could learn to converse.",
     "isMultiAnswer": false,
     "taskStatement": "1.1",
     "lastVerified": "2026-06-01",
@@ -851,7 +851,7 @@
   },
   {
     "id": "aif-q256",
-    "question": "An online retailer wants to divide its customers into groups based on their demographics and purchasing behaviour. Which algorithm should it use to meet this requirement?",
+    "question": "An online retailer wants to divide its customers into groups based on their demographics and purchasing behavior. Which algorithm should it use to meet this requirement?",
     "options": {
       "A": "Decision tree",
       "B": "Support vector machine",
@@ -859,7 +859,7 @@
       "D": "K-means"
     },
     "answer": "D",
-    "explanation": "K-means is an unsupervised clustering algorithm that partitions data points into a chosen number of groups based on similarity, so it naturally segments customers by shared demographics and buying patterns without needing labelled examples.\nK-nearest neighbours (k-NN), Decision tree, and Support vector machine are all supervised algorithms that require labelled training data to predict a known target or class, so they suit classification or regression rather than discovering natural groupings in unlabelled customer data.",
+    "explanation": "K-means is an unsupervised clustering algorithm that partitions data points into a chosen number of groups based on similarity, so it naturally segments customers by shared demographics and buying patterns without needing labeled examples.\nK-nearest neighbours (k-NN), Decision tree, and Support vector machine are all supervised algorithms that require labeled training data to predict a known target or class, so they suit classification or regression rather than discovering natural groupings in unlabeled customer data.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-02",
@@ -869,13 +869,13 @@
     "id": "aif-q264",
     "question": "Which of the following scenarios is an example of unsupervised learning?",
     "options": {
-      "A": "A model that organises thousands of news articles into related topics without predefined categories",
+      "A": "A model that organizes thousands of news articles into related topics without predefined categories",
       "B": "A model that flags a loan application as high risk or low risk",
       "C": "A model that forecasts a city's electricity demand for the next day",
       "D": "A model that teaches a robot to walk by rewarding successful movements"
     },
     "answer": "A",
-    "explanation": "Organising news articles into related topics without predefined categories is an example of unsupervised learning, where the model finds natural patterns and clusters in the data without relying on any labeled outputs.\nFlagging a loan application as high risk or low risk is supervised learning, because the model is trained on labeled examples where the correct outcome is already known. Forecasting a city's electricity demand for the next day is also supervised learning, specifically a regression task that learns from labeled historical values. Teaching a robot to walk by rewarding successful movements is reinforcement learning, where an agent improves by receiving rewards and penalties from its actions rather than discovering clusters in unlabeled data.",
+    "explanation": "Organizing news articles into related topics without predefined categories is an example of unsupervised learning, where the model finds natural patterns and clusters in the data without relying on any labeled outputs.\nFlagging a loan application as high risk or low risk is supervised learning, because the model is trained on labeled examples where the correct outcome is already known. Forecasting a city's electricity demand for the next day is also supervised learning, specifically a regression task that learns from labeled historical values. Teaching a robot to walk by rewarding successful movements is reinforcement learning, where an agent improves by receiving rewards and penalties from its actions rather than discovering clusters in unlabeled data.",
     "isMultiAnswer": false,
     "taskStatement": "1.1",
     "lastVerified": "2026-06-01",
@@ -891,7 +891,7 @@
       "D": "Speech Recognition"
     },
     "answer": "A",
-    "explanation": "Sentiment analysis is a Natural Language Processing (NLP) task. NLP is the field of AI focused on enabling machines to understand, interpret, and derive meaning from human language, and detecting the emotional tone of text is one of its core applications.\nComputer Vision deals with interpreting images and video rather than language. Speech Recognition converts spoken audio into text and does not itself analyse opinion or sentiment. Time Series Forecasting predicts future numeric values from sequential historical data and is unrelated to understanding language.",
+    "explanation": "Sentiment analysis is a Natural Language Processing (NLP) task. NLP is the field of AI focused on enabling machines to understand, interpret, and derive meaning from human language, and detecting the emotional tone of text is one of its core applications.\nComputer Vision deals with interpreting images and video rather than language. Speech Recognition converts spoken audio into text and does not itself analyze opinion or sentiment. Time Series Forecasting predicts future numeric values from sequential historical data and is unrelated to understanding language.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-02",
@@ -923,7 +923,7 @@
       "D": "Predicting a house's selling price from features such as its size and location"
     },
     "answer": "C",
-    "explanation": "Grouping data points into clusters by similarity is a classic example of Unsupervised Learning, where the algorithm finds structure and natural groupings in the data on its own, without any labelled examples to guide it.\nTraining a model to identify animals in photographs is Supervised Learning, since it learns from images already labelled with the correct animal. Predicting a house's selling price from its features is also Supervised Learning, specifically regression, because it is trained on examples with known prices. Producing human-like text from a prompt is Generative AI, which creates new content rather than discovering groupings in unlabelled data.",
+    "explanation": "Grouping data points into clusters by similarity is a classic example of Unsupervised Learning, where the algorithm finds structure and natural groupings in the data on its own, without any labeled examples to guide it.\nTraining a model to identify animals in photographs is Supervised Learning, since it learns from images already labeled with the correct animal. Predicting a house's selling price from its features is also Supervised Learning, specifically regression, because it is trained on examples with known prices. Producing human-like text from a prompt is Generative AI, which creates new content rather than discovering groupings in unlabeled data.",
     "isMultiAnswer": false,
     "taskStatement": "1.1",
     "lastVerified": "2026-06-02",
@@ -939,7 +939,7 @@
       "D": "F1 score"
     },
     "answer": "D",
-    "explanation": "The F1 score is the harmonic mean of precision and recall, making it the most appropriate metric for imbalanced datasets because it penalises models that perform well on one measure but poorly on the other, ensuring the model genuinely balances both detecting all instances of a class and labelling them correctly across all classes.\nAccuracy measures the overall percentage of correct predictions but is misleading on imbalanced datasets because a model that always predicts the majority class can achieve high accuracy while completely failing to detect minority classes. Recall measures how well the model detects all actual instances of each class, capturing the ability to find true positives, but it ignores the rate of false positives and so does not reflect how well the model balances detection and correct labelling simultaneously. Precision measures how often a positive prediction is actually correct but ignores false negatives, meaning a model that makes very few predictions can achieve high precision while missing most of the actual instances in underrepresented classes.",
+    "explanation": "The F1 score is the harmonic mean of precision and recall, making it the most appropriate metric for imbalanced datasets because it penalises models that perform well on one measure but poorly on the other, ensuring the model genuinely balances both detecting all instances of a class and labeling them correctly across all classes.\nAccuracy measures the overall percentage of correct predictions but is misleading on imbalanced datasets because a model that always predicts the majority class can achieve high accuracy while completely failing to detect minority classes. Recall measures how well the model detects all actual instances of each class, capturing the ability to find true positives, but it ignores the rate of false positives and so does not reflect how well the model balances detection and correct labeling simultaneously. Precision measures how often a positive prediction is actually correct but ignores false negatives, meaning a model that makes very few predictions can achieve high precision while missing most of the actual instances in underrepresented classes.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-05-30",
@@ -952,10 +952,10 @@
       "A": "Data normalisation",
       "B": "Data encoding",
       "C": "Data balancing",
-      "D": "Data labelling"
+      "D": "Data labeling"
     },
     "answer": "D",
-    "explanation": "Data labelling is the step of attaching a meaningful category or tag to each record so it can serve as the target for Supervised Learning, which is exactly what assigning every transaction a personal or business category and storing it on the record achieves.\nData encoding converts categorical values into a numeric form that algorithms can process, rather than creating the categories in the first place. Data normalisation rescales numeric features onto a common range so that no single feature dominates. Data balancing adjusts the proportion of classes in a dataset, for example through over- or under-sampling, so they are more evenly represented; none of these produces the category labels themselves.",
+    "explanation": "Data labeling is the step of attaching a meaningful category or tag to each record so it can serve as the target for Supervised Learning, which is exactly what assigning every transaction a personal or business category and storing it on the record achieves.\nData encoding converts categorical values into a numeric form that algorithms can process, rather than creating the categories in the first place. Data normalisation rescales numeric features onto a common range so that no single feature dominates. Data balancing adjusts the proportion of classes in a dataset, for example through over- or under-sampling, so they are more evenly represented; none of these produces the category labels themselves.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-02",
@@ -963,7 +963,7 @@
   },
   {
     "id": "aif-q280",
-    "question": "An energy provider wants to monitor voltage levels across a power grid in rural regions. It plans to record voltage readings continuously and store them in Amazon RDS, then analyse how the readings fluctuate throughout each day to build an AI model that predicts potential power outages. Which type of data should the provider collect for this task?",
+    "question": "An energy provider wants to monitor voltage levels across a power grid in rural regions. It plans to record voltage readings continuously and store them in Amazon RDS, then analyze how the readings fluctuate throughout each day to build an AI model that predicts potential power outages. Which type of data should the provider collect for this task?",
     "options": {
       "A": "Tabular data",
       "B": "Text data",
@@ -971,7 +971,7 @@
       "D": "Audio data"
     },
     "answer": "C",
-    "explanation": "Time series data consists of values recorded sequentially over time, such as voltage readings taken at regular intervals, which is exactly what is needed to analyse fluctuations throughout the day and build a model that predicts power outages.\nTabular data organises information into rows and columns of features but does not inherently capture the time-ordered sequence required to model changes throughout the day. Text data represents unstructured written language such as documents or messages, which is not relevant to numerical voltage measurements. Audio data captures sound signals and has no application to monitoring electrical readings over time.",
+    "explanation": "Time series data consists of values recorded sequentially over time, such as voltage readings taken at regular intervals, which is exactly what is needed to analyze fluctuations throughout the day and build a model that predicts power outages.\nTabular data organizes information into rows and columns of features but does not inherently capture the time-ordered sequence required to model changes throughout the day. Text data represents unstructured written language such as documents or messages, which is not relevant to numerical voltage measurements. Audio data captures sound signals and has no application to monitoring electrical readings over time.",
     "isMultiAnswer": false,
     "taskStatement": "1.1",
     "lastVerified": "2026-06-01",
@@ -979,7 +979,7 @@
   },
   {
     "id": "aif-q281",
-    "question": "A manufacturer wants to train an ML model that flags unusual readings in its equipment sensor data, but it has no labelled examples to learn from. Which ML method meets this requirement?",
+    "question": "A manufacturer wants to train an ML model that flags unusual readings in its equipment sensor data, but it has no labeled examples to learn from. Which ML method meets this requirement?",
     "options": {
       "A": "Decision tree",
       "B": "Autoencoders",
@@ -987,7 +987,7 @@
       "D": "Logistic regression"
     },
     "answer": "B",
-    "explanation": "Autoencoders are an unsupervised method that learn to reconstruct normal patterns in the data; readings that produce a large reconstruction error stand out as anomalies, so the technique can detect abnormal sensor behaviour without any labelled training data.\nDecision tree, linear regression, and logistic regression all fail for the same reason: they are supervised methods that require labelled examples to learn from, which the company does not have. Linear regression predicts continuous values and the other two perform classification, but none can be trained for anomaly detection on unlabelled data.",
+    "explanation": "Autoencoders are an unsupervised method that learn to reconstruct normal patterns in the data; readings that produce a large reconstruction error stand out as anomalies, so the technique can detect abnormal sensor behavior without any labeled training data.\nDecision tree, linear regression, and logistic regression all fail for the same reason: they are supervised methods that require labeled examples to learn from, which the company does not have. Linear regression predicts continuous values and the other two perform classification, but none can be trained for anomaly detection on unlabeled data.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-01",
@@ -1003,7 +1003,7 @@
       "D": "Amazon Comprehend"
     },
     "answer": "A",
-    "explanation": "Amazon Personalize is a fully managed ML service that delivers real-time personalised recommendations by analysing each user's history, interactions, and behaviour, making it purpose-built for use cases such as suggesting songs on a music streaming app.\nAmazon Transcribe is an automatic speech recognition service that converts audio and speech into text transcripts and plays no role in analysing listening history or producing recommendations. Amazon Polly is a text-to-speech service that synthesises written text into lifelike speech and cannot generate recommendations. Amazon Comprehend is a Natural Language Processing (NLP) service that extracts insights such as sentiment, entities, and key phrases from text and is not designed to produce personalised recommendations.",
+    "explanation": "Amazon Personalize is a fully managed ML service that delivers real-time personalized recommendations by analyzing each user's history, interactions, and behavior, making it purpose-built for use cases such as suggesting songs on a music streaming app.\nAmazon Transcribe is an automatic speech recognition service that converts audio and speech into text transcripts and plays no role in analyzing listening history or producing recommendations. Amazon Polly is a text-to-speech service that synthesises written text into lifelike speech and cannot generate recommendations. Amazon Comprehend is a Natural Language Processing (NLP) service that extracts insights such as sentiment, entities, and key phrases from text and is not designed to produce personalized recommendations.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-02",
@@ -1016,7 +1016,7 @@
   },
   {
     "id": "aif-q290",
-    "question": "A team is adopting MLOps to manage its machine learning workflows more reliably. Which two practices should the team prioritise?",
+    "question": "A team is adopting MLOps to manage its machine learning workflows more reliably. Which two practices should the team prioritize?",
     "options": {
       "A": "Model versioning for reproducibility",
       "B": "Automated model testing and validation",
@@ -1128,7 +1128,7 @@
       "D": "Diagnostic learning"
     },
     "answer": "D",
-    "explanation": "Diagnostic learning is not a recognised type of machine learning and does not appear in the AI/ML literature or the AWS exam guide, making it the option that does not belong among the established ML learning paradigms.\nSupervised learning, unsupervised learning, and reinforcement learning are the three primary types of machine learning. Supervised learning trains models on labeled datasets where each input is paired with a known correct output. Unsupervised learning discovers hidden patterns in unlabeled data without any predefined output values to learn from. Reinforcement learning trains an agent to make sequential decisions by rewarding desirable behaviours and penalising undesirable ones.",
+    "explanation": "Diagnostic learning is not a recognized type of machine learning and does not appear in the AI/ML literature or the AWS exam guide, making it the option that does not belong among the established ML learning paradigms.\nSupervised learning, unsupervised learning, and reinforcement learning are the three primary types of machine learning. Supervised learning trains models on labeled datasets where each input is paired with a known correct output. Unsupervised learning discovers hidden patterns in unlabeled data without any predefined output values to learn from. Reinforcement learning trains an agent to make sequential decisions by rewarding desirable behaviors and penalising undesirable ones.",
     "isMultiAnswer": false,
     "taskStatement": "1.1",
     "lastVerified": "2026-06-01",
@@ -1152,7 +1152,7 @@
   },
   {
     "id": "aif-q315",
-    "question": "A company wants to automatically analyse customer feedback written as text. Which AWS service is best suited for this Natural Language Processing (NLP) task?",
+    "question": "A company wants to automatically analyze customer feedback written as text. Which AWS service is best suited for this Natural Language Processing (NLP) task?",
     "options": {
       "A": "Amazon SageMaker AI",
       "B": "Amazon Comprehend",
@@ -1160,7 +1160,7 @@
       "D": "Amazon Transcribe"
     },
     "answer": "B",
-    "explanation": "Amazon Comprehend is a managed Natural Language Processing service that analyses text to extract sentiment, key phrases, entities, and language, making it the purpose-built choice for analysing customer feedback.\nAmazon SageMaker AI is a platform for building, training, and deploying custom ML models, which could perform NLP but requires significant development effort rather than providing ready-made NLP capabilities. Amazon Polly is a text-to-speech service that converts written text into lifelike speech, which is the opposite of analysing text. Amazon Transcribe is an automatic speech recognition service that converts spoken audio into text, and does not analyse the meaning or sentiment of that text.",
+    "explanation": "Amazon Comprehend is a managed Natural Language Processing service that analyzes text to extract sentiment, key phrases, entities, and language, making it the purpose-built choice for analyzing customer feedback.\nAmazon SageMaker AI is a platform for building, training, and deploying custom ML models, which could perform NLP but requires significant development effort rather than providing ready-made NLP capabilities. Amazon Polly is a text-to-speech service that converts written text into lifelike speech, which is the opposite of analyzing text. Amazon Transcribe is an automatic speech recognition service that converts spoken audio into text, and does not analyze the meaning or sentiment of that text.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-02",
@@ -1197,7 +1197,7 @@
       "D": "Feature engineering"
     },
     "answer": "B",
-    "explanation": "Brand advertising is a marketing activity aimed at promoting a product and raising awareness, so it is not part of an ML pipeline, which is made up of technical stages for building, validating, and deploying models.\nData collection, feature engineering, and model training are all genuine stages of a typical ML pipeline. Data collection gathers the relevant raw data from available sources. Feature engineering transforms that raw data into meaningful input variables to improve model performance. Model training fits a model to the prepared data by adjusting its parameters to minimise prediction error.",
+    "explanation": "Brand advertising is a marketing activity aimed at promoting a product and raising awareness, so it is not part of an ML pipeline, which is made up of technical stages for building, validating, and deploying models.\nData collection, feature engineering, and model training are all genuine stages of a typical ML pipeline. Data collection gathers the relevant raw data from available sources. Feature engineering transforms that raw data into meaningful input variables to improve model performance. Model training fits a model to the prepared data by adjusting its parameters to minimize prediction error.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-02",
@@ -1213,7 +1213,7 @@
       "D": "Automated Utility Calculation"
     },
     "answer": "A",
-    "explanation": "AUC stands for Area Under the Curve, specifically the area beneath the ROC (Receiver Operating Characteristic) curve. It measures how well a classification model separates the classes and ranges from 0 to 1, where 1.0 indicates perfect separation and 0.5 means the model is no better than random guessing.\nThe other choices are invented expansions that string together an A, U, and C word, but none of them is the recognised meaning of AUC as a model performance metric.",
+    "explanation": "AUC stands for Area Under the Curve, specifically the area beneath the ROC (Receiver Operating Characteristic) curve. It measures how well a classification model separates the classes and ranges from 0 to 1, where 1.0 indicates perfect separation and 0.5 means the model is no better than random guessing.\nThe other choices are invented expansions that string together an A, U, and C word, but none of them is the recognized meaning of AUC as a model performance metric.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-02",
@@ -1221,7 +1221,7 @@
   },
   {
     "id": "aif-q319",
-    "question": "You have a large dataset in which every example is already labelled. Which type of machine learning is the best fit?",
+    "question": "You have a large dataset in which every example is already labeled. Which type of machine learning is the best fit?",
     "options": {
       "A": "Unsupervised learning",
       "B": "Supervised learning",
@@ -1229,7 +1229,7 @@
       "D": "Reinforcement learning"
     },
     "answer": "B",
-    "explanation": "Supervised learning trains on labelled examples, where each input is paired with its correct output, so the model learns the mapping from inputs to known targets. That makes it the right choice when you have a large, fully labelled dataset.\nUnsupervised learning works with unlabelled data to uncover hidden structure or groupings, so it does not make use of the labels available here. Semi-supervised learning is intended for cases with a small amount of labelled data alongside a large amount of unlabelled data, not a fully labelled set. Reinforcement learning trains an agent through trial-and-error rewards from an environment and does not rely on a labelled dataset at all.",
+    "explanation": "Supervised learning trains on labeled examples, where each input is paired with its correct output, so the model learns the mapping from inputs to known targets. That makes it the right choice when you have a large, fully labeled dataset.\nUnsupervised learning works with unlabeled data to uncover hidden structure or groupings, so it does not make use of the labels available here. Semi-supervised learning is intended for cases with a small amount of labeled data alongside a large amount of unlabeled data, not a fully labeled set. Reinforcement learning trains an agent through trial-and-error rewards from an environment and does not rely on a labeled dataset at all.",
     "isMultiAnswer": false,
     "taskStatement": "1.1",
     "lastVerified": "2026-06-02",
@@ -1242,10 +1242,10 @@
       "A": "They always outperform custom-built models",
       "B": "They are guaranteed to be more accurate for every task",
       "C": "They can be used straight away without providing your own training data",
-      "D": "They remove the need to fine-tune for specialised tasks"
+      "D": "They remove the need to fine-tune for specialized tasks"
     },
     "answer": "C",
-    "explanation": "A pre-trained model has already been trained on a large dataset, so it can be applied straight away for inference without the user supplying their own training data, which saves the time, data, and effort of building a model from scratch and is its main advantage.\nClaiming a pre-trained model always outperforms custom-built models or is guaranteed to be more accurate for every task are both overclaims, because a model built or fine-tuned for a specific task can easily beat a general pre-trained model. Saying it removes the need to fine-tune for specialised tasks is also false, since pre-trained models frequently must be fine-tuned to perform well on domain-specific work.",
+    "explanation": "A pre-trained model has already been trained on a large dataset, so it can be applied straight away for inference without the user supplying their own training data, which saves the time, data, and effort of building a model from scratch and is its main advantage.\nClaiming a pre-trained model always outperforms custom-built models or is guaranteed to be more accurate for every task are both overclaims, because a model built or fine-tuned for a specific task can easily beat a general pre-trained model. Saying it removes the need to fine-tune for specialized tasks is also false, since pre-trained models frequently must be fine-tuned to perform well on domain-specific work.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-02",
@@ -1261,7 +1261,7 @@
       "D": "Amazon Transcribe"
     },
     "answer": "A",
-    "explanation": "Amazon SageMaker Autopilot automatically builds, trains, and tunes machine learning models, including exploring and selecting hyperparameter configurations on the data scientist's behalf, which removes the need for manual hyperparameter experimentation.\nAmazon Comprehend is a natural language processing service that extracts insights such as sentiment and entities from text, and has no role in model training or hyperparameter tuning. Amazon Polly is a text-to-speech service that converts written text into lifelike speech, which is unrelated to building or tuning ML models. Amazon Transcribe is an automatic speech recognition service that converts audio into text, and likewise plays no part in hyperparameter optimisation.",
+    "explanation": "Amazon SageMaker Autopilot automatically builds, trains, and tunes machine learning models, including exploring and selecting hyperparameter configurations on the data scientist's behalf, which removes the need for manual hyperparameter experimentation.\nAmazon Comprehend is a natural language processing service that extracts insights such as sentiment and entities from text, and has no role in model training or hyperparameter tuning. Amazon Polly is a text-to-speech service that converts written text into lifelike speech, which is unrelated to building or tuning ML models. Amazon Transcribe is an automatic speech recognition service that converts audio into text, and likewise plays no part in hyperparameter optimization.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-01",
@@ -1276,13 +1276,13 @@
     "id": "aif-q322",
     "question": "In a machine learning context, what is the term MLOps an abbreviation of?",
     "options": {
-      "A": "Machine Learning Optimisation",
+      "A": "Machine Learning Optimization",
       "B": "Managed Learning Outputs",
       "C": "Machine Learning Operations",
       "D": "Model Lifecycle Operations"
     },
     "answer": "C",
-    "explanation": "MLOps stands for Machine Learning Operations, the set of practices that bring machine learning together with DevOps principles to automate and manage the deployment, monitoring, and ongoing maintenance of models in production.\nThe remaining choices are invented expansions that string together plausible machine-learning-sounding words, but none of them is the recognised meaning of the acronym, so they are all incorrect.",
+    "explanation": "MLOps stands for Machine Learning Operations, the set of practices that bring machine learning together with DevOps principles to automate and manage the deployment, monitoring, and ongoing maintenance of models in production.\nThe remaining choices are invented expansions that string together plausible machine-learning-sounding words, but none of them is the recognized meaning of the acronym, so they are all incorrect.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-02",
@@ -1318,7 +1318,7 @@
       "B",
       "D"
     ],
-    "explanation": "Customer satisfaction score measures how well an AI solution meets end user needs and directly reflects the value delivered to the business, while time-to-value measures how quickly the AI solution begins delivering measurable business outcomes, making both examples of business metrics used to assess whether an AI model is meeting organisational objectives.\nPrecision score is a technical model performance metric that measures the proportion of positive predictions that are actually correct (true positives divided by all positive predictions), not a business outcome measure. Mean Average Precision is a technical evaluation metric used in information retrieval and object detection tasks to quantify how well a model ranks relevant results, measuring accuracy across ranked outputs rather than business value. Root Mean Square Error is a regression metric that measures the average magnitude of prediction errors by taking the square root of the mean of squared differences between predicted and actual values, again a technical performance measure rather than an indicator of business impact.",
+    "explanation": "Customer satisfaction score measures how well an AI solution meets end user needs and directly reflects the value delivered to the business, while time-to-value measures how quickly the AI solution begins delivering measurable business outcomes, making both examples of business metrics used to assess whether an AI model is meeting organizational objectives.\nPrecision score is a technical model performance metric that measures the proportion of positive predictions that are actually correct (true positives divided by all positive predictions), not a business outcome measure. Mean Average Precision is a technical evaluation metric used in information retrieval and object detection tasks to quantify how well a model ranks relevant results, measuring accuracy across ranked outputs rather than business value. Root Mean Square Error is a regression metric that measures the average magnitude of prediction errors by taking the square root of the mean of squared differences between predicted and actual values, again a technical performance measure rather than an indicator of business impact.",
     "isMultiAnswer": true,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-01",
@@ -1354,7 +1354,7 @@
       "D": "Transfer learning"
     },
     "answer": "C",
-    "explanation": "Reinforcement learning trains an agent to make decisions by interacting with an environment, where it receives rewards for desirable actions and penalties for undesirable ones and gradually learns a strategy that maximises cumulative reward.\nSupervised learning trains a model on labeled examples with known correct outputs, rather than having an agent learn from the consequences of its own actions. Unsupervised learning finds patterns or clusters in unlabeled data and does not involve an agent, an environment, or a reward signal. Transfer learning reuses knowledge from a model trained on one task to improve performance on a related task, which describes a way of reusing model knowledge rather than learning through environmental interaction.",
+    "explanation": "Reinforcement learning trains an agent to make decisions by interacting with an environment, where it receives rewards for desirable actions and penalties for undesirable ones and gradually learns a strategy that maximizes cumulative reward.\nSupervised learning trains a model on labeled examples with known correct outputs, rather than having an agent learn from the consequences of its own actions. Unsupervised learning finds patterns or clusters in unlabeled data and does not involve an agent, an environment, or a reward signal. Transfer learning reuses knowledge from a model trained on one task to improve performance on a related task, which describes a way of reusing model knowledge rather than learning through environmental interaction.",
     "isMultiAnswer": false,
     "taskStatement": "1.1",
     "lastVerified": "2026-06-01",
@@ -1407,7 +1407,7 @@
       "D": "Image classification"
     },
     "answer": "C",
-    "explanation": "Clustering customer segments is an example of unsupervised learning because the algorithm groups data points based on similarity without being given any labelled examples or predefined categories to learn from. The model discovers the structure in the data on its own.\nPredicting house prices uses labelled training data where each example has a known price, making it a supervised regression task. Spam detection trains a model on emails already labelled as spam or not spam, making it a supervised classification task. Image classification trains a model on images with known labels, such as cat or dog, also making it a supervised classification task.",
+    "explanation": "Clustering customer segments is an example of unsupervised learning because the algorithm groups data points based on similarity without being given any labeled examples or predefined categories to learn from. The model discovers the structure in the data on its own.\nPredicting house prices uses labeled training data where each example has a known price, making it a supervised regression task. Spam detection trains a model on emails already labeled as spam or not spam, making it a supervised classification task. Image classification trains a model on images with known labels, such as cat or dog, also making it a supervised classification task.",
     "isMultiAnswer": false,
     "taskStatement": "1.1",
     "lastVerified": "2026-05-30",
@@ -1460,7 +1460,7 @@
       "D": "Recommendation systems"
     },
     "answer": "B",
-    "explanation": "Manual record keeping is not a typical AI/ML use case because it is a routine, deterministic clerical task that does not involve learning from data or making predictions.\nFraud detection, recommendation systems, and speech recognition are all established AI/ML applications that rely on machine learning models to identify patterns, make predictions, or interpret unstructured data such as transactions, user behaviour, or audio.",
+    "explanation": "Manual record keeping is not a typical AI/ML use case because it is a routine, deterministic clerical task that does not involve learning from data or making predictions.\nFraud detection, recommendation systems, and speech recognition are all established AI/ML applications that rely on machine learning models to identify patterns, make predictions, or interpret unstructured data such as transactions, user behavior, or audio.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-02",
@@ -1523,7 +1523,7 @@
       "D": "Feature engineering"
     },
     "answer": "C",
-    "explanation": "Regulatory and compliance obligations are primarily established during business goal identification, because defining what you want to build determines which laws and regulations apply to the project before any data is collected or processed.\nData collection is where those obligations are applied in practice, such as obtaining consent and verifying data sources, but the obligations themselves must be understood before collection begins. Model training and feature engineering are later technical stages focused on building and optimising the model, not on identifying the legal and regulatory framework that governs the project.",
+    "explanation": "Regulatory and compliance obligations are primarily established during business goal identification, because defining what you want to build determines which laws and regulations apply to the project before any data is collected or processed.\nData collection is where those obligations are applied in practice, such as obtaining consent and verifying data sources, but the obligations themselves must be understood before collection begins. Model training and feature engineering are later technical stages focused on building and optimizing the model, not on identifying the legal and regulatory framework that governs the project.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-02",
@@ -2216,7 +2216,7 @@
       "D": "Amazon Transcribe"
     },
     "answer": "B",
-    "explanation": "Amazon Rekognition is a Computer Vision service that can detect, analyse, and identify faces in images and video, so it can locate customer faces in security footage for the company to blur before storage.\nAmazon Textract extracts text and structured data from documents and images but does not detect faces. Amazon Comprehend is a Natural Language Processing service that analyses text for sentiment, entities, and key phrases. Amazon Transcribe converts spoken audio into text. None of these provides facial detection in video.",
+    "explanation": "Amazon Rekognition is a Computer Vision service that can detect, analyze, and identify faces in images and video, so it can locate customer faces in security footage for the company to blur before storage.\nAmazon Textract extracts text and structured data from documents and images but does not detect faces. Amazon Comprehend is a Natural Language Processing service that analyzes text for sentiment, entities, and key phrases. Amazon Transcribe converts spoken audio into text. None of these provides facial detection in video.",
     "isMultiAnswer": false,
     "taskStatement": "1.2",
     "lastVerified": "2026-06-03",
@@ -2237,7 +2237,7 @@
       "D": "A CSV file containing sensor readings indexed by timestamp"
     },
     "answer": "C",
-    "explanation": "Free-form customer support emails are unstructured data because they have no predefined schema or fixed format — the content varies in length, style, and layout, making them unsuitable for direct storage in rows and columns without processing.\nA database table with defined columns, a spreadsheet with named fields, and a CSV file with consistent columns are all examples of structured data because each record follows a predefined schema where every field has a known type and position.",
+    "explanation": "Free-form customer support emails are unstructured data because they have no predefined schema or fixed format: the content varies in length, style, and layout, making them unsuitable for direct storage in rows and columns without processing.\nA database table with defined columns, a spreadsheet with named fields, and a CSV file with consistent columns are all examples of structured data because each record follows a predefined schema where every field has a known type and position.",
     "isMultiAnswer": false,
     "taskStatement": "1.1",
     "lastVerified": "2026-06-03",
@@ -2253,7 +2253,7 @@
       "D": "Deleting old datasets that are no longer needed"
     },
     "answer": "B",
-    "explanation": "Technical debt in MLOps refers to the accumulated cost of shortcuts, poorly documented pipelines, outdated dependencies, and tightly coupled components that make ML systems progressively harder to maintain, extend, and debug over time. Managing it means proactively refactoring, documenting, and modernizing these systems.\nReducing cloud compute costs is cost optimisation, not technical debt management. Increasing model parameters is a modelling decision related to capacity, not maintenance burden. Deleting old datasets is a data governance activity rather than a response to accumulated engineering shortcuts.",
+    "explanation": "Technical debt in MLOps refers to the accumulated cost of shortcuts, poorly documented pipelines, outdated dependencies, and tightly coupled components that make ML systems progressively harder to maintain, extend, and debug over time. Managing it means proactively refactoring, documenting, and modernizing these systems.\nReducing cloud compute costs is cost optimization, not technical debt management. Increasing model parameters is a modeling decision related to capacity, not maintenance burden. Deleting old datasets is a data governance activity rather than a response to accumulated engineering shortcuts.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-03",
@@ -2285,7 +2285,7 @@
       "D": "To monitor the model for data drift after deployment"
     },
     "answer": "B",
-    "explanation": "Hyperparameter tuning searches for the optimal configuration settings, such as learning rate, batch size, and number of layers, that are set before training begins and directly influence model performance. Finding the best combination maximises the model's accuracy or other target metric.\nCollecting and cleaning raw data is the data collection and preprocessing stage. Deploying the model to a production endpoint is the deployment stage. Monitoring for data drift is part of the post-deployment monitoring stage. Each of these is a separate step in the ML lifecycle.",
+    "explanation": "Hyperparameter tuning searches for the optimal configuration settings, such as learning rate, batch size, and number of layers, that are set before training begins and directly influence model performance. Finding the best combination maximizes the model's accuracy or other target metric.\nCollecting and cleaning raw data is the data collection and preprocessing stage. Deploying the model to a production endpoint is the deployment stage. Monitoring for data drift is part of the post-deployment monitoring stage. Each of these is a separate step in the ML lifecycle.",
     "isMultiAnswer": false,
     "taskStatement": "1.3",
     "lastVerified": "2026-06-03",
@@ -2296,7 +2296,7 @@
     "question": "In Machine Learning, what does the term bias most commonly refer to?",
     "options": {
       "A": "The speed at which a model trains",
-      "B": "A systematic error that causes a model to consistently favour certain outcomes over others",
+      "B": "A systematic error that causes a model to consistently favor certain outcomes over others",
       "C": "The total number of parameters in a model",
       "D": "The process of splitting data into training and test sets"
     },

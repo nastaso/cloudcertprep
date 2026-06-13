@@ -1702,7 +1702,7 @@
   },
   {
     "id": "aif-q447",
-    "question": "A travel company wants an AI system that can search flight availability, compare prices across airlines, book tickets, and send confirmation emails — all from a single customer request. Which solution meets this requirement?",
+    "question": "A travel company wants an AI system that can search flight availability, compare prices across airlines, book tickets, and send confirmation emails, all from a single customer request. Which solution meets this requirement?",
     "options": {
       "A": "A text summarization model",
       "B": "An AI agent that orchestrates multi-step tasks using tool calls",
@@ -1710,7 +1710,7 @@
       "D": "A recommendation engine that suggests popular flights"
     },
     "answer": "B",
-    "explanation": "An AI agent can break down the customer's request into steps — searching flights, comparing prices, booking, and sending confirmation — and execute each by calling the appropriate tools and APIs, which is the defining capability of agents for complex business workflows.\nA summarization model condenses text but cannot take actions. A classification model routes requests but cannot execute multi-step tasks. A recommendation engine suggests items but cannot book flights or send emails.",
+    "explanation": "An AI agent can break down the customer's request into steps (searching flights, comparing prices, booking, and sending confirmation) and execute each by calling the appropriate tools and APIs, which is the defining capability of agents for complex business workflows.\nA summarization model condenses text but cannot take actions. A classification model routes requests but cannot execute multi-step tasks. A recommendation engine suggests items but cannot book flights or send emails.",
     "isMultiAnswer": false,
     "taskStatement": "3.1",
     "lastVerified": "2026-06-03",

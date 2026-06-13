@@ -40,6 +40,7 @@ import {
   titleCaseKeyword,
   fixKeywordInitialisms,
 } from '../../../data/keyword-clusters'
+import { getFeaturedSampleIds } from '../../../data/featured-samples'
 import { SITE_URL } from '../../../lib/seo-data'
 import { GITHUB_REPO_URL } from '../../../lib/constants'
 import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB } from '../../../lib/levelAccent'
@@ -112,26 +113,42 @@ const canonical = `${SITE_URL}/aws/${cert.code}/${domainSlug}`
 const ogImage = `${SITE_URL}/og/og-${cert.code}-${domainSlug}.png`
 
 // Sample questions: single-select only (multi-answer "Select N" questions are
-// not shown as samples), ranked so the questions whose text matches this
-// domain's high-volume Semrush keyword terms (from keyword-clusters.ts, R6.18)
-// surface first. The page's question-count claim still uses the full bank.
+// not shown as samples). The five shown are a curated, topically diverse set
+// (featured-samples.ts) so the samples span five distinct subtopics instead of
+// repeating one. If fewer than five featured ids resolve, the remainder is
+// filled by this domain's keyword terms (from keyword-clusters.ts, R6.18) then
+// original bank order. The page's question-count claim still uses the full bank.
+const SAMPLE_COUNT = 5
 const bank: SampleQuestion[] = QUESTION_BANKS[cert.code]?.[domain.id] ?? []
 const singleSelectBank = bank.filter(q => !q.isMultiAnswer)
-const sampleKeywordTerms = getSampleKeywordTerms(cert.code, domain.id)
-const scoreQuestion = (q: SampleQuestion): number => {
-  const haystack = `${q.question} ${Object.values(q.options).join(' ')}`.toLowerCase()
-  let score = 0
-  for (const term of sampleKeywordTerms) {
-    if (haystack.includes(term)) score++
-  }
-  return score
+const byId = new Map(singleSelectBank.map(q => [q.id, q]))
+const sampleQuestions: SampleQuestion[] = []
+for (const id of getFeaturedSampleIds(cert.code, domain.id)) {
+  if (sampleQuestions.length >= SAMPLE_COUNT) break
+  const q = byId.get(id)
+  if (q && !sampleQuestions.includes(q)) sampleQuestions.push(q)
 }
-const sampleQuestions = singleSelectBank
-  .map((q, i) => ({ q, i, score: scoreQuestion(q) }))
-  // Stable sort: higher keyword score first, original bank order as tiebreak.
-  .sort((a, b) => b.score - a.score || a.i - b.i)
-  .slice(0, 5)
-  .map(entry => entry.q)
+// Fallback: fill any remaining slots by keyword score (then original bank order)
+// so the section always shows a full, on-topic set even if a featured id was
+// removed or retyped.
+if (sampleQuestions.length < SAMPLE_COUNT) {
+  const sampleKeywordTerms = getSampleKeywordTerms(cert.code, domain.id)
+  const scoreQuestion = (q: SampleQuestion): number => {
+    const haystack = `${q.question} ${Object.values(q.options).join(' ')}`.toLowerCase()
+    let score = 0
+    for (const term of sampleKeywordTerms) {
+      if (haystack.includes(term)) score++
+    }
+    return score
+  }
+  const ranked = singleSelectBank
+    .map((q, i) => ({ q, i, score: scoreQuestion(q) }))
+    .sort((a, b) => b.score - a.score || a.i - b.i)
+  for (const entry of ranked) {
+    if (sampleQuestions.length >= SAMPLE_COUNT) break
+    if (!sampleQuestions.includes(entry.q)) sampleQuestions.push(entry.q)
+  }
+}
 const totalDomainQuestions = bank.length
 const totalCertQuestions = getCertTotalQuestions(cert.code)
 
