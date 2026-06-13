@@ -27,6 +27,7 @@ import { shuffleAndMapQuestions, toOriginalAnswer, toggleMultiAnswer, type Optio
 import { trackEvent, trackPageView } from '../lib/analytics'
 import { MIN_VALID_EXAM_SECONDS, MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
 import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave } from '../lib/examGuard'
+import { storePendingAttempt, consumePendingAttemptSavedNotice, PENDING_ATTEMPT_SAVED_EVENT } from '../lib/pendingAttempt'
 import { getProviderLabel } from '../data/certifications'
 
 type ExamScreen = 'start' | 'exam' | 'results' | 'review'
@@ -99,6 +100,13 @@ export function MockExam() {
   // Pending in-app leave target. When set, the custom "Leave the exam?" modal
   // is shown (replacing the un-stylable native dialog for intercepted nav).
   const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null)
+  // Pending EXTERNAL link target (e.g. the header GitHub icon) clicked during
+  // an active exam. Opens in a new tab so nothing is lost, but a confirm keeps
+  // the user from wandering off while the timer burns (Alex, 2026-06-13).
+  const [pendingExternalUrl, setPendingExternalUrl] = useState<string | null>(null)
+  // One-shot success notice: a guest attempt stored before sign-in was flushed
+  // to the account (see lib/pendingAttempt.ts), shown once on the start screen.
+  const [attemptSavedNotice, setAttemptSavedNotice] = useState(false)
   const [results, setResults] = useState<{
     scaledScore: number
     percentScore: number
@@ -199,11 +207,15 @@ export function MockExam() {
     return registerExamLeaveHandler((url: string) => setPendingLeaveUrl(url))
   }, [screen])
 
-  // Intercept in-app anchor navigation during the exam (the static header logo,
-  // nav links, cert switcher, footer links — anything that's a same-origin
-  // link). One delegated capture listener covers them all DRY-ly, with no
-  // per-link wiring. Modified clicks and new-tab/external links pass through
-  // untouched (they don't unload the exam page).
+  // Intercept anchor clicks during the exam (the static header logo, nav
+  // links, breadcrumb, cert switcher, footer links). One delegated capture
+  // listener covers them all DRY-ly, with no per-link wiring. Same-origin
+  // navigation routes through the "Leave the exam?" modal; NEW-TAB/external
+  // links (header GitHub icon) route through a lighter "Open external link?"
+  // confirm: nothing is lost (the exam tab keeps running) but the timer does
+  // not pause, so an accidental click should not silently pull focus away
+  // (Alex, 2026-06-13). Modified clicks (cmd/ctrl/middle) pass through
+  // untouched: an explicit open-in-new-tab gesture never unloads the exam.
   useEffect(() => {
     if (screen !== 'exam') return
     function onClickCapture(e: MouseEvent) {
@@ -211,18 +223,39 @@ export function MockExam() {
       const anchor = (e.target as HTMLElement)?.closest('a')
       if (!anchor) return
       const href = anchor.getAttribute('href')
-      if (!href || anchor.target === '_blank' || href.startsWith('#') || href.startsWith('mailto:')) return
-      // Same-origin in-app navigation only; external links open without
-      // unloading via target handling above, but guard absolute externals too.
+      if (!href || href.startsWith('#') || href.startsWith('mailto:')) return
       const url = new URL(href, window.location.origin)
-      if (url.origin !== window.location.origin) return
+      const isExternal = anchor.target === '_blank' || url.origin !== window.location.origin
       e.preventDefault()
       e.stopPropagation()
-      setPendingLeaveUrl(url.pathname + url.search)
+      if (isExternal) {
+        setPendingExternalUrl(url.href)
+      } else {
+        setPendingLeaveUrl(url.pathname + url.search)
+      }
     }
     document.addEventListener('click', onClickCapture, true)
     return () => document.removeEventListener('click', onClickCapture, true)
   }, [screen])
+
+  // Surface the one-shot "attempt saved" notice: a guest finished an exam,
+  // clicked "Sign in to save this attempt", and the pending attempt was
+  // flushed to their account during sign-in (lib/pendingAttempt.ts). The
+  // flush races this island's remount, so check the flag now AND listen for
+  // the saved event in case the flush lands after mount.
+  useEffect(() => {
+    const consume = () => {
+      if (consumePendingAttemptSavedNotice()) setAttemptSavedNotice(true)
+    }
+    // Deferred (not called synchronously in the effect body) so the mount
+    // commit settles before any state update.
+    const t = window.setTimeout(consume, 0)
+    window.addEventListener(PENDING_ATTEMPT_SAVED_EVENT, consume)
+    return () => {
+      window.clearTimeout(t)
+      window.removeEventListener(PENDING_ATTEMPT_SAVED_EVENT, consume)
+    }
+  }, [])
 
   function handleTimeUp() {
     const answeredCount = Array.from(answers.values()).filter(isQuestionAnswered).length
@@ -431,6 +464,32 @@ export function MockExam() {
             await updateDomainProgress(userId, domain.id, cert.code)
           }
         }
+      } else if (isGuest && !isTooShort) {
+        // Guests hold results only in this island's memory, but the results
+        // screen promises "Sign in to save this attempt". Snapshot the
+        // finished attempt so it survives the trip through /login; useAuth
+        // flushes it to Supabase once the sign-in resolves.
+        storePendingAttempt({
+          certCode: cert.code,
+          finishedAt: Date.now(),
+          attempt: {
+            score_percent: percentScore,
+            scaled_score: scaledScore,
+            passed,
+            time_taken_seconds: timeTaken,
+            total_questions: questions.length,
+            correct_answers: correctCount,
+            domain_scores: domainScores,
+          },
+          questions: results.map(r => ({
+            question_id: r.questionId,
+            user_answer: Array.isArray(r.originalUserAnswer) ? r.originalUserAnswer.join(',') : r.originalUserAnswer,
+            correct_answer: Array.isArray(r.originalCorrectAnswer) ? r.originalCorrectAnswer.join(',') : r.originalCorrectAnswer,
+            is_correct: r.isCorrect,
+            was_flagged: r.wasFlagged,
+            domain_id: r.domainId,
+          })),
+        })
       }
     } catch (error: unknown) {
       logError('MockExam.submitExam', error)
@@ -465,6 +524,11 @@ export function MockExam() {
     return (
       <div className="p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
+          {attemptSavedNotice && (
+            <Alert tone="success" className="mb-4 p-4 animate-enter">
+              Your exam attempt was saved to your history.
+            </Alert>
+          )}
           <Card padding="lg">
             <h1 className="text-2xl md:text-3xl font-semibold text-text-primary mb-3 md:mb-4">{cert.shortName} Practice Exam</h1>
             <p className="text-sm md:text-base text-text-muted mb-6 md:mb-8">{cert.examQuestionCount} questions, {Math.round(cert.examTimeSeconds / 60)} minutes. No answer feedback during exam.</p>
@@ -885,6 +949,37 @@ export function MockExam() {
                 className="flex-1"
               >
                 Leave exam
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* External-link confirm: the link opens in a NEW tab (the exam keeps
+            running), but the timer does not pause, so an accidental click on
+            e.g. the header GitHub icon should not silently steal focus. */}
+        <Modal
+          isOpen={pendingExternalUrl !== null}
+          title="Open external link?"
+          onClose={() => setPendingExternalUrl(null)}
+        >
+          <div className="space-y-4">
+            <p className="text-text-primary">
+              This link opens in a new tab. Your exam keeps running here and
+              the timer does not pause.
+            </p>
+            <div className="flex gap-4 mt-6">
+              <Button onClick={() => setPendingExternalUrl(null)} variant="secondary" className="flex-1">
+                Stay focused
+              </Button>
+              <Button
+                onClick={() => {
+                  if (pendingExternalUrl) window.open(pendingExternalUrl, '_blank', 'noopener,noreferrer')
+                  setPendingExternalUrl(null)
+                }}
+                variant="primary"
+                className="flex-1"
+              >
+                Open in new tab
               </Button>
             </div>
           </div>

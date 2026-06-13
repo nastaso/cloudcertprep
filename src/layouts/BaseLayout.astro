@@ -204,9 +204,10 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
   <body>
     <!-- FOUC prevention: DO NOT REMOVE -->
     <script is:inline>
-      /* DSv5.1: dark-first brand. Dark unless the user explicitly chose light
-         (stored only on explicit toggle, never auto-persisted). */
-      (function(){var t=localStorage.getItem('cloudcertprep_theme');if(t!=='light'){document.documentElement.classList.add('dark')}})();
+      /* Light default. Dark only when the user explicitly chose it via the
+         theme toggle (stored only on explicit toggle, never auto-persisted;
+         no OS prefers-color-scheme mirroring by design). */
+      (function(){var t=localStorage.getItem('cloudcertprep_theme');if(t==='dark'){document.documentElement.classList.add('dark')}})();
     </script>
 
     <!-- Auth pre-paint: define a shared hasSession() helper on window, then

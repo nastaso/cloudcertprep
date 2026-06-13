@@ -13,6 +13,7 @@ export type UnlockCTALocation =
   | 'mock_exam_start'
   | 'exam_results'
   | 'domain_practice_wall'
+  | 'practice_results'
 
 interface UnlockCTAProps {
   /** Click handler — typically `() => goToLogin(navigate, location)`. */

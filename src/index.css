@@ -125,6 +125,22 @@ html.cc-js [data-reveal].is-revealed {
   transform: translateY(0);
 }
 
+/* Mobile motion calm: on phones the rise-and-stagger entrances read as
+   content popping in line by line on every page change. Phones keep ONE
+   quiet fade instead: no translateY rise, no per-child delay, shorter
+   duration. Desktop keeps the full motion vocabulary. */
+@media (max-width: 767px) {
+  .stagger > * {
+    animation-name: fade-in;
+    animation-duration: 0.35s;
+  }
+  .stagger > *:nth-child(n) { animation-delay: 0ms; }
+  html.cc-js [data-reveal] {
+    transform: none;
+    transition: opacity 0.35s var(--ease-out);
+  }
+}
+
 /* Header desktop nav link with an animated underline that wipes in on hover.
    Used inside the navy header, so currentColor (white) reads cleanly. */
 .hdr-link {
@@ -475,8 +491,15 @@ body {
    underline (premium pattern: brand colour is rare; underline + colour
    contrast carries the link affordance). */
 .blog-content {
-  line-height: 1.7;
+  /* Editorial body size: 17px base, 18px from tablet up (premium editorial
+     bodies run 17-19px). The 68ch measure is ch-based so it widens with the
+     font; spacing below is em-based so paragraph rhythm scales too. */
+  font-size: 1.0625rem;
+  line-height: 1.75;
   color: rgb(var(--color-text-primary));
+}
+@media (min-width: 768px) {
+  .blog-content { font-size: 1.125rem; }
 }
 .blog-content > * + * { margin-top: 1.25em; }
 .blog-content h2 {
@@ -546,12 +569,17 @@ body {
 .blog-content table {
   width: 100%;
   border-collapse: collapse;
+  /* 15px on phones (fits a 390px viewport without horizontal scroll); one
+     step up from tablet so the table keeps proportion with the larger body. */
   font-size: 0.9375rem;
   line-height: 1.5;
   display: block;
   overflow-x: auto;
   border: 1px solid rgb(var(--color-border));
   border-radius: 0.875rem;
+}
+@media (min-width: 768px) {
+  .blog-content table { font-size: 1rem; }
 }
 .blog-content thead th {
   background-color: rgb(var(--color-bg-card));
@@ -562,7 +590,7 @@ body {
 }
 .blog-content th,
 .blog-content td {
-  padding: 0.625rem 0.875rem;
+  padding: 0.75rem 0.875rem;
   border-bottom: 1px solid rgb(var(--color-border) / 0.6);
   vertical-align: top;
 }

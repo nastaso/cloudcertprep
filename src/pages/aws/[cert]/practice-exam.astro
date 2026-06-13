@@ -8,6 +8,7 @@
  */
 import BaseLayout from '../../../layouts/BaseLayout.astro'
 import AppIsland from '../../../components/AppIsland.tsx'
+import Breadcrumb from '../../../components/Breadcrumb.astro'
 import { getActiveCertStaticPaths, type Certification } from '../../../data/certifications'
 import { canonicalFor } from '../../../lib/seo-data'
 
@@ -21,8 +22,33 @@ const { cert } = Astro.props
 const title = `${cert.shortName} Practice Exam · CloudCertPrep`
 const description = `Take a free ${cert.name} practice exam. ${cert.examQuestionCount} questions in ${Math.round(cert.examTimeSeconds / 60)} minutes, matching the real exam format.`
 const canonical = canonicalFor(`/aws/${cert.code}/practice-exam`)
+
+// Orientation breadcrumb (UX only: the page is noindex, so no SEO weight).
+// During an active timed exam its links are intercepted by the exam island's
+// delegated click guard and routed through the "Leave the exam?" modal, so it
+// is not an accidental-exit trap.
+const breadcrumbItems = [
+  { label: 'Home', to: '/' },
+  { label: cert.shortName, to: `/aws/${cert.code}` },
+  { label: 'Practice exam' },
+]
 ---
 
 <BaseLayout title={title} description={description} canonical={canonical} robots="noindex" headerSticky={false} headerHideMobileMenu={true} noscriptDirectory={true}>
-  <AppIsland client:only="react" />
+  <div class="w-full max-w-4xl mx-auto px-4 md:px-8 pt-4 md:pt-6">
+    <Breadcrumb items={breadcrumbItems} />
+  </div>
+  {/* Static island shell: reserves the body height and shows a spinner in the
+      prerendered HTML so the page is never an empty, footer-only frame before
+      the client:only island hydrates. AppIsland removes #cc-island-fallback on
+      mount (spinner markup mirrors LoadingSpinner.tsx, kept in sync). */}
+  <div class="relative flex-1 flex flex-col min-h-[70vh]">
+    <div id="cc-island-fallback" class="absolute inset-0 flex items-center justify-center" role="status" aria-label="Loading">
+      <div class="w-12 h-12 relative">
+        <div class="absolute inset-0 border-[3px] border-text-muted/20 rounded-full"></div>
+        <div class="absolute inset-0 border-[3px] border-transparent border-t-text-primary/80 rounded-full animate-spin"></div>
+      </div>
+    </div>
+    <AppIsland client:only="react" />
+  </div>
 </BaseLayout>

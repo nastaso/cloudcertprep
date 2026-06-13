@@ -18,6 +18,7 @@
     "check:graph": "node scripts/validate-internal-graph.mjs",
     "check:person-graph": "node scripts/check-person-graph.mjs",
     "check:links": "node scripts/validate-internal-links.mjs",
+    "check:readability": "node scripts/check-readability.mjs",
     "check:free-for-dev": "node scripts/check-free-for-dev-link.mjs",
     "check:indexing": "node scripts/diagnose-indexing.mjs",
     "check:lighthouse": "lhci autorun",

@@ -13,6 +13,8 @@ import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { Modal } from '../components/Modal'
+import { confirmExamLeave, isIntentionalLeave } from '../lib/examGuard'
 import { UnlockCTA } from '../components/landing/UnlockCTA'
 import { updateDomainProgress } from '../lib/supabaseUtils'
 import { reviewCellClass } from '../lib/buttonStyles'
@@ -35,6 +37,23 @@ import {
 import { Check, X } from 'lucide-react'
 
 type Screen = 'selection' | 'config' | 'practice' | 'results'
+
+/**
+ * "Don't show again" flag for the practice leave-guard modal. Practice is
+ * lower-stakes than the timed mock exam (whose guard intentionally has NO
+ * opt-out), so users may permanently dismiss this one. Stored on confirm-leave
+ * with the checkbox ticked; when set, both the in-app modal and the native
+ * beforeunload warning are skipped.
+ */
+const PRACTICE_LEAVE_GUARD_KEY = 'cloudcertprep_practice_leave_guard'
+
+function isLeaveGuardDismissed(): boolean {
+  try {
+    return localStorage.getItem(PRACTICE_LEAVE_GUARD_KEY) === 'dismissed'
+  } catch {
+    return false
+  }
+}
 
 interface QuestionResult {
   question: Question
@@ -60,10 +79,11 @@ export function DomainPractice() {
   const [screen, setScreen] = useState<Screen>('config')
   // The selection screen is shown whenever no domain is selected in the URL.
   // Once a domain is chosen, `screen` drives config -> practice -> results.
-  // Guests are ALWAYS held on the selection screen: a `?domain=N` deep link
-  // would otherwise set effectiveScreen to 'config' and let a signed-out user
-  // start practice, bypassing the auth wall enforced in `selectDomain`.
-  const effectiveScreen: Screen = (selectedDomain === null || !user) ? 'selection' : screen
+  // Guests practise too (unlocked 2026-06-13, matching the "free, no signup"
+  // promise and the mock exam's guest mode): question selection falls back to
+  // a random shuffle and nothing is persisted; the config/results screens say
+  // so and carry the sign-in CTA.
+  const effectiveScreen: Screen = selectedDomain === null ? 'selection' : screen
   const [questionCount, setQuestionCount] = useState(DEFAULT_PRACTICE_QUESTIONS)
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -75,6 +95,8 @@ export function DomainPractice() {
   const [optionKeyMaps, setOptionKeyMaps] = useState<Map<string, OptionKeyMap>>(new Map())
   const [loading, setLoading] = useState(false)
   const [answering, setAnswering] = useState(false)
+  const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null)
+  const [dontShowLeaveGuard, setDontShowLeaveGuard] = useState(false)
   const { selectQuestions, refreshMastery } = useSpacedRepetition(user?.id ?? null, selectedDomain, cert.code)
 
   const domains = Object.fromEntries(cert.domains.map(d => [d.id, d.name]))
@@ -114,26 +136,67 @@ export function DomainPractice() {
     }
   }, [selectedDomain, cert.code])
 
-  function selectDomain(domainId: number) {
-    // Guests can see the selection screen for SEO/transparency but cannot
-    // proceed — clicking a domain card kicks them into the sign-in flow.
-    // `goToLogin` preserves the current URL as the `from` redirect target
-    // so they land back on this same DomainPractice page after sign-in and
-    // can re-click the domain they wanted. Domain id is logged as an extra
-    // analytics dimension so we can see if any specific domain card drives
-    // more sign-ins than others.
-    if (!user) {
-      trackEvent('unlock_cta_clicked', {
-        location: 'domain_practice_card',
-        domain_id: domainId,
-      })
-      goToLogin(navigate, location)
-      return
+  // Leave-guard (mirrors the MockExam pattern): answers are only persisted at
+  // finishPractice(), so leaving mid-session silently discards them. The
+  // native beforeunload dialog is the last-resort net for browser-level exits
+  // (tab close, refresh); confirmed in-app leaves set isIntentionalLeave() so
+  // the net stays silent for them. Skipped entirely once the user has ticked
+  // "don't show again".
+  useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (effectiveScreen === 'practice' && questions.length > 0 && !isIntentionalLeave() && !isLeaveGuardDismissed()) {
+        e.preventDefault()
+        e.returnValue = ''
+      }
     }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [effectiveScreen, questions.length])
+
+  // Intercept in-app anchor navigation during an active practice session (the
+  // static header logo/nav, breadcrumb, footer links) and route it through the
+  // custom "Leave practice?" modal instead of the native dialog. Same
+  // delegated capture listener as MockExam: modified clicks and
+  // new-tab/external links pass through untouched (they don't unload the
+  // page).
+  useEffect(() => {
+    if (effectiveScreen !== 'practice' || questions.length === 0) return
+    function onClickCapture(e: MouseEvent) {
+      if (isLeaveGuardDismissed()) return
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+      const anchor = (e.target as HTMLElement)?.closest('a')
+      if (!anchor) return
+      const href = anchor.getAttribute('href')
+      if (!href || anchor.target === '_blank' || href.startsWith('#') || href.startsWith('mailto:')) return
+      const url = new URL(href, window.location.origin)
+      if (url.origin !== window.location.origin) return
+      e.preventDefault()
+      e.stopPropagation()
+      setPendingLeaveUrl(url.pathname + url.search)
+    }
+    document.addEventListener('click', onClickCapture, true)
+    return () => document.removeEventListener('click', onClickCapture, true)
+  }, [effectiveScreen, questions.length])
+
+  function confirmPracticeLeave() {
+    if (!pendingLeaveUrl) return
+    if (dontShowLeaveGuard) {
+      try {
+        localStorage.setItem(PRACTICE_LEAVE_GUARD_KEY, 'dismissed')
+      } catch {
+        // localStorage unavailable: the choice just doesn't persist
+      }
+    }
+    confirmExamLeave(pendingLeaveUrl)
+  }
+
+  function selectDomain(domainId: number) {
     // Reflect the chosen domain in the URL (?domain=N) so it is deep-linkable
     // and browser Back returns to the selection screen. selectedDomain is then
     // derived from the URL on the next render. Reset the progression to the
     // config screen in case a previous session left it on practice/results.
+    // Guests proceed like signed-in users (guest mode: random selection, no
+    // persistence — communicated on the config screen).
     setScreen('config')
     navigate(`${domainPracticePath}?domain=${domainId}`)
   }
@@ -320,20 +383,18 @@ export function DomainPractice() {
             </Button>
           </Card>
 
-          {/* Guest-only sign-in nudge — rendered as a sibling card BELOW
-              the selection card, matching the MockExam guest pattern. The
-              domain cards above are visually identical to the signed-in
-              experience; clicking any of them triggers the sign-in flow
-              via `selectDomain`. This sibling card explains the gating
-              ahead of time so the redirect isn't a surprise. */}
+          {/* Guest-only sign-in nudge — rendered as a sibling card BELOW the
+              selection card, matching the MockExam guest pattern. Domain
+              practice is fully usable as a guest (random selection, nothing
+              saved); this card states the trade-off and the sign-in upside. */}
           {!user && (
             <div className="mt-4 md:mt-6">
               <UnlockCTA
                 onSignIn={() => goToLogin(navigate, location)}
                 location="domain_practice_wall"
-                title="Sign in to unlock domain practice"
-                body="Domain practice tracks per-domain mastery, prioritises questions you have gotten wrong, and saves your progress across sessions."
-                ctaLabel="Sign in to unlock domain practice"
+                title="Sign in to save your progress"
+                body="Practise free as a guest, no account needed. Sign in to save per-domain mastery and unlock spaced repetition, which repeats the questions you get wrong."
+                ctaLabel="Sign in to save progress"
                 noTopMargin
               />
             </div>
@@ -381,9 +442,15 @@ export function DomainPractice() {
             </div>
 
             <div className="bg-bg-dark rounded-lg p-4 mb-8">
-              <p className="text-sm text-text-muted">
-                <span className="text-text-primary font-semibold">Smart Practice:</span> Questions you've gotten wrong will appear more frequently. Questions you consistently get right will appear less often.
-              </p>
+              {user ? (
+                <p className="text-sm text-text-muted">
+                  <span className="text-text-primary font-semibold">Smart Practice:</span> Questions you've gotten wrong will appear more frequently. Questions you consistently get right will appear less often.
+                </p>
+              ) : (
+                <p className="text-sm text-text-muted">
+                  <span className="text-text-primary font-semibold">Guest mode:</span> your results will not be saved. Sign in to save per-domain mastery and unlock spaced repetition, which repeats the questions you get wrong.
+                </p>
+              )}
             </div>
 
             <div className="flex gap-4">
@@ -463,6 +530,19 @@ export function DomainPractice() {
                   certCode={cert.code}
                 />
               </div>
+            )}
+
+            {/* Guest signup CTA at the highest-intent moment, mirroring the
+                exam results screen: the session just ended and nothing was
+                persisted, so say so and offer the save path. */}
+            {!user && (
+              <UnlockCTA
+                onSignIn={() => goToLogin(navigate, location)}
+                location="practice_results"
+                title="Sign in to save your practice progress"
+                body="This session's results were not saved. Create a free account to track per-domain mastery and get spaced repetition focused on what you got wrong."
+                ctaLabel="Sign in to save progress"
+              />
             )}
 
             {/* Action Buttons */}
@@ -637,6 +717,40 @@ export function DomainPractice() {
               {currentIndex < questions.length - 1 ? 'Next question' : 'Finish session'}
             </Button>
           )}
+
+          {/* Custom leave-confirm modal for intercepted in-app navigation.
+              Unlike the mock-exam guard this one offers "don't show again":
+              practice is low-stakes (a session, not a 65-question timed
+              attempt), so a permanent opt-out is acceptable here. */}
+          <Modal
+            isOpen={pendingLeaveUrl !== null}
+            title="Leave practice?"
+            onClose={() => setPendingLeaveUrl(null)}
+          >
+            <div className="space-y-4">
+              <p className="text-text-primary">
+                Your practice session is still in progress. If you leave this
+                page now, the answers from this session will not be saved.
+              </p>
+              <label className="flex items-center gap-2.5 text-sm text-text-muted cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={dontShowLeaveGuard}
+                  onChange={e => setDontShowLeaveGuard(e.target.checked)}
+                  className="w-4 h-4 rounded border-border-hairline accent-brand"
+                />
+                Don't ask me again
+              </label>
+              <div className="flex gap-4 mt-6">
+                <Button onClick={() => setPendingLeaveUrl(null)} variant="secondary" className="flex-1">
+                  Keep practising
+                </Button>
+                <Button onClick={confirmPracticeLeave} variant="danger" className="flex-1">
+                  Leave practice
+                </Button>
+              </div>
+            </div>
+          </Modal>
           </div>
         </div>
     )

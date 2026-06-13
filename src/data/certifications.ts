@@ -171,10 +171,10 @@ export const CERTIFICATIONS: Record<string, Certification> = {
     examTimeSeconds: 90 * 60,
     passingScore: 700,
     domains: [
-      { id: 1, name: 'Cloud Concepts', questionCount: 187, examProportion: 0.24, weight: 24, taskRange: '1.1-1.4', blurb: 'the value of the AWS Cloud, the Cloud Adoption Framework, and core design principles such as elasticity, high availability, and the economics of cloud over on-premises infrastructure' },
-      { id: 2, name: 'Security & Compliance', questionCount: 247, examProportion: 0.30, weight: 30, taskRange: '2.1-2.4', blurb: 'the AWS shared responsibility model, identity and access management, encryption, and the compliance and governance tools AWS provides to secure cloud workloads' },
-      { id: 3, name: 'Cloud Technology & Services', questionCount: 384, examProportion: 0.34, weight: 34, taskRange: '3.1-3.4', blurb: 'the core AWS compute, storage, networking, and database services, the ways to deploy and operate on AWS, and how to choose the right service for a workload' },
-      { id: 4, name: 'Billing, Pricing & Support', questionCount: 232, examProportion: 0.12, weight: 12, taskRange: '4.1-4.2', blurb: 'AWS pricing models and the free tier, the cost-management and billing tools, and the support plans and resources available to AWS customers' },
+      { id: 1, name: 'Cloud Concepts', questionCount: 187, examProportion: 0.24, weight: 24, taskRange: '1.1-1.4', blurb: 'what the AWS Cloud offers, the Cloud Adoption Framework, and core design ideas like elasticity, high availability, and why cloud can cost less than your own servers' },
+      { id: 2, name: 'Security & Compliance', questionCount: 247, examProportion: 0.30, weight: 30, taskRange: '2.1-2.4', blurb: 'the AWS shared responsibility model, identity and access management, encryption, and the AWS tools that keep cloud workloads secure and compliant' },
+      { id: 3, name: 'Cloud Technology & Services', questionCount: 384, examProportion: 0.34, weight: 34, taskRange: '3.1-3.4', blurb: 'the main AWS compute, storage, networking, and database services, the ways to deploy and run workloads on AWS, and how to pick the right service for a job' },
+      { id: 4, name: 'Billing, Pricing & Support', questionCount: 232, examProportion: 0.12, weight: 12, taskRange: '4.1-4.2', blurb: 'how AWS pricing works, the free tier, the tools for tracking and managing costs, and the support plans AWS customers can choose from' },
     ],
     status: 'active',
     // AWS publishes no version number or change-history for the CLF-C02 exam
@@ -220,11 +220,11 @@ export const CERTIFICATIONS: Record<string, Certification> = {
     examTimeSeconds: 90 * 60,
     passingScore: 700,
     domains: [
-      { id: 1, name: 'Fundamentals of AI and ML', questionCount: 131, examProportion: 0.20, weight: 20, taskRange: '1.1-1.3', blurb: 'core artificial-intelligence and machine-learning concepts and terminology, practical use cases for AI, and the stages of the machine-learning development lifecycle' },
-      { id: 2, name: 'Fundamentals of Generative AI', questionCount: 78, examProportion: 0.24, weight: 24, taskRange: '2.1-2.3', blurb: 'how generative AI and foundation models work, the business problems they can and cannot solve, and the AWS infrastructure and services used to build generative applications' },
-      { id: 3, name: 'Applications of Foundation Models', questionCount: 102, examProportion: 0.28, weight: 28, taskRange: '3.1-3.4', blurb: 'design considerations for applications built on foundation models, prompt-engineering techniques, training and fine-tuning, and how to evaluate model performance' },
-      { id: 4, name: 'Guidelines for Responsible AI', questionCount: 52, examProportion: 0.14, weight: 14, taskRange: '4.1-4.2', blurb: 'the development of responsible AI systems and why transparent, explainable models matter for building trust and meeting expectations' },
-      { id: 5, name: 'Security, Compliance, and Governance', questionCount: 46, examProportion: 0.14, weight: 14, taskRange: '5.1-5.2', blurb: 'methods to secure AI systems and the governance, compliance, and regulatory considerations that apply to AI and machine learning on AWS' },
+      { id: 1, name: 'Fundamentals of AI and ML', questionCount: 131, examProportion: 0.20, weight: 20, taskRange: '1.1-1.3', blurb: 'basic AI and machine-learning ideas and terms, real-world uses for AI, and the stages of the machine-learning lifecycle' },
+      { id: 2, name: 'Fundamentals of Generative AI', questionCount: 78, examProportion: 0.24, weight: 24, taskRange: '2.1-2.3', blurb: 'how generative AI and foundation models work, which business problems they can and cannot solve, and the AWS services used to build generative AI applications' },
+      { id: 3, name: 'Applications of Foundation Models', questionCount: 102, examProportion: 0.28, weight: 28, taskRange: '3.1-3.4', blurb: 'how to design applications that use foundation models, prompt engineering, training and fine-tuning, and how to measure model performance' },
+      { id: 4, name: 'Guidelines for Responsible AI', questionCount: 52, examProportion: 0.14, weight: 14, taskRange: '4.1-4.2', blurb: 'how to build responsible AI systems and why transparent, explainable models earn user trust' },
+      { id: 5, name: 'Security, Compliance, and Governance', questionCount: 46, examProportion: 0.14, weight: 14, taskRange: '5.1-5.2', blurb: 'how to secure AI systems and the governance, compliance, and regulation rules that apply to AI and machine learning on AWS' },
     ],
     status: 'active',
     // AWS AIF-C01 exam guide version 1.1, published April 30 2026 (verified

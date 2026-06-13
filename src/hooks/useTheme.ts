@@ -14,7 +14,7 @@ type Theme = 'light' | 'dark'
 const THEME_KEY = 'cloudcertprep_theme'
 
 function read(): Theme {
-  if (typeof document === 'undefined') return 'dark'
+  if (typeof document === 'undefined') return 'light'
   return document.documentElement.classList.contains('dark') ? 'dark' : 'light'
 }
 
@@ -27,9 +27,9 @@ function notify() { listeners.forEach(cb => cb()) }
 function init() {
   if (initialised || typeof window === 'undefined') return
   initialised = true
-  // DSv5.1: the brand is dark-first (pre-paint script defaults to dark; light
-  // only on explicit stored choice). OS-theme mirroring is intentionally
-  // retired with the dark-first default: the OS signal no longer decides.
+  // Light default (pre-paint script applies dark only on explicit stored
+  // choice). OS-theme mirroring is intentionally retired: the OS signal
+  // never decides; only the user's explicit toggle does.
 }
 
 function subscribe(cb: () => void) {
@@ -39,7 +39,7 @@ function subscribe(cb: () => void) {
 }
 
 function getSnapshot(): Theme { return theme }
-function getServerSnapshot(): Theme { return 'dark' }
+function getServerSnapshot(): Theme { return 'light' }
 
 export function useTheme() {
   const t = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)

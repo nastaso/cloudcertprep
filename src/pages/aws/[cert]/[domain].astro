@@ -220,23 +220,23 @@ const breadcrumbItems = [
 const faqEntries = [
   {
     question: `How many ${cert.shortName} ${domain.name} practice questions are there?`,
-    answer: `There are ${totalDomainQuestions} free practice questions for the ${domain.name} domain of the ${cert.name} (${cert.shortName}) exam, part of a pool of ${totalCertQuestions.toLocaleString('en-US')}+ questions across the whole certification. Every question includes a detailed explanation.`,
+    answer: `There are ${totalDomainQuestions} free practice questions for the ${domain.name} domain of the ${cert.name} (${cert.shortName}) exam. They are part of a pool of ${totalCertQuestions.toLocaleString('en-US')}+ questions across the whole bank. Every question comes with a full explanation.`,
   },
   {
     question: `How do I practise ${cert.shortName} ${domain.name} questions?`,
-    answer: `Start a free domain practice session for ${domain.name} on CloudCertPrep. Signed-in users get adaptive spaced repetition that prioritises questions you have got wrong or have not seen yet. No account is required to practise as a guest.`,
+    answer: `Start a free domain practice session for ${domain.name} on CloudCertPrep. No account is needed to practise as a guest. If you sign in, spaced repetition shows you the questions you got wrong, or have not seen yet, more often.`,
   },
   {
     question: `How hard is the ${domain.name} domain on the ${cert.shortName} exam?`,
-    answer: `The ${domain.name} domain accounts for roughly ${Math.round(domain.examProportion * 100)}% of the ${cert.shortName} exam. ${cert.level === 'foundational' ? 'As a foundational certification, it tests breadth of understanding rather than deep implementation detail.' : 'It tests applied knowledge of this area of the exam blueprint.'} Working through the practice questions and reading the explanations is the fastest way to build confidence.`,
+    answer: `The ${domain.name} domain makes up roughly ${Math.round(domain.examProportion * 100)}% of the ${cert.shortName} exam. ${cert.level === 'foundational' ? 'It is a foundational exam, so it tests broad understanding rather than deep hands-on detail.' : 'It tests how you apply the knowledge in this part of the exam guide.'} The fastest way to build confidence is to work through the practice questions and read every explanation.`,
   },
   {
     question: `Are these ${cert.shortName} ${domain.name} practice questions free?`,
-    answer: `Yes. Every practice question on CloudCertPrep is 100% free with no paywalls, premium tiers, or ads. The platform is MIT licensed and sustained by optional donations.`,
+    answer: `Yes. Every practice question on CloudCertPrep is 100% free. There are no paywalls, premium tiers, or ads. The platform is MIT licensed and runs on optional donations.`,
   },
   {
     question: `Where do the ${cert.shortName} ${domain.name} questions come from?`,
-    answer: `The entire question bank is open source and publicly auditable on GitHub at ${GITHUB_REPO_URL}. The ${domain.name} questions live in src/data/${cert.code}/domain${domain.id}.json, aligned to the official AWS exam guide. You can inspect them, suggest corrections, or open a pull request.`,
+    answer: `The whole question bank is open source on GitHub at ${GITHUB_REPO_URL}. The ${domain.name} questions live in src/data/${cert.code}/domain${domain.id}.json, written against the official AWS exam guide. You can read them, report an error, or open a pull request.`,
   },
 ]
 
@@ -278,7 +278,7 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
           {levelLabel} · Domain {domain.id}
         </p>
 
-        <h1 class="font-display mt-3 text-[1.75rem] leading-[1.1] md:text-[2.5rem] font-bold tracking-[-0.025em] text-[#F4F6F8]">
+        <h1 class="font-display mt-3 text-[1.75rem] leading-[1.1] md:text-[2.5rem] lg:text-[2.75rem] font-bold tracking-[-0.025em] text-[#F4F6F8]">
           {cert.shortName} {domain.name}
           <span class="block mt-2 text-[1.125rem] md:text-[1.375rem] font-semibold tracking-[-0.01em] text-[#9AA6B2]">{primaryTitleCased}</span>
         </h1>
@@ -324,18 +324,18 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
       <div class="space-y-10 md:space-y-14">
         {/* 4. Intro — unique per domain (blurb + exam-guide facts). Primary
             keyword in the first paragraph and an H2 (R6.5); 200-400 words. */}
-        <section class="space-y-4 text-text-muted text-sm md:text-base leading-relaxed max-w-[68ch] mx-auto">
+        <section class="space-y-4 text-text-muted text-base md:text-lg leading-[1.7] max-w-[68ch] mx-auto">
           <p>
-            The <strong class="text-text-primary">{domain.name}</strong> domain of the {cert.name} ({cert.shortName}) exam covers {domain.blurb ?? `the ${domain.name.toLowerCase()} area of the exam`}.{domain.weight && domain.taskRange ? ` It accounts for ${domain.weight}% of the scored exam (task statements ${domain.taskRange} in the official AWS exam guide).` : ''} These {primaryInSentence} mirror that exam: the same scenario style, the same difficulty, and a full explanation on every question that walks through why the correct answer is right and why each distractor is wrong.
+            The <strong class="text-text-primary">{domain.name}</strong> domain of the {cert.name} ({cert.shortName}) exam covers {domain.blurb ?? `the ${domain.name.toLowerCase()} area of the exam`}.{domain.weight && domain.taskRange ? ` It makes up ${domain.weight}% of your exam score (task statements ${domain.taskRange} in the official AWS exam guide).` : ''} These {primaryInSentence} match the real exam: the same scenario style and the same difficulty. Every question comes with a full explanation of why the right answer is right and why each wrong option is wrong.
           </p>
           <p>
-            Practise free, with no signup. Every question is original and open source, so you can verify it against the official AWS exam guide and documentation instead of trusting an answer key. There are {totalDomainQuestions}+ questions in this domain alone, part of {totalCertQuestions.toLocaleString('en-US')}+ across the {cert.shortName} certification.{secondaryList ? ` If you searched for ${secondaryList}, these cover the same ground.` : ''} Create a free account to unlock adaptive spaced repetition, which resurfaces the questions you get wrong so your weakest topics get the most practice.
+            Practise free, with no signup. Every question is original and open source, so you can check it against the official AWS exam guide and documentation. You never have to trust a hidden answer key. There are {totalDomainQuestions}+ questions in this domain alone, and {totalCertQuestions.toLocaleString('en-US')}+ across the whole {cert.shortName} bank.{secondaryList ? ` If you searched for ${secondaryList}, these questions cover the same ground.` : ''} Create a free account to unlock spaced repetition: questions you get wrong come back more often, so your weakest topics get the most practice.
           </p>
           <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary pt-2">
             How to use these {primaryInSentence}
           </h2>
           <p>
-            Work through the sample questions below and read each explanation in full; the explanations are where the real learning happens. When the {domain.name} domain feels comfortable, take a full-length timed mock exam to build pacing and stamina, and track your domain mastery to watch this area climb as you practise.
+            Work through the sample questions below and read each explanation in full, even when you answer correctly. The explanations are where the real learning happens. When this domain feels easy, take a full-length timed mock exam to build pacing and stamina. Your domain mastery score will show this area climb as you practise.
           </p>
         </section>
 

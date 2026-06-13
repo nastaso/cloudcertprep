@@ -102,6 +102,38 @@ function validateQuestion(q, certCode, domainNum, idx, seenIds, regEntry) {
     }
   }
 
+  // Explanation formatting convention: exactly TWO paragraphs separated by
+  // one '\n' (correct-answer rationale, then the distractor rationales as a
+  // single block). The UI renders explanation.split('\n') as paragraphs, so
+  // extra newlines change the layout per-question. Corpus normalised
+  // 2026-06-13. Error for live (active, non-beta) banks so it cannot
+  // regress; warn for coming-soon/beta placeholder banks (same convention as
+  // the count-drift check).
+  const liveBank = regEntry?.status === 'active' && !regEntry?.beta
+  const formatIssue = liveBank ? err : warn
+  if (typeof q.explanation === 'string' && q.explanation.trim().length > 0) {
+    const newlines = (q.explanation.match(/\n/g) || []).length
+    if (newlines !== 1) {
+      formatIssue(`${where} (${q.id}): explanation must have exactly one \\n (two paragraphs), found ${newlines}`)
+    }
+  }
+
+  // Copy hygiene: a sentence period directly followed by a capital letter
+  // means a missing space ("Auto Scaling.Reducing"); stray leading/trailing
+  // whitespace breaks the JSON diff conventions. The live corpus is clean
+  // (verified 2026-06-13), so any hit is a real defect. If a legitimate
+  // token ever matches (e.g. a product name), allowlist it here explicitly.
+  for (const f of fields) {
+    if (typeof f !== 'string') continue
+    const missingSpace = f.match(/[a-z]\.[A-Z]/)
+    if (missingSpace) {
+      formatIssue(`${where} (${q.id}): missing space after period ("...${missingSpace[0]}...")`)
+    }
+    if (f !== f.trim()) {
+      formatIssue(`${where} (${q.id}): leading/trailing whitespace in a text field`)
+    }
+  }
+
   // Optional taskStatement validation: only fires when the cert defines a
   // taskStatements vocabulary and the question has a taskStatement set.
   if (regEntry?.taskStatements && q.taskStatement !== undefined) {

@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { trackEvent } from '../lib/analytics'
 import { maybeNotifyGoogleLink } from '../components/account-link'
+import { flushPendingAttempt, hasPendingAttempt } from '../lib/pendingAttempt'
 import type { User } from '@supabase/supabase-js'
 
 /**
@@ -70,6 +71,11 @@ function init() {
       const initialUser = session?.user ?? null
       prevUser = initialUser
       setState({ user: initialUser, loading: false })
+      // A guest exam attempt stored before this session resolved (e.g. the
+      // flush failed offline last visit) is retried on any signed-in load.
+      if (initialUser && hasPendingAttempt()) {
+        void flushPendingAttempt(initialUser.id)
+      }
     })
     .catch((err: unknown) => {
       logError('useAuth.getSession', err)
@@ -125,6 +131,16 @@ function init() {
 
     prevUser = newUser
     setState({ user: newUser, loading: false })
+
+    // Flush a pending guest exam attempt to the now-signed-in account (the
+    // results-screen "Sign in to save this attempt" path). Deferred out of
+    // the auth callback per the supabase-js deadlock caution; the flush
+    // self-guards against re-entry and missing payloads, so firing on any
+    // signed-in transition (incl. INITIAL_SESSION / TOKEN_REFRESHED) is safe.
+    if (newUser && hasPendingAttempt()) {
+      const userId = newUser.id
+      setTimeout(() => { void flushPendingAttempt(userId) }, 0)
+    }
   })
 }
 
