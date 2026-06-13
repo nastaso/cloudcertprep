@@ -36,7 +36,7 @@ export function OrderingInput({ options, value, correctOrder, mode, onChange, co
   // Reset the live region a moment after each move so the next move (even with
   // identical wording) is a genuine text change and re-announces. Cancelled on
   // a fresh move so the latest message is never cleared early.
-  const clearTimer = useRef<ReturnType<typeof setTimeout>>()
+  const clearTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
   useEffect(() => () => clearTimeout(clearTimer.current), [])
   const pad = compact ? 'p-2.5 gap-2.5 text-xs md:text-sm' : 'p-3 md:p-3.5 text-sm md:text-base'
   // Numbered step badge (DSv6 numbered-row language, §7) — a chip, not a bare
