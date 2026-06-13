@@ -38,7 +38,7 @@
     "@supabase/supabase-js": "^2.97.0",
     "astro": "6.4.4",
     "lucide-react": "^0.575.0",
-    "react": "^19.2.0",
+    "react": "^19.2.7",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.0"
   },
@@ -49,7 +49,7 @@
     "@playwright/test": "^1.60.0",
     "@resvg/resvg-js": "^2.6.2",
     "@types/node": "^24.10.1",
-    "@types/react": "^19.2.7",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.24",
