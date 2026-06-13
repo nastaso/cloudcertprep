@@ -1,6 +1,6 @@
 # CloudCertPrep
 
-> Free open-source AWS certification practice exams. 1,050+ Cloud Practitioner (CLF-C02) and 409+ AI Practitioner (AIF-C01) questions with adaptive spaced repetition, timed mock exams, and progress tracking. No signup, no ads. Maintained by Alex Santonastaso, CloudCertPrep keeps every question bank MIT licensed and publicly auditable on GitHub, with domain-by-domain practice driven by adaptive spaced repetition.
+> Free open-source AWS certification practice exams. 1,050+ Cloud Practitioner (CLF-C02) and 419+ AI Practitioner (AIF-C01) questions with adaptive spaced repetition, timed mock exams, and progress tracking. No signup, no ads. Maintained by Alex Santonastaso, CloudCertPrep keeps every question bank MIT licensed and publicly auditable on GitHub, with domain-by-domain practice driven by adaptive spaced repetition.
 
 ## Pages
 
@@ -32,7 +32,7 @@
 - [Applications of Foundation Models](https://www.cloudcertprep.io/aws/aif-c01/applications-of-foundation-models): Applications of Foundation Models free practice questions with explanations
 - [Guidelines for Responsible AI](https://www.cloudcertprep.io/aws/aif-c01/guidelines-for-responsible-ai): Guidelines for Responsible AI free practice questions with explanations
 - [Security, Compliance, and Governance](https://www.cloudcertprep.io/aws/aif-c01/security-compliance-and-governance): Security, Compliance, and Governance free practice questions with explanations
-- Question Bank: 409 questions across 5 domains (Fundamentals of AI and ML, Fundamentals of Generative AI, Applications of Foundation Models, Guidelines for Responsible AI, Security, Compliance, and Governance)
+- Question Bank: 419 questions across 5 domains (Fundamentals of AI and ML, Fundamentals of Generative AI, Applications of Foundation Models, Guidelines for Responsible AI, Security, Compliance, and Governance)
 
 ### Coming Soon
 

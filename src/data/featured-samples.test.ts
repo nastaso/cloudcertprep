@@ -16,6 +16,7 @@ interface BankQuestion {
   id: string
   answer: string | string[]
   isMultiAnswer?: boolean
+  type?: 'single' | 'multi' | 'ordering' | 'matching'
 }
 
 const BANKS: Record<string, Record<number, BankQuestion[]>> = {
@@ -51,13 +52,14 @@ describe('FEATURED_SAMPLE_IDS', () => {
           expect(new Set(ids).size).toBe(ids.length)
         })
 
-        it('every featured id resolves to a single-select question in this domain bank', () => {
+        it('every featured id resolves to a renderable (non-multi) sample in this domain bank', () => {
           for (const id of ids) {
             const q = byId.get(id)
             expect(q, `${certCode} d${domainId}: featured id ${id} not found in bank`).toBeDefined()
-            // Samples are single-select only (multi-answer "Select N" questions
-            // are never shown as samples on the Domain_Landing).
-            const multi = Array.isArray(q!.answer) || q!.isMultiAnswer === true
+            // Samples may be single-select, ordering, or matching. Multi-answer
+            // "Select N" questions are never shown as samples (the SampleQuestionCard
+            // has no multi-select reveal flow on the Domain_Landing).
+            const multi = q!.type === 'multi' || (q!.type === undefined && (Array.isArray(q!.answer) || q!.isMultiAnswer === true))
             expect(multi, `${certCode} d${domainId}: featured id ${id} is multi-answer`).toBe(false)
           }
         })

@@ -98,10 +98,10 @@ export interface ExamFormat {
   questionTypes: string[]
   /**
    * Question formats CloudCertPrep's practice bank ACTUALLY offers today.
-   * Distinct from `questionTypes` so the ExamRealismTable does not claim
-   * parity on formats we have not built yet (the engine currently supports
-   * single-select + multi-select only; ordering/matching are a
-   * deferred fast-follow). Omit to default to `questionTypes` (full parity).
+   * Distinct from `questionTypes` so the ExamRealismTable does not claim parity
+   * on formats not yet built for a given cert. The engine supports single,
+   * multi, ordering, and matching; set this only when a cert advertises a format
+   * its bank does not yet contain. Omit to default to `questionTypes` (full parity).
    */
   practiceQuestionTypes?: string[]
 }
@@ -220,11 +220,11 @@ export const CERTIFICATIONS: Record<string, Certification> = {
     examTimeSeconds: 90 * 60,
     passingScore: 700,
     domains: [
-      { id: 1, name: 'Fundamentals of AI and ML', questionCount: 131, examProportion: 0.20, weight: 20, taskRange: '1.1-1.3', blurb: 'basic AI and machine-learning ideas and terms, real-world uses for AI, and the stages of the machine-learning lifecycle' },
-      { id: 2, name: 'Fundamentals of Generative AI', questionCount: 78, examProportion: 0.24, weight: 24, taskRange: '2.1-2.3', blurb: 'how generative AI and foundation models work, which business problems they can and cannot solve, and the AWS services used to build generative AI applications' },
-      { id: 3, name: 'Applications of Foundation Models', questionCount: 102, examProportion: 0.28, weight: 28, taskRange: '3.1-3.4', blurb: 'how to design applications that use foundation models, prompt engineering, training and fine-tuning, and how to measure model performance' },
-      { id: 4, name: 'Guidelines for Responsible AI', questionCount: 52, examProportion: 0.14, weight: 14, taskRange: '4.1-4.2', blurb: 'how to build responsible AI systems and why transparent, explainable models earn user trust' },
-      { id: 5, name: 'Security, Compliance, and Governance', questionCount: 46, examProportion: 0.14, weight: 14, taskRange: '5.1-5.2', blurb: 'how to secure AI systems and the governance, compliance, and regulation rules that apply to AI and machine learning on AWS' },
+      { id: 1, name: 'Fundamentals of AI and ML', questionCount: 133, examProportion: 0.20, weight: 20, taskRange: '1.1-1.3', blurb: 'basic AI and machine-learning ideas and terms, real-world uses for AI, and the stages of the machine-learning lifecycle' },
+      { id: 2, name: 'Fundamentals of Generative AI', questionCount: 80, examProportion: 0.24, weight: 24, taskRange: '2.1-2.3', blurb: 'how generative AI and foundation models work, which business problems they can and cannot solve, and the AWS services used to build generative AI applications' },
+      { id: 3, name: 'Applications of Foundation Models', questionCount: 104, examProportion: 0.28, weight: 28, taskRange: '3.1-3.4', blurb: 'how to design applications that use foundation models, prompt engineering, training and fine-tuning, and how to measure model performance' },
+      { id: 4, name: 'Guidelines for Responsible AI', questionCount: 54, examProportion: 0.14, weight: 14, taskRange: '4.1-4.2', blurb: 'how to build responsible AI systems and why transparent, explainable models earn user trust' },
+      { id: 5, name: 'Security, Compliance, and Governance', questionCount: 48, examProportion: 0.14, weight: 14, taskRange: '5.1-5.2', blurb: 'how to secure AI systems and the governance, compliance, and regulation rules that apply to AI and machine learning on AWS' },
     ],
     status: 'active',
     // AWS AIF-C01 exam guide version 1.1, published April 30 2026 (verified
@@ -239,10 +239,9 @@ export const CERTIFICATIONS: Record<string, Certification> = {
       // Real AIF-C01 exam (guide v1.1, April 2026) uses these four response
       // formats. The official exam guide lists NO case-study format — do not
       // re-add it (verified against the AIF-C01 guide question-types section).
+      // The practice bank now offers all four (ordering + matching shipped
+      // 2026-06-13), so `practiceQuestionTypes` is omitted to claim full parity.
       questionTypes: ['multiple choice', 'multiple response', 'ordering', 'matching'],
-      // CloudCertPrep currently offers single + multi select only; ordering /
-      // matching are a deferred fast-follow (see review U-3).
-      practiceQuestionTypes: ['multiple choice', 'multiple response'],
     },
     // Task statements verbatim from the AWS AIF-C01 exam guide (v1.1, April 2026).
     // Verify against the latest official PDF when AWS updates the guide.

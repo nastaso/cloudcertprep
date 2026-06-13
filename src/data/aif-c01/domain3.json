@@ -1753,5 +1753,57 @@
     "services": [
       "Amazon Bedrock"
     ]
+  },
+  {
+    "id": "aif-q461",
+    "type": "ordering",
+    "question": "A team is using Amazon Bedrock to customize a foundation model with their own labeled data so it performs better on a domain-specific support task. Arrange the steps of the fine-tuning workflow from first to last.",
+    "options": {
+      "A": "Run the fine-tuning job, which adjusts the model weights on the provided examples",
+      "B": "Select a base foundation model that supports customization for the target task",
+      "C": "Provision throughput for the resulting custom model and deploy it for inference",
+      "D": "Prepare and upload a labeled training dataset to Amazon S3 in the required format",
+      "E": "Evaluate the tuned model against a held-out validation set to confirm it improved"
+    },
+    "correctOrder": [
+      "B",
+      "D",
+      "A",
+      "E",
+      "C"
+    ],
+    "explanation": "You must first select a base foundation model that supports customization, then prepare and upload a labeled dataset to S3, because the training job needs both a target model and formatted data before it can start. Running the fine-tuning job adjusts the weights, after which you evaluate the tuned model on a held-out set and, only once it passes, provision throughput to deploy it.\nA common mistake is to evaluate before training or to deploy before evaluating, but you cannot measure a tuned model that does not yet exist, and shipping an unevaluated model risks regressions. Data preparation also precedes the job itself, since fine-tuning consumes the labeled examples rather than producing them.",
+    "isMultiAnswer": false,
+    "taskStatement": "3.3",
+    "lastVerified": "2026-06-13",
+    "services": []
+  },
+  {
+    "id": "aif-q462",
+    "type": "matching",
+    "question": "Match each foundation model evaluation metric to what it primarily measures. Pair each metric on the left with the correct description on the right.",
+    "options": {
+      "A": "ROUGE",
+      "B": "BLEU",
+      "C": "BERTScore",
+      "D": "Perplexity"
+    },
+    "targets": {
+      "1": "Precision of n-gram overlap between generated text and references, used mainly to score machine translation quality",
+      "2": "How well a language model predicts a sample, measured as its uncertainty over the next token, where a lower value is better",
+      "3": "Recall-oriented overlap of n-grams between generated and reference text, used mainly to score summarization quality",
+      "4": "Semantic similarity between generated and reference text computed from contextual embeddings rather than exact token matches"
+    },
+    "correctMatches": {
+      "A": "3",
+      "B": "1",
+      "C": "4",
+      "D": "2"
+    },
+    "explanation": "ROUGE is recall-oriented and is the standard choice for summarization, while BLEU emphasizes n-gram precision against references and is the classic machine translation metric, so these two are easy to swap if you only remember that both use n-gram overlap. BERTScore moves beyond exact token matching by comparing contextual embeddings to capture semantic similarity, and perplexity is an intrinsic measure of how confidently a model predicts the next token, where lower is better.\nThe key distinction is overlap-based metrics (ROUGE and BLEU) versus an embedding-based one (BERTScore) versus an intrinsic probability measure (perplexity). A tempting error is to assume a higher perplexity signals a better model, but perplexity reflects uncertainty, so lower values indicate stronger next-token prediction.",
+    "isMultiAnswer": false,
+    "taskStatement": "3.4",
+    "lastVerified": "2026-06-13",
+    "services": []
   }
 ]

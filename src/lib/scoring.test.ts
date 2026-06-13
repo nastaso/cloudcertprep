@@ -7,9 +7,11 @@ import {
   formatDuration,
   formatTotalTime,
   isAnswerCorrect,
+  correctAnswerFor,
   getExamDomainTargets,
 } from './scoring'
 import type { Certification } from '../data/certifications'
+import type { Question } from '../types'
 
 describe('calculateScaledScore', () => {
   it('returns 100 when no questions are answered correctly', () => {
@@ -182,5 +184,63 @@ describe('isAnswerCorrect', () => {
       expect(isAnswerCorrect('A', ['A'], true)).toBe(false)
       expect(isAnswerCorrect(['A'], 'A', true)).toBe(false)
     })
+  })
+
+  describe('ordering (order-dependent)', () => {
+    it('returns true only when the sequence matches positionally', () => {
+      expect(isAnswerCorrect(['B', 'C', 'D', 'A'], ['B', 'C', 'D', 'A'], 'ordering')).toBe(true)
+    })
+
+    it('returns false when the same elements are in the wrong order', () => {
+      expect(isAnswerCorrect(['C', 'B', 'D', 'A'], ['B', 'C', 'D', 'A'], 'ordering')).toBe(false)
+    })
+
+    it('returns false on a length mismatch (incomplete order)', () => {
+      expect(isAnswerCorrect(['B', 'C'], ['B', 'C', 'D', 'A'], 'ordering')).toBe(false)
+    })
+
+    it('returns false when the user value is not an array', () => {
+      expect(isAnswerCorrect('', ['B', 'C', 'D', 'A'], 'ordering')).toBe(false)
+    })
+  })
+
+  describe('matching (token set equality)', () => {
+    it('returns true regardless of token order', () => {
+      expect(isAnswerCorrect(['C:1', 'A:3', 'B:2'], ['A:3', 'B:2', 'C:1'], 'matching')).toBe(true)
+    })
+
+    it('returns false when any pairing is wrong', () => {
+      expect(isAnswerCorrect(['A:3', 'B:1', 'C:2'], ['A:3', 'B:2', 'C:1'], 'matching')).toBe(false)
+    })
+
+    it('returns false when a pairing is missing (incomplete)', () => {
+      expect(isAnswerCorrect(['A:3', 'B:2'], ['A:3', 'B:2', 'C:1'], 'matching')).toBe(false)
+    })
+  })
+})
+
+describe('correctAnswerFor', () => {
+  const base: Question = {
+    id: 'q1', domainId: 1, question: 'Q',
+    options: { A: 'a', B: 'b', C: 'c', D: 'd', E: '' },
+    answer: '', explanation: '', isMultiAnswer: false,
+  }
+
+  it('returns the answer string for single questions', () => {
+    expect(correctAnswerFor({ ...base, answer: 'B' })).toBe('B')
+  })
+
+  it('returns the answer array for multi questions', () => {
+    expect(correctAnswerFor({ ...base, isMultiAnswer: true, answer: ['A', 'C'] })).toEqual(['A', 'C'])
+  })
+
+  it('returns correctOrder for ordering questions', () => {
+    expect(correctAnswerFor({ ...base, type: 'ordering', correctOrder: ['B', 'A', 'C', 'D'] }))
+      .toEqual(['B', 'A', 'C', 'D'])
+  })
+
+  it('returns sorted K:T tokens for matching questions', () => {
+    expect(correctAnswerFor({ ...base, type: 'matching', correctMatches: { B: '2', A: '3', C: '1' } }))
+      .toEqual(['A:3', 'B:2', 'C:1'])
   })
 })

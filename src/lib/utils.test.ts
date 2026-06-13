@@ -4,6 +4,10 @@ import {
   toggleMultiAnswer,
   toOriginalAnswer,
   shuffleQuestionOptions,
+  getQuestionType,
+  matchesToTokens,
+  toOriginalMatchTokens,
+  encodeAnswerForDb,
 } from './utils'
 import type { Question } from '../types'
 
@@ -113,5 +117,92 @@ describe('shuffleQuestionOptions', () => {
     const { question } = shuffleQuestionOptions(multi)
     expect(Array.isArray(question.answer)).toBe(true)
     expect((question.answer as string[]).length).toBe(2)
+  })
+
+  it('remaps an ordering correctOrder so the step-text sequence is preserved', () => {
+    const ordering: Question = {
+      ...baseQuestion,
+      answer: '',
+      type: 'ordering',
+      options: { A: 'first', B: 'second', C: 'third', D: 'fourth', E: '' },
+      correctOrder: ['A', 'B', 'C', 'D'],
+    }
+    const { question } = shuffleQuestionOptions(ordering)
+    // Reading correctOrder against the shuffled options must yield the same
+    // ordered list of step texts as the original.
+    const originalTexts = ordering.correctOrder!.map(k => ordering.options[k as keyof typeof ordering.options])
+    const shuffledTexts = question.correctOrder!.map(k => question.options[k as keyof typeof question.options])
+    expect(shuffledTexts).toEqual(originalTexts)
+  })
+
+  it('remaps matching correctMatches keys so each left keeps its correct target', () => {
+    const matching: Question = {
+      ...baseQuestion,
+      answer: '',
+      type: 'matching',
+      options: { A: 'left-a', B: 'left-b', C: 'left-c', D: '', E: '' },
+      targets: { '1': 'r1', '2': 'r2', '3': 'r3' },
+      correctMatches: { A: '2', B: '3', C: '1' },
+    }
+    const { question } = shuffleQuestionOptions(matching)
+    // Targets are not shuffled; each left text must still map to its target key.
+    for (const [origKey, targetKey] of Object.entries(matching.correctMatches!)) {
+      const leftText = matching.options[origKey as keyof typeof matching.options]
+      const displayKey = Object.keys(question.options).find(
+        k => question.options[k as keyof typeof question.options] === leftText,
+      )!
+      expect(question.correctMatches![displayKey]).toBe(targetKey)
+    }
+  })
+})
+
+describe('getQuestionType', () => {
+  it('infers single/multi from isMultiAnswer when type is absent', () => {
+    expect(getQuestionType({ isMultiAnswer: false })).toBe('single')
+    expect(getQuestionType({ isMultiAnswer: true })).toBe('multi')
+  })
+
+  it('uses the explicit type when present', () => {
+    expect(getQuestionType({ isMultiAnswer: false, type: 'ordering' })).toBe('ordering')
+    expect(getQuestionType({ isMultiAnswer: false, type: 'matching' })).toBe('matching')
+  })
+})
+
+describe('matchesToTokens', () => {
+  it('serialises a match map to sorted K:T tokens', () => {
+    expect(matchesToTokens({ B: '2', A: '3', C: '1' })).toEqual(['A:3', 'B:2', 'C:1'])
+  })
+})
+
+describe('toOriginalMatchTokens', () => {
+  const keyMap = { A: 'C', B: 'A', C: 'B' } // display -> original
+
+  it('remaps only the left option key, keeping the target key', () => {
+    expect(toOriginalMatchTokens(['A:3', 'B:2', 'C:1'], keyMap)).toEqual(['A:2', 'B:1', 'C:3'])
+  })
+})
+
+describe('encodeAnswerForDb', () => {
+  const keyMap = { A: 'C', B: 'A', C: 'B', D: 'D' } // display -> original
+
+  it('encodes a single answer', () => {
+    expect(encodeAnswerForDb('A', keyMap, 'single')).toBe('C')
+  })
+
+  it('encodes a multi answer as a comma list', () => {
+    expect(encodeAnswerForDb(['A', 'B'], keyMap, 'multi')).toBe('C,A')
+  })
+
+  it('encodes an ordering sequence as a comma list', () => {
+    expect(encodeAnswerForDb(['A', 'B', 'C', 'D'], keyMap, 'ordering')).toBe('C,A,B,D')
+  })
+
+  it('encodes matching tokens, remapping only left keys', () => {
+    expect(encodeAnswerForDb(['A:3', 'B:2'], keyMap, 'matching')).toBe('A:2,C:3')
+  })
+
+  it('encodes a null/empty answer to an empty string', () => {
+    expect(encodeAnswerForDb(null, keyMap, 'single')).toBe('')
+    expect(encodeAnswerForDb(null, keyMap, 'matching')).toBe('')
   })
 })

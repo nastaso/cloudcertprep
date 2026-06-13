@@ -880,5 +880,57 @@
     "taskStatement": "5.1",
     "lastVerified": "2026-06-03",
     "services": []
+  },
+  {
+    "id": "aif-q465",
+    "type": "ordering",
+    "question": "A team is establishing a secure data governance lifecycle for the dataset behind an AWS AI workload. Arrange the following stages from first to last to reflect the correct order of a data governance lifecycle.",
+    "options": {
+      "A": "Restrict who can use the data by attaching least-privilege IAM policies to the roles and users that need it",
+      "B": "Encrypt the dataset at rest and enforce encryption in transit before it is used for training or inference",
+      "C": "Discover and classify the data to identify which records contain sensitive or regulated information",
+      "D": "Continuously monitor and log access to the data so unusual or unauthorized activity can be detected",
+      "E": "Audit the collected logs and controls against compliance requirements and produce evidence for reviewers"
+    },
+    "correctOrder": [
+      "C",
+      "B",
+      "A",
+      "D",
+      "E"
+    ],
+    "explanation": "You first discover and classify the data so you know what is sensitive and how it must be protected, then encrypt it at rest and in transit to safeguard the data itself, then restrict access with least-privilege IAM so only the right identities can use it, then continuously monitor and log that access to detect misuse, and finally audit those logs and controls against compliance requirements to produce evidence. Each stage depends on the prior one: classification drives the right encryption and access decisions, and access controls and logging must exist before there is anything meaningful to audit.\nA tempting mistake is to put least-privilege IAM access controls first, but you cannot scope access correctly until you have classified the data and protected it with encryption, and auditing must come last because it evaluates the controls and logs that the earlier stages put in place.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-13",
+    "services": []
+  },
+  {
+    "id": "aif-q466",
+    "type": "matching",
+    "question": "Match each AWS security and governance service to the role it plays when securing an AI or machine learning workload. Pair each service on the left with the correct description of its purpose on the right.",
+    "options": {
+      "A": "AWS IAM",
+      "B": "AWS KMS",
+      "C": "Amazon Macie",
+      "D": "AWS CloudTrail"
+    },
+    "targets": {
+      "1": "Uses machine learning to discover and classify sensitive data, such as personally identifiable information, stored in Amazon S3",
+      "2": "Records account API activity to provide an audit trail of who did what and when across AWS services",
+      "3": "Enforces least-privilege access control by defining which identities can perform which actions on which resources",
+      "4": "Creates, stores, and manages the encryption keys used to protect data at rest"
+    },
+    "correctMatches": {
+      "A": "3",
+      "B": "4",
+      "C": "1",
+      "D": "2"
+    },
+    "explanation": "AWS IAM enforces least-privilege access control by governing which identities may perform which actions on which resources, AWS KMS creates and manages the encryption keys that protect data at rest, Amazon Macie uses machine learning to discover and classify sensitive data such as PII in Amazon S3, and AWS CloudTrail records account API activity to provide an audit trail of who did what and when. Each service maps to a distinct governance function: identity and access, key management, sensitive-data discovery, and API auditing.\nA common error is to confuse CloudTrail with Macie or KMS, but CloudTrail logs API calls rather than scanning data content or managing keys, while Macie inspects the data itself in S3 and KMS handles only the cryptographic keys, so each pairing is unique and unambiguous.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-13",
+    "services": []
   }
 ]

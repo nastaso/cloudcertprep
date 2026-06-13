@@ -2338,5 +2338,57 @@
     "taskStatement": "1.3",
     "lastVerified": "2026-06-01",
     "services": []
+  },
+  {
+    "id": "aif-q457",
+    "type": "ordering",
+    "question": "A team at a logistics company is building a machine learning model that predicts delivery delays. Arrange the following stages of the ML development lifecycle in the correct order, from first to last.",
+    "options": {
+      "A": "Train the model on the prepared dataset to learn patterns that predict delays",
+      "B": "Engineer features and clean the gathered data into a training-ready dataset",
+      "C": "Deploy the validated model to an endpoint so applications can request predictions",
+      "D": "Define the business problem and the success metric for the delay-prediction use case",
+      "E": "Collect historical shipment and delivery records from source systems"
+    },
+    "correctOrder": [
+      "D",
+      "E",
+      "B",
+      "A",
+      "C"
+    ],
+    "explanation": "The ML lifecycle starts by framing the business problem and defining a success metric (D), because every later choice depends on knowing what you are predicting and how success is measured. You then collect the raw data (E), prepare it and engineer features into a training-ready dataset (B), train the model on that dataset (A), and finally deploy the validated model to an endpoint (C) so applications can consume its predictions.\nA common mistake is to start with data collection or jump straight to model training, but gathering or modeling data before the business goal is defined risks building the wrong model on the wrong data. Note that data preparation and feature engineering (B) must follow collection (E), since you cannot clean or transform data you have not yet gathered, and deployment (C) is the last step shown because a model is only served after it has been trained and validated.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.3",
+    "lastVerified": "2026-06-13",
+    "services": []
+  },
+  {
+    "id": "aif-q458",
+    "type": "matching",
+    "question": "Match each machine learning approach or technique on the left with the scenario on the right that best represents it. Pair each left item with exactly one right item.",
+    "options": {
+      "A": "Supervised learning (classification)",
+      "B": "Unsupervised learning (clustering)",
+      "C": "Reinforcement learning",
+      "D": "Supervised learning (regression)"
+    },
+    "targets": {
+      "1": "Grouping retail customers into segments based on purchasing behavior when no predefined labels exist",
+      "2": "Predicting the dollar amount of a house sale from features such as size and location",
+      "3": "Training a warehouse robot to navigate by rewarding successful moves and penalizing collisions",
+      "4": "Labeling incoming emails as spam or not spam using a dataset of previously labeled emails"
+    },
+    "correctMatches": {
+      "A": "4",
+      "B": "1",
+      "C": "3",
+      "D": "2"
+    },
+    "explanation": "Supervised classification (A) learns from labeled examples to assign inputs to discrete categories, which fits sorting emails into spam or not spam using previously labeled emails (4). Unsupervised clustering (B) finds structure in unlabeled data, matching customer segmentation with no predefined labels (1); reinforcement learning (C) learns through rewards and penalties, matching the robot trained by trial and error (3); and supervised regression (D) predicts a continuous numeric value, matching the house sale price prediction (2).\nThe key distinction is the type of output and the supervision signal: classification produces a category, regression produces a number, and both require labeled data, while clustering needs no labels and reinforcement learning needs no fixed dataset at all but instead a reward signal. A tempting error is to pair the house price scenario (2) with classification, but a continuous dollar amount is a numeric prediction, which makes it regression, not a discrete class.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-13",
+    "services": []
   }
 ]

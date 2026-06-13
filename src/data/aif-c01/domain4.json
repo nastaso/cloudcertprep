@@ -911,5 +911,57 @@
     "taskStatement": "4.2",
     "lastVerified": "2026-06-03",
     "services": []
+  },
+  {
+    "id": "aif-q463",
+    "type": "ordering",
+    "question": "A machine learning team is performing a responsible-AI bias and fairness evaluation for a loan-approval model before and after it goes live. Arrange the following activities in the correct order, from first to last.",
+    "options": {
+      "A": "Run bias metrics on the trained model's predictions to compare outcomes across the protected groups",
+      "B": "Inspect the training dataset for class imbalance and under-representation of protected groups",
+      "C": "Define the fairness criteria and choose which attributes, such as age or gender, count as sensitive",
+      "D": "Record the intended use, evaluation results, and residual risk in a model card for reviewers",
+      "E": "Monitor the deployed endpoint for bias and feature-attribution drift over time"
+    },
+    "correctOrder": [
+      "C",
+      "B",
+      "A",
+      "D",
+      "E"
+    ],
+    "explanation": "You must first define the fairness criteria and identify the sensitive attributes, because every later measurement depends on knowing which groups you are comparing and what fair means for this use case. With that settled you analyze the training data for imbalance (pre-training bias), then measure the trained model's predictions across groups (post-training bias), document the intended use and findings in a model card, and finally monitor the live endpoint for drift, which only exists once the model is in production.\nA learner should anchor the sequence to the lifecycle: criteria and definitions come before any data analysis, data bias is checked before model bias, governance documentation captures the results before release, and production monitoring is necessarily last. A tempting mistake is to analyze the training data first, but without agreed fairness criteria and a defined set of sensitive attributes you would not know which imbalances actually matter.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-13",
+    "services": []
+  },
+  {
+    "id": "aif-q464",
+    "type": "matching",
+    "question": "Match each AWS responsible-AI capability to the purpose it serves. Pair each capability on the left with the single best description on the right.",
+    "options": {
+      "A": "Amazon SageMaker Clarify",
+      "B": "Amazon SageMaker Model Monitor",
+      "C": "Amazon Augmented AI (Amazon A2I)",
+      "D": "Amazon SageMaker Model Cards"
+    },
+    "targets": {
+      "1": "Routes predictions that fall below a confidence threshold to human reviewers for a final decision",
+      "2": "Detects bias in data and models and explains predictions using feature attributions such as SHAP values",
+      "3": "Documents a model's intended use, evaluation results, and risk rating in one place for governance",
+      "4": "Watches a deployed endpoint and alerts on data quality issues and feature-attribution drift over time"
+    },
+    "correctMatches": {
+      "A": "2",
+      "B": "4",
+      "C": "1",
+      "D": "3"
+    },
+    "explanation": "SageMaker Clarify computes bias metrics on datasets and trained models and produces SHAP feature attributions to explain predictions, so it maps to target 2. Model Monitor continuously checks a live endpoint and raises alerts on drift, including feature-attribution drift, mapping to target 4; Amazon A2I sends low-confidence predictions to human reviewers, mapping to target 1; and Model Cards record intended use, results, and a risk rating for governance, mapping to target 3.\nThe distinction to internalize is when each tool acts: Clarify and Model Cards apply mainly before deployment for explainability and documentation, A2I inserts a human in the loop at inference time, and Model Monitor operates after deployment to catch drift. A common error is to assign drift detection to Clarify; Clarify measures bias and explainability on a point-in-time job, whereas it is Model Monitor that tracks how those signals change in production.",
+    "isMultiAnswer": false,
+    "taskStatement": "4.1",
+    "lastVerified": "2026-06-13",
+    "services": []
   }
 ]

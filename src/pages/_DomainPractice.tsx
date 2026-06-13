@@ -7,6 +7,8 @@ import { useSEO } from '../hooks/useSEO'
 import { supabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { AnswerButton } from '../components/AnswerButton'
+import { OrderingInput } from '../components/OrderingInput'
+import { MatchingInput } from '../components/MatchingInput'
 import { ProgressBar } from '../components/ProgressBar'
 import { QuestionReviewCard } from '../components/QuestionReviewCard'
 import { Button } from '../components/Button'
@@ -21,10 +23,10 @@ import { reviewCellClass } from '../lib/buttonStyles'
 import { goToLogin } from '../lib/navigation'
 import type { Question, OptionKey } from '../types'
 import { loadDomainQuestions } from '../data/questions'
-import { isAnswerCorrect } from '../lib/scoring'
+import { isAnswerCorrect, correctAnswerFor } from '../lib/scoring'
 import { trackEvent, trackPageView } from '../lib/analytics'
 import { useSpacedRepetition } from '../hooks/useSpacedRepetition'
-import { shuffleAndMapQuestions, toOriginalAnswer, toggleMultiAnswer, type OptionKeyMap } from '../lib/utils'
+import { shuffleAndMapQuestions, toggleMultiAnswer, getQuestionType, encodeAnswerForDb, type OptionKeyMap } from '../lib/utils'
 import {
   MAX_MULTI_ANSWER,
   ANSWER_FEEDBACK_DELAY_MS,
@@ -266,19 +268,23 @@ export function DomainPractice() {
 
   function checkAnswer(answer?: string | string[]) {
     const current = questions[currentIndex]
-    const answerToCheck = answer || userAnswer
-    const correct = isAnswerCorrect(answerToCheck!, current.answer, current.isMultiAnswer)
+    const type = getQuestionType(current)
+    // Ordering/matching only reach here via the Submit button, which is gated on
+    // interaction (ordering: reordered at least once; matching: every pair set),
+    // so `userAnswer` already holds the answer. Single passes its key in directly.
+    const answerToCheck: string | string[] = answer ?? userAnswer ?? (type === 'single' ? '' : [])
+    const correct = isAnswerCorrect(answerToCheck, correctAnswerFor(current), type)
 
     // Functional updaters avoid stale closures if two checkAnswer calls
     // race in the same tick (e.g. rapid keyboard / re-render).
     setResults(prev => [...prev, correct])
     setQuestionResults(prev => [...prev, {
       question: current,
-      userAnswer: answerToCheck!,
+      userAnswer: answerToCheck,
       isCorrect: correct
     }])
     setAnswering(false)
-    setShowFeedback(true)    
+    setShowFeedback(true)
     trackEvent('question_answered', {
       domain_id: selectedDomain,
       question_id: current.id,
@@ -306,16 +312,15 @@ export function DomainPractice() {
         // Save each question result to attempt_questions table (without attempt_id for practice mode)
         const questionRecords = questions.map((q, idx) => {
           const keyMap = optionKeyMaps.get(q.id) || {}
-          const ua = questionResults[idx]?.userAnswer
-          const originalUserAnswer = toOriginalAnswer(ua || '', keyMap)
-          const originalCorrectAnswer = toOriginalAnswer(q.answer, keyMap)
+          const type = getQuestionType(q)
+          const ua = questionResults[idx]?.userAnswer ?? (type === 'single' ? '' : [])
 
           return {
             attempt_id: null, // Practice mode doesn't have an exam attempt
             user_id: user.id,
             question_id: q.id,
-            user_answer: Array.isArray(originalUserAnswer) ? originalUserAnswer.join(',') : originalUserAnswer,
-            correct_answer: Array.isArray(originalCorrectAnswer) ? originalCorrectAnswer.join(',') : originalCorrectAnswer,
+            user_answer: encodeAnswerForDb(ua, keyMap, type),
+            correct_answer: encodeAnswerForDb(correctAnswerFor(q), keyMap, type),
             is_correct: results[idx] || false,
             was_flagged: false,
             domain_id: selectedDomain,
@@ -343,7 +348,12 @@ export function DomainPractice() {
 
   const currentQuestion = questions[currentIndex]
   const correctCount = results.filter(r => r).length
-  const isCorrect = showFeedback && currentQuestion && isAnswerCorrect(userAnswer!, currentQuestion.answer, currentQuestion.isMultiAnswer)
+  const currentType = currentQuestion ? getQuestionType(currentQuestion) : 'single'
+  const isCorrect = showFeedback && currentQuestion && isAnswerCorrect(
+    userAnswer ?? (currentType === 'single' ? '' : []),
+    correctAnswerFor(currentQuestion),
+    currentType,
+  )
 
   if (effectiveScreen === 'selection') {
     return (
@@ -584,50 +594,75 @@ export function DomainPractice() {
           <Card className="mb-3">
             <h3 className="text-base md:text-lg text-text-primary mb-4 md:mb-5">
               {currentQuestion.question}
-              {currentQuestion.isMultiAnswer && (
+              {currentType === 'multi' && (
                 <span className="text-text-primary font-semibold ml-2">(Select {Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER})</span>
+              )}
+              {currentType === 'ordering' && (
+                <span className="text-text-primary font-semibold ml-2">(Put in order)</span>
+              )}
+              {currentType === 'matching' && (
+                <span className="text-text-primary font-semibold ml-2">(Match each item)</span>
               )}
             </h3>
 
             <div className="space-y-2.5 mb-4">
-              {Object.entries(currentQuestion.options).map(([key, value]) => {
-                const isSelected = currentQuestion.isMultiAnswer
-                  ? Array.isArray(userAnswer) && userAnswer.includes(key)
-                  : userAnswer === key
+              {currentType === 'ordering' ? (
+                <OrderingInput
+                  mode={showFeedback ? 'result' : 'input'}
+                  options={currentQuestion.options}
+                  value={Array.isArray(userAnswer) ? userAnswer : null}
+                  correctOrder={currentQuestion.correctOrder}
+                  onChange={order => setUserAnswer(order)}
+                />
+              ) : currentType === 'matching' ? (
+                <MatchingInput
+                  mode={showFeedback ? 'result' : 'input'}
+                  options={currentQuestion.options}
+                  targets={currentQuestion.targets ?? {}}
+                  value={Array.isArray(userAnswer) ? userAnswer : null}
+                  correctMatches={currentQuestion.correctMatches}
+                  onChange={tokens => setUserAnswer(tokens)}
+                />
+              ) : (
+                Object.entries(currentQuestion.options).map(([key, value]) => {
+                  const isSelected = currentQuestion.isMultiAnswer
+                    ? Array.isArray(userAnswer) && userAnswer.includes(key)
+                    : userAnswer === key
 
-                const requiredCount = Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER
-                const currentSelections = currentQuestion.isMultiAnswer && Array.isArray(userAnswer)
-                  ? userAnswer.length
-                  : 0
-                const isLimitReached = currentQuestion.isMultiAnswer && !isSelected && currentSelections >= requiredCount
-                
-                let state: 'default' | 'selected' | 'correct' | 'wrong' = 'default'
-                
-                if (showFeedback) {
-                  const correctAnswers = Array.isArray(currentQuestion.answer) ? currentQuestion.answer : [currentQuestion.answer]
-                  const isCorrectAnswer = correctAnswers.includes(key)
-                  
-                  if (isCorrectAnswer) {
-                    state = 'correct'
+                  const requiredCount = Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER
+                  const currentSelections = currentQuestion.isMultiAnswer && Array.isArray(userAnswer)
+                    ? userAnswer.length
+                    : 0
+                  const isLimitReached = currentQuestion.isMultiAnswer && !isSelected && currentSelections >= requiredCount
+
+                  let state: 'default' | 'selected' | 'correct' | 'wrong' = 'default'
+
+                  if (showFeedback) {
+                    const correctAnswers = Array.isArray(currentQuestion.answer) ? currentQuestion.answer : [currentQuestion.answer]
+                    const isCorrectAnswer = correctAnswers.includes(key)
+
+                    if (isCorrectAnswer) {
+                      state = 'correct'
+                    } else if (isSelected) {
+                      state = 'wrong'
+                    }
                   } else if (isSelected) {
-                    state = 'wrong'
+                    state = 'selected'
                   }
-                } else if (isSelected) {
-                  state = 'selected'
-                }
-                
-                return (
-                  <AnswerButton
-                    key={key}
-                    label={key as OptionKey}
-                    text={value}
-                    state={state}
-                    onClick={() => !showFeedback && !answering && handleAnswer(key)}
-                    disabled={showFeedback || answering || isLimitReached}
-                    compact={true}
-                  />
-                )
-              })}
+
+                  return (
+                    <AnswerButton
+                      key={key}
+                      label={key as OptionKey}
+                      text={value}
+                      state={state}
+                      onClick={() => !showFeedback && !answering && handleAnswer(key)}
+                      disabled={showFeedback || answering || isLimitReached}
+                      compact={true}
+                    />
+                  )
+                })
+              )}
             </div>
 
             {currentQuestion.isMultiAnswer && !showFeedback && (() => {
@@ -660,6 +695,37 @@ export function DomainPractice() {
               )
             })()}
 
+            {(currentType === 'ordering' || currentType === 'matching') && !showFeedback && (() => {
+              const leftCount = (Object.keys(currentQuestion.options) as OptionKey[]).filter(k => currentQuestion.options[k]).length
+              const selectedCount = Array.isArray(userAnswer) ? userAnswer.length : 0
+              // Both need interaction before grading. Ordering is unanswered
+              // until the first reorder (userAnswer stays null until then,
+              // matching the exam's unanswered model); matching needs every left
+              // item paired.
+              const touched = Array.isArray(userAnswer) && userAnswer.length > 0
+              const complete = currentType === 'ordering' ? touched : selectedCount === leftCount
+              return (
+                <>
+                  {currentType === 'matching' ? (
+                    <div className="mb-3 text-xs md:text-sm text-text-muted">
+                      {selectedCount > 0 ? (
+                        <span className="text-text-primary font-medium" aria-live="polite" aria-atomic="true">
+                          {selectedCount}/{leftCount} matched
+                        </span>
+                      ) : (
+                        <span>Match all {leftCount} items</span>
+                      )}
+                    </div>
+                  ) : !touched && (
+                    <div className="mb-3 text-xs md:text-sm text-text-muted">Reorder the steps to set your answer.</div>
+                  )}
+                  <Button onClick={() => checkAnswer()} disabled={!complete} variant="primary" fullWidth>
+                    Submit answer
+                  </Button>
+                </>
+              )
+            })()}
+
             {showFeedback && (
               <Alert tone={isCorrect ? 'success' : 'danger'} className="mt-4 p-4 animate-enter">
                 <div className={`font-semibold mb-2 flex items-center gap-2 text-sm md:text-base ${isCorrect ? 'text-success' : 'text-danger'}`}>
@@ -667,16 +733,19 @@ export function DomainPractice() {
                   <p>{isCorrect ? 'Correct!' : 'Incorrect'}</p>
                 </div>
                 
-                {!isCorrect && (
+                {/* Raw key echo only for single/multi. Ordering/matching show
+                    their answer-vs-correct inline via the result-mode control
+                    above, so a comma-joined key list would be redundant/cryptic. */}
+                {!isCorrect && (currentType === 'single' || currentType === 'multi') && (
                   <div className="mb-2 text-xs md:text-sm">
                     <p className="text-danger font-medium mb-1">
-                      Your answer: {currentQuestion.isMultiAnswer 
+                      Your answer: {currentQuestion.isMultiAnswer
                         ? (Array.isArray(userAnswer) ? userAnswer.join(', ') : '')
                         : userAnswer}
                     </p>
                     <p className="text-success font-medium">
-                      Correct answer: {Array.isArray(currentQuestion.answer) 
-                        ? currentQuestion.answer.join(', ') 
+                      Correct answer: {Array.isArray(currentQuestion.answer)
+                        ? currentQuestion.answer.join(', ')
                         : currentQuestion.answer}
                     </p>
                   </div>

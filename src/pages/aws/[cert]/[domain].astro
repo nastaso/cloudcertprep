@@ -64,6 +64,10 @@ interface SampleQuestion {
   answer: string | string[]
   explanation: string
   isMultiAnswer?: boolean
+  type?: 'single' | 'multi' | 'ordering' | 'matching'
+  correctOrder?: string[]
+  targets?: Record<string, string>
+  correctMatches?: Record<string, string>
 }
 
 const QUESTION_BANKS: Record<string, Record<number, SampleQuestion[]>> = {
@@ -112,16 +116,17 @@ const canonical = `${SITE_URL}/aws/${cert.code}/${domainSlug}`
 // Each Domain_Landing gets a unique cert+domain image. (R6.14)
 const ogImage = `${SITE_URL}/og/og-${cert.code}-${domainSlug}.png`
 
-// Sample questions: single-select only (multi-answer "Select N" questions are
-// not shown as samples). The five shown are a curated, topically diverse set
-// (featured-samples.ts) so the samples span five distinct subtopics instead of
-// repeating one. If fewer than five featured ids resolve, the remainder is
-// filled by this domain's keyword terms (from keyword-clusters.ts, R6.18) then
-// original bank order. The page's question-count claim still uses the full bank.
+// Sample questions: a curated, topically diverse set (featured-samples.ts) so
+// the samples span five distinct subtopics instead of repeating one. Curated
+// ids may be single-select, ordering, or matching (resolved from the FULL
+// bank); multi-answer "Select N" questions are never shown. If fewer than five
+// featured ids resolve, the remainder is filled by keyword-ranked SINGLE-SELECT
+// questions (the keyword/click-to-reveal fallback only makes sense for those),
+// then original bank order. The page's question-count claim uses the full bank.
 const SAMPLE_COUNT = 5
 const bank: SampleQuestion[] = QUESTION_BANKS[cert.code]?.[domain.id] ?? []
-const singleSelectBank = bank.filter(q => !q.isMultiAnswer)
-const byId = new Map(singleSelectBank.map(q => [q.id, q]))
+const singleSelectBank = bank.filter(q => !q.isMultiAnswer && (q.type === undefined || q.type === 'single'))
+const byId = new Map(bank.map(q => [q.id, q]))
 const sampleQuestions: SampleQuestion[] = []
 for (const id of getFeaturedSampleIds(cert.code, domain.id)) {
   if (sampleQuestions.length >= SAMPLE_COUNT) break
@@ -398,6 +403,10 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
                   answer={q.answer}
                   explanation={q.explanation}
                   index={i + 1}
+                  type={q.type}
+                  correctOrder={q.correctOrder}
+                  targets={q.targets}
+                  correctMatches={q.correctMatches}
                   certCode={cert.code}
                   domainSlug={domainSlug}
                   questionId={q.id}

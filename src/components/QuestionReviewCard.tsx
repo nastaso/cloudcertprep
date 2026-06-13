@@ -1,7 +1,10 @@
 import { AnswerButton } from './AnswerButton'
+import { OrderingInput } from './OrderingInput'
+import { MatchingInput } from './MatchingInput'
 import type { Question, OptionKey } from '../types'
 import { getCertDomains, DEFAULT_CERT_ID } from '../data/certifications'
 import { buildGitHubIssueUrl } from '../lib/constants'
+import { getQuestionType } from '../lib/utils'
 import { trackEvent } from '../lib/analytics'
 import { Flag, Check, X } from 'lucide-react'
 
@@ -24,6 +27,11 @@ export function QuestionReviewCard({
   totalQuestions,
   certCode = DEFAULT_CERT_ID,
 }: QuestionReviewCardProps) {
+  const qType = getQuestionType(question)
+  // Decode the persisted answer string. History loads `user_answer` as a comma
+  // joined string; in-session review passes the in-memory value. For ordering
+  // the tokens are option keys; for matching they are `K:T` pair tokens (which
+  // the old `.split(',') + includes(key)` membership test would mis-handle).
   const userAnswerArray = Array.isArray(userAnswer) ? userAnswer : userAnswer ? userAnswer.split(',') : []
   const correctAnswerArray = Array.isArray(question.answer) ? question.answer : [question.answer]
 
@@ -61,27 +69,46 @@ export function QuestionReviewCard({
         {question.question}
       </h3>
 
-      {/* Answer Options */}
+      {/* Answer Options / response */}
       <div className="space-y-1.5 mb-3">
-        {Object.entries(question.options).map(([key, value]) => {
-          const isUserAnswer = userAnswerArray.includes(key)
-          const isCorrectAnswer = correctAnswerArray.includes(key)
+        {qType === 'ordering' ? (
+          <OrderingInput
+            mode="result"
+            options={question.options}
+            value={userAnswerArray}
+            correctOrder={question.correctOrder}
+            compact={true}
+          />
+        ) : qType === 'matching' ? (
+          <MatchingInput
+            mode="result"
+            options={question.options}
+            targets={question.targets ?? {}}
+            value={userAnswerArray}
+            correctMatches={question.correctMatches}
+            compact={true}
+          />
+        ) : (
+          Object.entries(question.options).map(([key, value]) => {
+            const isUserAnswer = userAnswerArray.includes(key)
+            const isCorrectAnswer = correctAnswerArray.includes(key)
 
-          let state: 'default' | 'selected' | 'correct' | 'wrong' = 'default'
-          if (isCorrectAnswer) state = 'correct'
-          else if (isUserAnswer) state = 'wrong'
+            let state: 'default' | 'selected' | 'correct' | 'wrong' = 'default'
+            if (isCorrectAnswer) state = 'correct'
+            else if (isUserAnswer) state = 'wrong'
 
-          return (
-            <AnswerButton
-              key={key}
-              label={key as OptionKey}
-              text={value}
-              state={state}
-              disabled={true}
-              compact={true}
-            />
-          )
-        })}
+            return (
+              <AnswerButton
+                key={key}
+                label={key as OptionKey}
+                text={value}
+                state={state}
+                disabled={true}
+                compact={true}
+              />
+            )
+          })
+        )}
       </div>
 
       {/* Explanation */}

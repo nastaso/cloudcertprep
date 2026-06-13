@@ -11,19 +11,21 @@ import { useSEO } from '../hooks/useSEO'
 import { useCert } from '../hooks/useCert'
 import { useCertNavigate } from '../hooks/useCertNavigate'
 import { AnswerButton } from '../components/AnswerButton'
+import { OrderingInput } from '../components/OrderingInput'
+import { MatchingInput } from '../components/MatchingInput'
 import { Modal } from '../components/Modal'
 import { PassFailBanner } from '../components/PassFailBanner'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { QuestionReviewCard } from '../components/QuestionReviewCard'
 import { UnlockCTA } from '../components/landing/UnlockCTA'
-import { selectExamQuestions, calculateScaledScore, isPassed, getDomainScore, formatTime, formatDuration, isAnswerCorrect, getExamDomainTargets } from '../lib/scoring'
+import { selectExamQuestions, calculateScaledScore, isPassed, getDomainScore, formatTime, formatDuration, isAnswerCorrect, correctAnswerFor, getExamDomainTargets } from '../lib/scoring'
 import { supabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { updateDomainProgress } from '../lib/supabaseUtils'
 import { goToLogin } from '../lib/navigation'
 import type { Question, OptionKey } from '../types'
 import { loadAllQuestions } from '../data/questions'
-import { shuffleAndMapQuestions, toOriginalAnswer, toggleMultiAnswer, type OptionKeyMap } from '../lib/utils'
+import { shuffleAndMapQuestions, toggleMultiAnswer, getQuestionType, encodeAnswerForDb, type OptionKeyMap } from '../lib/utils'
 import { trackEvent, trackPageView } from '../lib/analytics'
 import { MIN_VALID_EXAM_SECONDS, MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
 import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave } from '../lib/examGuard'
@@ -342,6 +344,27 @@ export function MockExam() {
     }
   }
 
+  // Ordering / matching answers are not single-key clicks: the input controls
+  // emit the whole order array or the full set of `K:T` match tokens. Mirror
+  // handleAnswer's once-per-question analytics on the unanswered -> answered
+  // transition (ordering becomes answered on the first reorder; matching on the
+  // first pairing).
+  function setCurrentAnswer(value: string[]) {
+    const current = questions[currentIndex]
+    const currentState = answers.get(currentIndex) || { userAnswer: null, flagged: false }
+    const wasUnanswered = !isQuestionAnswered(currentState)
+    setAnswers(prev => new Map(prev).set(currentIndex, { ...currentState, userAnswer: value }))
+    if (wasUnanswered && value.length > 0) {
+      trackEvent('question_answered', {
+        surface: 'exam',
+        question_index: currentIndex,
+        question_id: current.id,
+        domain_id: current.domainId,
+        question_type: getQuestionType(current),
+      })
+    }
+  }
+
   function toggleFlag() {
     const currentState = answers.get(currentIndex) || { userAnswer: null, flagged: false }
     setAnswers(prev => new Map(prev).set(currentIndex, { ...currentState, flagged: !currentState.flagged }))
@@ -377,21 +400,22 @@ export function MockExam() {
     
     const results = questions.map((q, idx) => {
       const state = answers.get(idx)
-      const userAnswer = state?.userAnswer || (q.isMultiAnswer ? [] : '')
-      const correct = isAnswerCorrect(userAnswer, q.answer, q.isMultiAnswer)
-      
-      // Convert display keys back to original keys for DB storage
+      const type = getQuestionType(q)
+      const userAnswer = state?.userAnswer || (type === 'single' ? '' : [])
+      const correctAnswer = correctAnswerFor(q)
+      const correct = isAnswerCorrect(userAnswer, correctAnswer, type)
+
+      // Convert display keys back to original keys and encode to the persisted
+      // text shape (type-aware: matching uses the `K:T` token remap).
       const keyMap = optionKeyMaps.get(q.id) || {}
-      const originalUserAnswer = toOriginalAnswer(userAnswer, keyMap)
-      const originalCorrectAnswer = toOriginalAnswer(q.answer, keyMap)
 
       return {
         questionId: q.id,
         domainId: q.domainId,
         userAnswer,
-        correctAnswer: q.answer,
-        originalUserAnswer,
-        originalCorrectAnswer,
+        correctAnswer,
+        originalUserAnswer: encodeAnswerForDb(userAnswer, keyMap, type),
+        originalCorrectAnswer: encodeAnswerForDb(correctAnswer, keyMap, type),
         isCorrect: correct,
         wasFlagged: state?.flagged || false,
       }
@@ -517,6 +541,7 @@ export function MockExam() {
 
   const currentQuestion = questions[currentIndex]
   const currentState = answers.get(currentIndex)
+  const currentType = currentQuestion ? getQuestionType(currentQuestion) : 'single'
   const answeredCount = Array.from(answers.values()).filter(isQuestionAnswered).length
   const flaggedCount = Array.from(answers.values()).filter(s => s.flagged).length
 
@@ -786,37 +811,60 @@ export function MockExam() {
 
               <h2 className="text-base md:text-lg text-text-primary mb-4 md:mb-5">
                 {currentQuestion.question}
-                {currentQuestion.isMultiAnswer && (
+                {currentType === 'multi' && (
                   <span className="text-text-primary font-semibold ml-2">(Select {Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER})</span>
+                )}
+                {currentType === 'ordering' && (
+                  <span className="text-text-primary font-semibold ml-2">(Put in order)</span>
+                )}
+                {currentType === 'matching' && (
+                  <span className="text-text-primary font-semibold ml-2">(Match each item)</span>
                 )}
               </h2>
 
               <div className="space-y-2.5 md:space-y-3 mb-4">
-                {Object.entries(currentQuestion.options).map(([key, value]) => {
-                  const isSelected = currentQuestion.isMultiAnswer
-                    ? Array.isArray(currentState?.userAnswer) && currentState.userAnswer.includes(key)
-                    : currentState?.userAnswer === key
+                {currentType === 'ordering' ? (
+                  <OrderingInput
+                    mode="input"
+                    options={currentQuestion.options}
+                    value={Array.isArray(currentState?.userAnswer) ? currentState.userAnswer : null}
+                    onChange={setCurrentAnswer}
+                  />
+                ) : currentType === 'matching' ? (
+                  <MatchingInput
+                    mode="input"
+                    options={currentQuestion.options}
+                    targets={currentQuestion.targets ?? {}}
+                    value={Array.isArray(currentState?.userAnswer) ? currentState.userAnswer : null}
+                    onChange={setCurrentAnswer}
+                  />
+                ) : (
+                  Object.entries(currentQuestion.options).map(([key, value]) => {
+                    const isSelected = currentQuestion.isMultiAnswer
+                      ? Array.isArray(currentState?.userAnswer) && currentState.userAnswer.includes(key)
+                      : currentState?.userAnswer === key
 
-                  const requiredCount = Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER
-                  const currentSelections = currentQuestion.isMultiAnswer && Array.isArray(currentState?.userAnswer)
-                    ? currentState.userAnswer.length
-                    : 0
-                  const isDisabled = currentQuestion.isMultiAnswer && !isSelected && currentSelections >= requiredCount
-                  
-                  return (
-                    <AnswerButton
-                      key={key}
-                      label={key as OptionKey}
-                      text={value}
-                      state={isSelected ? 'selected' : 'default'}
-                      onClick={() => handleAnswer(key)}
-                      disabled={isDisabled}
-                    />
-                  )
-                })}
+                    const requiredCount = Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER
+                    const currentSelections = currentQuestion.isMultiAnswer && Array.isArray(currentState?.userAnswer)
+                      ? currentState.userAnswer.length
+                      : 0
+                    const isDisabled = currentQuestion.isMultiAnswer && !isSelected && currentSelections >= requiredCount
+
+                    return (
+                      <AnswerButton
+                        key={key}
+                        label={key as OptionKey}
+                        text={value}
+                        state={isSelected ? 'selected' : 'default'}
+                        onClick={() => handleAnswer(key)}
+                        disabled={isDisabled}
+                      />
+                    )
+                  })
+                )}
               </div>
 
-              {currentQuestion.isMultiAnswer && (() => {
+              {currentType === 'multi' && (() => {
                 const requiredCount = Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER
                 return (
                   <div className="mb-3 text-xs md:text-sm text-text-muted">
@@ -826,6 +874,20 @@ export function MockExam() {
                       </span>
                     ) : (
                       <span>Select {requiredCount} answers</span>
+                    )}
+                  </div>
+                )
+              })()}
+
+              {currentType === 'matching' && (() => {
+                const leftCount = (Object.keys(currentQuestion.options) as OptionKey[]).filter(k => currentQuestion.options[k]).length
+                const selectedCount = Array.isArray(currentState?.userAnswer) ? currentState.userAnswer.length : 0
+                return (
+                  <div className="mb-3 text-xs md:text-sm text-text-muted">
+                    {selectedCount > 0 ? (
+                      <span className="text-text-primary font-medium">{selectedCount}/{leftCount} matched</span>
+                    ) : (
+                      <span>Match all {leftCount} items</span>
                     )}
                   </div>
                 )

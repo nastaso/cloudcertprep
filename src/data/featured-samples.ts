@@ -14,9 +14,11 @@
  * (it does not read anything outside src/).
  *
  * Resilience: if an id is later removed or mistyped, the Domain_Landing falls
- * back to keyword-ranked questions to fill the set (see [domain].astro), so a
- * stale id never breaks a page. A unit test (featured-samples.test.ts) asserts
- * every id here resolves to a single-select question in the right domain bank.
+ * back to keyword-ranked single-select questions to fill the set (see
+ * [domain].astro), so a stale id never breaks a page. A unit test
+ * (featured-samples.test.ts) asserts every id here resolves to a renderable
+ * sample (single-select, ordering, or matching - never multi-answer) in the
+ * right domain bank.
  */
 export const FEATURED_SAMPLE_IDS: Record<string, Record<number, string[]>> = {
   'clf-c02': {
@@ -26,8 +28,11 @@ export const FEATURED_SAMPLE_IDS: Record<string, Record<number, string[]>> = {
     4: ['q061', 'q847', 'q009', 'q016', 'q180'],
   },
   'aif-c01': {
-    1: ['aif-q004', 'aif-q006', 'aif-q007', 'aif-q014', 'aif-q015'],
-    2: ['aif-q022', 'aif-q035', 'aif-q055', 'aif-q083', 'aif-q129'],
+    // aif-q457 (ordering: ML lifecycle) and aif-q460 (matching: genAI services)
+    // are featured so the Domain_Landings visibly showcase the two new AIF-C01
+    // response formats alongside the single-select samples (2026-06-13).
+    1: ['aif-q004', 'aif-q006', 'aif-q007', 'aif-q014', 'aif-q457'],
+    2: ['aif-q022', 'aif-q035', 'aif-q055', 'aif-q460', 'aif-q083'],
     3: ['aif-q271', 'aif-q283', 'aif-q008', 'aif-q019', 'aif-q024'],
     4: ['aif-q047', 'aif-q052', 'aif-q100', 'aif-q187', 'aif-q389'],
     5: ['aif-q126', 'aif-q133', 'aif-q026', 'aif-q028', 'aif-q030'],

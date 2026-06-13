@@ -1,6 +1,6 @@
-import type { Question } from '../types'
+import type { Question, QuestionType } from '../types'
 import type { Certification } from '../data/certifications'
-import { fisherYatesShuffle } from './utils'
+import { fisherYatesShuffle, getQuestionType, matchesToTokens } from './utils'
 
 /**
  * Calculate AWS scaled score (100-1000 range)
@@ -107,29 +107,65 @@ export function formatDuration(seconds: number): string {
   return `${minutes} minute${minutes !== 1 ? 's' : ''} ${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}`
 }
 
+/**
+ * The correct-answer value to compare a user's answer against, in whatever key
+ * space `q` is currently in (original bank keys, or shuffled display keys if it
+ * went through `shuffleQuestionOptions`). Single/multi use `answer`; ordering
+ * uses `correctOrder`; matching is encoded to comparable `K:T` tokens. Pair with
+ * `getQuestionType(q)` when calling `isAnswerCorrect`.
+ */
+export function correctAnswerFor(q: Question): string | string[] {
+  switch (getQuestionType(q)) {
+    case 'ordering':
+      return q.correctOrder ?? []
+    case 'matching':
+      return matchesToTokens(q.correctMatches ?? {})
+    default:
+      return q.answer
+  }
+}
+
+/**
+ * All-or-nothing correctness across every question format (AWS grades these
+ * formats with no partial credit, matching the boolean `is_correct` model that
+ * scaled score + domain mastery derive from).
+ *
+ * The third argument accepts a `boolean` (legacy `isMultiAnswer`, kept so the
+ * single/multi call sites and their tests need no change) OR an explicit
+ * `QuestionType`. Comparison by type:
+ * - single   : strict string equality.
+ * - multi    : set equality (order-independent).
+ * - matching : set equality over `K:T` tokens (order-independent, same logic as multi).
+ * - ordering : positional array equality (order-DEPENDENT).
+ */
 export function isAnswerCorrect(
   userAnswer: string | string[],
   correctAnswer: string | string[],
-  isMultiAnswer: boolean
+  typeOrMulti: boolean | QuestionType
 ): boolean {
-  if (isMultiAnswer) {
-    // Multi-answer: both arrays must match (order doesn't matter)
-    if (!Array.isArray(userAnswer) || !Array.isArray(correctAnswer)) {
-      return false
-    }
-    
-    if (userAnswer.length !== correctAnswer.length) {
-      return false
-    }
-    
+  const type: QuestionType = typeof typeOrMulti === 'boolean'
+    ? (typeOrMulti ? 'multi' : 'single')
+    : typeOrMulti
+
+  if (type === 'ordering') {
+    // Order-dependent: same elements in the same positions.
+    if (!Array.isArray(userAnswer) || !Array.isArray(correctAnswer)) return false
+    if (userAnswer.length !== correctAnswer.length) return false
+    return userAnswer.every((ans, idx) => ans === correctAnswer[idx])
+  }
+
+  if (type === 'multi' || type === 'matching') {
+    // Set equality. Matching tokens (`A:3`) bind left to right, so order of the
+    // tokens does not matter, exactly like a multi-answer selection set.
+    if (!Array.isArray(userAnswer) || !Array.isArray(correctAnswer)) return false
+    if (userAnswer.length !== correctAnswer.length) return false
     const sortedUser = [...userAnswer].sort()
     const sortedCorrect = [...correctAnswer].sort()
-    
     return sortedUser.every((ans, idx) => ans === sortedCorrect[idx])
-  } else {
-    // Single answer: simple string comparison
-    return userAnswer === correctAnswer
   }
+
+  // Single answer: simple string comparison.
+  return userAnswer === correctAnswer
 }
 
 /**

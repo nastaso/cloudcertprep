@@ -4,10 +4,14 @@
  *
  * Loads every domain JSON file under src/data/<cert>/domain*.json and asserts:
  *   - File parses as JSON array
- *   - Every entry has: id, question, options (object with A-E keys), answer, explanation
+ *   - Every entry has: id, question, options (object with A-E keys), explanation
  *   - id is unique across the cert
- *   - answer keys are present in options
- *   - For multi-answer questions (isMultiAnswer === true), answer is an array
+ *   - Per response format (optional `type`, default single/multi from isMultiAnswer):
+ *       single   -> `answer` is one option key
+ *       multi    -> `answer` is an array of option keys (isMultiAnswer === true)
+ *       ordering -> `correctOrder` is a permutation of all option keys
+ *       matching -> `targets` (keys 1-5) + `correctMatches` map every option key
+ *                   to a valid target key
  *   - explanation is non-empty
  *   - No em dashes (only ASCII punctuation)
  *
@@ -71,8 +75,81 @@ function validateQuestion(q, certCode, domainNum, idx, seenIds, regEntry) {
     }
   }
 
-  const isMulti = q.isMultiAnswer === true
-  if (isMulti) {
+  // Response format. `type` is optional; absent => inferred from isMultiAnswer
+  // (single/multi back-compat). ordering/matching carry their correct answer in
+  // dedicated fields (correctOrder / targets+correctMatches), not `answer`.
+  const VALID_TYPES = ['single', 'multi', 'ordering', 'matching']
+  if (q.type !== undefined && !VALID_TYPES.includes(q.type)) {
+    err(`${where} (${q.id}): invalid type "${q.type}" (must be ${VALID_TYPES.join('|')})`)
+  }
+  const qType = typeof q.type === 'string' ? q.type : (q.isMultiAnswer === true ? 'multi' : 'single')
+
+  if (qType === 'ordering') {
+    if (q.isMultiAnswer === true) {
+      err(`${where} (${q.id}): ordering question must have isMultiAnswer false`)
+    }
+    if (!Array.isArray(q.correctOrder)) {
+      err(`${where} (${q.id}): ordering question missing correctOrder array`)
+    } else {
+      const co = q.correctOrder
+      if (new Set(co).size !== co.length) {
+        err(`${where} (${q.id}): correctOrder has duplicate keys [${co.join(',')}]`)
+      }
+      const optSorted = [...optionKeys].sort().join(',')
+      const ordSorted = [...co].sort().join(',')
+      if (co.length !== optionKeys.length || optSorted !== ordSorted) {
+        err(`${where} (${q.id}): correctOrder must be a permutation of option keys [${optionKeys.join(',')}], got [${co.join(',')}]`)
+      }
+    }
+  } else if (qType === 'matching') {
+    if (q.isMultiAnswer === true) {
+      err(`${where} (${q.id}): matching question must have isMultiAnswer false`)
+    }
+    const targetsOk = typeof q.targets === 'object' && q.targets !== null
+    if (!targetsOk) {
+      err(`${where} (${q.id}): matching question missing targets object`)
+    }
+    const targetKeys = targetsOk
+      ? Object.keys(q.targets).filter(k => q.targets[k] !== undefined && q.targets[k] !== '')
+      : []
+    for (const tk of targetKeys) {
+      if (!/^[1-5]$/.test(tk)) {
+        err(`${where} (${q.id}): invalid target key "${tk}" (must be 1-5)`)
+      }
+      if (!isNonEmptyString(q.targets[tk])) {
+        err(`${where} (${q.id}): target ${tk} is empty`)
+      }
+    }
+    if (targetKeys.length < 2) {
+      err(`${where} (${q.id}): matching needs at least 2 non-empty targets`)
+    }
+    if (typeof q.correctMatches !== 'object' || q.correctMatches === null) {
+      err(`${where} (${q.id}): matching question missing correctMatches object`)
+    } else {
+      for (const ok of optionKeys) {
+        if (!(ok in q.correctMatches)) {
+          err(`${where} (${q.id}): correctMatches missing option key "${ok}"`)
+        }
+      }
+      for (const [ok, tk] of Object.entries(q.correctMatches)) {
+        if (!optionKeys.includes(ok)) {
+          err(`${where} (${q.id}): correctMatches has unknown option key "${ok}"`)
+        }
+        if (!targetKeys.includes(tk)) {
+          err(`${where} (${q.id}): correctMatches maps "${ok}" to unknown target "${tk}"`)
+        }
+      }
+      // One-to-one: each option must map to a DISTINCT target (no two options
+      // share a target). Catches accidental duplicate pairings; extra distractor
+      // targets beyond the option count are still allowed.
+      const usedTargets = new Set(
+        Object.values(q.correctMatches).filter(tk => targetKeys.includes(tk)),
+      )
+      if (usedTargets.size !== optionKeys.length) {
+        err(`${where} (${q.id}): correctMatches must be one-to-one - ${optionKeys.length} option(s) map to only ${usedTargets.size} distinct target(s)`)
+      }
+    }
+  } else if (qType === 'multi') {
     if (!Array.isArray(q.answer)) {
       err(`${where} (${q.id}): isMultiAnswer is true but answer is not an array`)
     } else {
@@ -93,8 +170,13 @@ function validateQuestion(q, certCode, domainNum, idx, seenIds, regEntry) {
   }
 
   // Em-dash discipline: warn (not error) so existing data isn't blocked
-  // until contributors clean it up.
-  const fields = [q.question, q.explanation, ...Object.values(q.options)]
+  // until contributors clean it up. Matching `targets` text is scanned too.
+  const fields = [
+    q.question,
+    q.explanation,
+    ...Object.values(q.options),
+    ...(q.targets && typeof q.targets === 'object' ? Object.values(q.targets) : []),
+  ]
   for (const f of fields) {
     if (typeof f === 'string' && /[\u2013\u2014]/.test(f)) {
       warn(`${where} (${q.id}): contains em or en dash (use ASCII punctuation)`)

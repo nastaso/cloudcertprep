@@ -28,6 +28,19 @@ interface Props {
   /** 1-based position of this question within the sample set. */
   index: number
   /**
+   * Response format. Absent => inferred single/multi from `answer`. Ordering and
+   * matching render as a static, answer-revealed block (no click-to-reveal): the
+   * sequence / pairing IS the answer, so it lives in static HTML for crawlers
+   * (R6.7) and needs no interaction model.
+   */
+  type?: 'single' | 'multi' | 'ordering' | 'matching'
+  /** Ordering only: correct sequence of option keys. */
+  correctOrder?: string[]
+  /** Matching only: right-column targets keyed '1'..'5'. */
+  targets?: Record<string, string>
+  /** Matching only: correct pairing { optionKey: targetKey }. */
+  correctMatches?: Record<string, string>
+  /**
    * Optional context for the prerendered "Suggest a fix on GitHub" link.
    * When all three are provided, a pre-filled new-issue link is rendered at
    * the bottom of the card. (R22.5)
@@ -37,7 +50,15 @@ interface Props {
   questionId?: string
 }
 
-const { question, options, answer, explanation, index, certCode, domainSlug, questionId } = Astro.props
+const { question, options, answer, explanation, index, type, correctOrder, targets, correctMatches, certCode, domainSlug, questionId } = Astro.props
+
+// Response format. Ordering/matching get a static answer-revealed layout below.
+const qType = type ?? (Array.isArray(answer) ? 'multi' : 'single')
+const isStaticType = qType === 'ordering' || qType === 'matching'
+// Matching pairs in stable left-key order.
+const matchPairs = qType === 'matching' && correctMatches
+  ? Object.keys(correctMatches).sort().map(k => ({ left: options[k] ?? k, right: targets?.[correctMatches[k]] ?? correctMatches[k] }))
+  : []
 
 // Pre-filled GitHub new-issue URL for reporting an error on this exact
 // question. Only rendered when the cert/domain/question context is supplied.
@@ -70,6 +91,49 @@ const explanationParagraphs = (explanation ?? '')
   .filter(Boolean)
 ---
 
+{isStaticType ? (
+  <div class="bg-bg-card rounded-2xl border border-border-hairline shadow-card p-4 md:p-6">
+    <div class="flex items-start gap-2 mb-3">
+      <span class="flex-shrink-0 font-mono text-xs md:text-sm font-semibold text-text-muted pt-px">Q{index}.</span>
+      <p class="text-text-primary text-sm md:text-base font-medium">{question}</p>
+    </div>
+    <p class="text-xs text-text-muted mb-2">{qType === 'ordering' ? 'Correct order:' : 'Correct matches:'}</p>
+    {qType === 'ordering' ? (
+      <ol class="space-y-2">
+        {(correctOrder ?? []).map((key, i) => (
+          <li class="flex items-start gap-2.5 border border-success/40 bg-success/10 rounded-xl p-2.5 md:p-3 text-xs md:text-sm">
+            <span class="flex-shrink-0 font-mono font-semibold text-[11px] md:text-[12px] pt-[3px] text-success">{i + 1}</span>
+            <span class="flex-1 text-text-primary">{options[key]}</span>
+          </li>
+        ))}
+      </ol>
+    ) : (
+      <dl class="space-y-2">
+        {matchPairs.map(pair => (
+          <div class="flex flex-col sm:flex-row sm:gap-3 border border-success/40 bg-success/10 rounded-xl p-2.5 md:p-3 text-xs md:text-sm">
+            <dt class="flex-1 text-text-primary font-medium">{pair.left}</dt>
+            <dd class="flex-1 text-text-muted">{pair.right}</dd>
+          </div>
+        ))}
+      </dl>
+    )}
+    {explanationParagraphs.length > 0 && (
+      <div class="mt-4 rounded-xl border border-border-hairline bg-bg-dark/60 px-4 py-3">
+        <p class="text-xs md:text-sm font-semibold text-text-primary mb-1">Explanation</p>
+        <div class="space-y-2">
+          {explanationParagraphs.map(para => (
+            <p class="text-text-muted text-xs md:text-sm leading-relaxed">{para}</p>
+          ))}
+        </div>
+      </div>
+    )}
+    {suggestFixUrl && (
+      <p class="mt-3 text-right">
+        <a href={suggestFixUrl} target="_blank" rel="noopener noreferrer" class="text-[11px] md:text-xs text-text-muted hover:text-text-primary underline">Suggest a fix on GitHub</a>
+      </p>
+    )}
+  </div>
+) : (
 <div
   class="sample-question bg-bg-card rounded-2xl border border-border-hairline shadow-card p-4 md:p-6"
   data-answer-count={correctKeys.size}
@@ -126,6 +190,7 @@ const explanationParagraphs = (explanation ?? '')
     </p>
   )}
 </div>
+)}
 
 <script>
   // Bundled once by Astro across all SampleQuestionCard instances on the page.

@@ -1353,5 +1353,55 @@
     "taskStatement": "2.2",
     "lastVerified": "2026-06-03",
     "services": []
+  },
+  {
+    "id": "aif-q459",
+    "type": "ordering",
+    "question": "A team is building a Retrieval Augmented Generation (RAG) application on AWS to ground a foundation model in their internal documents. Arrange the steps of preparing and querying the knowledge base from first to last.",
+    "options": {
+      "A": "Convert each text chunk into a numerical vector embedding using an embedding model",
+      "B": "Retrieve the most relevant chunks for a user question and pass them to the foundation model to generate a grounded answer",
+      "C": "Ingest the source documents from the data store and split them into smaller text chunks",
+      "D": "Store the embeddings in a vector database so they can be searched by similarity"
+    },
+    "correctOrder": [
+      "C",
+      "A",
+      "D",
+      "B"
+    ],
+    "explanation": "RAG first ingests the source documents and splits them into smaller chunks, then converts each chunk into a vector embedding, then stores those embeddings in a vector database that supports similarity search. Only after the knowledge base is indexed can the application, at query time, retrieve the most relevant chunks for a user question and feed them to the foundation model to generate a grounded answer.\nThe key idea is that indexing happens once up front while retrieval happens on every query, so storing embeddings must come before any search. A tempting mistake is to retrieve before embedding and storing, but you cannot search by similarity until the chunks have been embedded and indexed.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-13",
+    "services": []
+  },
+  {
+    "id": "aif-q460",
+    "type": "matching",
+    "question": "Match each AWS generative AI offering to the primary purpose it is designed for. Pair each service on the left with the correct description on the right.",
+    "options": {
+      "A": "Amazon Bedrock",
+      "B": "Amazon SageMaker JumpStart",
+      "C": "Amazon Q Business",
+      "D": "PartyRock"
+    },
+    "targets": {
+      "1": "A no-code playground for building and sharing small generative AI apps with no AWS account required",
+      "2": "Unified API access to foundation models from multiple providers for building generative AI applications",
+      "3": "A managed generative AI assistant that answers questions over a company's connected enterprise data and documents",
+      "4": "A hub of prebuilt foundation models and solution templates that ML practitioners can deploy and fine-tune"
+    },
+    "correctMatches": {
+      "A": "2",
+      "B": "4",
+      "C": "3",
+      "D": "1"
+    },
+    "explanation": "Amazon Bedrock provides serverless API access to foundation models from several providers, SageMaker JumpStart is a hub of prebuilt models and solution templates that practitioners deploy and fine-tune, Amazon Q Business is a managed assistant that reasons over connected enterprise data, and PartyRock is a no-code playground for quickly building and sharing generative AI apps.\nMatching each name to its purpose pins down the level it operates at, from raw model APIs to a finished assistant. A common mistake is to treat Bedrock and SageMaker JumpStart as interchangeable, but Bedrock is API-first access to managed models while JumpStart targets ML practitioners who want to deploy and customize models themselves.",
+    "isMultiAnswer": false,
+    "taskStatement": "2.3",
+    "lastVerified": "2026-06-13",
+    "services": []
   }
 ]

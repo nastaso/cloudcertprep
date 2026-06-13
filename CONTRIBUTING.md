@@ -45,14 +45,48 @@ Every question lives in `src/data/<cert-code>/domain<N>.json` as an array entry:
 }
 ```
 
+#### Ordering and matching questions
+
+Some certs (AIF-C01) also use **ordering** (arrange steps into a sequence) and **matching** (pair each left item with a right item). These add an explicit `type` discriminator and their own correct-answer fields; `answer` is unused (set it to `""`). `isMultiAnswer` stays `false`.
+
+```jsonc
+// ORDERING: options are the steps (keys A-E); correctOrder is the right sequence of keys.
+{
+  "id": "aif-q457",
+  "type": "ordering",
+  "question": "Arrange the ML lifecycle stages from first to last.",
+  "options": { "A": "Train", "B": "Prepare data", "C": "Deploy", "D": "Define the problem" },
+  "correctOrder": ["D", "B", "A", "C"],   // A permutation of EVERY option key.
+  "answer": "",
+  "isMultiAnswer": false,
+  "explanation": "..."
+}
+
+// MATCHING: options are the left column (A-E); targets are the right column (1-5);
+// correctMatches pairs every option key to a target key.
+{
+  "id": "aif-q460",
+  "type": "matching",
+  "question": "Match each service to its purpose.",
+  "options": { "A": "Amazon Bedrock", "B": "Amazon Q Business" },
+  "targets": { "1": "Generative AI assistant over enterprise data", "2": "Foundation-model API access" },
+  "correctMatches": { "A": "2", "B": "1" },
+  "answer": "",
+  "isMultiAnswer": false,
+  "explanation": "..."
+}
+```
+
 ### Validation rules (enforced by `npm run validate`)
 
-- Every entry must have: `id`, `question`, `options`, `answer`, `explanation`.
+- Every entry must have: `id`, `question`, `options`, `explanation` (plus the correct-answer field for its `type`).
 - IDs must be unique across the entire cert (across all domain files for that cert).
 - `options` must have at least 2 non-empty keys, and keys must be in `A` to `E`.
 - For single-answer: `answer` is a string matching one of the option keys.
 - For multi-answer: `isMultiAnswer: true` and `answer` is an array of 2+ keys, all matching options.
-- `explanation` should be non-empty (warning, not error).
+- For `type: "ordering"`: `correctOrder` is an array that is a permutation of every non-empty option key.
+- For `type: "matching"`: `targets` has keys `1`-`5`, and `correctMatches` maps every option key to a valid target key.
+- `explanation` should be non-empty (warning, not error); live banks require exactly two paragraphs (one `\n`).
 - No em dashes (use ASCII punctuation: `,`, `.`, `:`, `;`, ` - `).
 
 Run validation locally before opening a PR:
