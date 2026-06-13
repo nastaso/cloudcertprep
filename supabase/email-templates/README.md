@@ -82,12 +82,18 @@ far more for the score.
 A perfect template still lands in spam without sending-domain auth. mail-tester
 scores SpamAssassin rules + SPF/DKIM/DMARC. To hit ~10/10:
 
-1. **Custom SMTP on a verified subdomain.** Supabase's built-in email is shared
+> **Current setup:** cloudcertprep.io sends through **Brevo**, wired as Supabase's
+> **custom SMTP relay**. Supabase still renders these templates (they are pasted in
+> the dashboard, see the map above) and hands each message to Brevo for delivery.
+> The steps below describe that pattern generically so a fork can use any provider;
+> credentials live only in the Supabase dashboard, never in this repo.
+
+1. **Custom SMTP on a verified domain.** Supabase's built-in email is shared
    and rate-limited and you cannot fully control its SPF/DKIM/DMARC. Use a
-   provider (SES / Postmark / Resend) on e.g. `mail.cloudcertprep.io`.
+   provider (here: Brevo; alternatives SES / Postmark / Resend).
    Authentication > Emails > SMTP Settings -> enter the provider host/port/user/
    pass; set Sender name `CloudCertPrep` and Sender email
-   `no-reply@cloudcertprep.io` (or `@mail.cloudcertprep.io`).
+   `no-reply@cloudcertprep.io` (or a verified sending subdomain).
 2. **DNS auth on that domain, all passing:**
    - **SPF** TXT authorizing the provider's sending hosts.
    - **DKIM** CNAME/TXT keys from the provider, verified.

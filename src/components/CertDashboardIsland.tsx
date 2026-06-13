@@ -29,6 +29,7 @@ import { formatDuration } from '../lib/scoring'
 import { logError } from '../lib/logger'
 import { CERTIFICATIONS } from '../data/certifications'
 import { LEVEL_ACCENT_HEX } from '../lib/levelAccent'
+import { calculateDomainMastery } from '../lib/domainStats'
 import type { DomainProgress } from '../types'
 
 /** Minimal domain shape needed by the dashboard sidebar. */
@@ -247,12 +248,16 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
             {cert.domains.map(domain => {
               const progress = domainProgress.find(d => d.domain_id === domain.id)
-              // Clamp every displayed figure to the current bank: a stale
-              // domain_progress row (written before a bank trim) must never
-              // render >100% mastery or "91 of 78 practised".
-              const mastery = Math.min(100, Math.round(progress?.mastery_percent || 0))
+              // Cap displayed figures to the current bank, and DERIVE mastery from
+              // the bank-capped `correct` below rather than the stored mastery_percent.
+              // The stored value goes stale when the bank changes (questions added/
+              // moved/removed) and, once clamped, would render a misleading e.g. 100%
+              // next to "81 of 133 correct". updateDomainProgress rewrites the stored
+              // value correctly on the next practice session; the one-time cleanup
+              // (08/22) fixes existing rows in bulk.
               const attempted = Math.min(progress?.questions_attempted || 0, domain.questionCount)
               const correct = Math.min(progress?.questions_correct || 0, attempted)
+              const mastery = calculateDomainMastery(correct, domain.id, cert.code)
               return (
                 <div key={domain.id} className="bg-bg-card border border-border-hairline rounded-2xl p-5 md:p-6">
                   <div className="flex items-start justify-between gap-4">

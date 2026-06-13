@@ -15,7 +15,6 @@
  * Satisfies: R6.1, R6.4, R6.10, R2.9, R10.6, R13.2.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro'
-import Button from '../../components/Button.astro'
 import Breadcrumb from '../../components/Breadcrumb.astro'
 import ComingSoonBanner from '../../components/ComingSoonBanner.astro'
 import AboutCard from '../../components/landing/AboutCard.astro'
@@ -163,18 +162,6 @@ const certForIsland = {
     questionCount: d.questionCount,
   })),
 }
-
-// lucide check path data for hero bullets.
-const checkIcon = '<polyline points="20 6 9 17 4 12"></polyline>'
-
-const heroBullets = isComingSoon
-  ? []
-  : [
-      `${cert.examQuestionCount} questions`,
-      `${examMinutes} minutes`,
-      `Pass at ${cert.passingScore}/1000`,
-      '100% free',
-    ]
 
 // Cert-level secondary keyword (R13.2). The lowest-difficulty commercial-intent
 // term for each active cert ("clf c02 practice exam" KD 2, vol 70; the parallel

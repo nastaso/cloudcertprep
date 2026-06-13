@@ -115,9 +115,8 @@ export function DomainPractice() {
   useSEO({
     title: pageTitle,
     description: `Practice ${cert.name} (${cert.shortName}) questions by exam domain. Instant feedback, explanations, adaptive spaced repetition. Domains: ${domainNames}.`,
-    // Canonical stays on the URL for both guests and authed users so the
-    // page accumulates the same SEO equity whether the visitor sees the
-    // auth wall or the actual practice flow.
+    // Guests and signed-in users get the same treatment here: both see the
+    // real practice flow (there is no guest gate).
     // NOTE: this route ships robots=noindex (set on the Astro shell), so it
     // must NOT emit a canonical — noindex+canonical is contradictory and a
     // noindex page accrues no indexing equity. BaseLayout omits the canonical
@@ -127,9 +126,7 @@ export function DomainPractice() {
 
   // Preload questions when domain is selected (before user clicks Start).
   // This hides network latency — the chunk will be cached by the time
-  // they start. Only authed users reach this hook in any meaningful way
-  // (guests are blocked by the auth wall below) but the hook itself is
-  // always called to keep hook order consistent across renders.
+  // they start. Runs for guests and signed-in users alike (both practice).
   useEffect(() => {
     if (selectedDomain) {
       loadDomainQuestions(cert.code, selectedDomain).catch(() => {
@@ -204,14 +201,12 @@ export function DomainPractice() {
   }
 
   // Guests and signed-in users see the same selection screen (domain
-  // card grid + Back to home button) for visual consistency and SEO —
-  // crawlers see real cert-specific content rather than a thin gate.
-  // The gate itself is enforced inside `selectDomain` above: clicking
-  // a card as a guest triggers `goToLogin` instead of advancing screens.
-  // A sibling `UnlockCTA` card below the selection card explains the
-  // gating before the user clicks. The `authLoading` skeleton stays as
-  // an early-return below since it must run AFTER every hook so React's
-  // hook order remains consistent across renders.
+  // card grid + Back to home button) and the same practice flow — there
+  // is no guest gate; crawlers see real cert-specific content. A sibling
+  // `UnlockCTA` card below the selection card nudges guests to sign in to
+  // save mastery (it does not block practice). The `authLoading` skeleton
+  // stays as an early-return below since it must run AFTER every hook so
+  // React's hook order remains consistent across renders.
   if (authLoading) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
