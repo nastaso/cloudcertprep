@@ -1,0 +1,117 @@
+---
+/**
+ * ExamRealismTable.astro — "How Our Practice Exams Match the Real Exam"
+ * comparison table. Renders the published exam logistics (from the
+ * Cert_Registry's `examFormat`) side-by-side with the CloudCertPrep practice
+ * experience so crawlers and LLM browse-mode read a concrete realism claim
+ * grounded in the official exam guide.
+ *
+ * Prerendered HTML only — no island, no client JS.
+ *
+ * Guard: renders nothing when `cert.examFormat` is undefined (SAA-C03 and any
+ * future cert that has not had its format verified), so the page never crashes
+ * on a missing field. (R23.1)
+ */
+import { getCertTotalQuestions, type Certification } from '../data/certifications'
+
+interface Props {
+  cert: Certification
+}
+
+const { cert } = Astro.props
+const examFormat = cert.examFormat
+---
+
+{examFormat && (() => {
+  // Title-case the published question-type vocabulary for display.
+  const fmtTypes = (types: string[]) =>
+    types.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(', ')
+  const realTypesLabel = fmtTypes(examFormat.questionTypes)
+  // What CloudCertPrep actually offers (falls back to full parity when the
+  // cert does not distinguish). When the two differ, the table is honest that
+  // some real-exam formats are not yet in the practice bank.
+  const oursTypes = examFormat.practiceQuestionTypes ?? examFormat.questionTypes
+  const oursTypesLabel = fmtTypes(oursTypes)
+  const typesDiffer = oursTypesLabel !== realTypesLabel
+
+  // Scale ceiling for the passing-score cell, e.g. '100-1000' -> '1000'.
+  const scaleMax = examFormat.scoringScale.split('-').pop() ?? '1000'
+
+  // Our mock-exam logistics, sourced from the same registry.
+  const mockMinutes = Math.round(cert.examTimeSeconds / 60)
+  const totalQuestions = getCertTotalQuestions(cert.code)
+  const totalQuestionsLabel = totalQuestions.toLocaleString('en-US')
+
+  const rows = [
+    {
+      feature: 'Exam length',
+      real: `${examFormat.questionCount} questions`,
+      ours: `${cert.examQuestionCount}-question timed mock exam`,
+    },
+    {
+      feature: 'Time limit',
+      real: `${examFormat.timeMinutes} minutes`,
+      ours: `${mockMinutes} minutes`,
+    },
+    {
+      feature: 'Passing score',
+      real: `${examFormat.passingScore} / ${scaleMax}`,
+      ours: `${cert.passingScore} / ${scaleMax}`,
+    },
+    {
+      feature: 'Scoring scale',
+      real: `${examFormat.scoringScale} scaled`,
+      ours: `${examFormat.scoringScale} scaled`,
+    },
+    {
+      feature: 'Question types',
+      real: realTypesLabel,
+      ours: oursTypesLabel,
+    },
+    {
+      feature: 'Question pool',
+      real: 'One timed sitting',
+      ours: `${totalQuestionsLabel}+ questions, unlimited free attempts`,
+    },
+  ]
+
+  return (
+    <section aria-labelledby="exam-realism-heading" class="mt-8 md:mt-12">
+      <p class="kicker" aria-hidden="true">Exam realism</p>
+      <h2 id="exam-realism-heading" class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-2">
+        How Our Practice Exams Match the Real Exam
+      </h2>
+      <p class="text-lead mb-6 max-w-2xl">
+        Our {cert.shortName} mock exams mirror the format of the real {cert.name} exam, sourced from the official AWS exam guide.
+      </p>
+
+      <div class="bg-bg-card rounded-2xl border border-border-hairline shadow-card overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm md:text-base">
+          <thead>
+            <tr class="border-b border-border-hairline">
+              <th scope="col" class="px-4 md:px-6 py-3 font-semibold text-text-primary">Feature</th>
+              <th scope="col" class="px-4 md:px-6 py-3 font-semibold text-text-primary">Real Exam</th>
+              <th scope="col" class="px-4 md:px-6 py-3 font-semibold text-text-primary">CloudCertPrep</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => (
+              <tr class={i < rows.length - 1 ? 'border-b border-border-hairline/60' : ''}>
+                <th scope="row" class="px-4 md:px-6 py-3.5 font-medium text-text-primary align-top">
+                  {row.feature}
+                </th>
+                <td class="px-4 md:px-6 py-3.5 align-top font-mono text-[13px] md:text-sm text-text-muted">{row.real}</td>
+                <td class="px-4 md:px-6 py-3.5 align-top font-mono text-[13px] md:text-sm text-text-muted">{row.ours}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {typesDiffer && (
+        <p class="text-text-muted text-xs md:text-sm mt-3 max-w-2xl">
+          The real {cert.shortName} exam also includes {realTypesLabel.toLowerCase()} formats. CloudCertPrep currently offers {oursTypesLabel.toLowerCase()} questions; additional formats are on the roadmap.
+        </p>
+      )}
+    </section>
+  )
+})()}

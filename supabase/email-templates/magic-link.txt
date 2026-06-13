@@ -1,0 +1,12 @@
+Sign in to CloudCertPrep
+
+Open the link below to sign in. No password needed.
+
+Sign in:
+{{ .ConfirmationURL }}
+
+If you did not request this link, you can safely ignore this email. The link
+expires shortly and can be used only once.
+
+CloudCertPrep - Free AWS certification practice exams
+Questions? Reply to this email or contact alex@cloudcertprep.io

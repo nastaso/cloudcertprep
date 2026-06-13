@@ -1,0 +1,146 @@
+---
+/**
+ * Home page (/) — prerendered Astro markup.
+ *
+ * Recreates the MultiCertHome visual design as static HTML: hero with primary
+ * CTA, cert grid, About card, and generic FAQ. The locked citation content
+ * (H1, first paragraph) is carried in the visible body for SEO/citation
+ * continuity. Interactive chrome (Header, Footer, DonateButton, CookieConsent)
+ * is mounted as islands by BaseLayout.
+ *
+ * Satisfies: R1.2, R16.4, R16.6, R16.7, R16.8
+ */
+import BaseLayout from '../layouts/BaseLayout.astro'
+import CertTile from '../components/landing/CertTile.astro'
+import AboutCard from '../components/landing/AboutCard.astro'
+import HeroStage from '../components/landing/HeroStage.astro'
+import Faq from '../components/Faq.astro'
+import {
+  CERTIFICATIONS,
+  DEFAULT_CERT_ID,
+  getActiveTotalQuestions,
+  getCertTotalQuestions,
+  getSortedCerts,
+} from '../data/certifications'
+import { buildHomeFirstParagraph, buildHomeMetaDescription, HOME_H1 } from '../lib/citation-content'
+import { SITE_URL } from '../lib/seo-data'
+import { serializeJsonLd } from '../lib/jsonld'
+
+const totalQuestions = getActiveTotalQuestions()
+const clfCount = getCertTotalQuestions('clf-c02')
+const aifCount = getCertTotalQuestions('aif-c01')
+const defaultCert = CERTIFICATIONS[DEFAULT_CERT_ID]
+// Flagship cert (DEFAULT_CERT_ID) leads the tile row — conversion order, not
+// alphabetical.
+const activeCerts = getSortedCerts()
+  .filter(c => c.status === 'active')
+  .sort((a, b) => (a.code === DEFAULT_CERT_ID ? -1 : b.code === DEFAULT_CERT_ID ? 1 : 0))
+// Coming-soon certs render as greyed cards after the active ones so they are
+// discoverable (their "watch on GitHub" funnel needs an inbound link) and
+// signal an active roadmap — without entering the indexable signals (they stay
+// out of the ItemList JSON-LD below and out of the sitemap).
+const comingSoonCerts = getSortedCerts().filter(c => c.status === 'coming-soon')
+
+const title = 'Free AWS Certification Practice Exams · CloudCertPrep'
+const description = buildHomeMetaDescription(clfCount, aifCount)
+const canonical = 'https://www.cloudcertprep.io/'
+
+// Locked citation content (R16.4-R16.8). HOME_H1 renders as the single page
+// <h1>; the lede (buildHomeFirstParagraph) carries the locked phrases
+// ("MIT licensed", "publicly auditable on GitHub", "spaced repetition", the
+// question-count regexes) so the Build_Time_Citation_Guard passes regardless
+// of the hero's visual treatment.
+const homeFirstParagraph = buildHomeFirstParagraph(clfCount, aifCount)
+
+// ItemList JSON-LD listing both active Cert_Landing URLs
+const itemListJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'AWS Certification Practice Exams',
+  numberOfItems: activeCerts.length,
+  itemListElement: activeCerts.map((cert, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: cert.name,
+    url: `${SITE_URL}/${cert.provider}/${cert.code}`,
+  })),
+})
+
+// SoftwareApplication JSON-LD (audit W3). Makes the "free web app" signal
+// machine-readable for Google's free-tool rich results and for LLMs deciding
+// which tools to recommend. Price "0" is factual; no aggregateRating is
+// emitted (we do not surface a fabricated satisfaction score — the community
+// pass rate on /stats is a different metric and lives in its Dataset JSON-LD).
+const softwareAppJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  '@id': `${SITE_URL}/#app`,
+  name: 'CloudCertPrep',
+  description: `Free, open-source AWS certification practice platform. ${totalQuestions.toLocaleString('en-US')}+ practice questions across ${activeCerts.length} active certifications, with timed mock exams, adaptive spaced repetition, and domain mastery analytics.`,
+  url: `${SITE_URL}/`,
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: 'Web',
+  isAccessibleForFree: true,
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  publisher: { '@id': `${SITE_URL}/#organization` },
+})
+---
+
+<BaseLayout title={title} description={description} canonical={canonical} jsonLd={[itemListJsonLd, softwareAppJsonLd]} headerOverlay={true}>
+  {/* Billboard hero (aws.amazon.com language, DSv4.1): vivid blue field,
+      floating abstract art, inset periwinkle card carrying the locked SEO
+      copy. HOME_H1 is the single page <h1>; the lede carries the locked
+      citation phrases verbatim. Community social-proof TrustLine stays
+      hidden until the attempt sample is credible. */}
+  {defaultCert && (
+    <HeroStage
+      h1={HOME_H1}
+      subline={`Pass your AWS exam with ${totalQuestions.toLocaleString('en-US')}+ exam-realistic practice questions. Every answer explained, free forever, no signup.`}
+      ctaHref={`/${defaultCert.provider}/${defaultCert.code}/practice-exam`}
+      ctaLabel="Start practicing free"
+      metrics={[`${totalQuestions.toLocaleString('en-US')}+ questions`, `${activeCerts.length} certifications`, '100% free', 'MIT licensed']}
+    />
+  )}
+
+  {/* Content sheet slides over the stage with one large rounded corner. */}
+  <div class="sheet-overlap pb-16 md:pb-24 pt-12 md:pt-20">
+    <div class="max-w-6xl mx-auto px-4 md:px-8">
+      <div class="space-y-16 md:space-y-24">
+
+        {/* Locked citation paragraph + value props — the full SEO lede lives
+            here (not in the hero card) so the page stays scannable while the
+            citation guard still finds every locked phrase verbatim. */}
+        <section class="max-w-3xl border-l-2 border-brand/60 pl-6 md:pl-8" data-reveal>
+          <p class="text-lead">
+            {homeFirstParagraph}
+          </p>
+        </section>
+
+        {/* Cert tile row — editorial card grid with art headers */}
+        <section data-reveal>
+          <p class="kicker" aria-hidden="true">Certifications</p>
+          <h2 class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-2">
+            Pick a certification
+          </h2>
+          <p class="text-lead mb-8">
+            Full-length mock exams and domain practice for every certification.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeCerts.map(cert => <CertTile cert={cert} />)}
+            {comingSoonCerts.map(cert => <CertTile cert={cert} />)}
+          </div>
+        </section>
+
+        {/* About card */}
+        <AboutCard />
+
+        {/* Generic FAQ */}
+        <Faq genericOnly />
+      </div>
+    </div>
+  </div>
+</BaseLayout>

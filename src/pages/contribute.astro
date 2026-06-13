@@ -1,0 +1,139 @@
+---
+/**
+ * Contribute (/contribute) — genuine prerendered Astro markup.
+ *
+ * The top of the open-source contribution funnel: explains how to add or fix
+ * questions, report errors, write blog content, and contribute code. Links
+ * into CONTRIBUTING.md and the good-first-issue filter on GitHub Issues.
+ *
+ * Satisfies: R22.1, R22.3.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro'
+import Breadcrumb from '../components/Breadcrumb.astro'
+import HeroMini from '../components/landing/HeroMini.astro'
+import { GITHUB_REPO_URL, GITHUB_ISSUES_URL } from '../lib/constants'
+import { SITE_URL } from '../lib/seo-data'
+import { serializeJsonLd } from '../lib/jsonld'
+
+const canonical = `${SITE_URL}/contribute`
+const contributingUrl = `${GITHUB_REPO_URL}/blob/main/CONTRIBUTING.md`
+const goodFirstIssuesUrl = `${GITHUB_ISSUES_URL}?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22`
+const dataDirUrl = `${GITHUB_REPO_URL}/tree/main/src/data`
+
+const breadcrumbItems = [
+  { label: 'Home', to: '/' },
+  { label: 'Contribute' },
+]
+
+const sectionHeading = 'text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary'
+const bodyText = 'text-text-muted text-base md:text-lg leading-[1.7]'
+const link = 'text-text-primary hover:text-text-primary/70 underline'
+
+// Page-specific structured data (audit W14): a HowTo describing the
+// contribution workflow, plus a WebPage node tying the page to the
+// Organization. Makes the contribution funnel machine-readable for search +
+// LLMs ("how to contribute to open-source AWS practice questions").
+const contributeJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  '@id': `${canonical}#how-to-contribute`,
+  name: 'How to contribute to CloudCertPrep',
+  description:
+    'Ways to contribute to CloudCertPrep, the MIT-licensed open-source AWS certification practice platform: add or improve questions, report errors, write study content, or contribute code.',
+  mainEntityOfPage: canonical,
+  publisher: { '@id': `${SITE_URL}/#organization` },
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Add or improve questions',
+      text: 'Question banks live as plain JSON under src/data, one file per exam domain. Add or correct questions following the schema in CONTRIBUTING.md and open a pull request; the automated validator checks your additions before review.',
+      url: `${canonical}#add-questions`,
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Report an error',
+      text: 'Found a wrong answer or a typo? Open a GitHub issue describing the question and the correction so a maintainer or contributor can fix it.',
+      url: `${canonical}#report-error`,
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Write study content',
+      text: 'Contribute blog articles and study guides as Markdown with validated frontmatter. Posts are reviewed via pull request and published to the blog.',
+      url: `${canonical}#write-content`,
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Contribute code',
+      text: 'Pick up a good first issue, fork the repository, and open a pull request. The codebase is MIT licensed and built in the open on GitHub.',
+      url: `${canonical}#contribute-code`,
+    },
+  ],
+})
+---
+
+<BaseLayout
+  title="Contribute to CloudCertPrep · Open-Source AWS Practice Exams"
+  description="Help build CloudCertPrep: add or fix practice questions, report errors, write study content, or contribute code. MIT licensed and community-maintained on GitHub."
+  canonical={canonical}
+  jsonLd={[contributeJsonLd]}
+  headerOverlay={true}
+>
+  <Breadcrumb items={breadcrumbItems} visuallyHidden />
+
+  <HeroMini
+    kicker="Open source"
+    title="Contribute to CloudCertPrep"
+    lede="MIT licensed and built in the open. Contributions of every size are welcome, from fixing a single typo to adding a whole certification."
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'Contribute' }]}
+    maxWidth="max-w-3xl"
+  />
+
+  <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
+    <div class="max-w-3xl mx-auto px-4 md:px-8">
+      <div class="space-y-10 max-w-[68ch] mx-auto">
+        <p class={bodyText}>
+          Every question, explanation, and line of code is public on{' '}
+          <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class={link}>GitHub</a>. The fastest way to start is to pick up a{' '}
+          <a href={goodFirstIssuesUrl} target="_blank" rel="noopener noreferrer" class={link}>good first issue</a>.
+        </p>
+
+        <section id="add-questions" class="space-y-3">
+          <h2 class={sectionHeading}>Add or improve questions</h2>
+          <p class={bodyText}>
+            Question banks live as plain JSON under{' '}
+            <a href={dataDirUrl} target="_blank" rel="noopener noreferrer" class={link}>src/data</a>, one file per exam domain. Every question is aligned to the official AWS exam guide and ships with a detailed explanation. The contribution workflow, the question schema, and the validator rules are documented in{' '}
+            <a href={contributingUrl} target="_blank" rel="noopener noreferrer" class={link}>CONTRIBUTING.md</a>. Open a pull request and the automated validator checks your additions before review.
+          </p>
+        </section>
+
+        <section id="report-error" class="space-y-3">
+          <h2 class={sectionHeading}>Report an error</h2>
+          <p class={bodyText}>
+            Spotted a wrong answer, an outdated service name, or a confusing explanation? Open an issue on{' '}
+            <a href={GITHUB_ISSUES_URL} target="_blank" rel="noopener noreferrer" class={link}>GitHub Issues</a>. Every sample question on the site also has a "Suggest a fix on GitHub" link that pre-fills the issue with the exact question reference, so reporting takes seconds.
+          </p>
+        </section>
+
+        <section id="write-content" class="space-y-3">
+          <h2 class={sectionHeading}>Write study content</h2>
+          <p class={bodyText}>
+            The{' '}
+            <a href="/blog" class={link}>blog</a>{' '}
+            covers exam strategy, domain deep-dives, and career topics. If you want to write a guide, open an issue describing the topic and we will line it up against the editorial calendar. Posts are Markdown with a small frontmatter schema; no build tooling knowledge required.
+          </p>
+        </section>
+
+        <section id="contribute-code" class="space-y-3">
+          <h2 class={sectionHeading}>Contribute code</h2>
+          <p class={bodyText}>
+            The platform is built with Astro and React. Bug fixes, accessibility improvements, and new features are all welcome. Start with a{' '}
+            <a href={goodFirstIssuesUrl} target="_blank" rel="noopener noreferrer" class={link}>good first issue</a>{' '}
+            or open one to propose something new. See{' '}
+            <a href={contributingUrl} target="_blank" rel="noopener noreferrer" class={link}>CONTRIBUTING.md</a>{' '}
+            for the local development setup.
+          </p>
+        </section>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

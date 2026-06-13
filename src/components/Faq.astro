@@ -1,0 +1,162 @@
+---
+/**
+ * Faq.astro — prerendered FAQ section that mirrors the FAQPage JSON-LD.
+ * Native <details>/<summary> (zero JS), emits FAQPage JSON-LD that matches
+ * the visible entries.
+ *
+ * Two render modes:
+ *
+ *   1. Registry-driven (default). Reads FAQ_ENTRIES from seo-data.ts and
+ *      groups by category. Used by /, the cert landings, etc.
+ *      Props: { certCode?, genericOnly? }
+ *
+ *   2. Custom-entries. The caller passes a flat list of {question, answer};
+ *      no grouping, no registry lookup. Used by per-domain pages whose FAQ
+ *      content is page-specific. Props: { entries, headingId?, headingLabel? }
+ *
+ * Satisfies: R6.20, R6.10 (FAQPage JSON-LD parity).
+ */
+import { FAQ_ENTRIES, FAQ_CATEGORY_LABEL, FAQ_CATEGORY_ORDER } from '../lib/seo-data'
+import { serializeJsonLd } from '../lib/jsonld'
+
+interface SimpleEntry {
+  question: string
+  answer: string
+}
+
+interface Props {
+  certCode?: string
+  genericOnly?: boolean
+  /** Custom entries override the registry. Flat (no category grouping). */
+  entries?: SimpleEntry[]
+  /** Heading id used by aria-labelledby (defaults to "faq-heading"). */
+  headingId?: string
+  /** Visible heading text (defaults to "Frequently asked questions"). */
+  headingLabel?: string
+}
+
+const {
+  certCode,
+  genericOnly,
+  entries: customEntries,
+  headingId = 'faq-heading',
+  headingLabel = 'Frequently asked questions',
+} = Astro.props
+
+const useCustom = !!customEntries
+
+const registryEntries = useCustom
+  ? []
+  : genericOnly
+    ? FAQ_ENTRIES.filter(e => !e.certCode)
+    : certCode
+      ? FAQ_ENTRIES.filter(e => !e.certCode || e.certCode === certCode)
+      : FAQ_ENTRIES
+
+const grouped = useCustom
+  ? []
+  : FAQ_CATEGORY_ORDER.map(category => ({
+      category,
+      entries: registryEntries.filter(e => e.category === category),
+    })).filter(g => g.entries.length > 0)
+
+const faqJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: (useCustom ? customEntries! : registryEntries).map(entry => ({
+    '@type': 'Question',
+    name: entry.question,
+    acceptedAnswer: { '@type': 'Answer', text: entry.answer },
+  })),
+})
+
+// Split bare URLs in an answer into linkable fragments.
+function splitLinks(text: string): Array<{ text: string; isLink: boolean }> {
+  return text.split(/(https?:\/\/[^\s)]+)/g).filter(Boolean).map(part => ({
+    text: part,
+    isLink: part.startsWith('http://') || part.startsWith('https://'),
+  }))
+}
+
+const chevron = '<polyline points="6 9 12 15 18 9"></polyline>'
+---
+
+<section aria-labelledby={headingId} class="mt-8 md:mt-12 max-w-3xl mx-auto">
+  <script type="application/ld+json" set:html={faqJsonLd} />
+  <div class="text-center mb-10 md:mb-12">
+    <p class="kicker" aria-hidden="true">FAQ</p>
+    <h2 id={headingId} class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary">
+      {headingLabel}
+    </h2>
+    <p class="mt-4 text-base leading-relaxed text-text-muted max-w-[42ch] mx-auto">
+      Something not covered? <a href="https://github.com/nastaso/cloudcertprep/issues" target="_blank" rel="noopener noreferrer" class="text-link underline underline-offset-2 hover:text-link/80">Open an issue</a> and we will answer it.
+    </p>
+  </div>
+
+  <div>
+  {useCustom ? (
+    <div class="border-t border-border-hairline">
+      {customEntries!.map(entry => (
+        <details class="group border-b border-border-hairline" name={headingId}>
+          <summary class="flex items-center justify-between gap-6 py-5 md:py-6 cursor-pointer list-none text-base md:text-lg font-medium text-text-primary/90 hover:text-text-primary transition-colors duration-200 focus-visible:outline-none focus-visible:text-brand">
+            <span>{entry.question}</span>
+            <span class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-border-hairline text-text-muted transition-[transform,color,border-color] duration-300 ease-out group-open:rotate-180 group-hover:border-text-muted/60">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" set:html={chevron} />
+            </span>
+          </summary>
+          <div class="pb-6 md:pb-7 pr-12 text-base leading-[1.7] text-text-muted max-w-3xl">
+            <p>{entry.answer}</p>
+          </div>
+        </details>
+      ))}
+    </div>
+  ) : (
+    <div class="space-y-12">
+      {grouped.map(({ category, entries }) => (
+        <div>
+          <h3 class="font-mono text-[12px] uppercase tracking-[0.18em] text-text-muted mb-2">
+            {FAQ_CATEGORY_LABEL[category]}
+          </h3>
+          <div class="border-t border-border-hairline">
+            {entries.map(entry => (
+              <details class="group border-b border-border-hairline" name={`faq-${category}`}>
+                <summary class="flex items-center justify-between gap-6 py-5 md:py-6 cursor-pointer list-none text-base md:text-lg font-medium text-text-primary/90 hover:text-text-primary transition-colors duration-200 focus-visible:outline-none focus-visible:text-brand">
+                  <span>{entry.question}</span>
+                  <span class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-border-hairline text-text-muted transition-[transform,color,border-color] duration-300 ease-out group-open:rotate-180 group-hover:border-text-muted/60">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" set:html={chevron} />
+                  </span>
+                </summary>
+                <div class="pb-6 md:pb-7 pr-12 text-base leading-[1.7] text-text-muted max-w-3xl space-y-3">
+                  {entry.steps ? (
+                    <>
+                      <p>{entry.steps.intro}</p>
+                      <ol class="list-decimal list-outside pl-5 space-y-2 marker:text-text-muted">
+                        {entry.steps.items.map(item => (
+                          <li>
+                            {splitLinks(item).map(frag => frag.isLink
+                              ? <a href={frag.text} target="_blank" rel="noopener noreferrer" class="text-link underline underline-offset-2 hover:text-link/80 break-all">{frag.text}</a>
+                              : <span>{frag.text}</span>
+                            )}
+                          </li>
+                        ))}
+                      </ol>
+                      {entry.steps.outro && <p>{entry.steps.outro}</p>}
+                    </>
+                  ) : (
+                    <p>
+                      {splitLinks(entry.answer).map(frag => frag.isLink
+                        ? <a href={frag.text} target="_blank" rel="noopener noreferrer" class="text-link underline underline-offset-2 hover:text-link/80 break-all">{frag.text}</a>
+                        : <span>{frag.text}</span>
+                      )}
+                    </p>
+                  )}
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+  </div>
+</section>

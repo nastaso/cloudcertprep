@@ -1,11 +1,11 @@
 {
-  "name": "CloudCertPrep · Free AWS Practice Exams",
+  "name": "CloudCertPrep · Free Cloud Certification Practice Exams",
   "short_name": "CloudCertPrep",
-  "description": "Free AWS Cloud Practitioner (CLF-C02) practice exams. 1,050+ questions, timed mock exams, domain practice with adaptive spaced repetition. No signup, no ads.",
+  "description": "Free cloud certification practice exams across 2 active certifications (1,469+ questions). Timed mock exams, domain practice with adaptive spaced repetition, and progress tracking. No signup, no ads.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F5F5F4",
-  "theme_color": "#EA8C00",
+  "background_color": "#F8F9FA",
+  "theme_color": "#FF9900",
   "icons": [
     {
       "src": "/favicon.svg",
@@ -13,9 +13,21 @@
       "type": "image/svg+xml"
     },
     {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "/apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

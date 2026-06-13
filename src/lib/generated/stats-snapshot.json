@@ -1,0 +1,18 @@
+{
+  "_comment": "AUTO-UPDATED by scripts/generate-stats-snapshot.mjs from the live get_public_exam_stats() RPC at prebuild. The committed fallback is restored only when build-time DB access is unavailable (R2.12).",
+  "generatedAt": "2026-06-06",
+  "source": "live-rpc",
+  "overall": {
+    "passRatePercent": 74,
+    "averageScaledScore": 839,
+    "attemptsCompleted": 23
+  },
+  "certs": [
+    {
+      "certCode": "clf-c02",
+      "passRatePercent": 74,
+      "averageScaledScore": 839,
+      "attemptsCompleted": 23
+    }
+  ]
+}

@@ -73,6 +73,16 @@ Primary key: `(user_id, cert_code, domain_id)`.
 
 **RLS:** enabled. `auth.uid() = user_id`.
 
+> **Known live-schema gotcha (found 2026-06-12):** production carries a CLF-era check constraint
+> `domain_progress_domain_id_check` that **rejects `domain_id = 5`** (23514), so AIF-C01 domain-5
+> progress upserts fail silently (the app only logs). `attempt_questions` is not affected. Fix
+> (pending owner run — see `.kiro/ship-v2/08-owner-action-items.md`):
+>
+> ```sql
+> ALTER TABLE public.domain_progress DROP CONSTRAINT domain_progress_domain_id_check;
+> ALTER TABLE public.domain_progress ADD CONSTRAINT domain_progress_domain_id_check CHECK (domain_id >= 1);
+> ```
+
 ---
 
 ### `platform_stats`
@@ -139,10 +149,12 @@ Full source: see `src/pages/Stats.tsx` for the call site. If you change the func
 
 ## How schema changes are made today
 
-There is no automated migration tool in the repo. Schema changes happen manually via the **Supabase Dashboard SQL Editor**. When you change the schema:
+The live Supabase database is the **source of truth**. Schema changes happen manually via the **Supabase Dashboard SQL Editor**. When you change the schema:
 
 1. Run the SQL in the Supabase SQL Editor.
 2. Update this README in the same PR so the documentation stays in sync.
 3. Mention the SQL in the PR description so reviewers can copy-paste it into their own Supabase instance.
 
-If we ever outgrow this approach, the next step is to adopt the [Supabase CLI](https://supabase.com/docs/guides/cli/local-development#database-migrations) and store migration files in `supabase/migrations/`.
+A reference sketch of the schema previously lived at `supabase/migrations/00001_initial_schema.sql`. It was deleted because it was non-authoritative — its `question_mastery` view and `get_public_exam_stats()` RPC had two named divergences from production that would silently degrade Domain Practice and the Stats page on a fresh apply.
+
+If we ever outgrow this approach, the next step is to adopt the [Supabase CLI](https://supabase.com/docs/guides/cli/local-development#database-migrations) and generate a canonical migration from the live database.

@@ -1,12 +1,10 @@
 interface ProgressBarProps {
   percent: number
-  color?: string
   showLabel?: boolean
+  label?: string
 }
 
-export function ProgressBar({ percent, color, showLabel = true }: ProgressBarProps) {
-  const hasCustomColor = !!color
-
+export function ProgressBar({ percent, showLabel = true, label }: ProgressBarProps) {
   return (
     <div className="w-full">
       <div
@@ -15,21 +13,16 @@ export function ProgressBar({ percent, color, showLabel = true }: ProgressBarPro
         aria-valuenow={Math.round(percent)}
         aria-valuemin={0}
         aria-valuemax={100}
+        aria-label={label || `${Math.round(percent)}% complete`}
       >
         <div
-          className={`h-full transition-all duration-500 ease-out rounded-full ${!hasCustomColor ? 'bg-aws-orange' : ''}`}
-          style={{
-            width: `${Math.min(100, Math.max(0, percent))}%`,
-            ...(hasCustomColor ? { backgroundColor: color } : {}),
-          }}
+          className="h-full transition-all duration-500 ease-out rounded-full bg-brand"
+          style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
         />
       </div>
       {showLabel && (
         <div className="mt-1 text-right">
-          <span
-            className={`text-sm font-medium ${!hasCustomColor ? 'text-aws-orange' : ''}`}
-            style={hasCustomColor ? { color } : {}}
-          >
+          <span className="text-sm font-medium text-text-primary">
             {Math.round(percent)}%
           </span>
         </div>

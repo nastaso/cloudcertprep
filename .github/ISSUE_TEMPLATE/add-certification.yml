@@ -7,8 +7,8 @@ body:
     id: cert_code
     attributes:
       label: Certification code
-      description: AWS code, e.g. SAA-C03, SAP-C02, DOP-C02. For non-AWS, use any short identifier.
-      placeholder: SAA-C03
+      description: AWS code, e.g. SOA-C02, SAP-C02, DOP-C02. For non-AWS, use any short identifier.
+      placeholder: SOA-C02
     validations:
       required: true
   - type: input

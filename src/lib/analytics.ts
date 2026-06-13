@@ -13,6 +13,7 @@
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void
+    dataLayer?: unknown[]
     umami?: {
       track: (eventOrPath: string, dataOrParams?: Record<string, unknown>) => void
     }
@@ -34,6 +35,43 @@ export function trackPageView(path: string): void {
     window.umami.track(path)
   }
 }
+
+/**
+ * Every event name the platform fires, in one place. This is the authoritative
+ * registry of the analytics namespace: dashboards, the conversion-event smoke
+ * test, and llms/docs all key off this list. Keep it in sync with the
+ * `trackEvent(...)` call sites. Grouped by surface for readability.
+ */
+export const KNOWN_EVENTS = [
+  // Lifecycle / navigation
+  'landing',            // one-shot UTM attribution on first paint
+  'page_view',          // virtual page view on SPA route change
+  'page_not_found',     // 404 page hit
+  // Auth
+  'sign_up',            // email sign-up submitted
+  'sign_in_initiated',  // OAuth button clicked (method: github | google)
+  'sign_in',            // unauth -> auth transition (fired once, any method)
+  'sign_out',           // sign-out
+  // Mock exam flow
+  'exam_started',
+  'exam_abandoned',     // beforeunload during an active exam
+  'timer_expired',      // exam timer hit zero
+  'exam_completed',
+  // Practice + per-question (question_answered is fired by BOTH the domain
+  // practice flow and the mock exam; the `surface` param disambiguates)
+  'practice_started',
+  'question_answered',
+  'practice_completed',
+  // Engagement
+  'cta_start_practice_exam', // primary "Start Practice Exam" CTA
+  'unlock_cta_clicked',      // guest sign-in nudge in practice/exam
+  'report_question_clicked',
+  'donate_click',
+  'github_click',
+  'affiliate_click',    // reserved for the deferred affiliate iteration
+] as const
+
+export type KnownEvent = (typeof KNOWN_EVENTS)[number]
 
 /** Fire a named GA4/Umami event with optional parameters. */
 export function trackEvent(name: string, params?: Record<string, unknown>): void {

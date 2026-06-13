@@ -1,0 +1,352 @@
+---
+import '../index.css'
+import AnalyticsBootstrap from '../components/AnalyticsBootstrap.tsx'
+import Header from '../components/Header.astro'
+import FooterIsland from '../components/FooterIsland.tsx'
+import DonateButtonIsland from '../components/DonateButtonIsland.tsx'
+import CookieConsentIsland from '../components/CookieConsentIsland.tsx'
+import AccountLinkNoticeIsland from '../components/AccountLinkNoticeIsland.tsx'
+import SchemaOrgJsonLd from '../components/SchemaOrgJsonLd.astro'
+import { BASE_GRAPH_NODES } from '../lib/base-graph'
+import { SITE_URL } from '../lib/seo-data'
+
+interface Props {
+  title: string
+  description: string
+  canonical: string
+  ogImage?: string
+  ogType?: string
+  robots?: string
+  jsonLd?: string[]
+  /**
+   * Whether to render the global chrome (Header, Footer, DonateButton).
+   * Interactive island pages that manage their own layout (e.g. the exam
+   * flow) can opt out. Defaults to true. CookieConsent + AnalyticsBootstrap
+   * always render regardless.
+   */
+  showChrome?: boolean
+  /** Whether the Header shows its full nav (cert switcher + links). Default true. */
+  headerShowNav?: boolean
+  /** Billboard overlay header (transparent → frosted on scroll). Hero pages only. */
+  headerOverlay?: boolean
+  /**
+   * Whether the Header sticks to the top of the viewport on scroll. Default
+   * true. Disabled on the mock-exam shell, whose in-page exam toolbar already
+   * owns `sticky top-0`; two sticky bars at top-0 would overlap.
+   */
+  headerSticky?: boolean
+  /**
+   * Hide the mobile hamburger/drawer in the Header. Default false (drawer
+   * shown site-wide). The exam shells (practice-exam, domain-practice) pass
+   * true because the drawer overlaps the in-exam toolbar; everywhere else the
+   * drawer is the only mobile navigation, so it must stay visible.
+   */
+  headerHideMobileMenu?: boolean
+  /**
+   * Render the no-JS site-directory fallback block. Default false: prerendered
+   * marketing/content pages are fully readable without JS, so the directory
+   * would only duplicate content (and a second raw-HTML <h1>) for crawlers.
+   * The interactive island shells (login, reset-password, history,
+   * practice-exam, domain-practice) pass true because their body is empty
+   * without JavaScript.
+   */
+  noscriptDirectory?: boolean
+}
+
+const {
+  title,
+  description,
+  canonical,
+  ogImage = 'https://www.cloudcertprep.io/og-image.png',
+  ogType = 'website',
+  robots = 'index, follow',
+  jsonLd = [],
+  showChrome = true,
+  headerShowNav = true,
+  headerOverlay = false,
+  headerSticky = true,
+  headerHideMobileMenu = false,
+  noscriptDirectory = false,
+} = Astro.props
+
+const umamiWebsiteId = import.meta.env.VITE_UMAMI_WEBSITE_ID ?? ''
+const gaMeasurementId = import.meta.env.VITE_GA_MEASUREMENT_ID ?? ''
+
+// Pre-promotion noindex preview gate (R9.17, Property 7). In any non-production
+// Netlify context (deploy-preview / branch-deploy), netlify.toml sets
+// PUBLIC_NOINDEX=true and the served pages get an X-Robots-Tag: noindex header.
+// We mirror that here so the prerendered HTML itself also carries noindex on
+// the preview, regardless of each page's intended robots value. Production
+// (CONTEXT=production, BRANCH=main) leaves PUBLIC_NOINDEX unset, so indexable
+// routes emit their real robots value untouched.
+const isNoindexPreview = import.meta.env.PUBLIC_NOINDEX === 'true'
+const effectiveRobots = isNoindexPreview ? 'noindex' : robots
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#FF9900" />
+
+    <!-- Preconnect to external origins (improves LCP) -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://cloud.umami.is" />
+    <link rel="dns-prefetch" href="https://cloud.umami.is" />
+
+    <!-- Primary Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <meta name="author" content="Alex Santonastaso" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:site_name" content="CloudCertPrep" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonical} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Additional SEO -->
+    <meta name="robots" content={effectiveRobots} />
+    {/* On noindex previews (branch deploys / deploy previews) the real robots
+        value is preserved here so postbuild guards (validate-internal-graph)
+        can validate the INTENDED production structure. Never emitted in
+        production; crawlers ignore unknown meta names regardless. */}
+    {isNoindexPreview && <meta name="x-intended-robots" content={robots} />}
+    {/* Canonical is suppressed on noindex pages: emitting a self-canonical
+        alongside noindex is a contradictory signal (canonical = "index this as
+        authoritative", noindex = "do not index"). Google's guidance is to omit
+        canonical on noindex pages. (audit W6) */}
+    {!effectiveRobots.includes('noindex') && <link rel="canonical" href={canonical} />}
+
+    {/* Site-wide RSS autodiscovery so feed readers and LLM browse-mode can find
+        the blog feed from any page, not just /blog. (audit W10) */}
+    <link rel="alternate" type="application/rss+xml" title="CloudCertPrep Blog" href={`${SITE_URL}/blog/rss.xml`} />
+
+    {/* TODO(W16): add <meta name="twitter:site"> / <meta name="twitter:creator">
+        once an official X/Twitter handle exists. Not invented here. */}
+
+    <!-- Platform-level structured data (cert-agnostic): WebSite, Organization,
+         and the standalone Person entity that anchors the E-E-A-T signal.
+         Sourced from src/lib/base-graph.ts (single source of truth) and guarded
+         byte-identical across every page by scripts/check-person-graph.mjs. -->
+    {BASE_GRAPH_NODES.map((node) => (
+      <SchemaOrgJsonLd data={node} />
+    ))}
+
+    <!-- Additional per-page JSON-LD -->
+    {jsonLd.map((ld) => (
+      <script type="application/ld+json" set:html={ld} />
+    ))}
+
+    <!-- Umami Analytics (cookieless, GDPR-friendly, runs without consent) -->
+    <script is:inline define:vars={{ umamiWebsiteId }}>
+      (function(){
+        var id=umamiWebsiteId;
+        if(!id||id.charAt(0)==='%')return;
+        var s=document.createElement('script');
+        s.defer=true;
+        s.src='https://cloud.umami.is/script.js';
+        s.setAttribute('data-website-id',id);
+        document.head.appendChild(s);
+      })();
+    </script>
+
+    <!-- Google Analytics (deferred until page is interactive, requires consent) -->
+    <script is:inline define:vars={{ gaMeasurementId }}>
+      (function(){
+        var id=gaMeasurementId;
+        if(!id||id.charAt(0)==='%')return;
+
+        // Check for cookie consent
+        var consent=localStorage.getItem('cloudcertprep_cookie_consent');
+        if(consent!=='accepted')return;
+
+        function load(){
+          window.dataLayer=window.dataLayer||[];
+          window.gtag=function(){dataLayer.push(arguments);};
+          window.gtag('js',new Date());
+          window.gtag('config',id);
+          var s=document.createElement('script');
+          s.async=true;
+          s.src='https://www.googletagmanager.com/gtag/js?id='+id;
+          document.head.appendChild(s);
+        }
+
+        if('requestIdleCallback'in window){
+          requestIdleCallback(load)
+        }else{
+          setTimeout(load,1)
+        }
+      })();
+    </script>
+
+    <slot name="head" />
+  </head>
+  <body>
+    <!-- FOUC prevention: DO NOT REMOVE -->
+    <script is:inline>
+      /* Light default. Dark only when the user explicitly chose it via the
+         theme toggle (stored only on explicit toggle, never auto-persisted;
+         no OS prefers-color-scheme mirroring by design). */
+      (function(){var t=localStorage.getItem('cloudcertprep_theme');if(t==='dark'){document.documentElement.classList.add('dark')}})();
+    </script>
+
+    <!-- Auth pre-paint: define a shared hasSession() helper on window, then
+         apply the `cc-authed` class to <html> before paint. Logged-in
+         visitors see History + Sign out immediately (no flash, no shift).
+         The HeaderInteractive island re-syncs this class to the real auth
+         result; the per-page cert landing pre-hide script (cert.astro)
+         reuses the same window.__ccHasSession() helper. Runs on bfcache
+         restore (pageshow) too. DO NOT REMOVE. -->
+    <script is:inline>
+      (function(){function h(){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sb-')===0&&k.indexOf('-auth-token')===k.length-11)return true}}catch(e){}return false}window.__ccHasSession=h;function apply(){document.documentElement.classList.toggle('cc-authed',h())}apply();window.addEventListener('pageshow',apply)})();
+    </script>
+
+    <!-- Stale-chunk recovery: after a new deploy, a still-open old tab can
+         request a hashed chunk that no longer exists. Vite fires
+         `vite:preloadError` on the failed dynamic import; reload once (guarded by
+         a 10s timestamp so a permanently-missing chunk can never loop) to fetch
+         the current app. Inline so the CSP-hash generator covers it. DO NOT REMOVE. -->
+    <script is:inline>
+      (function(){window.addEventListener('vite:preloadError',function(e){try{e.preventDefault()}catch(_){}var now=Date.now(),last=0;try{last=+sessionStorage.getItem('cc-chunk-reload')||0}catch(_){}if(now-last<10000)return;try{sessionStorage.setItem('cc-chunk-reload',String(now))}catch(_){}location.reload()})})();
+    </script>
+
+    <div class="min-h-screen bg-bg-dark flex flex-col">
+      <a
+        href="#main"
+        class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-brand focus:text-on-brand focus:rounded focus:font-medium"
+      >
+        Skip to main content
+      </a>
+
+      {showChrome && <Header showNav={headerShowNav} sticky={headerSticky} hideMobileMenu={headerHideMobileMenu} overlay={headerOverlay} />}
+
+      <main id="main" class="flex-1 flex flex-col">
+        <slot />
+      </main>
+
+      {showChrome && <FooterIsland client:idle />}
+      {showChrome && <DonateButtonIsland client:idle />}
+    </div>
+
+    <CookieConsentIsland client:idle />
+    <AccountLinkNoticeIsland client:idle />
+    {/* client:idle (was client:load): analytics is non-critical, keep its
+        hydration off the critical path. Inline consumers of
+        window.trackEvent must tolerate late exposure (404.astro polls). */}
+    <AnalyticsBootstrap client:idle />
+
+    {/* Progressive-enhancement motion bootstrap (§8 item 3): marks <html> with
+        `cc-js` so the scroll-reveal CSS only applies when JS runs (no-JS users
+        and crawlers always see fully-visible content), then reveals
+        [data-reveal] elements as they scroll into view. Reduced-motion users
+        get the content immediately (the transition is neutralised globally and
+        we reveal everything up-front). Inline so the CSP-hash generator covers
+        it. */}
+    <script is:inline>
+      (function () {
+        var root = document.documentElement
+        root.classList.add('cc-js')
+        var els = function () { return Array.prototype.slice.call(document.querySelectorAll('[data-reveal]')) }
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        if (reduce || !('IntersectionObserver' in window)) {
+          els().forEach(function (el) { el.classList.add('is-revealed') })
+          return
+        }
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add('is-revealed'); io.unobserve(e.target) }
+          })
+        }, { rootMargin: '0px 0px -10% 0px' })
+        function start() { els().forEach(function (el) { io.observe(el) }) }
+        if (document.readyState !== 'loading') start()
+        else document.addEventListener('DOMContentLoaded', start)
+      })()
+    </script>
+    {noscriptDirectory && <noscript>
+      <style>
+        .cc-no { font-family: system-ui, -apple-system, sans-serif; max-width: 720px; margin: 0 auto; padding: 2rem 1rem; line-height: 1.6; color: #1c1917; }
+        .cc-no h1 { color: #FF9900; margin: 0 0 0.5rem; font-size: 1.875rem; }
+        .cc-no h2 { font-size: 1.25rem; margin: 0 0 0.75rem; color: #1c1917; }
+        .cc-no a { color: #1c1917; text-decoration: underline; }
+        .cc-no .muted { color: #57534E; }
+        .cc-no header { text-align: center; margin-bottom: 2rem; }
+        .cc-no section { margin-bottom: 2rem; }
+        .cc-no footer { text-align: center; color: #57534E; font-size: 0.875rem; border-top: 1px solid #e7e5e4; padding-top: 1rem; }
+        .cc-no ul { margin: 0; padding-left: 1.5rem; }
+      </style>
+      <div class="cc-no">
+        <header>
+          <h1>CloudCertPrep</h1>
+          <p class="muted" style="margin: 0;">Free Cloud Certification Practice Exams</p>
+        </header>
+
+        <section>
+          <p style="margin: 0 0 1rem;">CloudCertPrep is a free, open-source web application for preparing for cloud certifications. It provides full-length timed mock exams, domain-by-domain practice with adaptive spaced repetition, and progress tracking across every supported certification.</p>
+          <p style="margin: 0;"><strong>Marketing pages, blog posts, and per-domain study content render without JavaScript.</strong> Follow the links below to read them. The interactive practice exam and domain practice flows do require JavaScript to manage timing, scoring, and progress.</p>
+        </section>
+
+        <section>
+          <h2>How CloudCertPrep works</h2>
+          <ul>
+            <li><strong>Mock exam:</strong> full-length, randomly selected questions, exactly mirroring the real exam format for the certification you choose. Scaled scoring with the cert's official passing threshold.</li>
+            <li><strong>Domain practice:</strong> focused study by exam domain with instant feedback, explanations, and spaced repetition for signed-in users.</li>
+            <li><strong>History:</strong> review past attempts and see domain mastery breakdowns.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Supported certifications</h2>
+          <ul>
+            <li><a href="https://www.cloudcertprep.io/aws/clf-c02">AWS Certified Cloud Practitioner (CLF-C02)</a> &mdash; foundational AWS cert. 1,050+ practice questions across 4 domains.</li>
+            <li><a href="https://www.cloudcertprep.io/aws/aif-c01">AWS Certified AI Practitioner (AIF-C01)</a> &mdash; foundational AI/ML cert. 5 domains covering AI fundamentals, generative AI, foundation models, responsible AI, and security.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Privacy and Terms</h2>
+          <p style="margin: 0 0 0.75rem;">CloudCertPrep is GDPR-compliant. Guest users generate no server-side data. Authenticated user data is stored in the EU (Supabase, Ireland) and never sold or shared. Read the full <a href="https://www.cloudcertprep.io/privacy">Privacy Policy</a> and <a href="https://www.cloudcertprep.io/terms">Terms of Service</a>.</p>
+        </section>
+
+        <section>
+          <h2>Pages on this site</h2>
+          <ul>
+            <li><a href="https://www.cloudcertprep.io/">Home</a></li>
+            <li><a href="https://www.cloudcertprep.io/about">About</a></li>
+            <li><a href="https://www.cloudcertprep.io/aws/clf-c02">AWS Cloud Practitioner (CLF-C02)</a></li>
+            <li><a href="https://www.cloudcertprep.io/aws/aif-c01">AWS AI Practitioner (AIF-C01)</a></li>
+            <li><a href="https://www.cloudcertprep.io/blog">Blog</a></li>
+            <li><a href="https://www.cloudcertprep.io/contribute">Contribute</a></li>
+            <li><a href="https://www.cloudcertprep.io/history">Exam History</a></li>
+            <li><a href="https://www.cloudcertprep.io/privacy">Privacy Policy</a></li>
+            <li><a href="https://www.cloudcertprep.io/terms">Terms of Service</a></li>
+          </ul>
+        </section>
+
+        <footer>
+          <p style="margin: 0 0 0.25rem;">CloudCertPrep is created by <a href="https://santonastaso.me">Alex Santonastaso</a> and is open source on <a href="https://github.com/nastaso/cloudcertprep">GitHub</a>.</p>
+          <p style="margin: 0;">Not affiliated with Amazon Web Services or Amazon.com, Inc. AWS and related trademarks belong to Amazon.</p>
+        </footer>
+      </div>
+    </noscript>}
+  </body>
+</html>

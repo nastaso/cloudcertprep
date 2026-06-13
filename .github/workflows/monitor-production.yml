@@ -1,0 +1,64 @@
+name: Monitor production
+
+# Scheduled production monitoring (R19.1–R19.4, R21.6).
+# Targets ONLY the production origin https://www.cloudcertprep.io — never a
+# branch-deploy preview — so the dev/staging surface is never probed here.
+
+on:
+  schedule:
+    # Daily at 06:00 UTC. The job runs the full check set on every invocation.
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  monitor:
+    name: Citation + sitemap + backlink re-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Locked citation phrases present live
+        run: node scripts/check-citation-phrases.mjs --url https://www.cloudcertprep.io/
+
+      - name: Sitemap URLs return crawlable HTML
+        run: node scripts/monitor-sitemap.mjs https://www.cloudcertprep.io
+
+      - name: free-for-dev backlink still present (alert-only)
+        run: npm run check:free-for-dev || echo "::warning::free-for-dev backlink check failed (upstream edits are outside our control)"
+
+      - name: Open an issue on failure
+        if: failure()
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const title = `Production monitor failed: ${new Date().toISOString().slice(0,10)}`
+            const body = [
+              'The scheduled production monitor (`monitor-production.yml`) failed.',
+              '',
+              `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              '',
+              'Check the failing step: a missing Locked_Citation_Phrase on the live `/`,',
+              'a sitemap URL returning a non-200 or missing title/canonical/JSON-LD, or',
+              'the free-for-dev backlink (alert-only — does not fail the job).',
+            ].join('\n')
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: ['monitoring'],
+            })

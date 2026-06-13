@@ -1,0 +1,72 @@
+---
+/**
+ * Button.astro — the static-page counterpart to React's `Button.tsx`. Renders a
+ * prerendered `<a>` (or `<button>`) using the SAME recipe from
+ * `src/lib/buttonStyles.ts`, so static CTAs (home, cert/domain landings, 404,
+ * coming-soon banner) match the interactive islands exactly. No hydration.
+ *
+ * Usage:
+ *   <Button href="/aws/clf-c02/practice-exam" variant="primary" size="lg">Start Practice Exam</Button>
+ *   <Button as="button" type="submit">Submit</Button>
+ */
+import { buttonClass, type ButtonVariant, type ButtonSize } from '../lib/buttonStyles'
+
+interface Props {
+  href?: string
+  as?: 'a' | 'button'
+  variant?: ButtonVariant
+  size?: ButtonSize
+  fullWidth?: boolean
+  /**
+   * Append a decorative trailing right-arrow (forward-motion cue). Use on
+   * primary navigational CTAs (e.g. "Start Practice Exam"); the arrow is
+   * `aria-hidden` so assistive tech ignores it. Not for Sign in, secondary,
+   * chip, or icon buttons.
+   */
+  arrow?: boolean
+  class?: string
+  /** Explicit button type; defaults to "button" for <button> tags. */
+  type?: 'button' | 'submit' | 'reset'
+  [key: string]: unknown
+}
+
+const {
+  href,
+  as,
+  variant = 'primary',
+  size = 'md',
+  fullWidth = false,
+  arrow = false,
+  class: className = '',
+  type: explicitType,
+  ...rest
+} = Astro.props as Props
+
+const Tag = as ?? (href ? 'a' : 'button')
+const cls = buttonClass({ variant, size, fullWidth, className })
+// A bare <button> defaults to type="submit", which can trigger accidental
+// form submits when a Button sits inside a <form>. Default to "button" unless
+// the caller passes an explicit type. Anchors ignore the attribute. (§4 LOW)
+const buttonType = Tag === 'button' ? (explicitType ?? 'button') : explicitType
+---
+
+<Tag class={cls} href={href} type={buttonType} {...rest}>
+  <slot />
+  {arrow && (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  )}
+</Tag>

@@ -1,0 +1,13 @@
+Confirm your CloudCertPrep email
+
+Thanks for signing up. Confirm this address to finish creating your account
+and start saving your practice progress across devices.
+
+Confirm your email address:
+{{ .ConfirmationURL }}
+
+If you did not create a CloudCertPrep account, you can safely ignore this
+email. The link expires in 24 hours.
+
+CloudCertPrep - Free AWS certification practice exams
+Questions? Reply to this email or contact alex@cloudcertprep.io

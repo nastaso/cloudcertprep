@@ -1,0 +1,18 @@
+---
+/**
+ * /history — interactive page body island. Noindexed (R2.7).
+ * Static Astro chrome comes from BaseLayout; AppIsland renders only the body.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro'
+import AppIsland from '../components/AppIsland.tsx'
+---
+
+<BaseLayout
+  title="Exam History · CloudCertPrep"
+  description="Review your past practice exam attempts and domain practice sessions."
+  canonical="https://www.cloudcertprep.io/history"
+  robots="noindex"
+  noscriptDirectory={true}
+>
+  <AppIsland client:only="react" />
+</BaseLayout>

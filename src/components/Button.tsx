@@ -1,5 +1,6 @@
 import { forwardRef } from 'react'
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { buttonClass, type ButtonVariant, type ButtonSize } from '../lib/buttonStyles'
 
 /** Inline button spinner: small, no flex wrapper, current text colour. */
 function ButtonSpinner() {
@@ -11,54 +12,53 @@ function ButtonSpinner() {
   )
 }
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost'
-type Size = 'sm' | 'md' | 'lg'
-
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: Variant
-  size?: Size
+  variant?: ButtonVariant
+  size?: ButtonSize
   fullWidth?: boolean
   loading?: boolean
   loadingText?: string
   leftIcon?: ReactNode
   rightIcon?: ReactNode
+  /**
+   * Append a decorative trailing right-arrow (forward-motion cue), matching
+   * `Button.astro`'s `arrow` prop. Use on primary navigational "start" CTAs
+   * (Start exam, Start practice); the arrow is `aria-hidden`. Not for Sign in,
+   * secondary, danger, chip, or in-flow confirm buttons. Ignored while loading.
+   */
+  arrow?: boolean
+}
+
+/** Inline trailing arrow — matches the lucide arrow-right used by Button.astro. */
+function ButtonArrow() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  )
 }
 
 /**
- * Single source of truth for every action button in the app.
+ * Single source of truth for every action button in the interactive islands.
+ * The recipe (Apple-style pill, tiered palette, font-medium, press-scale) lives
+ * in `src/lib/buttonStyles.ts`, shared with the static `Button.astro` so the two
+ * systems can never drift on shape/weight/shadow again.
  *
- * Replaces ~24 inline-styled buttons that had drifted to inconsistent font
- * weights (font-medium / font-semibold / font-bold) and paddings. Always uses
- * font-medium per design rules and the user's preference for non-bold buttons.
- *
- * Variants:
- *   - primary   = orange CTA, the most prominent action on a screen
- *   - secondary = neutral card-coloured fill, for non-destructive secondary actions
- *   - danger    = red CTA, for destructive confirmations (Reset Progress)
- *   - ghost     = transparent, hover bg, for tertiary inline actions
- *
- * Sizes:
- *   - sm = compact (filter chips, inline page nav)
- *   - md = default (most form submits and CTAs)
- *   - lg = hero / start-of-flow (e.g. Start Exam)
+ * Variants: primary (Filled), secondary (Gray), tinted (Tinted), ghost (Plain),
+ * danger. Sizes: sm (chips/inline nav), md (default), lg (hero / start-of-flow).
  */
-const VARIANT_CLASSES: Record<Variant, string> = {
-  primary:
-    'bg-aws-orange hover:bg-aws-orange/90 text-white disabled:hover:bg-aws-orange',
-  secondary:
-    'bg-bg-dark hover:bg-bg-card-hover text-text-primary border border-text-muted/30 hover:border-text-muted/50 disabled:hover:bg-bg-dark disabled:hover:border-text-muted/30',
-  danger:
-    'bg-danger hover:bg-danger/90 text-white disabled:hover:bg-danger',
-  ghost:
-    'bg-transparent hover:bg-bg-card text-text-muted hover:text-text-primary',
-}
-
-const SIZE_CLASSES: Record<Size, string> = {
-  sm: 'px-3 py-1.5 text-xs md:text-sm',
-  md: 'px-4 py-2.5 text-sm md:text-base',
-  lg: 'px-6 py-3 md:py-3.5 text-base md:text-lg',
-}
-
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
     variant = 'primary',
@@ -68,6 +68,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     loadingText,
     leftIcon,
     rightIcon,
+    arrow = false,
     disabled,
     className = '',
     children,
@@ -78,19 +79,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 ) {
   const isDisabled = disabled || loading
 
-  const base =
-    'font-medium rounded-lg transition-colors inline-flex items-center justify-center gap-2 ' +
-    'disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-aws-orange focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark'
-
-  const composed = [
-    base,
-    VARIANT_CLASSES[variant],
-    SIZE_CLASSES[size],
-    fullWidth ? 'w-full' : '',
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ')
+  const composed = buttonClass({ variant, size, fullWidth, className })
 
   return (
     <button ref={ref} type={type} disabled={isDisabled} className={composed} {...rest}>
@@ -104,6 +93,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
           {leftIcon}
           {children}
           {rightIcon}
+          {arrow && <ButtonArrow />}
         </>
       )}
     </button>

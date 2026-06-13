@@ -8,6 +8,12 @@ export const MAX_MULTI_ANSWER = 2
 export const ANSWER_FEEDBACK_DELAY_MS = 300
 export const TIMER_PULSE_THRESHOLD = 600
 
+/** Domain-practice session size bounds and step. Drives the +/- stepper UI. */
+export const MIN_PRACTICE_QUESTIONS = 10
+export const MAX_PRACTICE_QUESTIONS = 50
+export const DEFAULT_PRACTICE_QUESTIONS = 20
+export const PRACTICE_QUESTION_STEP = 5
+
 export const KOFI_URL = 'https://ko-fi.com/alexsantonastaso'
 export const GITHUB_REPO_URL = 'https://github.com/nastaso/cloudcertprep'
 export const GITHUB_ISSUES_URL = 'https://github.com/nastaso/cloudcertprep/issues'

@@ -1,0 +1,137 @@
+---
+/**
+ * Terms of Service (/terms) — genuine prerendered Astro markup.
+ *
+ * Ports the visible content of the former React `_Terms.tsx` page into static
+ * HTML rendered inside BaseLayout. No React app is mounted; the chrome
+ * (Header/Footer/etc.) comes from BaseLayout islands.
+ *
+ * Satisfies: R1.2
+ */
+import BaseLayout from '../layouts/BaseLayout.astro'
+import HeroMini from '../components/landing/HeroMini.astro'
+---
+
+<BaseLayout
+  title="Terms of Service · CloudCertPrep"
+  description="CloudCertPrep terms of service. Free to use, no warranty, open source under MIT license."
+  canonical="https://www.cloudcertprep.io/terms"
+  headerOverlay={true}
+>
+  <HeroMini
+    kicker="Legal"
+    title="Terms of Service"
+    lede="A free study tool, provided as-is, open source under the MIT license."
+    crumbs={[{ label: 'Home', href: '/' }, { label: 'Terms' }]}
+    maxWidth="max-w-3xl"
+  />
+
+  <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
+    <div class="max-w-3xl mx-auto px-4 md:px-8">
+      <p class="font-mono text-[12px] tracking-wide text-text-muted mb-8">Last updated: May 2026</p>
+
+      <div class="space-y-8 max-w-[68ch] mx-auto">
+        <section>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">The short version</h2>
+          <p class="text-text-muted text-base leading-[1.7]">
+            CloudCertPrep is a free study tool. Use it to prepare for your cloud certification exams (AWS today; Azure and GCP planned). It is provided as-is with no guarantees. Be respectful, don't abuse the service.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Free to use</h2>
+          <p class="text-text-muted text-base leading-[1.7]">
+            CloudCertPrep is completely free. There are no paid tiers, no premium features, and no paywalls. We may accept voluntary donations via Ko-fi to cover hosting costs, but payment is never required to access any feature.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">No warranty</h2>
+          <p class="text-text-muted text-base leading-[1.7]">
+            CloudCertPrep is provided "as is" without warranty of any kind, express or implied. We make no guarantees about uptime, accuracy of questions, or fitness for any particular purpose. The service may be interrupted, changed, or discontinued at any time without notice.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">No exam guarantee</h2>
+          <p class="text-text-muted text-base leading-[1.7]">
+            Using CloudCertPrep does not guarantee you will pass AWS certification exams. You are responsible for your own study outcomes. Results vary depending on your prior knowledge, study habits, and effort.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Question content</h2>
+          <p class="text-text-muted text-base leading-[1.7]">
+            Practice questions are original works created for CloudCertPrep, written against the published AWS exam guides and AWS documentation. While we aim for accuracy, questions may contain errors or become outdated as AWS updates its services. Always cross-reference with official AWS documentation and training materials.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Acceptable use</h2>
+          <p class="text-text-muted text-base leading-[1.7] mb-3">
+            You agree not to:
+          </p>
+          <ul class="space-y-2 text-text-muted text-base">
+            <li class="flex items-start gap-2">
+              <span class="text-text-muted mt-0.5">-</span>
+              <span>Attempt to scrape, reverse engineer, or systematically extract question content</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-text-muted mt-0.5">-</span>
+              <span>Use the service in a way that places unreasonable load on our infrastructure</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-text-muted mt-0.5">-</span>
+              <span>Create multiple accounts to circumvent any limitations</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-text-muted mt-0.5">-</span>
+              <span>Use the service for any unlawful purpose</span>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">AWS trademark notice</h2>
+          <p class="text-text-muted text-base leading-[1.7]">
+            AWS, Amazon Web Services, and related trademarks are the property of Amazon.com, Inc. or its affiliates. CloudCertPrep is an independent study tool and is not affiliated with, endorsed by, or sponsored by Amazon or AWS.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Limitation of liability</h2>
+          <p class="text-text-muted text-base leading-[1.7]">
+            To the maximum extent permitted by applicable law, CloudCertPrep and its creator shall not be liable for any direct, indirect, incidental, special, consequential, or punitive damages arising from your use of, or inability to use, the service. Nothing in these terms excludes or limits liability for death or personal injury caused by negligence, fraud, or any other liability that cannot be excluded by law.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Governing law</h2>
+          <p class="text-text-muted text-base leading-[1.7]">
+            These terms are governed by the laws of England and Wales. Any disputes arising from these terms or your use of the service shall be subject to the exclusive jurisdiction of the courts of England and Wales. If you are a consumer resident in the UK, you may also bring proceedings in the courts of your country of residence.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Consumer rights</h2>
+          <p class="text-text-muted text-base leading-[1.7]">
+            Nothing in these terms affects your statutory rights as a consumer under UK law, including rights under the Consumer Rights Act 2015. If any provision of these terms is found to be unenforceable, the remaining provisions will continue in effect.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Changes to these terms</h2>
+          <p class="text-text-muted text-base leading-[1.7]">
+            We may update these terms from time to time. The "last updated" date at the top of this page will reflect any changes. Continued use of the service after changes constitutes acceptance of the updated terms.
+          </p>
+        </section>
+
+        <div class="pt-4 border-t border-text-muted/20">
+          <p class="text-text-muted text-sm">
+            Questions? Email <a href="mailto:alex@cloudcertprep.io" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">alex@cloudcertprep.io</a> or read our <a href="/privacy" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">Privacy Policy</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

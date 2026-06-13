@@ -1,0 +1,19 @@
+---
+/**
+ * /login — interactive page body island. Noindexed (R2.7).
+ * Static Astro chrome (header/footer) comes from BaseLayout; AppIsland renders
+ * only the Login body.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro'
+import AppIsland from '../components/AppIsland.tsx'
+---
+
+<BaseLayout
+  title="Sign In · CloudCertPrep"
+  description="Sign in to CloudCertPrep to track your progress across practice exams and domain sessions."
+  canonical="https://www.cloudcertprep.io/login"
+  robots="noindex"
+  noscriptDirectory={true}
+>
+  <AppIsland client:only="react" />
+</BaseLayout>

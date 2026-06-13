@@ -1,0 +1,37 @@
+---
+/**
+ * Card.astro — static-page counterpart to React's `Card.tsx`. Same recipe from
+ * `src/lib/buttonStyles.ts` so static and interactive cards match exactly.
+ *
+ * Usage:
+ *   <Card>...</Card>
+ *   <Card as="a" href="/x" interactive>...</Card>
+ *   <Card as="section" padding="lg">...</Card>
+ */
+import { cardClass, type CardPadding } from '../lib/buttonStyles'
+
+interface Props {
+  as?: string
+  interactive?: boolean
+  padding?: CardPadding
+  href?: string
+  class?: string
+  [key: string]: unknown
+}
+
+const {
+  as = 'div',
+  interactive = false,
+  padding = 'md',
+  href,
+  class: className = '',
+  ...rest
+} = Astro.props as Props
+
+const Tag = as as any
+const cls = cardClass({ interactive, padding, className })
+---
+
+<Tag class={cls} href={href} {...rest}>
+  <slot />
+</Tag>

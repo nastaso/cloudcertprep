@@ -1,47 +1,62 @@
-import { createContext, useContext, useState, useCallback, createElement } from 'react'
-import type { ReactNode } from 'react'
+/**
+ * Theme as a module-level singleton.
+ *
+ * The pre-paint inline script in BaseLayout.astro decides the initial theme
+ * before any island hydrates. This hook lets components react to subsequent
+ * toggles. No Context, no Provider — useTheme() composes safely across any
+ * number of islands on the same page.
+ */
+
+import { useCallback, useSyncExternalStore } from 'react'
 
 type Theme = 'light' | 'dark'
 
-function getTheme(): Theme {
+const THEME_KEY = 'cloudcertprep_theme'
+
+function read(): Theme {
+  if (typeof document === 'undefined') return 'light'
   return document.documentElement.classList.contains('dark') ? 'dark' : 'light'
 }
 
-interface ThemeContextValue {
-  theme: Theme
-  toggleTheme: () => void
+let theme: Theme = read()
+const listeners = new Set<() => void>()
+let initialised = false
+
+function notify() { listeners.forEach(cb => cb()) }
+
+function init() {
+  if (initialised || typeof window === 'undefined') return
+  initialised = true
+  // Light default (pre-paint script applies dark only on explicit stored
+  // choice). OS-theme mirroring is intentionally retired: the OS signal
+  // never decides; only the user's explicit toggle does.
 }
 
-const ThemeContext = createContext<ThemeContextValue | null>(null)
+function subscribe(cb: () => void) {
+  init()
+  listeners.add(cb)
+  return () => listeners.delete(cb)
+}
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(getTheme)
+function getSnapshot(): Theme { return theme }
+function getServerSnapshot(): Theme { return 'light' }
+
+export function useTheme() {
+  const t = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
   const toggleTheme = useCallback(() => {
     const root = document.documentElement
     root.classList.add('no-transition')
-    setTheme(prev => {
-      const next = prev === 'dark' ? 'light' : 'dark'
-      if (next === 'dark') {
-        root.classList.add('dark')
-      } else {
-        root.classList.remove('dark')
-      }
-      localStorage.setItem('cloudcertprep_theme', next)
-      return next
-    })
+    const next: Theme = t === 'dark' ? 'light' : 'dark'
+    root.classList.toggle('dark', next === 'dark')
+    localStorage.setItem(THEME_KEY, next)
+    theme = next
+    notify()
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        root.classList.remove('no-transition')
-      })
+      requestAnimationFrame(() => root.classList.remove('no-transition'))
     })
-  }, [])
+  }, [t])
 
-  return createElement(ThemeContext.Provider, { value: { theme, toggleTheme } }, children)
+  return { theme: t, toggleTheme }
 }
 
-export function useTheme() {
-  const ctx = useContext(ThemeContext)
-  if (!ctx) throw new Error('useTheme must be used within <ThemeProvider>')
-  return ctx
-}

@@ -1,0 +1,95 @@
+---
+/**
+ * HeroStage.astro — DSv5 "big OSS project" hero.
+ *
+ * Research-grounded (Linear/Supabase/roadmap.sh/Astro/Brilliant):
+ *  - dark ink stage, fixed in BOTH themes (marketing surface, not themed)
+ *  - single accent: brand orange, used as a glow + on key tokens
+ *  - the product itself is the hero art: a static mockup of the real exam UI
+ *  - GitHub/open-source credibility in the primary view (stars CTA + metrics)
+ *
+ * The page <h1> (locked HOME_H1) renders here; the full locked SEO paragraph
+ * lives in the section below the stage (citation guard checks presence, not
+ * position). Subline copy targets the primary keyword cluster.
+ */
+import { GITHUB_REPO_URL } from '../../lib/constants'
+import ExamMockup from './ExamMockup.astro'
+
+interface Props {
+  h1: string
+  subline: string
+  ctaHref: string
+  ctaLabel: string
+  metrics: string[]
+}
+
+const { h1, subline, ctaHref, ctaLabel, metrics } = Astro.props
+---
+
+<section class="stage relative overflow-hidden -mt-[calc(3rem+1px)] md:-mt-[calc(3.5rem+1px)]">
+  <div class="relative max-w-6xl mx-auto px-4 md:px-8 pt-28 md:pt-36 pb-16 md:pb-24">
+    <div class="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-10 items-center">
+
+      {/* ---- Copy column ---- */}
+      <div class="stagger max-w-xl">
+
+        {/* Eyebrow pill (Astro/Linear announcement-slot pattern): quiet mono
+            micro-label with a brand dot, above the h1. */}
+        <p class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[#C9D2DC]">
+          {/* Green "live" status dot (operational, like a status page) rather
+              than orange, which reads as paused/in-progress. */}
+          <span class="h-1.5 w-1.5 rounded-full bg-[#34D399]" aria-hidden="true"></span>
+          Open source · MIT licensed
+        </p>
+
+        <h1 class="font-display mt-5 text-[2.25rem] leading-[1.05] md:text-[2.75rem] lg:text-[3.5rem] font-bold tracking-[-0.025em] text-[#F4F6F8]">
+          {h1}
+        </h1>
+
+        <p class="mt-5 text-lg md:text-xl leading-relaxed text-[#9AA6B2]">
+          {subline}
+        </p>
+
+        <div class="mt-8 flex flex-wrap items-center gap-4">
+          <a
+            href={ctaHref}
+            class="halo chev-link inline-flex min-h-[48px] items-center justify-center rounded-full bg-[#FF9900] px-7 py-3 text-base font-semibold text-[#16191F] transition-[background-color,transform] duration-200 ease-press hover:bg-[#FFAD33] active:scale-[0.97] active:duration-[80ms] focus:outline-none"
+            data-cc-event="cta_start_practice_exam"
+            data-cc-param-location="home_hero"
+          >
+            {ctaLabel}<span class="chev" aria-hidden="true">›</span>
+          </a>
+          <a
+            href={GITHUB_REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-medium text-[#F4F6F8] transition-[border-color,background-color,transform] duration-200 ease-press hover:border-white/40 hover:bg-white/5 active:scale-[0.97] active:duration-[80ms] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+            data-cc-event="github_click"
+            data-cc-param-location="home_hero"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.55v-2.17c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.19 1.76 1.19 1.03 1.76 2.7 1.25 3.35.96.1-.74.4-1.25.72-1.54-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.83 1.18 3.09 0 4.41-2.69 5.38-5.26 5.66.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.55A11.51 11.51 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/></svg>
+            Star on GitHub
+          </a>
+        </div>
+
+        {/* Metrics strip. On mobile a clean 2-column grid (no separators, so
+            middots never orphan at a wrapped line start); on sm+ a single
+            hairline-separated mono line. */}
+        <ul class="mt-10 grid grid-cols-2 gap-x-6 gap-y-2 sm:flex sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-1.5 list-none font-mono text-[13px] tracking-wide text-[#8B95A3] sm:[&>li+li]:before:content-['·'] sm:[&>li+li]:before:mr-3 sm:[&>li+li]:before:text-white/25">
+          {metrics.map(m => (
+            <li class="whitespace-nowrap">{m}</li>
+          ))}
+        </ul>
+      </div>
+
+      {/* ---- Product mockup column: the exam UI IS the art ---- */}
+      <ExamMockup
+        code="CLF-C02"
+        question="Which AWS service lets you run code without provisioning or managing servers?"
+        options={['Amazon EC2', 'AWS Lambda', 'Amazon ECS', 'AWS Elastic Beanstalk']}
+        correctIndex={1}
+        why="Lambda runs code serverlessly, with no instances to provision or patch. EC2, ECS, and Beanstalk all surface the underlying compute."
+      />
+    </div>
+  </div>
+</section>

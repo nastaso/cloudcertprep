@@ -1,0 +1,76 @@
+---
+/**
+ * LastUpdatedStamp.astro — a small muted "Last updated" / alignment line.
+ *
+ * Auto-derives the month + year from the build timestamp (`new Date()`), so
+ * every prerender stamps the page with its deploy date.
+ *
+ * When an `examGuideVersion` is supplied (e.g. 'AIF-C01 (1.1, April 2026)'),
+ * the stamp renders an exam-guide alignment statement:
+ *   "✓ Aligned to the <CERT_CODE> exam guide (version <version>). Last verified <Month Year>."
+ * The leading "✓" is a literal UTF-8 check-mark character, not an icon
+ * component. The `examGuideVersion` string is
+ * parsed into its code (everything before " (") and version (inside the
+ * parens); if it does not match the expected `CODE (version)` shape it falls
+ * back to rendering the whole string as the code with no version parens (used
+ * by CLF-C02, whose AWS guide publishes no version number).
+ *
+ * When an `examGuideUrl` is supplied, the phrase "exam guide" becomes an
+ * outbound `rel="noopener"` link to the official AWS guide — an authoritative
+ * citation / E-E-A-T signal.
+ *
+ * When no `examGuideVersion` is supplied, the stamp reads
+ * "Last updated: <Month Year>".
+ *
+ * Satisfies: R17.5, R23.3.
+ */
+interface Props {
+  /**
+   * Optional exam-guide version label, e.g. 'AIF-C01 (1.1, April 2026)' or a
+   * bare code like 'CLF-C02' when the guide carries no version. When provided,
+   * the stamp renders the "✓ Aligned to the <code> exam guide …" line.
+   */
+  examGuideVersion?: string
+  /**
+   * Optional official AWS exam-guide URL. When provided, "exam guide" renders
+   * as an outbound link to it.
+   */
+  examGuideUrl?: string
+}
+
+const { examGuideVersion, examGuideUrl } = Astro.props
+
+// Derive "Month Year" from the build timestamp.
+const monthYear = new Date().toLocaleDateString('en-US', {
+  month: 'long',
+  year: 'numeric',
+})
+
+// Parse the 'CODE (version)' label into its two parts. Group 1 is everything
+// before " (", group 2 is the text inside the parens.
+const match = examGuideVersion?.match(/^(.+?)\s*\((.+)\)\s*$/)
+const certCode = match ? match[1] : examGuideVersion
+const version = match ? match[2] : undefined
+---
+
+<p class="text-xs text-text-muted">
+  {examGuideVersion ? (
+    <>
+      {'✓ Aligned to the '}{certCode}{' '}
+      {examGuideUrl ? (
+        <a
+          href={examGuideUrl}
+          target="_blank"
+          rel="noopener"
+          class="underline hover:text-text-primary rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
+        >exam guide</a>
+      ) : (
+        'exam guide'
+      )}
+      {version ? ` (version ${version})` : ''}
+      {`. Last verified ${monthYear}.`}
+    </>
+  ) : (
+    `Last updated: ${monthYear}`
+  )}
+</p>

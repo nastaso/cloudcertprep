@@ -1,0 +1,92 @@
+---
+/**
+ * Breadcrumb.astro — Astro port of the React Breadcrumb component.
+ *
+ * Emits BreadcrumbList JSON-LD (always) and, unless `visuallyHidden`, the
+ * visible breadcrumb trail. Uses native `<a href>` instead of react-router
+ * Link and inlines the ChevronRight SVG. Identical Tailwind classes to the
+ * React source.
+ *
+ * Satisfies: R6.10, R10.6 (BreadcrumbList structured data parity).
+ */
+import { SITE_URL } from '../lib/seo-data'
+import { serializeJsonLd } from '../lib/jsonld'
+
+export interface BreadcrumbItem {
+  label: string
+  /**
+   * Path to link to. Omit (or pass undefined) for the current page so the
+   * trailing item renders as plain text without a link.
+   */
+  to?: string
+}
+
+interface Props {
+  items: BreadcrumbItem[]
+  /**
+   * Hide the visible trail but still emit JSON-LD. Useful for pages that
+   * render their own breadcrumb-like header but want the structured data for
+   * SERP enrichment.
+   */
+  visuallyHidden?: boolean
+}
+
+const { items, visuallyHidden = false } = Astro.props
+
+const jsonLd = items.length === 0
+  ? null
+  : serializeJsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: items.map((item, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: item.label,
+        ...(item.to ? { item: `${SITE_URL}${item.to}` } : {}),
+      })),
+    })
+
+// lucide chevron-right path data (24x24, stroke-based)
+const chevronRight = '<polyline points="9 18 15 12 9 6"></polyline>'
+---
+
+{jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
+
+{items.length > 0 && !visuallyHidden && (
+  <nav aria-label="Breadcrumb" class="text-xs md:text-sm text-text-muted mb-4 md:mb-6">
+    <ol class="flex items-center flex-wrap gap-1.5 list-none p-0">
+      {items.map((item, i) => {
+        const isLast = i === items.length - 1
+        return (
+          <li class="inline-flex items-center gap-1.5">
+            {item.to && !isLast ? (
+              <a href={item.to} class="text-text-muted hover:text-text-primary transition-colors">
+                {item.label}
+              </a>
+            ) : (
+              <span
+                aria-current={isLast ? 'page' : undefined}
+                class={isLast ? 'text-text-primary font-medium' : undefined}
+              >
+                {item.label}
+              </span>
+            )}
+            {!isLast && (
+              <svg
+                class="w-3 h-3 md:w-4 md:h-4 text-text-muted/60"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                set:html={chevronRight}
+              />
+            )}
+          </li>
+        )
+      })}
+    </ol>
+  </nav>
+)}

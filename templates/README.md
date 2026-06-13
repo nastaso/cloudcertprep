@@ -10,7 +10,6 @@ HTML email templates for Supabase transactional emails. Sent from `alex@cloudcer
 |---|---|---|
 | `confirm-signup.html` | **Confirm signup** | User registers with email/password |
 | `reset-password.html` | **Reset Password** | User requests password reset |
-| `magic-link.html` | **Magic Link** | User requests passwordless sign-in |
 | `email-change.html` | **Change Email Address** | User updates their email address |
 
 ---
@@ -30,7 +29,6 @@ HTML email templates for Supabase transactional emails. Sent from `alex@cloudcer
 |---|---|
 | Confirm signup | `Confirm your CloudCertPrep account` |
 | Reset Password | `Reset your CloudCertPrep password` |
-| Magic Link | `Your CloudCertPrep sign-in link` |
 | Change Email Address | `Confirm your new CloudCertPrep email address` |
 
 ---
@@ -39,7 +37,7 @@ HTML email templates for Supabase transactional emails. Sent from `alex@cloudcer
 
 | Variable | Description |
 |---|---|
-| `{{ .ConfirmationURL }}` | Full action URL with token (confirmation, reset, magic link) |
+| `{{ .ConfirmationURL }}` | Full action URL with token (confirmation, reset) |
 | `{{ .SiteURL }}` | Configured site URL (`https://www.cloudcertprep.io`), set in Auth > URL Configuration |
 | `{{ .NewEmail }}` | New email address (email-change template only) |
 

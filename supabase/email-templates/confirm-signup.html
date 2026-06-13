@@ -1,0 +1,92 @@
+<!--
+  Supabase Auth template: "Confirm signup"
+  Dashboard: Authentication > Emails > Confirm signup > Message body (HTML)
+  Suggested subject: Confirm your CloudCertPrep email
+  Variables used: {{ .ConfirmationURL }}
+  Paste everything BELOW this comment (the comment is fine to keep; clients ignore it).
+-->
+<!doctype html>
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>Confirm your CloudCertPrep email</title>
+  <!--[if mso]>
+  <style>body,table,td,a{font-family:Arial,Helvetica,sans-serif !important;}</style>
+  <![endif]-->
+</head>
+<body style="margin:0;padding:0;background-color:#F8F9FA;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
+  <!-- Preheader (hidden inbox preview text) -->
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#F8F9FA;opacity:0;">
+    One tap confirms your email and unlocks progress tracking. No password needed here.
+  </div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F8F9FA;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background-color:#FFFFFF;border:1px solid #E9EBED;border-radius:16px;overflow:hidden;">
+          <!-- Brand lockup -->
+          <tr>
+            <td style="padding:28px 36px 20px 36px;border-bottom:1px solid #E9EBED;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align:middle;padding-right:12px;">
+                    <img src="https://www.cloudcertprep.io/logo-email-v2.png" width="40" height="40" alt="" style="display:block;border:0;border-radius:9px;">
+                  </td>
+                  <td style="vertical-align:middle;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:19px;letter-spacing:-0.2px;line-height:1;">
+                    <span style="font-weight:500;color:#16191F;">Cloud</span><span style="font-weight:700;color:#16191F;">CertPrep</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style="padding:32px 36px 8px 36px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <h1 style="margin:0 0 16px 0;font-size:22px;line-height:1.3;font-weight:700;color:#16191F;">Confirm your email</h1>
+              <p style="margin:0 0 16px 0;font-size:16px;line-height:1.6;color:#16191F;">
+                Thanks for signing up. Confirm this address to finish creating your account and start saving your practice progress across devices.
+              </p>
+            </td>
+          </tr>
+          <!-- CTA -->
+          <tr>
+            <td align="center" style="padding:12px 36px 28px 36px;">
+              <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ .ConfirmationURL }}" style="height:48px;v-text-anchor:middle;width:300px;" arcsize="50%" strokecolor="#EA8C00" fillcolor="#EA8C00">
+                <w:anchorlock/>
+                <center style="color:#0E1116;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">Confirm email address</center>
+              </v:roundrect>
+              <![endif]-->
+              <!--[if !mso]><!-- -->
+              <a href="{{ .ConfirmationURL }}" style="display:inline-block;background-color:#EA8C00;color:#0E1116;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:700;line-height:1;text-decoration:none;padding:15px 30px;border-radius:9999px;">Confirm email address</a>
+              <!--<![endif]-->
+            </td>
+          </tr>
+          <!-- Fallback link -->
+          <tr>
+            <td style="padding:0 36px 28px 36px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0 0 6px 0;font-size:13px;line-height:1.5;color:#545B64;">Button not working? Copy and paste this link into your browser:</p>
+              <p style="margin:0;font-size:13px;line-height:1.5;word-break:break-all;"><a href="{{ .ConfirmationURL }}" style="color:#0073BB;text-decoration:underline;">{{ .ConfirmationURL }}</a></p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="padding:20px 36px 28px 36px;border-top:1px solid #E9EBED;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0 0 8px 0;font-size:13px;line-height:1.6;color:#545B64;">
+                If you did not create a CloudCertPrep account, you can safely ignore this email. The link expires in 24 hours.
+              </p>
+              <p style="margin:0;font-size:13px;line-height:1.6;color:#545B64;">
+                CloudCertPrep &middot; Free AWS certification practice exams<br>
+                Questions? Reply to this email or contact <a href="mailto:alex@cloudcertprep.io" style="color:#0073BB;text-decoration:underline;">alex@cloudcertprep.io</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

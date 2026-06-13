@@ -26,6 +26,13 @@ const CERT_LOADERS: Record<string, Record<number, DomainLoader>> = {
     3: () => import('./saa-c03/domain3.json'),
     4: () => import('./saa-c03/domain4.json'),
   },
+  'aif-c01': {
+    1: () => import('./aif-c01/domain1.json'),
+    2: () => import('./aif-c01/domain2.json'),
+    3: () => import('./aif-c01/domain3.json'),
+    4: () => import('./aif-c01/domain4.json'),
+    5: () => import('./aif-c01/domain5.json'),
+  },
 }
 
 /**

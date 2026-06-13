@@ -40,7 +40,7 @@ function weightedDraw(pool: Array<{ question: Question; weight: number }>, count
 export function useSpacedRepetition(
   userId: string | null,
   domainId: number | null,
-  certCode: string | null = null
+  certCode: string,
 ) {
   const [masteryMap, setMasteryMap] = useState<Map<string, MasteryRow>>(new Map())
 
@@ -51,17 +51,12 @@ export function useSpacedRepetition(
     }
 
     try {
-      let query = supabase
+      const { data, error: fetchError } = await supabase
         .from('question_mastery')
         .select('question_id, correct_streak, last_was_wrong, last_seen_at, is_mastered, in_exclusion_window, weight')
         .eq('user_id', userId)
         .eq('domain_id', domainId)
-
-      if (certCode) {
-        query = query.eq('cert_code', certCode)
-      }
-
-      const { data, error: fetchError } = await query
+        .eq('cert_code', certCode)
 
       if (fetchError) throw fetchError
 
@@ -78,6 +73,10 @@ export function useSpacedRepetition(
   }, [userId, domainId, certCode])
 
   useEffect(() => {
+    // refreshMastery is async; setState happens in microtasks after the await,
+    // not synchronously in the effect body. The lint rule's synchronous
+    // heuristic flags this as a false positive.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshMastery()
   }, [refreshMastery])
 

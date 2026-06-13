@@ -21,6 +21,7 @@ Closes #
 
 - [ ] `npm run build` passes locally
 - [ ] `npm run lint` passes locally
+- [ ] `npm run test` passes locally
 - [ ] `npm run validate` passes locally (only if you touched `src/data/**/*.json`)
 - [ ] No new third-party dependencies (or justified above)
 

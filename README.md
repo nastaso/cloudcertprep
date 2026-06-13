@@ -1,19 +1,36 @@
-![GitHub stars](https://img.shields.io/github/stars/nastaso/cloudcertprep?style=social)
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Last commit](https://img.shields.io/github/last-commit/nastaso/cloudcertprep)
-![Website](https://img.shields.io/website?url=https%3A%2F%2Fcloudcertprep.io)
-
 # CloudCertPrep
 
-Free, open-source AWS certification practice exams.
+### Free open-source AWS certification practice exams
 
-No ads, no paywalls, no premium tiers. MIT licensed.
+<p align="center">
+  <a href="https://github.com/nastaso/cloudcertprep"><strong>⭐ Star CloudCertPrep on GitHub</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://www.cloudcertprep.io"><strong>🚀 Try the live demo</strong></a>
+</p>
 
 [![CI](https://github.com/nastaso/cloudcertprep/actions/workflows/ci.yml/badge.svg)](https://github.com/nastaso/cloudcertprep/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Live demo](https://img.shields.io/badge/demo-cloudcertprep.io-FF9900)](https://www.cloudcertprep.io)
+[![Last commit](https://img.shields.io/github/last-commit/nastaso/cloudcertprep)](https://github.com/nastaso/cloudcertprep/commits/main)
+[![GitHub stars](https://img.shields.io/github/stars/nastaso/cloudcertprep?style=social)](https://github.com/nastaso/cloudcertprep/stargazers)
+
+1,050+ AWS Cloud Practitioner and 409+ AWS Certified AI Practitioner practice questions. Full-length timed mock exams, domain-by-domain practice with adaptive spaced repetition, and progress tracking. No signup required, no ads. MIT licensed and publicly auditable on GitHub.
+
+No ads, no paywalls, no premium tiers. MIT licensed.
+
+> If CloudCertPrep helps you pass your AWS exam, a star here costs you nothing and is the strongest signal that this project should keep getting built. **[⭐ Star the repo](https://github.com/nastaso/cloudcertprep)** to follow new certifications as they ship.
 
 > Most paid AWS exam-prep platforms ship a fixed handful of practice exams pulled from a small question bank. CloudCertPrep randomises every exam from a much larger bank, so the practice variations are effectively unlimited.
+
+### Contribute in 60 seconds
+
+The question banks are plain JSON, one file per exam domain. Spotted a wrong answer or want to add a question?
+
+1. Open the relevant file under [`src/data/<cert>/`](src/data) (e.g. `src/data/clf-c02/domain1.json`). You can edit it right in the GitHub web UI.
+2. Fix or add a question following the [schema in CONTRIBUTING.md](./CONTRIBUTING.md#question-json-schema).
+3. Open a pull request. The validator (`npm run validate`) checks it automatically.
+
+No local setup needed for question edits. Good first issues are labelled [`good first issue`](https://github.com/nastaso/cloudcertprep/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22): pick one and dive in.
 
 ---
 
@@ -27,14 +44,28 @@ No ads, no paywalls, no premium tiers. MIT licensed.
 - **Community stats page** with pass rates, average scores, and domain difficulty rankings.
 - **Multi-certification architecture** that supports any number of domains per cert with no code or schema changes.
 - **Guest mode** for the full exam without an account; sign in only when you want progress saved.
-- **GitHub OAuth** for one-click sign-in.
+- **Google, GitHub, and email/password sign-in** via Supabase Auth, with Cloudflare Turnstile bot protection on the auth flow.
 
 Current certifications:
 
 | Cert | Status | Questions |
 |---|---|---|
 | AWS Cloud Practitioner (CLF-C02) | Active | ~1,050 |
+| AWS Certified AI Practitioner (AIF-C01) | Active | ~410 |
 | AWS Solutions Architect Associate (SAA-C03) | Coming soon | Placeholder |
+
+---
+
+## Roadmap
+
+- AWS Solutions Architect Associate (SAA-C03) — question bank in progress, target Q3 2026
+- AWS Developer Associate (DVA-C02) — planned for late 2026
+- AWS SysOps Administrator Associate (SOA-C02) — planned for 2027
+- Per-cert programmatic SEO landing pages (`/aws/clf-c02/security-questions`, etc.)
+- Per-cert OG share images
+- Community-contributed questions via PR review
+
+New certification proposals and contributors are welcome via the [add-certification issue template](https://github.com/nastaso/cloudcertprep/issues/new?template=add-certification.yml).
 
 ---
 
@@ -50,11 +81,18 @@ npm run dev
 
 You'll need your own [Supabase](https://supabase.com) project to test authenticated flows. The anon key and project URL are safe to expose (security is enforced server-side via Row Level Security). The service role key is private and never appears in client code.
 
-Open <http://localhost:5173>. Sign-up flows require a working Supabase backend; everything else (guest exams, domain practice) works offline against the bundled question JSON.
+Open <http://localhost:4321> (the Astro dev server's default port). Sign-up flows require a working Supabase backend; everything else (guest exams, domain practice) works offline against the bundled question JSON.
+
+Sign-in offers three options (**Google, GitHub, and email/password**), brokered by Supabase Auth, with Cloudflare Turnstile bot protection on the auth forms. None of these are needed to develop the guest-mode experience. Maintainer setup for the OAuth providers (Google and GitHub) and Turnstile lives in [CONTRIBUTING.md, Deployment and auth setup](./CONTRIBUTING.md#deployment--auth-setup-maintainer).
 
 ---
 
+
 ## Architecture
+
+CloudCertPrep is an **Astro hybrid** site. Astro prerenders the public SEO
+surface to static HTML at build time, and the interactive flows hydrate as
+**React islands** on top of that static shell.
 
 ```
 +-------------------------------------------------------------+
@@ -62,12 +100,18 @@ Open <http://localhost:5173>. Sign-up flows require a working Supabase backend; 
 |                 (static hosting, global edge)               |
 +-------------------------------------------------------------+
 |                                                             |
-|  index.html  ->  React SPA (code-split per route)           |
+|  Astro static output (output: 'static') — one HTML file     |
+|  per route, prerendered at build time:                      |
+|    /  /about  /blog  /blog/:slug  /contribute               |
+|    /aws/:cert  /aws/:cert/:domain  /privacy  /terms  /404   |
 |                                                             |
-|  vendor-react  +  vendor-supabase  +  per-route chunks      |
+|  React islands hydrate inside the static shells:            |
+|    Header nav, Footer, DonateButton, CookieConsent,         |
+|    the practice-exam / domain-practice / history / login /  |
+|    reset-password bodies, and the /stats + cert dashboard.  |
 |                                                             |
 |  Question data: static JSON, code-split per cert/domain.    |
-|  Loaded on demand (only the chunks you need).               |
+|  Sample questions on domain landings are server-rendered.   |
 |                                                             |
 +-----------------------------+-------------------------------+
                               | HTTPS (auth + persistence)
@@ -75,7 +119,8 @@ Open <http://localhost:5173>. Sign-up flows require a working Supabase backend; 
 +-------------------------------------------------------------+
 |             Supabase (PostgreSQL + Auth, EU/Ireland)        |
 |                                                             |
-|  Auth:  email/password, GitHub OAuth, JWT                   |
+|  Auth:  email/password, GitHub OAuth, Google OAuth, JWT     |
+|         Cloudflare Turnstile CAPTCHA on auth requests       |
 |                                                             |
 |  Tables                                                     |
 |    exam_attempts        domain scores stored as JSONB       |
@@ -100,15 +145,18 @@ Open <http://localhost:5173>. Sign-up flows require a working Supabase backend; 
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 19, TypeScript, Vite 7 |
+| Framework | Astro 6 (static output) with React 19 islands |
+| Language | TypeScript |
+| Build | Astro + Vite 7 |
 | Styling | Tailwind CSS 3.4 (CSS variable tokens for theming) |
 | Auth and DB | Supabase (PostgreSQL with Row Level Security, JWT auth) |
+| Bot protection | Cloudflare Turnstile (CAPTCHA on Supabase auth) |
 | Hosting | Netlify (auto-deploy from `main`) |
 | Email | Brevo SMTP via Supabase Auth |
 | Analytics | Umami (cookieless, always on) + GA4 (consent-gated) |
-| CI | GitHub Actions: lint, question-bank validation, build |
+| CI | GitHub Actions: validate, lint, astro check, test, build, citation guard |
 
-The full bundle is small and code-split: the initial route ships around 130 KB gzipped, with per-route and per-cert-domain chunks loaded on demand. See `npm run build` output for exact sizes against your local build.
+The marketing surface is prerendered static HTML, so crawlers and LLM browse-mode read full content with no JavaScript. Interactive islands are code-split and hydrate on demand. See `npm run build` output for exact sizes against your local build.
 
 ---
 
@@ -116,19 +164,29 @@ The full bundle is small and code-split: the initial route ships around 130 KB g
 
 ```
 src/
-  pages/          Route components (MockExam, DomainPractice, History, Stats, etc.)
-  components/     Shared UI (AnswerButton, QuestionReviewCard, Modal, ErrorBoundary, ...)
-  hooks/          useAuth, useCert, useTheme, useTimer, useSEO, useSpacedRepetition
-  lib/            scoring, formatting, analytics, supabase client, constants, logger
-  data/           Certification config + question JSON per cert/domain
+  pages/          Astro routes. *.astro prerender the static surface (home,
+                  cert/domain landings, about, blog, legal, 404); _*.tsx are
+                  the React island bodies (MockExam, DomainPractice, History,
+                  Login, ResetPassword, Stats) mounted by the .astro shells.
+  layouts/        BaseLayout.astro (head, JSON-LD, chrome) + BlogLayout.astro
+  components/     Astro components (*.astro) for static UI + React (*.tsx) for
+                  islands; shared style recipe in lib/buttonStyles.ts
+  content/        Markdown blog collection (content.config.ts defines the schema)
+  hooks/          useAuth, useCert, useTheme, useTimer, useSpacedRepetition, ...
+  lib/            scoring, formatting, analytics, supabase client, citation-content,
+                  seo-data, constants, logger, generated/ (build outputs)
+  data/           Certification registry + question JSON per cert/domain,
+                  keyword-clusters for per-domain SEO targeting
   types/          TypeScript interfaces (Question, ExamAttempt, OptionKey, DomainId)
 
-templates/
-  email/          HTML templates for Supabase Auth (confirm signup, reset, magic link, email change)
-
-scripts/
-  validate-questions.mjs   Question-bank validator (`npm run validate`)
-  generate-sitemap.mjs     Sitemap generator (runs in `prebuild`)
+scripts/          Build/prebuild + CI checks:
+  validate-questions.mjs    Question-bank validator (`npm run validate`)
+  generate-seo-assets.mjs   Sitemap + question-counts.ts + llms.txt + _redirects
+  generate-og-images.mjs    Per-cert / per-domain / blog OG composites
+  generate-stats-snapshot.mjs   Build-time /stats snapshot
+  validate-blog-frontmatter.mjs, validate-internal-links.mjs,
+  check-citation-phrases.mjs, validate-internal-graph.mjs, diagnose-indexing.mjs,
+  check-free-for-dev-link.mjs, check-staged-files.mjs
 
 .github/
   workflows/ci.yml          GitHub Actions CI
@@ -148,13 +206,20 @@ Quick links:
 - [Propose a new certification](https://github.com/nastaso/cloudcertprep/issues/new?template=add-certification.yml)
 - [File a bug](https://github.com/nastaso/cloudcertprep/issues/new?template=bug-report.yml)
 
-Run all checks locally before opening a PR (the same three CI runs on every pull request):
+Run all checks locally before opening a PR (the same checks CI runs on every pull request):
 
 ```bash
 npm run lint
 npm run validate
+npm run test
 npm run build
 ```
+
+---
+
+## Contributors
+
+CloudCertPrep is maintained by [Alex Santonastaso](https://santonastaso.me). Question fixes and new certification banks are credited in commit history; project-level contributors will be listed here.
 
 ---
 

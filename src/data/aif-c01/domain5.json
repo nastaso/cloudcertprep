@@ -1,0 +1,936 @@
+[
+  {
+    "id": "aif-q009",
+    "question": "A startup runs a chatbot built on an Amazon Bedrock foundation model (FM). The chatbot needs to read files in an Amazon S3 bucket that is protected with Amazon S3 managed keys (SSE-S3), yet every attempt to read them fails. What will resolve the issue?",
+    "options": {
+      "A": "Use prompt engineering to tell the model where to look for the data in Amazon S3",
+      "B": "Strip any sensitive details out of the S3 data",
+      "C": "Grant the IAM role that Amazon Bedrock assumes permission to decrypt the data with the correct encryption key",
+      "D": "Update the S3 bucket policy to allow public internet access to the data"
+    },
+    "answer": "C",
+    "explanation": "The read failures are a permissions problem: the IAM role that Amazon Bedrock assumes must be allowed to access and decrypt the encrypted objects, so granting it permission to decrypt the data with the correct key resolves the access failure.\nPrompt engineering cannot grant access to encrypted data. Removing sensitive data does not address the missing decrypt permission and defeats the purpose of using the data. Opening the bucket to the public internet is an insecure change that still does not give the role decrypt permission.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "Amazon S3"
+    ]
+  },
+  {
+    "id": "aif-q013",
+    "question": "A bank is building an AI application on Amazon Bedrock. The application sits in a VPC that, to satisfy regulators, must be cut off from all internet traffic. Which AWS service or feature meets these requirements?",
+    "options": {
+      "A": "Internet gateway",
+      "B": "Amazon Macie",
+      "C": "AWS PrivateLink",
+      "D": "Amazon CloudFront"
+    },
+    "answer": "C",
+    "explanation": "AWS PrivateLink creates private connectivity between a VPC and AWS services such as Amazon Bedrock, so traffic stays on the AWS network and never reaches the public internet, which satisfies the no-internet compliance requirement.\nAn internet gateway does the opposite of what is required by giving the VPC a path to the public internet. Amazon Macie discovers and protects sensitive data in Amazon S3 and does not provide private connectivity. Amazon CloudFront is a content delivery network that serves content over the internet.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS PrivateLink",
+      "Amazon Macie",
+      "Amazon CloudFront"
+    ]
+  },
+  {
+    "id": "aif-q026",
+    "question": "A security company invokes foundation models (FMs) on Amazon Bedrock and wants to limit use to approved users only. Before tightening its IAM roles and policies later, it first needs to spot any attempts to reach the models without authorization. Which AWS service should it use?",
+    "options": {
+      "A": "AWS Trusted Advisor",
+      "B": "Amazon Inspector",
+      "C": "AWS CloudTrail",
+      "D": "AWS Audit Manager"
+    },
+    "answer": "C",
+    "explanation": "AWS CloudTrail records API activity across AWS services, so it captures who attempted to call Amazon Bedrock and when, letting the company identify unauthorized access attempts and refine its IAM roles and policies.\nAWS Trusted Advisor gives best-practice recommendations on cost, performance, and security but does not log individual access attempts. Amazon Inspector scans workloads for software vulnerabilities. AWS Audit Manager automates evidence collection for audits rather than tracking who tried to access a service.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS CloudTrail",
+      "AWS Trusted Advisor",
+      "Amazon Inspector",
+      "AWS Audit Manager"
+    ]
+  },
+  {
+    "id": "aif-q028",
+    "question": "A company regularly audits its operations alongside independent software vendors (ISVs) and wants an email alert each time a new ISV compliance report is published. Which AWS service meets this requirement?",
+    "options": {
+      "A": "AWS Data Exchange",
+      "B": "AWS Trusted Advisor",
+      "C": "AWS Artifact",
+      "D": "AWS Audit Manager"
+    },
+    "answer": "C",
+    "explanation": "AWS Artifact provides on-demand access to compliance reports and agreements, including third-party reports, and can notify the company when a new report becomes available.\nAWS Data Exchange is a marketplace for third-party datasets, not compliance reports. AWS Trusted Advisor offers best-practice checks. AWS Audit Manager automates evidence collection for the company's own audits rather than distributing ISV reports.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS Artifact",
+      "AWS Data Exchange",
+      "AWS Trusted Advisor",
+      "AWS Audit Manager"
+    ]
+  },
+  {
+    "id": "aif-q030",
+    "question": "An insurer is mapping its generative AI projects onto the Generative AI Security Scoping Matrix. Which scope leaves the insurer with the MOST security responsibility?",
+    "options": {
+      "A": "Building and training a generative AI model from scratch using data the company owns",
+      "B": "Fine-tuning an existing third-party foundation model (FM) with the company's own data",
+      "C": "Building an application on top of an existing third-party foundation model (FM)",
+      "D": "Using a third-party enterprise application that has generative AI features built in"
+    },
+    "answer": "A",
+    "explanation": "Building and training a model from scratch on data the company owns gives the company full control over the data, training, deployment, and safeguards, so it carries the most security responsibility.\nFine-tuning a third-party FM, building an application on a third-party FM, and using a vendor application with embedded generative AI each shift increasing portions of responsibility to the provider, so they grant the company less ownership.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q061",
+    "question": "An AI practitioner relies on an Amazon Bedrock base model to summarize support chats and wants to keep a record of what goes into and comes out of the model for monitoring. Which approach should the practitioner take?",
+    "options": {
+      "A": "Set AWS CloudTrail as the model's log destination",
+      "B": "Configure model invocation logging in Amazon EventBridge",
+      "C": "Turn on model invocation logging in Amazon Bedrock",
+      "D": "Set AWS Audit Manager as the model's log destination"
+    },
+    "answer": "C",
+    "explanation": "Turning on model invocation logging in Amazon Bedrock captures and stores the model's input and output data, which is exactly what the practitioner needs to monitor invocations.\nAWS CloudTrail records management API calls but not the model's prompt and response payloads. Amazon EventBridge routes events between services and is not where Bedrock invocation logging is enabled. AWS Audit Manager collects audit evidence rather than invocation data.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "AWS CloudTrail",
+      "AWS Audit Manager",
+      "Amazon EventBridge"
+    ]
+  },
+  {
+    "id": "aif-q066",
+    "question": "A company plans to build a large language model (LLM) application with Amazon Bedrock using customer data held in Amazon S3. Its policy says each team may reach only the records of its own customers. Which solution meets these requirements?",
+    "options": {
+      "A": "Create a single Amazon Bedrock service role with full Amazon S3 access, then create IAM roles per team scoped to each team's customer folders",
+      "B": "Create an Amazon Bedrock custom service role for each team that grants access only to that team's customer data",
+      "C": "Create one service role with Amazon S3 access and require teams to name the customer on each Amazon Bedrock request",
+      "D": "Redact personal data in Amazon S3 and update the bucket policy to allow team access to customer data"
+    },
+    "answer": "B",
+    "explanation": "Creating a separate Amazon Bedrock custom service role for each team, scoped to only that team's customer data, enforces the policy through least-privilege access and prevents teams from reaching other teams' data.\nA single role with full Amazon S3 access plus per-team IAM roles still grants the shared Bedrock role broad access, risking exposure. A single role that depends on teams naming the customer relies on cooperation rather than enforced controls. Redacting data and opening the bucket policy does not segregate access by team.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "AWS Identity and Access Management (IAM)",
+      "Amazon S3"
+    ]
+  },
+  {
+    "id": "aif-q078",
+    "question": "An AI practitioner fine-tuned a custom model on Amazon Bedrock using a dataset that contained confidential records. The practitioner must guarantee that the model's inference responses are never based on that confidential data. What should the practitioner do?",
+    "options": {
+      "A": "Mask the confidential data in the inference responses with dynamic data masking",
+      "B": "Encrypt the confidential data in the inference responses with Amazon SageMaker AI",
+      "C": "Delete the custom model, remove the confidential data from the training dataset, and retrain the model",
+      "D": "Encrypt the confidential data in the custom model with AWS Key Management Service (AWS KMS)"
+    },
+    "answer": "C",
+    "explanation": "Because the confidential data was part of the training set, the only reliable fix is to delete the custom model, remove the confidential data from the dataset, and retrain so the model never learned patterns from that data.\nDynamic data masking and encrypting responses act after the model has already learned from the confidential data, so the information can still influence outputs. Encrypting the data in the model with AWS KMS protects it at rest but does not stop the model from generating responses based on it.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "Amazon SageMaker AI",
+      "AWS Key Management Service (AWS KMS)"
+    ]
+  },
+  {
+    "id": "aif-q084",
+    "question": "A team builds and trains ML models in Amazon SageMaker Studio notebooks, keeping its data in an Amazon S3 bucket. It needs to control how data moves between Amazon S3 and the notebooks. Which solution meets this requirement?",
+    "options": {
+      "A": "Use Amazon Macie to monitor SageMaker Studio",
+      "B": "Configure SageMaker to use a VPC with an Amazon S3 endpoint",
+      "C": "Use Amazon Inspector to monitor SageMaker Studio",
+      "D": "Configure SageMaker to use S3 Glacier Deep Archive"
+    },
+    "answer": "B",
+    "explanation": "Configuring Amazon SageMaker to use a VPC with an Amazon S3 endpoint creates a managed, private path for data to flow between Amazon S3 and the Studio notebooks without traversing the public internet.\nAmazon Macie and Amazon Inspector monitor for sensitive data and vulnerabilities respectively, but neither manages the data path between services. Amazon S3 Glacier Deep Archive is a low-cost archival storage class and does not control data flow.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker AI",
+      "Amazon S3",
+      "Amazon Macie",
+      "Amazon Inspector"
+    ]
+  },
+  {
+    "id": "aif-q087",
+    "question": "A company is about to adopt Amazon Bedrock and needs to know which security duties stay with the company under the AWS shared responsibility model. Which duty belongs to the company?",
+    "options": {
+      "A": "Protecting the infrastructure that hosts Amazon Bedrock",
+      "B": "Patching and updating the versions of Amazon Bedrock",
+      "C": "Provisioning Amazon Bedrock within the company network",
+      "D": "Securing the company's data in transit and at rest"
+    },
+    "answer": "D",
+    "explanation": "Under the AWS shared responsibility model, AWS secures the cloud infrastructure and managed services such as Amazon Bedrock, while the customer is responsible for security in the cloud, including protecting its own data in transit and at rest.\nPatching Amazon Bedrock versions and protecting the hosting infrastructure are AWS responsibilities for a managed service. Provisioning Amazon Bedrock within the company network is not how the managed service is accessed and is not a customer security responsibility.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q090",
+    "question": "To satisfy regulators, a company must run its Amazon SageMaker AI training and inference in a sealed environment with no internet connectivity. Which solution will meet these requirements?",
+    "options": {
+      "A": "Associate appropriate IAM roles with the SageMaker AI jobs",
+      "B": "Encrypt the data at rest using encryption for SageMaker geospatial capabilities",
+      "C": "Run the SageMaker AI training and inference jobs with network isolation",
+      "D": "Run the SageMaker AI training and inference jobs with SageMaker Experiments"
+    },
+    "answer": "C",
+    "explanation": "Running the Amazon SageMaker AI training and inference jobs with network isolation removes internet access for those jobs, keeping them in the isolated environment that the regulations require.\nAssociating IAM roles controls permissions but does not remove internet connectivity. Encryption for geospatial capabilities protects data at rest, and SageMaker Experiments tracks training runs; neither isolates the job from the internet.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker AI",
+      "AWS Identity and Access Management (IAM)"
+    ]
+  },
+  {
+    "id": "aif-q104",
+    "question": "A company runs custom models on Amazon Bedrock for a generative AI application and wants the model artifacts produced during customization jobs encrypted with a key the company controls. Which AWS service meets these requirements?",
+    "options": {
+      "A": "Amazon Macie",
+      "B": "AWS Secrets Manager",
+      "C": "AWS Key Management Service (AWS KMS)",
+      "D": "Amazon Inspector"
+    },
+    "answer": "C",
+    "explanation": "AWS Key Management Service (AWS KMS) lets the company create and control its own encryption key and use it to encrypt the model artifacts produced by Amazon Bedrock customization jobs.\nAmazon Macie discovers sensitive data and Amazon Inspector scans for vulnerabilities, neither of which manages customer encryption keys. AWS Secrets Manager stores credentials and secrets, not the encryption keys used to protect model artifacts.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS Key Management Service (AWS KMS)",
+      "Amazon Macie",
+      "AWS Secrets Manager",
+      "Amazon Inspector"
+    ]
+  },
+  {
+    "id": "aif-q124",
+    "question": "A company must record every call to its Amazon Bedrock API and keep those records safely for five years as cheaply as possible. Which two choices (one AWS service and one S3 storage class) should it combine to meet these requirements?",
+    "options": {
+      "A": "Amazon CloudWatch",
+      "B": "AWS CloudTrail",
+      "C": "Amazon S3 Intelligent-Tiering",
+      "D": "AWS Audit Manager",
+      "E": "Amazon S3 Standard"
+    },
+    "answer": [
+      "B",
+      "C"
+    ],
+    "explanation": "AWS CloudTrail is designed to log API requests made to AWS services, including Amazon Bedrock, and Amazon S3 Intelligent-Tiering automatically moves the stored logs between access tiers to keep long-term retention costs low, so together they meet the logging and five-year, low-cost retention requirements.\nAmazon CloudWatch focuses on metrics and operational monitoring rather than recording API calls, and AWS Audit Manager collects audit evidence rather than logging every API request. Amazon S3 Standard costs more than Intelligent-Tiering for data that is rarely accessed over a long retention period.",
+    "isMultiAnswer": true,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS CloudTrail",
+      "Amazon CloudWatch",
+      "AWS Audit Manager",
+      "Amazon S3"
+    ]
+  },
+  {
+    "id": "aif-q126",
+    "question": "A hospital is building an AI system that helps doctors diagnose illnesses from patient files and medical images. By law, the sensitive patient data must stay within the country where it is held. Which data governance strategy ensures compliance and protects privacy?",
+    "options": {
+      "A": "Data quality",
+      "B": "Data enrichment",
+      "C": "Data residency",
+      "D": "Data discoverability"
+    },
+    "answer": "C",
+    "explanation": "Data residency ensures data is stored and processed only within a specific geographic location, which directly meets the requirement that the patient data never leaves the country and protects patient privacy.\nData quality concerns the accuracy and completeness of data, data enrichment adds information to existing records, and data discoverability helps users find data; none of these controls where the data is physically stored.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q139",
+    "question": "A company will move customer service emails into Amazon S3 for an analytics application. Because some emails hold sensitive data, the company wants an alert whenever such data appears. Which solution fully automates this detection with the LEAST development effort?",
+    "options": {
+      "A": "Build several custom regex patterns and run them in a custom application to detect sensitive data",
+      "B": "Configure Amazon Macie to detect sensitive information in the documents uploaded to Amazon S3",
+      "C": "Deploy a large language model (LLM) on Amazon SageMaker endpoints to redact sensitive data",
+      "D": "Ask customers not to share sensitive information in their emails"
+    },
+    "answer": "B",
+    "explanation": "Amazon Macie is a managed service that uses machine learning to automatically discover sensitive data such as PII in Amazon S3 and can raise alerts when it is found, meeting the requirement with the least development effort.\nBuilding custom regex patterns in a custom application and deploying an LLM on Amazon SageMaker endpoints both require significant development and maintenance. Asking customers not to share sensitive information does not detect or alert on anything.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Macie",
+      "Amazon SageMaker AI",
+      "Amazon S3"
+    ]
+  },
+  {
+    "id": "aif-q145",
+    "question": "A global bank created an ML application that analyzes market data to surface trends. Throughout development, the bank wants ongoing checks that its policies and industry regulations are being followed. Which two AWS services help the bank assess compliance?",
+    "options": {
+      "A": "Amazon CloudWatch",
+      "B": "AWS Config",
+      "C": "AWS CloudTrail",
+      "D": "AWS Audit Manager",
+      "E": "Amazon Inspector"
+    },
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "AWS Audit Manager continuously collects evidence and maps it to regulatory frameworks to assess compliance, and AWS Config tracks configuration changes against rules so the bank can confirm its resources stay within policy throughout development.\nAmazon CloudWatch monitors metrics and logs, AWS CloudTrail records API activity, and Amazon Inspector scans for software vulnerabilities; these support security and operations but are not the primary services for assessing compliance against policies and regulations.",
+    "isMultiAnswer": true,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS Audit Manager",
+      "AWS Config",
+      "Amazon Inspector",
+      "Amazon CloudWatch",
+      "AWS CloudTrail"
+    ]
+  },
+  {
+    "id": "aif-q151",
+    "question": "Which AWS feature offers a consistent way to document the details of ML models for governance and reporting?",
+    "options": {
+      "A": "Amazon SageMaker Model Monitor",
+      "B": "Amazon SageMaker JumpStart",
+      "C": "Amazon SageMaker Model Cards",
+      "D": "Amazon SageMaker Model Registry"
+    },
+    "answer": "C",
+    "explanation": "Amazon SageMaker Model Cards provide a standardized record of a model's intended use, training data, evaluation results, and compliance details, supporting governance and reporting throughout the model's lifecycle.\nAmazon SageMaker Model Monitor watches deployed models for drift, Amazon SageMaker JumpStart provides pre-built models and solutions, and Amazon SageMaker Model Registry stores and versions models; none of these is the standardized documentation record used for governance and reporting.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker Model Cards",
+      "Amazon SageMaker Model Monitor",
+      "Amazon SageMaker JumpStart",
+      "Amazon SageMaker Model Registry"
+    ]
+  },
+  {
+    "id": "aif-q179",
+    "question": "When models are trained on AWS, which machine learning technique helps keep the underlying training data private and compliant?",
+    "options": {
+      "A": "Transfer learning",
+      "B": "Unsupervised learning",
+      "C": "Federated learning",
+      "D": "Reinforcement learning"
+    },
+    "answer": "C",
+    "explanation": "Federated learning trains a shared model across multiple data holders without moving the raw data to a central location, so each participant keeps its private data in place, which helps preserve privacy and meet compliance requirements.\nTransfer learning, unsupervised learning, and reinforcement learning are approaches defined by how a model learns from data, not techniques designed to keep training data private and compliant.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q185",
+    "question": "A hospital wants to fine-tune a foundation model (FM) with AWS services while keeping its data private and inside the AWS Region where it is stored. Which two steps achieve this MOST cost-effectively?",
+    "options": {
+      "A": "Host the model on premises with AWS Outposts",
+      "B": "Use AWS PrivateLink with a VPC",
+      "C": "Host the Amazon Bedrock API on premises",
+      "D": "Use the Amazon Bedrock API"
+    },
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Calling the Amazon Bedrock API keeps fine-tuning within the managed service in the same AWS Region, and routing that traffic through a VPC with AWS PrivateLink keeps it on the AWS private network, meeting the privacy requirement cost-effectively without extra infrastructure.\nHosting the model on premises with AWS Outposts and hosting the Amazon Bedrock API on premises both add hardware and operational cost and are not how the managed Amazon Bedrock service is consumed.",
+    "isMultiAnswer": true,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock",
+      "AWS PrivateLink"
+    ]
+  },
+  {
+    "id": "aif-q186",
+    "question": "A bank running its generative AI models on AWS must produce reports that prove it meets international rules for handling sensitive customer data. Which AWS service meets these requirements?",
+    "options": {
+      "A": "AWS Config",
+      "B": "Amazon Macie",
+      "C": "AWS Artifact",
+      "D": "AWS Secrets Manager"
+    },
+    "answer": "C",
+    "explanation": "AWS Artifact provides on-demand access to AWS compliance reports and certifications such as ISO and SOC, which the bank can use to demonstrate that its workloads and data handling meet international regulatory requirements.\nAWS Config tracks resource configuration, Amazon Macie discovers sensitive data, and AWS Secrets Manager stores credentials; none of these produces the compliance reports needed to prove regulatory adherence.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS Artifact",
+      "AWS Config",
+      "Amazon Macie",
+      "AWS Secrets Manager"
+    ]
+  },
+  {
+    "id": "aif-q208",
+    "question": "A company with Amazon Bedrock access wants to control which models specific employees are allowed to use. Which solution meets these requirements?",
+    "options": {
+      "A": "Use AWS Identity and Access Management (IAM) service roles to restrict model subscription",
+      "B": "Use AWS Identity and Access Management (IAM) policies to restrict model access",
+      "C": "Use Amazon Inspector to monitor model access",
+      "D": "Use AWS Security Token Service (AWS STS) to generate temporary credentials for model use"
+    },
+    "answer": "B",
+    "explanation": "AWS Identity and Access Management (IAM) policies can allow or deny Amazon Bedrock API actions scoped to specific model resources, so the company can restrict which models each employee is allowed to invoke.\nIAM service roles grant permissions to services rather than restricting which models a user can subscribe to, AWS STS issues temporary credentials but does not by itself limit model access, and Amazon Inspector scans for vulnerabilities rather than controlling access.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS Identity and Access Management (IAM)",
+      "Amazon Bedrock",
+      "Amazon Inspector"
+    ]
+  },
+  {
+    "id": "aif-q215",
+    "question": "A company analyzes confidential documents with a third-party model on Amazon Bedrock and is worried about data privacy. Which statement explains how Amazon Bedrock keeps that data private?",
+    "options": {
+      "A": "User inputs are kept confidential, but model outputs are shared with the third-party model providers",
+      "B": "User inputs and model outputs are anonymized and then shared with the third-party model providers",
+      "C": "User inputs and model outputs are not shared with any third-party model providers",
+      "D": "User inputs and model outputs are redacted before they are shared with the third-party model providers"
+    },
+    "answer": "C",
+    "explanation": "Amazon Bedrock processes data within the AWS environment and does not share user inputs or model outputs with the third-party model providers, so the company's confidential documents stay private.\nThe options stating that outputs are shared, that inputs and outputs are anonymized and shared, or that data is redacted before sharing are all incorrect because Amazon Bedrock does not send the inputs or outputs to the model providers at all.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q229",
+    "question": "A bank needs its generative AI chatbot to stay factual for regulatory reasons. Which solution helps stop the underlying foundation model (FM) from producing hallucinated answers?",
+    "options": {
+      "A": "Use AWS Config to query compliance metadata using natural language",
+      "B": "Use AWS Audit Manager to prepare IT audit and compliance reports",
+      "C": "Configure Amazon Bedrock Guardrails to evaluate user inputs and model responses",
+      "D": "Use Amazon Inspector to scan workloads for vulnerabilities"
+    },
+    "answer": "C",
+    "explanation": "Amazon Bedrock Guardrails lets the bank define policies that evaluate user inputs and model responses, including contextual grounding checks, helping keep the chatbot's answers factual and reducing hallucinated content for compliance.\nAWS Config tracks resource configuration, AWS Audit Manager prepares audit and compliance reports, and Amazon Inspector scans workloads for vulnerabilities; none of these constrains a model's generated responses.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock Guardrails",
+      "AWS Config",
+      "AWS Audit Manager",
+      "Amazon Inspector"
+    ]
+  },
+  {
+    "id": "aif-q235",
+    "question": "A healthcare company plans to fine-tune a model on Amazon Bedrock using sensitive data held in private databases inside its VPC. The data must never leave the company's private network. Which solution meets this requirement?",
+    "options": {
+      "A": "Restrict access to Amazon Bedrock by using AWS Identity and Access Management (IAM) policies",
+      "B": "Use AWS PrivateLink to connect the VPC and Amazon Bedrock",
+      "C": "Use AWS Key Management Service (AWS KMS) keys to encrypt the data",
+      "D": "Route traffic to Amazon Bedrock through an internet gateway in the VPC"
+    },
+    "answer": "B",
+    "explanation": "AWS PrivateLink establishes a private connection between the VPC and Amazon Bedrock, so traffic travels over the AWS private network instead of the public internet, keeping the sensitive data inside the company's private network during fine-tuning.\nIAM policies control who is allowed to call Amazon Bedrock but do not keep the network traffic off the public internet. AWS KMS encrypts data at rest and does not change the network path the data takes. An internet gateway routes VPC traffic to the public internet, which is the opposite of keeping the data on a private network.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS PrivateLink",
+      "Amazon Bedrock",
+      "AWS Identity and Access Management (IAM)",
+      "AWS Key Management Service (AWS KMS)"
+    ]
+  },
+  {
+    "id": "aif-q248",
+    "question": "A company with offices around the world requires that every API call between its generative AI applications and the foundation models (FMs) avoid the public internet. Which AWS service should it use?",
+    "options": {
+      "A": "Amazon Q",
+      "B": "AWS CloudTrail",
+      "C": "AWS PrivateLink",
+      "D": "Amazon CloudFront"
+    },
+    "answer": "C",
+    "explanation": "AWS PrivateLink provides private connectivity between VPCs and AWS services, so API calls between the generative AI applications and the foundation models stay on the AWS network and off the public internet.\nAmazon Q is a generative AI assistant, AWS CloudTrail logs API activity, and Amazon CloudFront is a content delivery network that serves traffic over the internet; none of these keeps API traffic off the public internet.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS PrivateLink",
+      "Amazon Q",
+      "AWS CloudTrail",
+      "Amazon CloudFront"
+    ]
+  },
+  {
+    "id": "aif-q269",
+    "question": "A company wants to reach Amazon Bedrock APIs privately from within its AWS account while keeping its data away from the public internet. Which solution meets these requirements?",
+    "options": {
+      "A": "Use AWS Glue to set up data encryption across the company's data catalog",
+      "B": "Use AWS PrivateLink to configure a private connection between the company's VPC and Amazon Bedrock",
+      "C": "Use Amazon CloudFront to restrict access to the company's private content",
+      "D": "Use AWS Lake Formation to manage centralized data governance and cross-account data sharing"
+    },
+    "answer": "B",
+    "explanation": "AWS PrivateLink configures a private connection between the company's VPC and Amazon Bedrock APIs, so calls and data transfers stay within the AWS network and are not exposed to the public internet.\nAWS Glue handles data integration and cataloging, Amazon CloudFront restricts and delivers content over the internet, and AWS Lake Formation manages data governance and sharing; none of these creates a private network connection to Amazon Bedrock.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS PrivateLink",
+      "Amazon Bedrock",
+      "AWS Glue",
+      "Amazon CloudFront",
+      "AWS Lake Formation"
+    ]
+  },
+  {
+    "id": "aif-q305",
+    "question": "A company acquires International Organization for Standardization (ISO) accreditation to manage AI risks and to use AI responsibly. What does this accreditation reflect about the company?",
+    "options": {
+      "A": "All members of the company are ISO certified.",
+      "B": "All AI systems that the company uses are ISO certified.",
+      "C": "All AI application team members are ISO certified.",
+      "D": "The company's development framework is ISO certified."
+    },
+    "answer": "D",
+    "explanation": "ISO accreditation certifies that the company's development framework, processes, and controls for managing AI meet the requirements of the relevant ISO standard, reflecting that the organization has demonstrated responsible and risk-aware AI governance practices at a structural level.\nAll members of the company being ISO certified is incorrect because organizational accreditation does not automatically certify every individual employee; personal ISO certification is a separate process that individuals undertake independently. All AI systems being ISO certified is incorrect because the accreditation applies to the framework and processes used to develop and govern AI, not to the individual systems or models produced within it. All AI application team members being ISO certified is incorrect for the same reason, as individual employees require separate certification and are not automatically certified by the organization achieving accreditation.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-01",
+    "services": []
+  },
+  {
+    "id": "aif-q307",
+    "question": "A company keeps rules that set how long information is stored and when it should be removed. Which data governance strategy does this describe?",
+    "options": {
+      "A": "Data quality standards",
+      "B": "Data retention",
+      "C": "Log storage",
+      "D": "Data de-identification"
+    },
+    "answer": "B",
+    "explanation": "Data retention is the set of policies that define how long data is stored and when it must be deleted, which is exactly what the company's guidelines describe.\nData quality standards govern accuracy and completeness, log storage concerns where logs are kept, and data de-identification removes identifying details; none of these defines storage duration and deletion timing.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q040",
+    "question": "A chatbot built on a fine-tuned Amazon SageMaker JumpStart model must meet several regulatory frameworks. Which two capabilities help the company demonstrate compliance?",
+    "options": {
+      "A": "Cost optimization",
+      "B": "Data protection",
+      "C": "Elastic auto scaling",
+      "D": "Threat detection",
+      "E": "Faster time to market"
+    },
+    "answer": [
+      "B",
+      "D"
+    ],
+    "explanation": "Data protection (safeguarding sensitive data) and threat detection (identifying security risks) are security controls that regulators expect, so they directly support demonstrating compliance.\nCost optimization, elastic auto scaling, and faster time to market are performance and business concerns that do not establish regulatory compliance.",
+    "isMultiAnswer": true,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker JumpStart"
+    ]
+  },
+  {
+    "id": "aif-q213",
+    "question": "A bank fine-tunes an LLM on Amazon Bedrock for loan questions and must ensure the model never reveals private customer data. Which solution fits?",
+    "options": {
+      "A": "Increase the Top K parameter",
+      "B": "Use Amazon Bedrock Guardrails",
+      "C": "Remove personally identifiable information (PII) from the data before fine-tuning",
+      "D": "Encrypt the data in Amazon S3 before fine-tuning"
+    },
+    "answer": "C",
+    "explanation": "Removing PII before fine-tuning prevents the model from ever ingesting private details, so it cannot reproduce them later, which is the most reliable safeguard.\nEncrypting the data in Amazon S3 protects it at rest but the model still learns the PII, Amazon Bedrock Guardrails filter outputs after the data has been ingested, and Top K only affects token sampling.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock Guardrails",
+      "Amazon Bedrock"
+    ]
+  },
+  {
+    "id": "aif-q218",
+    "question": "A company wants to control which publicly available foundation models (FMs) its employees can access. Which solution fits?",
+    "options": {
+      "A": "Analyze usage in AWS Cost Explorer",
+      "B": "Configure Amazon SageMaker JumpStart to restrict which FMs are discoverable",
+      "C": "Download compliance reports from AWS Artifact",
+      "D": "Review recommendations in AWS Trusted Advisor"
+    },
+    "answer": "B",
+    "explanation": "Amazon SageMaker JumpStart lets administrators curate the model catalog, so configuring it to restrict which FMs are discoverable controls the models employees can access.\nAWS Cost Explorer analyzes spending, AWS Artifact provides compliance documents, and AWS Trusted Advisor gives best-practice recommendations; none governs which models employees can access.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon SageMaker JumpStart"
+    ]
+  },
+  {
+    "id": "aif-q299",
+    "question": "A generative AI chatbot on an Amazon Bedrock foundation model (FM) is vulnerable to prompt injection. How can the company secure it with the LEAST effort?",
+    "options": {
+      "A": "Fine-tune the FM to avoid harmful responses",
+      "B": "Apply Amazon Bedrock Guardrails content filters and denied topics",
+      "C": "Switch to a different foundation model",
+      "D": "Add more few-shot examples to the prompt"
+    },
+    "answer": "B",
+    "explanation": "Amazon Bedrock Guardrails content filters and denied topics can be configured without retraining to block unsafe prompts and responses, mitigating prompt injection with the least effort.\nFine-tuning needs data and a training run, switching FMs does not inherently stop injection, and adding few-shot examples does not defend against malicious prompts.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "Amazon Bedrock Guardrails"
+    ]
+  },
+  {
+    "id": "aif-q034",
+    "question": "How can a company use large language models securely on Amazon Bedrock?",
+    "options": {
+      "A": "Configure IAM roles and policies based on least privilege",
+      "B": "Enable AWS Audit Manager to run automatic model evaluation jobs",
+      "C": "Enable Amazon Bedrock automatic model evaluation jobs",
+      "D": "Use Amazon CloudWatch Logs to make models explainable and monitor for bias"
+    },
+    "answer": "A",
+    "explanation": "Configuring IAM roles and policies based on least privilege restricts which users and applications can access the Amazon Bedrock models and actions, which is the foundational way to use large language models securely.\nAWS Audit Manager collects evidence for compliance and does not run model evaluation jobs. Amazon Bedrock model evaluation assesses model performance rather than securing access. Amazon CloudWatch Logs records activity but does not make models explainable or detect bias.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": [
+      "AWS Identity and Access Management (IAM)",
+      "Amazon Bedrock",
+      "AWS Audit Manager",
+      "AWS CloudWatch"
+    ]
+  },
+  {
+    "id": "aif-q133",
+    "question": "Which option describes a characteristic of AI governance frameworks that help build trust and deploy human-centered AI?",
+    "options": {
+      "A": "Expanding AI initiatives across business units to maximize long-term value",
+      "B": "Aligning AI projects with revenue goals and stakeholder expectations",
+      "C": "Driving business transformation and competitive growth through AI",
+      "D": "Developing policies and guidelines for data, transparency, responsible AI, and compliance"
+    },
+    "answer": "D",
+    "explanation": "AI governance frameworks are characterized by developing policies and guidelines covering data, transparency, responsible AI, and compliance, which builds trust and supports human-centered AI.\nExpanding initiatives across business units, aligning with revenue goals and stakeholder expectations, and driving business transformation are general business aims, not defining characteristics of an AI governance framework.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q159",
+    "question": "A company uses AI to generate customer credit scores during loan applications and plans to expand into a new geographic market. To operate there, which type of compliance laws should the company review?",
+    "options": {
+      "A": "Local health data protection laws",
+      "B": "Local payment card data protection laws",
+      "C": "Local algorithm accountability laws",
+      "D": "Local education privacy laws"
+    },
+    "answer": "C",
+    "explanation": "Because automated credit scoring makes decisions about individuals, the company must review local algorithm accountability laws, which govern the fairness, transparency, and impact of automated decision-making in the new market.\nLocal health data, payment card, and education privacy laws apply to other types of data and use cases, not to the accountability of automated credit-scoring decisions.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q191",
+    "question": "An ecommerce company runs an AI chatbot on its website that lets customers submit orders around the clock. Which input vulnerability should the company address before launching the chatbot?",
+    "options": {
+      "A": "Data leakage",
+      "B": "Prompt injection",
+      "C": "Large language model (LLM) hallucinations",
+      "D": "Concept drift"
+    },
+    "answer": "B",
+    "explanation": "Prompt injection is an input vulnerability in which a user crafts malicious input to override or manipulate the chatbot's instructions, so the company must sanitize and constrain inputs before launch.\nData leakage is the exposure of sensitive information, large language model hallucinations are fabricated outputs, and concept drift is a gradual change in data patterns over time. None of these is an input-level attack on the chatbot's instructions.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q254",
+    "question": "A company wants to make sure its AI system is fair and explainable and decides to require training for its AI development team. Which training meets this requirement?",
+    "options": {
+      "A": "Training on advanced coding skills",
+      "B": "Training on data privacy and encryption protocols",
+      "C": "Training on bias awareness and responsible AI",
+      "D": "Training on advanced ML algorithms"
+    },
+    "answer": "C",
+    "explanation": "Training the AI development team on bias awareness and responsible AI gives the team the knowledge and practices needed to build systems that are fair and explainable, which meets the requirement.\nTraining on advanced coding skills, advanced ML algorithms, or data privacy and encryption protocols builds other valuable skills but does not directly address fairness and explainability.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-02",
+    "services": []
+  },
+  {
+    "id": "aif-q393",
+    "question": "A company is deploying AI agents on Amazon Bedrock that need to access multiple backend systems on behalf of users. The company wants each agent to authenticate with its own identity rather than sharing a single set of credentials. Which AWS feature meets this requirement?",
+    "options": {
+      "A": "AWS Secrets Manager",
+      "B": "Amazon Bedrock AgentCore Identity",
+      "C": "Amazon Macie",
+      "D": "AWS CloudTrail"
+    },
+    "answer": "B",
+    "explanation": "Amazon Bedrock AgentCore Identity provides identity management for AI agents, allowing each agent to authenticate with its own distinct identity when accessing backend systems, which supports the principle of least privilege and avoids sharing credentials.\nAWS Secrets Manager stores and rotates credentials but does not provide per-agent identity management. Amazon Macie discovers sensitive data in Amazon S3. AWS CloudTrail logs API activity for auditing. None of these assigns individual identities to AI agents.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon Bedrock AgentCore",
+      "AWS Secrets Manager",
+      "Amazon Macie",
+      "AWS CloudTrail"
+    ]
+  },
+  {
+    "id": "aif-q394",
+    "question": "A compliance team at a pharmaceutical company uses a generative AI assistant to answer questions about drug interactions. To reduce the risk of the model generating incorrect medical information, the team wants every answer verified against approved reference documents. Which technique meets this requirement?",
+    "options": {
+      "A": "Increase the model's temperature parameter",
+      "B": "Apply RAG grounding with approved reference documents",
+      "C": "Fine-tune the model on more general medical data",
+      "D": "Use a larger foundation model"
+    },
+    "answer": "B",
+    "explanation": "RAG grounding retrieves relevant passages from approved reference documents at query time and uses them to verify and anchor the model's responses, ensuring answers are traceable to authoritative sources and reducing the risk of hallucinated medical information.\nIncreasing the temperature adds randomness and makes hallucinations more likely, not less. Fine-tuning on more general medical data does not guarantee answers are grounded in specific approved documents. Using a larger model may improve general capability but does not verify outputs against authoritative references.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q395",
+    "question": "Which two techniques help improve the accuracy of a generative AI model's outputs by detecting potential hallucinations before they reach users?",
+    "options": {
+      "A": "Output validation against source documents",
+      "B": "Increasing the model's training data volume",
+      "C": "Confidence scoring to flag low-certainty responses",
+      "D": "Reducing the number of model parameters",
+      "E": "Adding more GPU compute during inference"
+    },
+    "answer": [
+      "A",
+      "C"
+    ],
+    "explanation": "Output validation checks model responses against source documents to confirm factual accuracy, and confidence scoring assigns a certainty measure to each response so low-confidence outputs can be flagged for review or withheld from users. Together these techniques catch potential hallucinations before they reach end users.\nIncreasing training data volume may improve general model quality but does not detect hallucinations in real time. Reducing model parameters simplifies the model but does not add runtime verification. Adding more GPU compute speeds up inference but provides no mechanism to detect or prevent inaccurate outputs.",
+    "isMultiAnswer": true,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q396",
+    "question": "A financial institution trains ML models using data from multiple internal systems. Regulators require the institution to trace every piece of training data back to its original source and demonstrate that the data was collected and processed in compliance with policy. Which practice meets this requirement?",
+    "options": {
+      "A": "Data augmentation",
+      "B": "Data lineage tracking",
+      "C": "Data normalization",
+      "D": "Data balancing"
+    },
+    "answer": "B",
+    "explanation": "Data lineage tracking documents the origin, movement, and transformation of data throughout its lifecycle, so the institution can trace every piece of training data back to its source and prove it was handled in compliance with policy, which satisfies the regulatory requirement.\nData augmentation creates additional training examples to improve model performance. Data normalization rescales features to a common range. Data balancing adjusts class distributions to reduce bias. None of these provides a traceable record of data origins and transformations for regulatory purposes.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q397",
+    "question": "A company wants to document the training data sources, processing steps, and intended use of each ML model it deploys, so auditors can verify data provenance. Which AWS feature provides a standardized way to record this information?",
+    "options": {
+      "A": "Amazon SageMaker Model Cards",
+      "B": "Amazon SageMaker Data Wrangler",
+      "C": "Amazon SageMaker Feature Store",
+      "D": "Amazon SageMaker Autopilot"
+    },
+    "answer": "A",
+    "explanation": "Amazon SageMaker Model Cards provide a standardized framework for documenting model details including training data sources, processing steps, evaluation results, and intended use, giving auditors a consistent record of data provenance and model lineage.\nAmazon SageMaker Data Wrangler prepares and transforms data but does not produce audit-ready model documentation. Amazon SageMaker Feature Store manages and serves features for ML models. Amazon SageMaker Autopilot automates model building. None of these creates the standardized documentation record needed for data provenance audits.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "Amazon SageMaker Model Cards",
+      "Amazon SageMaker Data Wrangler",
+      "Amazon SageMaker Feature Store",
+      "Amazon SageMaker Autopilot"
+    ]
+  },
+  {
+    "id": "aif-q451",
+    "question": "A company uses AI models trained on customer data and needs to define rules for how long training datasets are kept, when they are archived, and when they must be deleted. Which data governance strategy does this describe?",
+    "options": {
+      "A": "Data residency",
+      "B": "Data lifecycle management",
+      "C": "Data logging",
+      "D": "Data monitoring"
+    },
+    "answer": "B",
+    "explanation": "Data lifecycle management defines rules for how data is created, stored, archived, and deleted over time, which is what setting retention and deletion schedules for training datasets describes.\nData residency governs where data is stored geographically. Data logging records events for auditing. Data monitoring observes quality and usage in real time. None of these sets archival and deletion timelines.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q452",
+    "question": "A company's data governance team wants to continuously watch how AI training data is accessed and used across the organization to detect unauthorized usage patterns. Which data governance strategy does this describe?",
+    "options": {
+      "A": "Data retention",
+      "B": "Data residency",
+      "C": "Data observation and monitoring",
+      "D": "Data logging"
+    },
+    "answer": "C",
+    "explanation": "Data observation and monitoring involves continuously watching how data is accessed and used to detect anomalies and unauthorized patterns, which is the governance strategy that addresses the team's need to oversee AI training data usage.\nData retention defines how long data is stored. Data residency controls geographic location. Data logging records individual access events but does not provide the ongoing surveillance and pattern detection that monitoring does.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q453",
+    "question": "A company building AI systems on AWS wants to record every access to its training datasets for auditing purposes. Which AWS service provides this logging capability?",
+    "options": {
+      "A": "AWS Config",
+      "B": "AWS CloudTrail",
+      "C": "AWS Trusted Advisor",
+      "D": "Amazon Inspector"
+    },
+    "answer": "B",
+    "explanation": "AWS CloudTrail logs API calls made to AWS services, including data access events for services like Amazon S3, creating an audit trail that records who accessed training data, when, and what they did.\nAWS Config tracks resource configuration changes, not data access events. AWS Trusted Advisor provides best-practice recommendations. Amazon Inspector scans for vulnerabilities. None of these logs individual data access events for auditing.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-03",
+    "services": [
+      "AWS CloudTrail",
+      "AWS Config",
+      "AWS Trusted Advisor",
+      "Amazon Inspector"
+    ]
+  },
+  {
+    "id": "aif-q456",
+    "question": "A financial institution trains ML models using data from multiple systems. Regulators require the institution to trace every piece of training data back to its source. Which practice meets this requirement?",
+    "options": {
+      "A": "Data augmentation",
+      "B": "Data lineage tracking",
+      "C": "Data normalization",
+      "D": "Data balancing"
+    },
+    "answer": "B",
+    "explanation": "Data lineage tracking documents the origin, movement, and transformation of data throughout its lifecycle, so the institution can trace every piece of training data back to its source and demonstrate compliant handling.\nData augmentation creates additional training examples. Data normalization rescales features. Data balancing adjusts class distributions. None provides a traceable record of data origins.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-03",
+    "services": []
+  },
+  {
+    "id": "aif-q465",
+    "type": "ordering",
+    "question": "A team is establishing a secure data governance lifecycle for the dataset behind an AWS AI workload. Arrange the following stages from first to last to reflect the correct order of a data governance lifecycle.",
+    "options": {
+      "A": "Restrict who can use the data by attaching least-privilege IAM policies to the roles and users that need it",
+      "B": "Encrypt the dataset at rest and enforce encryption in transit before it is used for training or inference",
+      "C": "Discover and classify the data to identify which records contain sensitive or regulated information",
+      "D": "Continuously monitor and log access to the data so unusual or unauthorized activity can be detected",
+      "E": "Audit the collected logs and controls against compliance requirements and produce evidence for reviewers"
+    },
+    "correctOrder": [
+      "C",
+      "B",
+      "A",
+      "D",
+      "E"
+    ],
+    "explanation": "You first discover and classify the data so you know what is sensitive and how it must be protected, then encrypt it at rest and in transit to safeguard the data itself, then restrict access with least-privilege IAM so only the right identities can use it, then continuously monitor and log that access to detect misuse, and finally audit those logs and controls against compliance requirements to produce evidence. Each stage depends on the prior one: classification drives the right encryption and access decisions, and access controls and logging must exist before there is anything meaningful to audit.\nA tempting mistake is to put least-privilege IAM access controls first, but you cannot scope access correctly until you have classified the data and protected it with encryption, and auditing must come last because it evaluates the controls and logs that the earlier stages put in place.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.2",
+    "lastVerified": "2026-06-13",
+    "services": []
+  },
+  {
+    "id": "aif-q466",
+    "type": "matching",
+    "question": "Match each AWS security and governance service to the role it plays when securing an AI or machine learning workload. Pair each service on the left with the correct description of its purpose on the right.",
+    "options": {
+      "A": "AWS IAM",
+      "B": "AWS KMS",
+      "C": "Amazon Macie",
+      "D": "AWS CloudTrail"
+    },
+    "targets": {
+      "1": "Uses machine learning to discover and classify sensitive data, such as personally identifiable information, stored in Amazon S3",
+      "2": "Records account API activity to provide an audit trail of who did what and when across AWS services",
+      "3": "Enforces least-privilege access control by defining which identities can perform which actions on which resources",
+      "4": "Creates, stores, and manages the encryption keys used to protect data at rest"
+    },
+    "correctMatches": {
+      "A": "3",
+      "B": "4",
+      "C": "1",
+      "D": "2"
+    },
+    "explanation": "AWS IAM enforces least-privilege access control by governing which identities may perform which actions on which resources, AWS KMS creates and manages the encryption keys that protect data at rest, Amazon Macie uses machine learning to discover and classify sensitive data such as PII in Amazon S3, and AWS CloudTrail records account API activity to provide an audit trail of who did what and when. Each service maps to a distinct governance function: identity and access, key management, sensitive-data discovery, and API auditing.\nA common error is to confuse CloudTrail with Macie or KMS, but CloudTrail logs API calls rather than scanning data content or managing keys, while Macie inspects the data itself in S3 and KMS handles only the cryptographic keys, so each pairing is unique and unambiguous.",
+    "isMultiAnswer": false,
+    "taskStatement": "5.1",
+    "lastVerified": "2026-06-13",
+    "services": []
+  }
+]

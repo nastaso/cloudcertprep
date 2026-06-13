@@ -1,0 +1,23 @@
+# Path-based PR auto-labelling for actions/labeler@v5. (R22.6)
+# Keys are label names; values are changed-file globs.
+
+"questions:clf-c02":
+  - changed-files:
+      - any-glob-to-any-file: "src/data/clf-c02/**"
+
+"questions:aif-c01":
+  - changed-files:
+      - any-glob-to-any-file: "src/data/aif-c01/**"
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "docs/**"
+          - "*.md"
+
+frontend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/components/**"
+          - "src/pages/**"
+          - "src/layouts/**"

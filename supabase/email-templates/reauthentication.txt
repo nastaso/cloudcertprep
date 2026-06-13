@@ -1,0 +1,11 @@
+Your CloudCertPrep verification code
+
+Enter this code to confirm it's you:
+
+{{ .Token }}
+
+This code expires in a few minutes and can be used once. If you did not request
+it, you can safely ignore this email.
+
+CloudCertPrep - Free AWS certification practice exams
+Questions? Reply to this email or contact alex@cloudcertprep.io

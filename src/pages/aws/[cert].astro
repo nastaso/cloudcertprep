@@ -1,0 +1,416 @@
+---
+/**
+ * /aws/:cert — the Cert_Landing.
+ *
+ * Dual-view by auth state, served from a single prerendered document:
+ *   - The GUEST SEO landing (hero, CTA, bullets, AboutCard, FAQ) is prerendered
+ *     as static Astro markup so crawlers and logged-out users always see it.
+ *   - CertDashboardIsland (client:only="react") mounts after the guest view.
+ *     For logged-in users it hides the static guest view and renders the
+ *     authenticated dashboard (Practice Modes, Recent Attempts, Domain Mastery).
+ *
+ * getStaticPaths enumerates EVERY cert (active + coming-soon); coming-soon
+ * certs render a landing with the ComingSoonBanner instead of the CTA+bullets.
+ *
+ * Satisfies: R6.1, R6.4, R6.10, R2.9, R10.6, R13.2.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import Breadcrumb from '../../components/Breadcrumb.astro'
+import ComingSoonBanner from '../../components/ComingSoonBanner.astro'
+import AboutCard from '../../components/landing/AboutCard.astro'
+import ExamRealismTable from '../../components/ExamRealismTable.astro'
+import ExplanationShowcase from '../../components/ExplanationShowcase.astro'
+import Faq from '../../components/Faq.astro'
+import LastUpdatedStamp from '../../components/LastUpdatedStamp.astro'
+import CertDashboardIsland from '../../components/CertDashboardIsland.tsx'
+import {
+  CERTIFICATION_LIST,
+  getActiveProviders,
+  getCertDomainSlug,
+  getCertTotalQuestions,
+  getLevelLabel,
+  getProviderLabel,
+  isCertNoindex,
+  type Certification,
+} from '../../data/certifications'
+import { SITE_URL } from '../../lib/seo-data'
+import { serializeJsonLd } from '../../lib/jsonld'
+import snapshot from '../../lib/generated/stats-snapshot.json'
+import CertSpecPanel from '../../components/landing/CertSpecPanel.astro'
+import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB } from '../../lib/levelAccent'
+import { getCollection, type CollectionEntry } from 'astro:content'
+import PostCard from '../../components/PostCard.astro'
+
+export function getStaticPaths() {
+  // Enumerate all AWS certs (active + coming-soon). Coming-soon certs like
+  // SAA-C03 still render a landing (with the ComingSoonBanner + GitHub watch
+  // CTA). The `provider === 'aws'` filter scopes this `/aws/[cert]` route to
+  // AWS certs only: a future non-AWS cert in the registry must NOT prerender at
+  // `/aws/<code>` with a wrong provider label/canonical. (M8)
+  return CERTIFICATION_LIST.filter(cert => cert.provider === 'aws').map(cert => ({
+    params: { cert: cert.code },
+    props: { cert },
+  }))
+}
+
+interface Props {
+  cert: Certification
+}
+
+const { cert } = Astro.props
+
+const isActive = cert.status === 'active'
+const isComingSoon = cert.status === 'coming-soon'
+
+const examMinutes = Math.round(cert.examTimeSeconds / 60)
+const providerLabel = getProviderLabel(cert.provider)
+const certPath = `/${cert.provider}/${cert.code}`
+const totalQuestions = getCertTotalQuestions(cert.code)
+const totalQuestionsLabel = totalQuestions.toLocaleString('en-GB')
+const levelLabel = getLevelLabel(cert.level)
+
+// Per-cert SEO. Active certs get SERP-friendly specifics (question count,
+// year); coming-soon certs avoid promising practice content they don't ship.
+const title = isActive
+  ? `Free ${cert.name} Practice Exam · ${totalQuestionsLabel}+ Questions · ${cert.shortName} 2026`
+  : `${cert.name} (${cert.shortName}) Practice Exams · Coming Soon · CloudCertPrep`
+
+const description = isActive
+  ? `Free ${cert.name} (${cert.shortName}) practice exams. ${totalQuestionsLabel}+ practice questions across ${cert.domains.length} exam domains. ${cert.examQuestionCount}-question timed mock exam in ${examMinutes} minutes (pass at ${cert.passingScore}/1000). Open-source MIT-licensed alternative to paid AWS practice platforms. No signup, no ads. Updated for the 2026 exam guide.`
+  : `${cert.name} (${cert.shortName}) practice exams are coming soon to CloudCertPrep. Watch the GitHub repository to be notified at launch.`
+
+const canonical = `${SITE_URL}/aws/${cert.code}`
+
+// Per-cert OG composite generated at build time by generate-og-images.mjs
+// (resolves the prior AIF-C01-shares-CLF-OG mismatch). Falls back to the
+// platform og-image.png only if generation fell back. (R6.14)
+const ogImage = `${SITE_URL}/og/og-${cert.code}.png`
+
+// Coming-soon certs render a real landing for the GitHub CTA but should not
+// appear in search results; the same applies to any active cert still under
+// review (CERTS_UNDER_REVIEW). Driven by the shared isCertNoindex helper so a
+// future under-review cert auto-noindexes here. AIF-C01 ships GA + indexable
+// (the set is empty at squash). (R2.9, R6.17)
+const robots = isCertNoindex(cert) ? 'noindex' : 'index, follow'
+
+// Breadcrumb items mirror the canonical navigation hierarchy. When there is
+// only one active provider, the provider hub collapses to `/`, so the trail
+// is Home → CertShortName.
+const breadcrumbItems = getActiveProviders().length > 1
+  ? [
+      { label: 'Home', to: '/' },
+      { label: providerLabel, to: `/${cert.provider}` },
+      { label: cert.shortName },
+    ]
+  : [
+      { label: 'Home', to: '/' },
+      { label: cert.shortName },
+    ]
+
+// Build-time community enrollment for this cert (audit W15). Course rich
+// results support totalHistoricalEnrollment; the /stats snapshot already holds
+// attemptsCompleted per cert. Only emitted when there is real data (>0).
+const certSnapshot = snapshot.certs.find(c => c.certCode === cert.code)
+const enrollment = certSnapshot?.attemptsCompleted ?? 0
+// Build date for the Course dateModified freshness signal (audit W21).
+const buildDateIso = new Date().toISOString().slice(0, 10)
+
+// Course JSON-LD for the certification.
+const courseJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'Course',
+  name: `${cert.name} (${cert.shortName}) Practice Exam`,
+  description: `Free practice exams and domain practice for the ${cert.name} (${cert.shortName}) certification. ${cert.examQuestionCount} questions in ${examMinutes} minutes, scored 100 to 1000.`,
+  provider: { '@id': `${SITE_URL}/#organization` },
+  url: `${SITE_URL}${certPath}`,
+  inLanguage: 'en',
+  isAccessibleForFree: true,
+  educationalLevel: levelLabel,
+  teaches: cert.domains.map(d => d.name).join(', '),
+  dateModified: buildDateIso,
+  ...(enrollment > 0 ? { totalHistoricalEnrollment: enrollment } : {}),
+  about: {
+    '@type': 'EducationalOccupationalCredential',
+    name: cert.name,
+    credentialCategory: 'certification',
+    educationalLevel: levelLabel,
+  },
+  hasCourseInstance: {
+    '@type': 'CourseInstance',
+    courseMode: 'online',
+  },
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+    category: 'Free',
+  },
+})
+
+// Serialise only the fields the dashboard island needs.
+const certForIsland = {
+  code: cert.code,
+  name: cert.name,
+  shortName: cert.shortName,
+  provider: cert.provider,
+  examQuestionCount: cert.examQuestionCount,
+  examTimeSeconds: cert.examTimeSeconds,
+  passingScore: cert.passingScore,
+  domains: cert.domains.map(d => ({
+    id: d.id,
+    name: d.name,
+    questionCount: d.questionCount,
+  })),
+}
+
+// Cert-level secondary keyword (R13.2). The lowest-difficulty commercial-intent
+// term for each active cert ("clf c02 practice exam" KD 2, vol 70; the parallel
+// "aif c01 practice exam"). Rendered in the HYPHENATED brand form
+// ("CLF-C02 practice exam") rather than the spaced Semrush string: search
+// engines normalise hyphen<->space, so the hyphenated copy ranks for the
+// spaced query while reading naturally (the verbatim "clf c02 ..." weave was
+// awkward in a sentence/H2). BODY COPY ONLY — never the <title>/<meta>
+// (R16.5). Coming-soon certs target nothing.
+const CERT_SECONDARY_KEYWORD: Record<string, string> = {
+  'clf-c02': 'CLF-C02 practice exam',
+  'aif-c01': 'AIF-C01 practice exam',
+}
+const secondaryKeyword = isActive ? CERT_SECONDARY_KEYWORD[cert.code] : undefined
+
+// Guest hero lede. When a secondary keyword exists, lead with it (mirroring the
+// Domain_Landing's "Looking for {primaryKeyword}?" opener); otherwise keep the
+// generic platform line.
+const heroLede = secondaryKeyword
+  ? `Looking for a free ${secondaryKeyword}? Practise realistic ${providerLabel} exam questions with adaptive domain mastery, randomised exams, and unlimited free attempts.`
+  : `Practise realistic ${providerLabel} exam questions with adaptive domain mastery, randomised exams, and unlimited free attempts.`
+
+// DSv6 wayfinding: the exam-UI mockup is the HOME page's exclusive hero
+// signature. Cert hubs show the exam blueprint (CertSpecPanel: domain weights
+// in the level color + exam facts) so each funnel level reads differently at
+// a glance.
+const levelAccent = LEVEL_ACCENT_HEX[cert.level]
+const levelGlow = LEVEL_ACCENT_RGB[cert.level]
+
+// Per-domain landing links. These keyword-rich pages are the indexable SEO
+// surface for each exam domain; linking them here creates the
+// Home -> Cert -> Domain crawl path and makes them reachable by users.
+// Active certs only (coming-soon certs have no published domain landings).
+const domainLinks = isActive
+  ? cert.domains.map(d => ({
+      name: d.name,
+      questionCount: d.questionCount,
+      href: `/${cert.provider}/${cert.code}/${getCertDomainSlug(cert, d.id)}`,
+    }))
+  : []
+
+// Latest blog posts for this cert (audit W13). Surfaces the blog on the
+// highest-authority indexable page so posts get inbound internal links from
+// the Cert_Landing, not just the Header island. Posts tagged with the cert
+// code (e.g. 'clf-c02') come first; if none are tagged, fall back to the most
+// recent non-draft posts so the block is never empty on an active cert.
+const allPosts = isActive
+  ? (await getCollection('blog'))
+      .filter((post: CollectionEntry<'blog'>) => !post.data.draft)
+      .sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => b.data.date.getTime() - a.data.date.getTime())
+  : []
+const taggedPosts = allPosts.filter((post: CollectionEntry<'blog'>) => post.data.tags.includes(cert.code))
+const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2)
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  ogImage={ogImage}
+  robots={robots}
+  jsonLd={[courseJsonLd]}
+  headerOverlay={true}
+>
+  {/* BreadcrumbList JSON-LD only (visuallyHidden); the visible mono trail
+      renders inside the stage hero. */}
+  <Breadcrumb items={breadcrumbItems} visuallyHidden />
+
+  {/* Static GUEST view (stage hero + content sheet) — visible to crawlers and
+      logged-out users. CertDashboardIsland hides this for authenticated users. */}
+  <div id="cert-guest-view">
+    {/* ---- Stage hero, glow in the cert's official LEVEL color ---- */}
+    <section class="stage relative overflow-hidden -mt-[calc(3rem+1px)] md:-mt-[calc(3.5rem+1px)]" style={`--stage-glow: ${levelGlow}`}>
+      <div class="relative max-w-6xl mx-auto px-4 md:px-8 pt-28 md:pt-36 pb-16 md:pb-24">
+        <div class="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-10 items-center">
+          <div class="stagger max-w-xl">
+            <nav aria-label="Breadcrumb" class="font-mono text-[12px] tracking-wide text-[#8B95A3]">
+              <a href="/" class="hover:text-[#F4F6F8] transition-colors duration-200">Home</a>
+              <span class="mx-2 text-white/25">›</span>
+              <span class="text-[#C9D2DC]">{cert.shortName}</span>
+            </nav>
+
+            <p class="mt-6 font-mono text-[12px] font-bold uppercase tracking-[0.22em]" style={`color: ${levelAccent}`}>
+              {levelLabel}
+            </p>
+
+            <h1 class="font-display mt-3 text-[2rem] leading-[1.05] md:text-[2.5rem] lg:text-[3rem] font-bold tracking-[-0.025em] text-[#F4F6F8]">
+              Free {cert.name} <span class="whitespace-nowrap">({cert.shortName})</span> Practice Exams
+            </h1>
+
+            <p class="mt-5 text-lg md:text-xl leading-relaxed text-[#9AA6B2]">
+              {heroLede}
+            </p>
+
+            {!isComingSoon && (
+              <div class="mt-8 flex flex-wrap items-center gap-4">
+                <a
+                  href={`${certPath}/practice-exam`}
+                  class="halo chev-link inline-flex min-h-[48px] items-center justify-center rounded-full bg-[#FF9900] px-7 py-3 text-base font-semibold text-[#16191F] transition-[background-color,transform] duration-200 ease-press hover:bg-[#FFAD33] active:scale-[0.97] active:duration-[80ms] focus:outline-none"
+                  data-cc-event="cta_start_practice_exam"
+                  data-cc-param-location="cert_landing_hero"
+                  data-cc-param-cert={cert.code}
+                >
+                  Start practice exam<span class="chev" aria-hidden="true">›</span>
+                </a>
+                <a
+                  href="#domains"
+                  class="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-medium text-[#F4F6F8] transition-[border-color,background-color,transform] duration-200 ease-press hover:border-white/40 hover:bg-white/5 active:scale-[0.97] active:duration-[80ms] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                >
+                  Practice by domain
+                </a>
+              </div>
+            )}
+
+            {!isComingSoon && (
+              <ul class="mt-10 grid grid-cols-2 gap-x-6 gap-y-2 sm:flex sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-1.5 list-none font-mono text-[13px] tracking-wide text-[#8B95A3] sm:[&>li+li]:before:content-['·'] sm:[&>li+li]:before:mr-3 sm:[&>li+li]:before:text-white/25">
+                <li class="whitespace-nowrap">{cert.examQuestionCount} questions</li>
+                <li class="whitespace-nowrap">{examMinutes} minutes</li>
+                <li class="whitespace-nowrap">pass {cert.passingScore}/1000</li>
+                <li class="whitespace-nowrap">{totalQuestionsLabel}+ question bank</li>
+              </ul>
+            )}
+
+            {isActive && (
+              <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 52 211 153;">
+                <LastUpdatedStamp examGuideVersion={cert.examGuideVersion} examGuideUrl={cert.examGuideUrl} />
+              </div>
+            )}
+          </div>
+
+          {!isComingSoon && (
+            <CertSpecPanel cert={cert} accent={levelAccent} glowRgb={levelGlow} />
+          )}
+        </div>
+      </div>
+    </section>
+
+    {/* ---- Content sheet ---- */}
+    <div class="sheet-overlap pb-16 md:pb-24 pt-12 md:pt-20">
+      <div class="max-w-6xl mx-auto px-4 md:px-8">
+        <div class="space-y-16 md:space-y-24">
+
+          {isComingSoon && <ComingSoonBanner cert={cert} />}
+
+          {/* Practice by exam domain — links to the per-domain keyword landing
+              pages (Home -> Cert -> Domain crawl path). Active certs only. */}
+          {domainLinks.length > 0 && (
+            <section id="domains" data-reveal>
+              <p class="kicker" aria-hidden="true">Practice by domain</p>
+              <h2 class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-2">
+                {secondaryKeyword ? `Build your ${secondaryKeyword} by domain` : 'Practice by exam domain'}
+              </h2>
+              <p class="text-lead mb-8">
+                Focused question sets for every exam domain, weighted like the real exam.
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {cert.domains.map(d => (
+                  <a
+                    href={`/${cert.provider}/${cert.code}/${getCertDomainSlug(cert, d.id)}`}
+                    class="halo group flex flex-col gap-2 rounded-2xl border border-border-hairline bg-bg-card p-5 md:p-6 shadow-card transition-[background-color,border-color] duration-200 ease-out hover:bg-bg-card-hover focus:outline-none"
+                    style={`--halo-color: ${levelGlow}`}
+                  >
+                    <span class="flex items-baseline justify-between gap-4">
+                      <span class="text-base md:text-lg font-semibold text-text-primary">{d.name}</span>
+                      <span class="font-mono text-[12px] text-text-muted whitespace-nowrap">{Math.round(d.examProportion * 100)}%</span>
+                    </span>
+                    <span class="h-1 w-full overflow-hidden rounded-full bg-border-hairline/60">
+                      <span class="block h-full rounded-full" style={`width: ${Math.round(d.examProportion * 100)}%; background-color: ${levelAccent}`}></span>
+                    </span>
+                    <span class="flex items-center justify-between text-sm text-text-muted">
+                      <span>{d.questionCount}+ practice questions</span>
+                      <span class="feature-arrow text-link" aria-hidden="true">→</span>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Platform pillars (shared with home) */}
+          {!isComingSoon && <div data-reveal><AboutCard /></div>}
+
+          {/* Exam realism + explanation showcase (self-guarding). (R23.1, R23.2) */}
+          <ExamRealismTable cert={cert} />
+          <ExplanationShowcase cert={cert} />
+
+          {/* Latest from the blog (audit W13) */}
+          {latestPosts.length > 0 && (
+            <section data-reveal>
+              <p class="kicker" aria-hidden="true">Guides</p>
+              <h2 class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-8">Latest from the blog</h2>
+              <div class="grid grid-cols-1 gap-6">
+                {latestPosts.map((post: CollectionEntry<'blog'>) => (
+                  <PostCard data={post.data} slug={post.data.slug} />
+                ))}
+              </div>
+              <p class="mt-6">
+                <a href="/blog" class="chev-link text-sm md:text-base font-medium text-link hover:underline underline-offset-4">Read all articles<span class="chev" aria-hidden="true">›</span></a>
+              </p>
+            </section>
+          )}
+
+          {/* Per-cert FAQ + FAQPage JSON-LD */}
+          <Faq certCode={cert.code} />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Authenticated dashboard island. ACTIVE certs only: a coming-soon cert has
+      no question bank, so a logged-in visitor must keep seeing the coming-soon
+      guest view (Watch on GitHub) rather than a practice dashboard whose CTAs
+      lead to non-existent exam routes. */}
+  {isActive && (
+    <div class="px-4 md:px-8">
+      <CertDashboardIsland cert={certForIsland} client:only="react" />
+    </div>
+  )}
+
+  {/*
+    Synchronous guest-view pre-hide. Runs before paint (and on bfcache
+    restore via pageshow) so a logged-in user never sees the prerendered
+    guest landing flash before CertDashboardIsland hydrates. Reuses the
+    `window.__ccHasSession` helper installed by the BaseLayout pre-paint
+    script. Stale tokens self-correct once the island resolves auth.
+
+    Also drops the header's overlay mode for signed-in visitors: the
+    transparent white-text overlay state assumes the dark stage hero is
+    behind it, but the dashboard view hides that stage, so in light theme
+    the overlay would paint white-on-white. Removing data-overlay restores
+    the standard frosted themed header before first paint.
+
+    Coming-soon certs never mount the dashboard, so this pre-hide is gated to
+    active certs (otherwise a signed-in visitor would see the guest view
+    hidden with nothing to replace it).
+  */}
+  {isActive && (
+    <script is:inline>
+      (function () {
+        function apply() {
+          if (!(window.__ccHasSession && window.__ccHasSession())) return
+          var el = document.getElementById('cert-guest-view')
+          if (el) el.style.display = 'none'
+          var hdr = document.getElementById('site-header')
+          if (hdr) hdr.removeAttribute('data-overlay')
+        }
+        apply()
+        window.addEventListener('pageshow', apply)
+      })()
+    </script>
+  )}
+</BaseLayout>

@@ -1,0 +1,13 @@
+You're invited to CloudCertPrep
+
+You've been invited to create a CloudCertPrep account: free, open-source AWS
+certification practice exams with progress tracking. Accept the invitation to
+set your password and get started.
+
+Accept your invitation:
+{{ .ConfirmationURL }}
+
+If you were not expecting this invitation, you can safely ignore this email.
+
+CloudCertPrep - Free AWS certification practice exams
+Questions? Reply to this email or contact alex@cloudcertprep.io
