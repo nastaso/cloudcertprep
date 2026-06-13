@@ -32,6 +32,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import satori from 'satori'
 import { Resvg } from '@resvg/resvg-js'
+import sharp from 'sharp'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const CERT_REGISTRY_PATH = resolve(__dirname, '../src/data/certifications.ts')
@@ -141,8 +142,8 @@ function parseCertRegistry() {
 // "Free … Practice Exams" tagline, an optional orange domain line, and the
 // CloudCertPrep wordmark bottom-right.
 //
-// `logoDataUri` is a data: URI of public/logo-email.svg (white tile + orange
-// cloud + white check), loaded once in main() and passed through.
+// `logoDataUri` is a data: URI of the bare brand mark (orange cloud + ink
+// check, NO tile — built inline in main() below), loaded once and passed through.
 function template({ title, tagline, domainName, code, level, logoDataUri }) {
   const accent = accentFor(level)
   const headerChildren = []
@@ -152,11 +153,21 @@ function template({ title, tagline, domainName, code, level, logoDataUri }) {
       props: { src: logoDataUri, width: 64, height: 64 },
     })
   }
+  // Two-tone wordmark mirroring the header lockup (Header.astro:87):
+  // "Cloud" lighter + "CertPrep" heavier so the compound name reads as a brand,
+  // not a label. satori embeds Inter (it cannot use the site's system stack), so
+  // this matches the WEIGHT treatment, not the typeface. The header uses 500/600;
+  // the OG pipeline ships only the 400/700 Inter TTFs, so it uses those two
+  // (a sanctioned approximation — see 12-og-image-polish.md). Both spans share
+  // one color; the contrast is weight alone, exactly as in the header.
   headerChildren.push({
     type: 'div',
     props: {
-      style: { fontSize: 30, fontWeight: 700, color: TEXT_PRIMARY, marginLeft: logoDataUri ? 18 : 0, letterSpacing: -0.5 },
-      children: 'CloudCertPrep',
+      style: { display: 'flex', fontSize: 30, color: TEXT_PRIMARY, marginLeft: logoDataUri ? 18 : 0, letterSpacing: -0.5 },
+      children: [
+        { type: 'span', props: { style: { fontWeight: 400 }, children: 'Cloud' } },
+        { type: 'span', props: { style: { fontWeight: 700 }, children: 'CertPrep' } },
+      ],
     },
   })
 
@@ -285,7 +296,14 @@ function template({ title, tagline, domainName, code, level, logoDataUri }) {
 async function renderPng(spec, fonts) {
   const svg = await satori(template(spec), { width: WIDTH, height: HEIGHT, fonts })
   const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: WIDTH } })
-  return resvg.render().asPng()
+  const raw = resvg.render().asPng()
+  // Palette-quantize the share cards: the dark-stage art is near-flat (solid ink
+  // + a few accent bars + text, no radial gradients), so an indexed palette is
+  // lossless to the eye yet ~65% smaller (49,974 -> ~17,355 B measured). Keeps
+  // egress polite to link scrapers without touching dimensions (palette PNGs
+  // carry the same IHDR the --strict check reads). quality 90 + level 9 avoids
+  // banding on the alpha-blended accent bars; verified by eye at thumb + full.
+  return sharp(raw).png({ palette: true, quality: 90, compressionLevel: 9 }).toBuffer()
 }
 
 // --- Cert tile art (site-facing, /og/card-<code>.png) ---
@@ -459,12 +477,17 @@ async function main() {
     { name: 'Inter', data: readFileSync(FONT_BOLD), weight: 700, style: 'normal' },
   ]
 
-  // Bare brand mark (matches the favicon and the site header): orange cloud +
-  // white check, NO tile. Built inline so the art never depends on the email
-  // asset (logo-email.svg keeps its white tile for email-client rendering).
+  // Bare brand mark, built to MATCH THE HEADER lockup exactly (Header.astro:73-74):
+  // orange cloud (full 24-box, stroke-width 1) + the FULL Lucide check
+  // `M20 6 9 17l-5-5` in ink, scaled to 0.5625 (the header renders an 18px check
+  // over a 32px cloud) and centred with the same ~1px downward optical nudge,
+  // stroke-width 3.4. The previous OG glyph used a different, compact check path
+  // (`M16.2 ...`) which read as a visibly different mark; this is the header's.
   const glyphSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-  <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" fill="${AWS_ORANGE}" stroke="${AWS_ORANGE}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M16.2 9.6 11.4 14.4 9 12" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" fill="${AWS_ORANGE}" stroke="${AWS_ORANGE}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(5.25,6) scale(0.5625)">
+    <path d="M20 6 9 17l-5-5" fill="none" stroke="${BG_INK}" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
 </svg>`
   const logoDataUri = `data:image/svg+xml;base64,${Buffer.from(glyphSvg, 'utf8').toString('base64')}`
 
@@ -508,7 +531,6 @@ async function main() {
   // WebP via sharp (bundled with Astro): the dark gradient art compresses
   // ~5x better than PNG, keeping the homepage light (DSv5.1 weight budget).
   let cardsRendered = 0
-  const { default: sharp } = await import('sharp')
   for (const cert of certs) {
     try {
       const png = await renderCardPng({ shortName: cert.shortName, level: cert.level, logoDataUri }, fonts)

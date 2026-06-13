@@ -401,7 +401,7 @@ header[data-overlay]:not(.hdr-scrolled) {
   --color-bg-card-hover: 250 251 252;/* #FAFBFC */
   --color-border: 233 235 237;       /* #E9EBED hairline (DSv4) */
   --color-link: 0 115 187;           /* #0073BB AWS link blue, 5.1:1 on white (DSv4) */
-  --color-success: 22 163 74;        /* #16A34A — passes 4.5:1 on white */
+  --color-success: 22 101 52;        /* #166534 — 6.1:1 on its bg-success/10 tint, 5.2:1 on /20 (WCAG AA); deepened from #16A34A which read ~2.6:1 on those correct-answer tints */
   --color-danger: 220 38 38;         /* #DC2626 — passes 4.5:1 on white */
   --color-warning: 154 69 9;         /* #9A4509 — 6.5:1 on white, 5.3:1 on its own bg-warning/15 badge tint (WCAG AA) */
   --color-text-primary: 22 25 31;    /* #16191F AWS squid ink (DSv4) */

@@ -1,0 +1,105 @@
+<!--
+  CloudCertPrep marketing / announcement template (REUSABLE).
+  NOT wired to anything. Starting point for future newsletters/announcements.
+  Send only to recipients who opted in. Replace every {{ placeholder }} below
+  (these are generic ESP merge fields, NOT Supabase auth variables).
+
+  Required placeholders:
+    {{ preheader }}        - inbox preview text (~90 chars)
+    {{ headline }}         - main headline (<= 8 words)
+    {{ subhead }}          - one-sentence supporting line
+    {{ body_html }}        - body copy (inline-styled <p> blocks)
+    {{ cta_label }}        - button text (<= 3 words)
+    {{ cta_url }}          - button destination (full https URL, no shorteners)
+    {{ unsubscribe_url }}  - one-click unsubscribe link (REQUIRED, see README)
+    {{ preferences_url }}  - manage-preferences link (optional)
+    {{ company_address }}  - physical postal address (REQUIRED, CAN-SPAM)
+
+  Also set the List-Unsubscribe and List-Unsubscribe-Post headers at send time
+  (see README.md). Legal: marketing email MUST carry a working unsubscribe, a
+  postal address, and a truthful From/subject. See README.md "Legal".
+-->
+<!doctype html>
+<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>{{ headline }}</title>
+  <!--[if mso]>
+  <style>body,table,td,a{font-family:Arial,Helvetica,sans-serif !important;}</style>
+  <![endif]-->
+</head>
+<body style="margin:0;padding:0;background-color:#F8F9FA;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#F8F9FA;opacity:0;">
+    {{ preheader }}
+  </div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F8F9FA;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background-color:#FFFFFF;border:1px solid #E9EBED;border-radius:16px;overflow:hidden;">
+          <!-- Brand lockup -->
+          <tr>
+            <td style="padding:28px 36px 20px 36px;border-bottom:1px solid #E9EBED;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align:middle;padding-right:12px;">
+                    <img src="https://www.cloudcertprep.io/logo-email-v2.png" width="40" height="40" alt="" style="display:block;border:0;border-radius:9px;">
+                  </td>
+                  <td style="vertical-align:middle;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:19px;letter-spacing:-0.2px;line-height:1;">
+                    <span style="font-weight:500;color:#16191F;">Cloud</span><span style="font-weight:700;color:#16191F;">CertPrep</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Hero -->
+          <tr>
+            <td style="padding:32px 36px 8px 36px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <p style="margin:0 0 12px 0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#EA8C00;">CloudCertPrep</p>
+              <h1 style="margin:0 0 12px 0;font-size:26px;line-height:1.25;font-weight:700;letter-spacing:-0.5px;color:#16191F;">{{ headline }}</h1>
+              <p style="margin:0 0 20px 0;font-size:17px;line-height:1.6;color:#545B64;">{{ subhead }}</p>
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style="padding:0 36px 8px 36px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#16191F;">
+              {{ body_html }}
+            </td>
+          </tr>
+          <!-- CTA -->
+          <tr>
+            <td align="center" style="padding:16px 36px 32px 36px;">
+              <!--[if mso]>
+              <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="{{ cta_url }}" style="height:48px;v-text-anchor:middle;width:260px;" arcsize="50%" strokecolor="#EA8C00" fillcolor="#EA8C00">
+                <w:anchorlock/>
+                <center style="color:#0E1116;font-family:Arial,sans-serif;font-size:16px;font-weight:bold;">{{ cta_label }}</center>
+              </v:roundrect>
+              <![endif]-->
+              <!--[if !mso]><!-- -->
+              <a href="{{ cta_url }}" style="display:inline-block;background-color:#EA8C00;color:#0E1116;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:700;line-height:1;text-decoration:none;padding:15px 30px;border-radius:9999px;">{{ cta_label }}</a>
+              <!--<![endif]-->
+            </td>
+          </tr>
+        </table>
+        <!-- Footer (outside the card): sender identity + unsubscribe + address -->
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;">
+          <tr>
+            <td style="padding:24px 36px 8px 36px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#8B95A3;text-align:center;">
+              <p style="margin:0 0 8px 0;">You are receiving this because you opted in at cloudcertprep.io.</p>
+              <p style="margin:0 0 8px 0;">
+                <a href="{{ unsubscribe_url }}" style="color:#545B64;text-decoration:underline;">Unsubscribe</a>
+                &nbsp;&middot;&nbsp;
+                <a href="{{ preferences_url }}" style="color:#545B64;text-decoration:underline;">Manage preferences</a>
+              </p>
+              <p style="margin:0;">CloudCertPrep &middot; {{ company_address }}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

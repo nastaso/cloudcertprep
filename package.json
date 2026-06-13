@@ -13,6 +13,7 @@
     "preview": "astro preview",
     "validate": "node scripts/validate-questions.mjs",
     "sitemap": "npx tsx scripts/generate-seo-assets.mjs",
+    "icons": "node scripts/generate-icons.mjs",
     "csp:hash": "node scripts/generate-csp-hashes.mjs",
     "check:citation": "node scripts/check-citation-phrases.mjs",
     "check:graph": "node scripts/validate-internal-graph.mjs",

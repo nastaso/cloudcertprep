@@ -1,0 +1,12 @@
+Confirm your new CloudCertPrep email
+
+You asked to change the email on your CloudCertPrep account from
+{{ .Email }} to {{ .NewEmail }}. Confirm the new address to complete the change.
+
+Confirm your new email:
+{{ .ConfirmationURL }}
+
+If you did not request this change, contact alex@cloudcertprep.io right away so
+we can secure your account.
+
+CloudCertPrep - Free AWS certification practice exams
