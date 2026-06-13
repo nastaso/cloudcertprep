@@ -403,7 +403,7 @@ header[data-overlay]:not(.hdr-scrolled) {
   --color-link: 0 115 187;           /* #0073BB AWS link blue, 5.1:1 on white (DSv4) */
   --color-success: 22 163 74;        /* #16A34A — passes 4.5:1 on white */
   --color-danger: 220 38 38;         /* #DC2626 — passes 4.5:1 on white */
-  --color-warning: 180 83 9;         /* #B45309 — 4.6:1 on white */
+  --color-warning: 154 69 9;         /* #9A4509 — 6.5:1 on white, 5.3:1 on its own bg-warning/15 badge tint (WCAG AA) */
   --color-text-primary: 22 25 31;    /* #16191F AWS squid ink (DSv4) */
   --color-text-muted: 84 91 100;     /* #545B64 AWS gray — 6.5:1 on white */
 }

@@ -766,8 +766,8 @@ export function DomainPractice() {
 
             {/* Question ID + Disclaimer */}
             <div className="mt-4 pt-3 border-t border-text-muted/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
-              <span className="text-xs text-text-muted/70 font-mono">{currentQuestion.id}</span>
-              <span className="text-[10px] text-text-muted/60">
+              <span className="text-xs text-text-muted font-mono">{currentQuestion.id}</span>
+              <span className="text-[10px] text-text-muted">
                 Found an error?{' '}
                 <a 
                   href={buildGitHubIssueUrl(currentQuestion.id)}

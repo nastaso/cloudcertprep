@@ -42,7 +42,7 @@ const {
   <div class={`relative ${maxWidth} mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-16 md:pb-20`}>
     <div class="stagger max-w-[68ch] mx-auto">
       {crumbs && crumbs.length > 0 && (
-        <nav class="mb-6 font-mono text-[12px] tracking-wide text-[#8B95A3]" aria-hidden="true">
+        <nav class="mb-6 font-mono text-[12px] tracking-wide text-[#8B95A3]" aria-label="Breadcrumb">
           {crumbs.map((c, i) => (
             <>
               {i > 0 && <span class="mx-1.5 text-white/25">›</span>}

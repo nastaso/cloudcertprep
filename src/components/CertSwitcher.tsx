@@ -289,7 +289,7 @@ export function CertSwitcher({ variant, onSelect, initialPathname }: CertSwitche
             className={`inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full font-mono text-[12px] tracking-wide transition-[background-color,color] duration-200 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header/60 ${
               isActive
                 ? 'bg-on-header/[0.14] text-on-header font-semibold'
-                : 'text-on-header/50 hover:text-on-header/80 font-medium'
+                : 'text-on-header/70 hover:text-on-header font-medium'
             }`}
           >
             {c.shortName}

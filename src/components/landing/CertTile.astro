@@ -30,11 +30,11 @@ const domains = cert.domains.length
 
 <a
   href={href}
-  class:list={['feature-card halo group', isComingSoon && 'opacity-90']}
+  class:list={['feature-card halo group']}
   style={`--halo-color: ${LEVEL_ACCENT_RGB[cert.level]}`}
   aria-label={`${cert.name}: ${isComingSoon ? 'coming soon' : `${questions.toLocaleString('en-US')}+ practice questions`}`}
 >
-  <div class="feature-art relative" aria-hidden="true">
+  <div class:list={['feature-art relative', isComingSoon && 'opacity-90']} aria-hidden="true">
     {/* Brand art from the OG pipeline (scripts/generate-og-images.mjs emits
         /og/card-<code>.webp at prebuild): one visual system for share cards
         and site tiles. */}

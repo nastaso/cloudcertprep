@@ -221,6 +221,15 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
       (function(){function h(){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sb-')===0&&k.indexOf('-auth-token')===k.length-11)return true}}catch(e){}return false}window.__ccHasSession=h;function apply(){document.documentElement.classList.toggle('cc-authed',h())}apply();window.addEventListener('pageshow',apply)})();
     </script>
 
+    <!-- Stale-chunk recovery: after a new deploy, a still-open old tab can
+         request a hashed chunk that no longer exists. Vite fires
+         `vite:preloadError` on the failed dynamic import; reload once (guarded by
+         a 10s timestamp so a permanently-missing chunk can never loop) to fetch
+         the current app. Inline so the CSP-hash generator covers it. DO NOT REMOVE. -->
+    <script is:inline>
+      (function(){window.addEventListener('vite:preloadError',function(e){try{e.preventDefault()}catch(_){}var now=Date.now(),last=0;try{last=+sessionStorage.getItem('cc-chunk-reload')||0}catch(_){}if(now-last<10000)return;try{sessionStorage.setItem('cc-chunk-reload',String(now))}catch(_){}location.reload()})})();
+    </script>
+
     <div class="min-h-screen bg-bg-dark flex flex-col">
       <a
         href="#main"
