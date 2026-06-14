@@ -191,13 +191,15 @@ const primaryTitleCased = titleCaseKeyword(primaryKeyword)
 // instead of showing a raw lowercase keyword.
 const primaryInSentence = fixKeywordInitialisms(primaryKeyword)
 
-// Title: lead with the primary keyword, anchor to the cert, end with the
-// brand. Never names a competitor (R6.13, R16.5), asserted below. No em
+// Title: lead with the primary keyword, anchor to the cert short name. The
+// " · CloudCertPrep" brand suffix is dropped here (deep page; the brand lives
+// on the home/hub) so the keyword-led title stays under the ~60-char SERP
+// limit. Never names a competitor (R6.13, R16.5), asserted below. No em
 // dashes anywhere (site-wide rule): the cert short name is parenthesised.
-const title = `${primaryTitleCased} (${cert.shortName}) · CloudCertPrep`
-// Meta description: includes the primary keyword + domain question count,
-// reads naturally, ~150 chars, no competitor name (R6.13, R16.5).
-const description = `${primaryTitleCased}: ${totalDomainQuestions}+ free ${cert.shortName} questions with explanations for the ${domain.name} domain. No signup required.`
+const title = `${primaryTitleCased} (${cert.shortName})`
+// Meta description: primary keyword + cert + domain question count, one
+// complete sentence under ~155 chars, no competitor name (R6.13, R16.5).
+const description = `${primaryTitleCased} for ${cert.shortName}: ${totalDomainQuestions}+ free questions with full explanations. No signup, no ads.`
 
 // Secondary keywords woven into the intro body copy (joined for a natural
 // sentence). Body-only terms are intentionally NOT surfaced here. Each term is

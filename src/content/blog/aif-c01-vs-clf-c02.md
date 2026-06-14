@@ -1,5 +1,5 @@
 ---
-title: 'AIF-C01 vs CLF-C02: Which AWS Foundational Cert Should You Take First?'
+title: 'AIF-C01 vs CLF-C02: Which AWS Cert to Take First'
 slug: aif-c01-vs-clf-c02
 description: 'A practical comparison of the AWS Certified AI Practitioner (AIF-C01) and Cloud Practitioner (CLF-C02) exams, and which foundational cert to sit first.'
 date: 2026-06-01

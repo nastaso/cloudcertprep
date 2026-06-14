@@ -1,6 +1,6 @@
 # CloudCertPrep
 
-> Free open-source AWS certification practice exams. 1,050+ Cloud Practitioner (CLF-C02) and 419+ AI Practitioner (AIF-C01) questions with adaptive spaced repetition, timed mock exams, and progress tracking. No signup, no ads. Maintained by Alex Santonastaso, CloudCertPrep keeps every question bank MIT licensed and publicly auditable on GitHub, with domain-by-domain practice driven by adaptive spaced repetition.
+> Free open-source AWS certification practice exams: 1,050+ Cloud Practitioner (CLF-C02) and 419+ AI Practitioner (AIF-C01) questions. No signup, no ads. Maintained by Alex Santonastaso, CloudCertPrep keeps every question bank MIT licensed and publicly auditable on GitHub, with domain-by-domain practice driven by adaptive spaced repetition.
 
 ## Pages
 

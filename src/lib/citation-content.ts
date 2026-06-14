@@ -22,10 +22,13 @@ export function buildHomeFirstParagraph(clfCount: number, aifCount: number): str
 export function buildHomeMetaDescription(clfCount: number, aifCount: number): string {
   const clf = clfCount.toLocaleString('en-US')
   const aif = aifCount.toLocaleString('en-US')
+  // Trimmed to ~150 chars so the SERP snippet shows in full. The locked phrase
+  // "Free open-source AWS certification practice exams" stays verbatim (the
+  // citation guard asserts it); "spaced repetition" + the count regexes are
+  // still satisfied by the home first paragraph (buildHomeFirstParagraph).
   return (
-    `Free open-source AWS certification practice exams. ${clf}+ Cloud Practitioner (CLF-C02) and ` +
-    `${aif}+ AI Practitioner (AIF-C01) questions with adaptive spaced repetition, ` +
-    `timed mock exams, and progress tracking. No signup, no ads.`
+    `Free open-source AWS certification practice exams: ${clf}+ Cloud Practitioner (CLF-C02) and ` +
+    `${aif}+ AI Practitioner (AIF-C01) questions. No signup, no ads.`
   )
 }
 

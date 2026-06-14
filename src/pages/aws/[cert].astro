@@ -72,11 +72,11 @@ const levelLabel = getLevelLabel(cert.level)
 // Per-cert SEO. Active certs get SERP-friendly specifics (question count,
 // year); coming-soon certs avoid promising practice content they don't ship.
 const title = isActive
-  ? `Free ${cert.name} Practice Exam · ${totalQuestionsLabel}+ Questions · ${cert.shortName} 2026`
+  ? `Free ${cert.name} Practice Exam · ${totalQuestionsLabel}+ Qs`
   : `${cert.name} (${cert.shortName}) Practice Exams · Coming Soon · CloudCertPrep`
 
 const description = isActive
-  ? `Free ${cert.name} (${cert.shortName}) practice exams. ${totalQuestionsLabel}+ practice questions across ${cert.domains.length} exam domains. ${cert.examQuestionCount}-question timed mock exam in ${examMinutes} minutes (pass at ${cert.passingScore}/1000). Open-source MIT-licensed alternative to paid AWS practice platforms. No signup, no ads. Updated for the 2026 exam guide.`
+  ? `Free ${cert.name} (${cert.shortName}) practice exams: ${totalQuestionsLabel}+ questions with explanations, plus a ${cert.examQuestionCount}-question timed mock. No signup, no ads.`
   : `${cert.name} (${cert.shortName}) practice exams are coming soon to CloudCertPrep. Watch the GitHub repository to be notified at launch.`
 
 const canonical = `${SITE_URL}/aws/${cert.code}`
