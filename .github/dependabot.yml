@@ -7,6 +7,22 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
+    # One grouped PR for non-breaking bumps. Grouping also keeps interdependent
+    # packages in lockstep: react + react-dom + @types/react must bump together
+    # or the build fails on a version mismatch (splitting them broke PR #8).
+    # Majors are excluded below, so they are never grouped (they would land as
+    # individual PRs if not ignored).
+    groups:
+      npm-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    # Major npm bumps broke the build before (tailwind v4 #6, eslint 10 #9).
+    # Hold them out of automation; do majors by hand, deliberately.
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -15,3 +31,11 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
+    # Action majors (checkout v4, setup-node v4) are low-risk and wanted - they
+    # clear the "Node 20 deprecated" warning - so group everything, no ignore.
+    groups:
+      actions-all:
+        update-types:
+          - "minor"
+          - "patch"
+          - "major"
