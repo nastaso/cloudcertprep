@@ -41,7 +41,11 @@ export function ResetPassword() {
     )
   }
 
-  if (!user) {
+  // `!success` exception: a successful reset signs out to revoke the recovery
+  // session, which flips `user` to null. Without this, the post-reset render
+  // would swap the "updated successfully" card for the invalid-link card during
+  // the brief redirect window. The success branch below owns that interval.
+  if (!user && !success) {
     return (
       <div className="flex-1 flex items-center justify-center px-4">
         <Card padding="lg" className="max-w-md w-full">
@@ -78,7 +82,21 @@ export function ResetPassword() {
 
       if (error) throw error
 
+      // Mark success BEFORE signing out. signOut flips useAuth's user to null,
+      // and the early-return guard above keys off `user`; setting success first
+      // (paired with the `!success` exception) keeps the success card showing
+      // instead of flashing the invalid-link card during the redirect window.
       setSuccess(true)
+
+      // Revoke sessions after the password change. A reset is account recovery,
+      // so use the default global scope: it invalidates every refresh token for
+      // the user (this browser plus any other device), the standard posture for
+      // a password reset, which also evicts anyone who still held a session.
+      // Best-effort: a failed revoke must not block the redirect to sign-in (the
+      // password change already succeeded, and the request that just made it
+      // proves the network is up, so a failure here is very unlikely).
+      await supabase.auth.signOut().catch(() => {})
+
       setTimeout(() => navigate('/login'), 2000)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -139,7 +157,7 @@ export function ResetPassword() {
             fullWidth
             loading={loading}
             loadingText="Updating..."
-            disabled={!isPasswordStrongEnough(password) || password !== confirmPassword}
+            disabled={success || !isPasswordStrongEnough(password) || password !== confirmPassword}
           >
             Reset password
           </Button>

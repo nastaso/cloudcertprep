@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useCert } from '../hooks/useCert'
@@ -99,6 +99,11 @@ export function DomainPractice() {
   const [answering, setAnswering] = useState(false)
   const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null)
   const [dontShowLeaveGuard, setDontShowLeaveGuard] = useState(false)
+  // Synchronous re-entrancy guard for finishPractice (mirrors _MockExam's
+  // submittingRef). React state is async, so a rapid double-click on "Finish
+  // session" would otherwise run the attempt_questions insert twice before the
+  // screen swaps to results, inflating per-domain mastery.
+  const finishingRef = useRef(false)
   const { selectQuestions, refreshMastery } = useSpacedRepetition(user?.id ?? null, selectedDomain, cert.code)
 
   const domains = Object.fromEntries(cert.domains.map(d => [d.id, d.name]))
@@ -115,8 +120,6 @@ export function DomainPractice() {
   useSEO({
     title: pageTitle,
     description: `Practice ${cert.name} (${cert.shortName}) questions by exam domain. Instant feedback, explanations, adaptive spaced repetition. Domains: ${domainNames}.`,
-    // Guests and signed-in users get the same treatment here: both see the
-    // real practice flow (there is no guest gate).
     // NOTE: this route ships robots=noindex (set on the Astro shell), so it
     // must NOT emit a canonical — noindex+canonical is contradictory and a
     // noindex page accrues no indexing equity. BaseLayout omits the canonical
@@ -200,13 +203,9 @@ export function DomainPractice() {
     navigate(`${domainPracticePath}?domain=${domainId}`)
   }
 
-  // Guests and signed-in users see the same selection screen (domain
-  // card grid + Back to home button) and the same practice flow — there
-  // is no guest gate; crawlers see real cert-specific content. A sibling
-  // `UnlockCTA` card below the selection card nudges guests to sign in to
-  // save mastery (it does not block practice). The `authLoading` skeleton
-  // stays as an early-return below since it must run AFTER every hook so
-  // React's hook order remains consistent across renders.
+  // The `authLoading` skeleton stays as an early-return below since it must
+  // run AFTER every hook so React's hook order remains consistent across
+  // renders.
   if (authLoading) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
@@ -235,6 +234,7 @@ export function DomainPractice() {
       setShowFeedback(false)
       setResults([])
       setQuestionResults([])
+      finishingRef.current = false // re-arm the dup-write guard for this fresh session
       setScreen('practice')
       window.scrollTo(0, 0)
       trackEvent('practice_started', { domain_id: selectedDomain, question_count: questionCount })
@@ -301,6 +301,8 @@ export function DomainPractice() {
   }
 
   async function finishPractice() {
+    if (finishingRef.current) return
+    finishingRef.current = true
     // Only save to database if user is logged in
     if (user) {
       try {
