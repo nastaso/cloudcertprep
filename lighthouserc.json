@@ -4,10 +4,10 @@
       "staticDistDir": "./dist",
       "url": [
         "http://localhost/index.html",
-        "http://localhost/about/index.html",
-        "http://localhost/blog/index.html",
-        "http://localhost/aws/clf-c02/index.html",
-        "http://localhost/aws/aif-c01/index.html"
+        "http://localhost/about.html",
+        "http://localhost/blog.html",
+        "http://localhost/aws/clf-c02.html",
+        "http://localhost/aws/aif-c01.html"
       ],
       "numberOfRuns": 3,
       "settings": {
