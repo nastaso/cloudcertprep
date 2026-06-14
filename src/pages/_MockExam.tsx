@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Flag, AlertCircle, LayoutGrid } from 'lucide-react'
 import { Button } from '../components/Button'
@@ -128,6 +128,11 @@ export function MockExam() {
     }>
   } | null>(null)
   const [loading, setLoading] = useState(false)
+  // Synchronous re-entrancy guard for exam submission. setLoading is async, so a
+  // state-only guard lets rapid clicks (or any re-entrant call) before the next
+  // render all slip through and each insert a duplicate exam_attempts row. A ref
+  // flips synchronously, so the save body runs at most once per attempt.
+  const submittingRef = useRef(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [startTime, setStartTime] = useState<number>(0)
@@ -279,6 +284,7 @@ export function MockExam() {
       setOptionKeyMaps(keyMaps)
       setAnswers(new Map())
       setCurrentIndex(0)
+      submittingRef.current = false // re-arm the dup-submit guard for this fresh attempt
       setScreen('exam')
       setStartTime(Date.now())
       // Rebase the timer to the full exam duration before starting. Without
@@ -387,7 +393,8 @@ export function MockExam() {
   }
 
   async function handleSubmitExam() {
-    if (loading || screen === 'results') return
+    if (submittingRef.current || screen === 'results') return
+    submittingRef.current = true
     setLoading(true)
     // Clear any stale submit error from a previous attempt so a later
     // successful save doesn't keep showing "could not be saved". (M0b)
