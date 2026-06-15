@@ -14,7 +14,10 @@
       "E"
     ],
     "explanation": "Automatically provisioning new resources to meet demand and the ability to recover quickly from failures are both core reliability principles, ensuring the system continues operating correctly under varying conditions and after failure events.\nApplying the principle of least privilege is a security practice related to access control, not a reliability principle. All AWS services being considered global services is false, as many services are regional, and global reach is a separate concept from reliability. Providing compensation to customers if issues occur describes an SLA remediation mechanism and is not a design principle that contributes to system reliability.",
-    "isMultiAnswer": true
+    "isMultiAnswer": true,
+    "taskStatement": "1.2",
+    "lastVerified": "2026-06-15",
+    "services": []
   },
   {
     "id": "q010",
@@ -27,7 +30,13 @@
     },
     "answer": "D",
     "explanation": "Deploying EC2 instances in a US Region places compute resources physically closer to US users, directly reducing network latency at minimal additional cost.\nApplying a Route 53 latency-based routing policy directs users to the Region with the lowest latency, but this only optimizes routing and does not itself reduce latency if all compute resources remain in Tokyo. Registering a new US domain name changes how users reach the application by name but does not move any compute resources closer to US users or reduce network latency. Building a new data center in the US and implementing a hybrid model introduces significant capital expenditure and operational complexity, contradicting the requirement to minimize costs.",
-    "isMultiAnswer": false
+    "isMultiAnswer": false,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-15",
+    "services": [
+      "Amazon EC2",
+      "Amazon Route 53"
+    ]
   },
   {
     "id": "q013",
@@ -57,7 +66,10 @@
       "E"
     ],
     "explanation": "AWS increases speed and agility by allowing customers to provision resources in minutes rather than weeks, and handles physical security along with most data and network security so customers can focus on building applications rather than managing infrastructure.\nUnlimited free storage is not an AWS benefit, as storage services such as Amazon S3 and EBS are billed based on the amount of data stored and retrieved. Complete control over physical infrastructure is not available to AWS customers, as AWS owns and manages all physical hardware, data centers, and networking equipment on the customer's behalf. Operating applications on behalf of customers is not an AWS benefit, as customers remain responsible for building, deploying, and managing their own applications under the shared responsibility model.",
-    "isMultiAnswer": true
+    "isMultiAnswer": true,
+    "taskStatement": "1.1",
+    "lastVerified": "2026-06-15",
+    "services": []
   },
   {
     "id": "q015",

@@ -250,7 +250,11 @@ function validateQuestion(q, certCode, domainNum, idx, seenIds, regEntry) {
 function parseCertRegistryForValidation() {
   const certRegistryPath = join(__dirname, '..', 'src', 'data', 'certifications.ts')
   const source = readFileSync(certRegistryPath, 'utf8')
-  const objectRegex = /'([a-z0-9-]+)':\s*\{([\s\S]*?)\n\s*\},?/g
+  // Capture the FULL cert block. The terminator is the cert object's own close,
+  // which sits at a 2-space indent (`\n  },`); nested objects (e.g. examFormat)
+  // close at 4-space (`\n    },`) and must NOT terminate the match, or the body
+  // truncates before taskStatements/services and their vocab checks go dormant.
+  const objectRegex = /'([a-z0-9-]+)':\s*\{([\s\S]*?)\n  \},?/g
   const map = {}
   let match
   while ((match = objectRegex.exec(source)) !== null) {
