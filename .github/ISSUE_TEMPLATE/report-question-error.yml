@@ -7,8 +7,8 @@ body:
     id: question_id
     attributes:
       label: Question ID
-      description: The ID shown in the bottom-left of the question card (e.g. CLF-D3-0142). The "Report on GitHub" link from inside the app pre-fills this.
-      placeholder: CLF-D3-0142
+      description: The ID shown in the bottom-left of the question card (e.g. q142 or aif-q457). The "Report on GitHub" link from inside the app pre-fills this.
+      placeholder: q142 or aif-q457
     validations:
       required: true
   - type: dropdown
