@@ -14,7 +14,7 @@
 [![Last commit](https://img.shields.io/github/last-commit/nastaso/cloudcertprep)](https://github.com/nastaso/cloudcertprep/commits/main)
 [![GitHub stars](https://img.shields.io/github/stars/nastaso/cloudcertprep?style=social)](https://github.com/nastaso/cloudcertprep/stargazers)
 
-1,050+ AWS Cloud Practitioner and 409+ AWS Certified AI Practitioner practice questions. Full-length timed mock exams, domain-by-domain practice with adaptive spaced repetition, and progress tracking. No signup required, no ads. MIT licensed and publicly auditable on GitHub.
+1,050+ AWS Cloud Practitioner and 419+ AWS Certified AI Practitioner practice questions. Full-length timed mock exams, domain-by-domain practice with adaptive spaced repetition, and progress tracking. No signup required, no ads. MIT licensed and publicly auditable on GitHub.
 
 No ads, no paywalls, no premium tiers. MIT licensed.
 
@@ -51,7 +51,7 @@ Current certifications:
 | Cert | Status | Questions |
 |---|---|---|
 | AWS Cloud Practitioner (CLF-C02) | Active | ~1,050 |
-| AWS Certified AI Practitioner (AIF-C01) | Active | ~410 |
+| AWS Certified AI Practitioner (AIF-C01) | Active | 419 |
 | AWS Solutions Architect Associate (SAA-C03) | Coming soon | Placeholder |
 
 ---
