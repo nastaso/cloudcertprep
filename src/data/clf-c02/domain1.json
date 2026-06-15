@@ -49,7 +49,8 @@
     },
     "answer": "C",
     "explanation": "Elasticity is the cloud best practice of dynamically adjusting compute capacity up or down in response to demand, avoiding over-provisioning during low-traffic periods and under-provisioning during peaks, which directly reduces cost.\nBuild security in every layer is the Defense in Depth principle from the Security pillar of the Well-Architected Framework, which addresses threat protection rather than capacity management. Parallelizing tasks is a performance design principle that distributes workloads across multiple smaller components to increase throughput, not a mechanism for dynamically adjusting capacity to control costs. Adopting monolithic architecture consolidates all application components into a single tightly coupled unit, which is the opposite of a cloud best practice and does not support dynamic scaling.",
-    "isMultiAnswer": false
+    "isMultiAnswer": false,
+    "services": []
   },
   {
     "id": "q014",
