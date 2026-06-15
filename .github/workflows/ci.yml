@@ -19,9 +19,13 @@ jobs:
     # these are missing. They are public client-side values (the anon key is in the
     # shipped bundle), provided to CI as repo secrets so .env (gitignored) is not needed.
     env:
-      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-      VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
+      # Fork PRs do not receive repo secrets, so these are empty on a fork and the
+      # build (which requires them) throws. Fall back to harmless placeholders so a
+      # fork PR can build: the build never calls Supabase, the anon key is public,
+      # and the CI artifact is never deployed. Same-repo pushes/PRs use the real secrets.
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || 'placeholder-anon-key-build-only' }}
+      VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA' }}
 
     steps:
       - name: Checkout
@@ -63,10 +67,17 @@ jobs:
   lighthouse:
     name: Lighthouse CI
     runs-on: ubuntu-latest
+    # Skip on fork PRs: a fork build has no real secrets/deploy, and Lighthouse is a
+    # quality gate for our own changes, not a blocker for external contributors.
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
     env:
-      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-      VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
+      # Fork PRs do not receive repo secrets, so these are empty on a fork and the
+      # build (which requires them) throws. Fall back to harmless placeholders so a
+      # fork PR can build: the build never calls Supabase, the anon key is public,
+      # and the CI artifact is never deployed. Same-repo pushes/PRs use the real secrets.
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || 'placeholder-anon-key-build-only' }}
+      VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA' }}
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
