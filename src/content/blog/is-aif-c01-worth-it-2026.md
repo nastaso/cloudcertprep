@@ -5,7 +5,7 @@ description: 'An honest 2026 guide to whether the AWS Certified AI Practitioner 
 date: 2026-06-15
 tags: ['aif-c01', 'career', 'study-tips']
 ogImage: /og/og-blog.png
-draft: false
+draft: true
 faq:
   - q: "Is the AWS AI Practitioner (AIF-C01) worth it in 2026?"
     a: "For most people who work near AI or cloud, yes. It is a low-cost, recognised way to prove foundational AI literacy, which more roles now expect. It is less worthwhile for experienced machine-learning engineers, who will find the depth too introductory."

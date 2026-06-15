@@ -144,13 +144,4 @@
       <image:loc>https://www.cloudcertprep.io/og/og-blog.png</image:loc>
     </image:image>
   </url>
-  <url>
-    <loc>https://www.cloudcertprep.io/blog/is-aif-c01-worth-it-2026</loc>
-    <lastmod>2026-06-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <image:image>
-      <image:loc>https://www.cloudcertprep.io/og/og-blog.png</image:loc>
-    </image:image>
-  </url>
 </urlset>
