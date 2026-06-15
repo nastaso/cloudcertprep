@@ -1,0 +1,41 @@
+name: IndexNow ping
+
+# Instant-indexing ping (Bing + Yandex + Seznam; Google ignores IndexNow).
+# Submits the production indexable surface to the IndexNow API after a push to
+# `main` so new or changed URLs are crawled within hours. This is a DEPLOY-time
+# action, NOT a build guard: it must run only against production, never on a
+# preview or local build (which is why it lives here and not in
+# prebuild/postbuild).
+#
+# Timing: Netlify deploys `main` independently and asynchronously. IndexNow
+# validates the key lazily (it fetches <key>.txt at crawl time, minutes to hours
+# later), so a short deploy lag between this ping and the live key file is fine.
+# The ping reads the LIVE sitemap, so it only ever submits already-crawlable
+# URLs; a URL added in this very push is picked up by the next push or the daily
+# monitor.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Outbound HTTP only; no repo writes.
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    name: Submit production URLs to IndexNow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: '22'
+
+      # Zero-dependency script (bare fetch); no `npm ci` needed.
+      - name: Ping IndexNow with the production sitemap URLs
+        run: node scripts/ping-indexnow.mjs https://www.cloudcertprep.io
