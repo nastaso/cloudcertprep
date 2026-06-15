@@ -38,7 +38,13 @@ function parseCertRegistry() {
     const provider = body.match(/provider:\s*'([a-z0-9-]+)'/)?.[1]
     const status = body.match(/status:\s*'([a-z-]+)'/)?.[1]
     if (!provider || !status) continue
-    const domainEntryRegex = /\{\s*id:\s*\d+,\s*name:\s*'([^']+)',\s*questionCount:\s*\d+,\s*examProportion:\s*[\d.]+\s*\}/g
+    // Match a domain object by its leading `id: <int>, name: '<name>'` and
+    // capture the name, tolerating any trailing fields (questionCount,
+    // examProportion, weight, taskRange, blurb, ...). Domain objects are
+    // single-brace and contain no nested `}`, so `[^}]*` stops at this entry's
+    // own close. Quoted-id objects (taskStatements) are excluded by the
+    // unquoted `\d+` id requirement.
+    const domainEntryRegex = /\{\s*id:\s*\d+,\s*name:\s*'([^']+)'[^}]*\}/g
     const domains = [...body.matchAll(domainEntryRegex)].map(m => ({ name: m[1] }))
     certs.push({ code, provider, status, domains })
   }

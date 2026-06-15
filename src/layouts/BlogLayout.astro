@@ -30,6 +30,7 @@ interface BlogFrontmatter {
   draft?: boolean
   canonical?: string
   author?: { name: string; id: string }
+  faq?: { q: string; a: string }[]
 }
 
 interface Props {
@@ -69,6 +70,24 @@ const blogPostingJsonLd = serializeJsonLd({
   ...(data.tags && data.tags.length > 0 ? { keywords: data.tags.join(', ') } : {}),
 })
 
+// Optional FAQPage graph, built from the post's `faq` frontmatter. Google
+// retired the FAQ rich result, but answer engines (ChatGPT, Perplexity,
+// Gemini) still read FAQPage Q&A when citing sources, so it stays a useful
+// signal. Author the same Q&A visibly in the post body (kept in sync).
+const faqJsonLd =
+  data.faq && data.faq.length > 0
+    ? serializeJsonLd({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        '@id': `${selfUrl}#faq`,
+        mainEntity: data.faq.map((item) => ({
+          '@type': 'Question',
+          name: item.q,
+          acceptedAnswer: { '@type': 'Answer', text: item.a },
+        })),
+      })
+    : null
+
 const publishedDisplay = data.date.toLocaleDateString('en-GB', {
   year: 'numeric',
   month: 'long',
@@ -85,7 +104,7 @@ const updatedDisplay = data.updated
   canonical={canonical}
   ogImage={ogImage}
   ogType="article"
-  jsonLd={[blogPostingJsonLd]}
+  jsonLd={faqJsonLd ? [blogPostingJsonLd, faqJsonLd] : [blogPostingJsonLd]}
   headerOverlay={true}
 >
   <Fragment slot="head">

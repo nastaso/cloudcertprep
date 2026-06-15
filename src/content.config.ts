@@ -22,6 +22,13 @@ const blog = defineCollection({
     tags: z.array(z.string()).default([]),
     ogImage: z.string().optional(),
     draft: z.boolean().default(false),
+    // Optional FAQ pairs. When present, BlogLayout emits an FAQPage JSON-LD
+    // block (an AI-citation / answer-engine signal) alongside the post's
+    // BlogPosting graph. Author the same Q&A visibly in the post body so the
+    // structured data mirrors what readers see.
+    faq: z
+      .array(z.object({ q: z.string().min(1), a: z.string().min(1) }))
+      .default([]),
     canonical: z.string().url().optional(),
     author: z
       .object({
