@@ -61,7 +61,6 @@ Current certifications:
 - AWS Solutions Architect Associate (SAA-C03) — question bank in progress, target Q3 2026
 - AWS Developer Associate (DVA-C02) — planned for late 2026
 - AWS SysOps Administrator Associate (SOA-C02) — planned for 2027
-- Per-cert programmatic SEO landing pages (`/aws/clf-c02/security-questions`, etc.)
 - Per-cert OG share images
 - Community-contributed questions via PR review
 
