@@ -8,6 +8,7 @@ import {
   matchesToTokens,
   toOriginalMatchTokens,
   encodeAnswerForDb,
+  groupBy,
 } from './utils'
 import type { Question } from '../types'
 
@@ -204,5 +205,59 @@ describe('encodeAnswerForDb', () => {
   it('encodes a null/empty answer to an empty string', () => {
     expect(encodeAnswerForDb(null, keyMap, 'single')).toBe('')
     expect(encodeAnswerForDb(null, keyMap, 'matching')).toBe('')
+  })
+})
+
+describe('groupBy', () => {
+  it('returns an empty Map for empty input', () => {
+    const result = groupBy([], (n: number) => n)
+    expect(result.size).toBe(0)
+  })
+
+  it('buckets items by the derived key', () => {
+    const certs = [
+      { id: 'clf', provider: 'aws' },
+      { id: 'aif', provider: 'aws' },
+      { id: 'az900', provider: 'azure' },
+    ]
+    const result = groupBy(certs, c => c.provider)
+    expect([...result.keys()]).toEqual(['aws', 'azure'])
+    expect(result.get('aws')).toEqual([
+      { id: 'clf', provider: 'aws' },
+      { id: 'aif', provider: 'aws' },
+    ])
+    expect(result.get('azure')).toEqual([{ id: 'az900', provider: 'azure' }])
+  })
+
+  it('preserves the original array order within each bucket', () => {
+    const items = [
+      { id: 1, group: 'a' },
+      { id: 2, group: 'a' },
+      { id: 3, group: 'a' },
+    ]
+    const result = groupBy(items, i => i.group)
+    expect(result.get('a')!.map(i => i.id)).toEqual([1, 2, 3])
+  })
+
+  it('orders keys by first appearance in the input', () => {
+    // azure is seen first, then aws, then azure again: key order is azure, aws.
+    const certs = [
+      { id: 'az900', provider: 'azure' },
+      { id: 'clf', provider: 'aws' },
+      { id: 'az104', provider: 'azure' },
+    ]
+    const result = groupBy(certs, c => c.provider)
+    expect([...result.keys()]).toEqual(['azure', 'aws'])
+  })
+
+  it('supports non-string keys (number and boolean)', () => {
+    const byLevel = groupBy([1, 2, 3, 4], n => n % 2 === 0)
+    expect([...byLevel.keys()]).toEqual([false, true])
+    expect(byLevel.get(false)).toEqual([1, 3])
+    expect(byLevel.get(true)).toEqual([2, 4])
+
+    const byNumber = groupBy([1.1, 2.2, 1.9], n => Math.floor(n))
+    expect([...byNumber.keys()]).toEqual([1, 2])
+    expect(byNumber.get(1)).toEqual([1.1, 1.9])
   })
 })
