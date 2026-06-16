@@ -17,6 +17,7 @@ export function LoadingSpinner({ size = 'md', text, delayed = false }: LoadingSp
       className={`flex flex-col items-center justify-center gap-4 ${delayed ? 'animate-delayed-fade' : 'animate-fade-in'}`}
       role="status"
       aria-live="polite"
+      aria-label={text ?? "Loading"}
     >
       {/* Monochrome ring (track + single rotating head in the primary text
           colour, theme-aware). The brand orange is reserved for CTAs/active
