@@ -125,7 +125,7 @@ export function Stats() {
           </header>
 
           {error && (
-            <Alert tone="danger" className="text-danger">
+            <Alert tone="danger" role="alert" className="text-danger">
               <p className="text-danger text-sm">{error}</p>
             </Alert>
           )}
