@@ -931,6 +931,11 @@
     "isMultiAnswer": false,
     "taskStatement": "5.1",
     "lastVerified": "2026-06-13",
-    "services": []
+    "services": [
+      "AWS IAM",
+      "AWS KMS",
+      "Amazon Macie",
+      "AWS CloudTrail"
+    ]
   }
 ]
