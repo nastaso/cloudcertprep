@@ -64,10 +64,18 @@ function ExamQuestionGrid({
         const isAnswered = isQuestionAnswered(state)
         const isFlagged = state?.flagged || false
         const isCurrent = idx === currentIndex
+        const stateLabel = [
+          isCurrent ? 'current' : null,
+          isAnswered ? 'answered' : 'not answered',
+          isFlagged ? 'flagged for review' : null,
+        ].filter(Boolean).join(', ')
+        const ariaLabel = `Question ${idx + 1}, ${stateLabel}`
         return (
           <button
             key={idx}
             onClick={() => onSelect(idx)}
+            aria-label={ariaLabel}
+            aria-current={isCurrent ? 'true' : undefined}
             className={`relative ${variant === 'sidebar' ? 'w-10 h-10' : 'w-full aspect-square'} rounded text-sm font-medium transition-colors ${
               isCurrent
                 ? 'bg-brand text-on-brand'
@@ -78,7 +86,7 @@ function ExamQuestionGrid({
           >
             {idx + 1}
             {isFlagged && (
-              <Flag className="absolute -top-1 -right-1 w-3 h-3 text-warning fill-warning" />
+              <Flag className="absolute -top-1 -right-1 w-3 h-3 text-warning fill-warning" aria-hidden="true" />
             )}
           </button>
         )
