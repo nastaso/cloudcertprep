@@ -219,7 +219,11 @@ npm run build
 
 ## Contributors
 
-CloudCertPrep is maintained by [Alex Santonastaso](https://santonastaso.me). Question fixes and new certification banks are credited in commit history; project-level contributors will be listed here.
+CloudCertPrep is maintained by [Alex Santonastaso](https://santonastaso.me) and improved by the contributors below. Every question fix, test, and accessibility tweak helps people study for free.
+
+[![Contributors](https://contrib.rocks/image?repo=nastaso/cloudcertprep)](https://github.com/nastaso/cloudcertprep/graphs/contributors)
+
+New here? The [good first issues](https://github.com/nastaso/cloudcertprep/labels/good%20first%20issue) are small and welcoming, and even a single-question fix counts. And if CloudCertPrep helps your own studying, a [star](https://github.com/nastaso/cloudcertprep) helps other learners find it.
 
 ---
 
