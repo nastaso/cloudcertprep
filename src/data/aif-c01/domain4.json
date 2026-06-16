@@ -962,6 +962,11 @@
     "isMultiAnswer": false,
     "taskStatement": "4.1",
     "lastVerified": "2026-06-13",
-    "services": []
+    "services": [
+      "Amazon SageMaker Clarify",
+      "Amazon SageMaker Model Monitor",
+      "Amazon Augmented AI (Amazon A2I)",
+      "Amazon SageMaker Model Cards"
+    ]
   }
 ]

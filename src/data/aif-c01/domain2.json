@@ -1402,6 +1402,10 @@
     "isMultiAnswer": false,
     "taskStatement": "2.3",
     "lastVerified": "2026-06-13",
-    "services": []
+    "services": [
+      "Amazon Bedrock",
+      "Amazon SageMaker JumpStart",
+      "Amazon Q Business"
+    ]
   }
 ]
