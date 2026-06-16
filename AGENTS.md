@@ -37,7 +37,7 @@ opening PRs, see `CONTRIBUTING.md`; for a project overview, see `README.md`.
 | `npm run build` | Production build. Runs the prebuild + postbuild guard chains below. |
 | `npm run preview` | Serve the built `dist/`. |
 | `npm run lint` | ESLint over the repo. |
-| `npm run test` | Vitest - 188 unit tests. |
+| `npm run test` | Full Vitest unit suite. |
 | `npm run e2e` | Playwright end-to-end tests. |
 | `npm run validate` | Question-bank validator (also runs in prebuild). |
 | `npm run icons` | Regenerate the favicon / app-icon / maskable set from one source. |
@@ -63,7 +63,7 @@ are no migrations in the repo - and **RLS is the security boundary**, not app co
 
 ## Verify your work before calling it done
 
-- Guards + `npm run lint` + `npm run test` (188) + `npm run e2e` all green.
+- Guards + `npm run lint` + the full `npm run test` suite + `npm run e2e` all green.
 - For UI changes, screenshot the change dark and light, across mobile-to-wide widths,
   and both logged-out and logged-in. Use the Playwright harness with
   `reducedMotion: 'reduce'` (otherwise below-fold reveal animations capture as blank).
