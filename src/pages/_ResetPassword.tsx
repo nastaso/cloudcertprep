@@ -146,7 +146,7 @@ export function ResetPassword() {
           )}
 
           {error && (
-            <Alert tone="danger" className="text-danger">
+            <Alert tone="danger" role="alert" className="text-danger">
               {error}
             </Alert>
           )}
