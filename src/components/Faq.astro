@@ -18,6 +18,7 @@
  */
 import { FAQ_ENTRIES, FAQ_CATEGORY_LABEL, FAQ_CATEGORY_ORDER } from '../lib/seo-data'
 import { serializeJsonLd } from '../lib/jsonld'
+import { splitLinks } from '../lib/faqLinks'
 
 interface SimpleEntry {
   question: string
@@ -69,14 +70,6 @@ const faqJsonLd = serializeJsonLd({
     acceptedAnswer: { '@type': 'Answer', text: entry.answer },
   })),
 })
-
-// Split bare URLs in an answer into linkable fragments.
-function splitLinks(text: string): Array<{ text: string; isLink: boolean }> {
-  return text.split(/(https?:\/\/[^\s)]+)/g).filter(Boolean).map(part => ({
-    text: part,
-    isLink: part.startsWith('http://') || part.startsWith('https://'),
-  }))
-}
 
 const chevron = '<polyline points="6 9 12 15 18 9"></polyline>'
 ---
