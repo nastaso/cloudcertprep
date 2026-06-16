@@ -6,11 +6,24 @@ date: 2026-06-01
 tags: ['clf-c02', 'aif-c01', 'exam-format']
 ogImage: /og/og-blog.png
 draft: false
+faq:
+  - q: "What is the difference between AIF-C01 and CLF-C02?"
+    a: "CLF-C02 (Cloud Practitioner) covers the AWS Cloud broadly: core services, security, pricing, and support. AIF-C01 (AI Practitioner) focuses on AI and machine learning on AWS. Both are foundational, 65 questions, 90 minutes, and pass at 700 out of 1000; the only real difference is the subject matter."
+  - q: "Should I take CLF-C02 or AIF-C01 first?"
+    a: "For most people new to AWS, take CLF-C02 first. It builds the cloud vocabulary (regions, IAM, S3, the shared responsibility model) that makes several AIF-C01 topics easier to follow. Take AIF-C01 first only if your work is squarely in AI or ML and you already know cloud basics."
+  - q: "Do I need CLF-C02 before AIF-C01?"
+    a: "No. AIF-C01 is foundational and has no prerequisites. Knowing basic AWS concepts helps you place some topics in context, but it is not required to sit or pass the exam."
+  - q: "Is AIF-C01 harder than CLF-C02?"
+    a: "They are the same level (foundational), length (65 questions, 90 minutes), and passing score (700 out of 1000). AIF-C01 is narrower and deeper on AI and ML and adds two question formats (ordering and matching) that CLF-C02 does not use, but neither is harder by design; it depends on your background."
+  - q: "How much do the CLF-C02 and AIF-C01 exams cost?"
+    a: "Each exam fee is about USD 100 before any local tax, and each certification is valid for three years."
 ---
 
 AWS now has two foundational certifications: the long-established **Cloud Practitioner (CLF-C02)** and the newer **Certified AI Practitioner (AIF-C01)**. If you are starting out and only want to sit one, or you are deciding which order to take them in, this post breaks down how they differ and who each one is for.
 
 Both are entry-level and neither requires hands-on lab work. They follow AWS's standard certification experience, though AIF-C01 introduces a couple of extra question formats. The main difference is entirely in the subject matter.
+
+_Last reviewed: June 2026._
 
 ## CLF-C02 vs AIF-C01 at a glance
 
@@ -24,6 +37,8 @@ Both are entry-level and neither requires hands-on lab work. They follow AWS's s
 | Domains | 4 | 5 |
 | Question formats | Multiple choice, multiple response | Multiple choice and response, plus ordering and matching |
 | Prerequisites | None | None |
+| Exam fee | About USD 100 | About USD 100 |
+| Validity | 3 years | 3 years |
 
 ## The headline difference: cloud breadth vs AI focus
 
@@ -65,3 +80,25 @@ If you want both, do them back to back. The shared format means the second exam 
 ## Bottom line
 
 CLF-C02 is the broad cloud foundation; AIF-C01 is the focused AI foundation. Similar exam experience, same scoring, same foundational level, different subject matter (AIF-C01 adds a couple of question formats). Start with CLF-C02 unless you live in AI/ML, then add AIF-C01. Either way, rehearse with domain practice and a couple of full-length mock exams before you book. Start with the [CLF-C02 practice exam](/aws/clf-c02) or jump straight into [AIF-C01](/aws/aif-c01).
+
+## Frequently asked questions
+
+### What is the difference between AIF-C01 and CLF-C02?
+
+CLF-C02 (Cloud Practitioner) covers the AWS Cloud broadly: core services, security, pricing, and support. AIF-C01 (AI Practitioner) focuses on AI and machine learning on AWS. Both are foundational, 65 questions, 90 minutes, and pass at 700 out of 1000; the only real difference is the subject matter.
+
+### Should I take CLF-C02 or AIF-C01 first?
+
+For most people new to AWS, take CLF-C02 first. It builds the cloud vocabulary (regions, IAM, S3, the shared responsibility model) that makes several AIF-C01 topics easier to follow. Take AIF-C01 first only if your work is squarely in AI or ML and you already know cloud basics.
+
+### Do I need CLF-C02 before AIF-C01?
+
+No. AIF-C01 is foundational and has no prerequisites. Knowing basic AWS concepts helps you place some topics in context, but it is not required to sit or pass the exam.
+
+### Is AIF-C01 harder than CLF-C02?
+
+They are the same level (foundational), length (65 questions, 90 minutes), and passing score (700 out of 1000). AIF-C01 is narrower and deeper on AI and ML and adds two question formats (ordering and matching) that CLF-C02 does not use, but neither is harder by design; it depends on your background.
+
+### How much do the CLF-C02 and AIF-C01 exams cost?
+
+Each exam fee is about USD 100 before any local tax, and each certification is valid for three years.
