@@ -76,7 +76,7 @@ Primary key: `(user_id, cert_code, domain_id)`.
 > **Known live-schema gotcha (found 2026-06-12):** production carries a CLF-era check constraint
 > `domain_progress_domain_id_check` that **rejects `domain_id = 5`** (23514), so AIF-C01 domain-5
 > progress upserts fail silently (the app only logs). `attempt_questions` is not affected. Fix
-> (pending owner run — see `.kiro/ship-v2/08-owner-action-items.md`):
+> (pending owner run):
 >
 > ```sql
 > ALTER TABLE public.domain_progress DROP CONSTRAINT domain_progress_domain_id_check;
@@ -126,7 +126,7 @@ Returns aggregated per-cert stats (pass rates, avg scores, domain difficulty, re
 - Reads `exam_attempts.domain_scores` JSONB and aggregates dynamically (no per-cert hardcoding).
 - Used by the Stats page.
 
-Full source: see `src/pages/Stats.tsx` for the call site. If you change the function signature, update the `CertStats` and `DomainStat` interfaces in that file.
+Full source: see `src/pages/_Stats.tsx` for the call site. If you change the function signature, update the `CertStats` and `DomainStat` interfaces in that file.
 
 ---
 
@@ -142,7 +142,7 @@ Full source: see `src/pages/Stats.tsx` for the call site. If you change the func
 
 - Email/password sign-up enabled.
 - GitHub OAuth enabled.
-- Email templates customised - see `templates/email/*.html` and `templates/README.md`.
+- Email templates customised - see `supabase/email-templates/*.html` and `supabase/email-templates/README.md`.
 - Site URL set to `https://www.cloudcertprep.io`; redirect URLs include `https://www.cloudcertprep.io/**`.
 
 ---
@@ -155,6 +155,6 @@ The live Supabase database is the **source of truth**. Schema changes happen man
 2. Update this README in the same PR so the documentation stays in sync.
 3. Mention the SQL in the PR description so reviewers can copy-paste it into their own Supabase instance.
 
-A reference sketch of the schema previously lived at `supabase/migrations/00001_initial_schema.sql`. It was deleted because it was non-authoritative — its `question_mastery` view and `get_public_exam_stats()` RPC had two named divergences from production that would silently degrade Domain Practice and the Stats page on a fresh apply.
+A reference sketch of the schema previously lived at `supabase/migrations/00001_initial_schema.sql`. It was deleted because it was non-authoritative; its `question_mastery` view and `get_public_exam_stats()` RPC had two named divergences from production that would silently degrade Domain Practice and the Stats page on a fresh apply.
 
 If we ever outgrow this approach, the next step is to adopt the [Supabase CLI](https://supabase.com/docs/guides/cli/local-development#database-migrations) and generate a canonical migration from the live database.

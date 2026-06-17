@@ -109,7 +109,7 @@ scores SpamAssassin rules + SPF/DKIM/DMARC. To hit ~10/10:
    the report, iterate. Expect SPF/DKIM/DMARC = pass and no major content hits;
    the only likely residual is `MIME_HTML_ONLY` (see "Plain text").
 
-Owner actions are tracked in `.kiro/ship-v2/08-owner-action-items.md`.
+Owner actions are tracked in the maintainer's private planning notes.
 
 ## Legal
 

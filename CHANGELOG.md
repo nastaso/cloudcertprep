@@ -7,18 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Nothing yet.
+### Fixed
+
+- FAQ answer links no longer break when followed by trailing punctuation (#62).
+- Corrected the CLF-C02 q978 explanation so its rationale matches the answer options shown (#84).
+- Normalised an SAA-C03 explanation to the standard two-paragraph format (#67).
+
+### Accessibility
+
+- Descriptive aria-labels on the MockExam question grid (#50).
+- aria-label for the no-text loading spinner (#65).
+- Alert role on the reset-password and stats error components (#66).
+
+### Internal
+
+- Service-metadata tagging for CLF-C02 questions q013, q015, and q023 (#49, #68, #86).
+- Extracted spaced-repetition question selection into a tested pure function (#82).
+- Added unit coverage for the exam leave guard, the groupBy helper, the SEO URL builders, and relative-date formatting (#54, #55, #64, #85).
+- CI: fork PRs build a preview with placeholder env fallbacks and skip Lighthouse.
+- Docs: removed stale roadmap and test-count notes (#81).
 
 ## [2.0.0] - 2026-06
 
-The Astro hybrid migration: a multi-cert rebuild that adds the AWS Certified AI
+The Astro static-site migration: a multi-cert rebuild that adds the AWS Certified AI
 Practitioner (AIF-C01) alongside the existing AWS Cloud Practitioner (CLF-C02),
 a blog, programmatic domain landing pages, Google OAuth, Cloudflare Turnstile, and
 an AI-visibility layer for LLM citation.
 
 ### Highlights
 
-- Migrated from a single-page React 19 app to an Astro hybrid site. The marketing
+- Migrated from a single-page React 19 app to an Astro static site. The marketing
   surface (home, About, blog, cert and domain landings, legal pages, 404) is
   prerendered to static HTML at build time; the interactive flows hydrate as React
   islands on top of the static shells.
@@ -52,8 +70,9 @@ an AI-visibility layer for LLM citation.
 ### Under the hood
 
 - Astro static output (`output: 'static'`) deployed to Netlify, with
-  `trailingSlash: 'never'` and an edge redirect to keep served paths aligned with
-  canonical tags.
+  `trailingSlash: 'never'` and `build.format: 'file'` (pages emit as `/about.html`,
+  served at the canonical `/about` with no redirect) to keep served paths aligned
+  with canonical tags.
 - Server-rendered JSON-LD with a build-time assertion that the Person, Organization,
   and WebSite graph stays byte-identical to the pre-migration snapshot.
 - A build-time citation guard that asserts the locked home-page phrases and headings

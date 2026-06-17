@@ -57,6 +57,7 @@ each one supplies to the platform:
 |---|---|
 | Email + password | Email address. Passwords are handled and hashed by Supabase; never visible to application code. |
 | Google OAuth | Email address, display name, and avatar URL from the Google profile (brokered entirely by Supabase; no Google credentials or tokens are handled by application code). |
+| GitHub OAuth | Email address, username, and avatar URL from the GitHub profile (brokered entirely by Supabase; no GitHub credentials or tokens are handled by application code). |
 
 Beyond auth identity, the platform stores only exam-activity data keyed to the
 user id (attempts, per-question answers, domain mastery). No payment data, no
@@ -65,7 +66,7 @@ captcha token is verified server-side by Supabase.
 
 ## Security model summary
 
-CloudCertPrep is an Astro hybrid site (prerendered pages + React islands) backed by Supabase Postgres:
+CloudCertPrep is an Astro static site (prerendered pages + React islands) backed by Supabase Postgres:
 
 - All Supabase tables that contain user data have **Row Level Security (RLS)** enabled with the policy `auth.uid() = user_id`.
 - The Supabase **anon key** is intentionally public (inlined into the browser bundle). Security is enforced server-side via RLS, not by hiding the key.

@@ -143,14 +143,14 @@ The cert switcher, mock exam, domain practice, history, and stats pages all pick
 
 Blog posts live in `src/content/blog/` as Markdown with frontmatter validated at build time (`scripts/validate-blog-frontmatter.mjs`, wired into `prebuild`):
 
-1. Create `src/content/blog/<slug>.md`. Required frontmatter: `title`, `slug` (must match the filename), `description`, `date` (`YYYY-MM-DD`, not in the future), `tags`, `author` (`Alex Santonastaso` — posts are anchored to the site Person entity), `draft`. Optional: `ogImage` (root-relative path), `canonical` (only for cross-posts), `updated`.
+1. Create `src/content/blog/<slug>.md`. Required frontmatter: `title`, `slug` (must match the filename), `description`, `date` (`YYYY-MM-DD`, not in the future), `tags`, `author` (`Alex Santonastaso`; posts are anchored to the site Person entity), `draft`. Optional: `ogImage` (root-relative path), `canonical` (only for cross-posts), `updated`.
 2. `draft: true` keeps the post out of the production build, sitemap, and RSS feed while you iterate.
-3. Internal links must point at real routes — `scripts/validate-internal-links.mjs` fails the build on broken ones. Images need alt text.
+3. Internal links must point at real routes; `scripts/validate-internal-links.mjs` fails the build on broken ones. Images need alt text.
 4. `npm run build` regenerates the sitemap and RSS; nothing else to wire. The post appears on `/blog`, in `/blog/rss.xml`, and (when tagged with a domain slug) in the "Latest from the blog" block on matching domain landing pages.
 
 ## Adding or editing a domain landing page
 
-The per-domain pages (`/aws/<cert>/<domain-slug>`) are generated from the registry — there is no per-page file to edit:
+The per-domain pages (`/aws/<cert>/<domain-slug>`) are generated from the registry; there is no per-page file to edit:
 
 - Copy (intro, FAQ, hero bullets) is templated in `src/pages/aws/[cert]/[domain].astro` from `src/data/certifications.ts` (domain `name`, `weight`, `taskRange`, `taskStatements`, `services`) and `src/data/keyword-clusters.ts`.
 - To improve a specific domain page, enrich its registry entry (e.g. add `taskStatements[]` or `services[]`) rather than forking the template.
@@ -171,17 +171,19 @@ npm run test:ui    # Vitest UI in the browser
 - Co-located with source: `src/lib/scoring.test.ts` sits next to `src/lib/scoring.ts`.
 - Naming: `<source>.test.ts` (the runner picks up `*.test.ts` and `*.test.tsx` automatically).
 
-**Existing coverage**
+**Existing coverage** (representative, not exhaustive)
 
-- `src/lib/scoring.test.ts` — `isAnswerCorrect`, `calculateScaledScore`, `getDomainScore`, `getExamDomainTargets`, `selectExamQuestions`.
-- `src/lib/validation.test.ts` — `validatePassword`, `scorePassword`, `isPasswordStrongEnough`.
-- `src/lib/utils.test.ts` — `toOriginalAnswer`, `toggleMultiAnswer`, `shuffleAndMapQuestions` round-trip.
+- `src/lib/scoring.test.ts`: `isAnswerCorrect`, `calculateScaledScore`, `getDomainScore`, `getExamDomainTargets`, `selectExamQuestions`.
+- `src/lib/validation.test.ts`: `validatePassword`, `scorePassword`, `isPasswordStrongEnough`.
+- `src/lib/utils.test.ts`: `toOriginalAnswer`, `toggleMultiAnswer`, `shuffleAndMapQuestions` round-trip.
+- `src/lib/spacedRepetition.test.ts`: unseen / weighted / backfill question selection.
+- Also covered: `formatting`, `faqLinks`, `examGuard`, `domainStats`, `navigation`, `seo-data`, `jsonld`, `authErrors`, `supabaseUtils`, plus the `certifications` and `questionTypes` integration checks.
 
-**Suggested next targets** (by impact):
+**Suggested next targets** (by impact; all currently untested):
 
-- `src/hooks/useSpacedRepetition.ts` — extract `selectQuestions` to a pure function and test the unseen / weighted / exclusion split.
-- `src/lib/scoring.ts` — edge cases in `selectExamQuestions` (small pools, exact-quota selection).
-- `src/lib/formatting.ts` — calendar-boundary cases for `formatRelativeDate`.
+- `src/lib/pendingAttempt.ts`: `storePendingAttempt` / `hasPendingAttempt` / `consumePendingAttemptSavedNotice` round-trip (the guest-to-login attempt-restore flow). Stub `localStorage`; skip the async `flushPendingAttempt`, which calls Supabase.
+- `src/lib/analytics.ts`: the `KNOWN_EVENTS` allow-list guard in `trackEvent` (reserved-name rejection) and the `trackPageView` path handling. Stub the global tracker.
+- `src/lib/buttonStyles.ts`: the pure class-builders (`buttonClass`, `inputClass`, `alertClass`, and siblings) map variant / size / tone and error states to the expected classes.
 
 **What not to test** (yet)
 
@@ -254,8 +256,8 @@ Always use the `Button` component from `src/components/Button.tsx` for any click
 
 `src/pages/` contains two kinds of files:
 
-- **`*.astro` files** — Astro routes. Each one is a prerendered page (home, cert landings, blog, legal, etc.) or a thin shell for an interactive island.
-- **`_*.tsx` files** (underscore prefix) — React island bodies (MockExam, DomainPractice, History, Login, ResetPassword, Stats, NotFound). The `_` prefix prevents Astro's file-based router from treating them as URL routes. **Do not rename these without the underscore** — they would become `/MockExam` etc.
+- **`*.astro` files**: Astro routes. Each one is a prerendered page (home, cert landings, blog, legal, etc.) or a thin shell for an interactive island.
+- **`_*.tsx` files** (underscore prefix): React island bodies (MockExam, DomainPractice, History, Login, ResetPassword, Stats, NotFound). The `_` prefix prevents Astro's file-based router from treating them as URL routes. **Do not rename these without the underscore**, or they would become `/MockExam` etc.
 
 `src/components/` follows the same pattern: `*.astro` for static markup, `*.tsx` for React islands, `*Island.tsx` for thin wrappers that mount a React component as an Astro island.
 
@@ -305,21 +307,23 @@ The auth forms (sign in, sign up, password reset) are protected by [Cloudflare T
 
 ## Branching model
 
-CloudCertPrep uses a `main ← dev ← phase/*` model:
+Contributor PRs target `main` directly. Cut a short-lived feature branch
+(`fix/*`, `feat/*`, `test/*`, `docs/*`) from `main`, push it, and open a PR back
+into `main`. Squash-merge is the default. Each PR gets its own Netlify Deploy
+Preview (a noindex build, described below), so UI changes can be reviewed before
+they merge.
 
-- **`main`** is the production branch. Netlify auto-deploys it. It receives changes
-  only via squash-merge from `dev` (or a release branch cut from `dev`). It is the
-  only indexable surface.
-- **`dev`** is the long-lived integration branch, cut from `main`. Netlify gives it a
-  branch-deploy preview that is **noindex** (via an `X-Robots-Tag: noindex` header
-  and/or a `<meta name="robots" content="noindex">` injected in non-production
-  builds), so the staging surface is never crawled or indexed.
-- **`phase/*`** (or `feat/*`) are short-lived feature branches cut from `dev`. They
-  merge back into `dev` first, never directly into `main`.
+- **`main`** is the production branch and the integration trunk. Netlify
+  auto-deploys it; it is the only indexable surface. All contributions land here.
+- **`dev`** is an optional, maintainer-only staging branch. It is not a required
+  hop, and it is not where contributor PRs go. When used, it is reset from `main`
+  for ad-hoc integration previews.
 
-Squash-merge only into `main`. The production build never emits `noindex` on any
-indexable route; the noindex gate is strictly scoped to non-production Netlify
-contexts.
+Non-production Netlify contexts (deploy previews and branch deploys) set
+`PUBLIC_NOINDEX=true`, which bakes `<meta name="robots" content="noindex">` into
+every prerendered page. That meta tag is the only noindex gate; per-context
+`X-Robots-Tag` headers are not supported by Netlify and are not used. The
+production build never emits `noindex` on any indexable route.
 
 Each production release is marked with an annotated semver tag (e.g. `v2.0.0`) and a
 GitHub Release published from that tag, so the GitHub Releases page stays a durable,

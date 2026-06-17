@@ -58,9 +58,9 @@ Current certifications:
 
 ## Roadmap
 
-- AWS Solutions Architect Associate (SAA-C03) — question bank in progress, target Q3 2026
-- AWS Developer Associate (DVA-C02) — planned for late 2026
-- AWS SysOps Administrator Associate (SOA-C02) — planned for 2027
+- AWS Solutions Architect Associate (SAA-C03): question bank in progress, target Q3 2026
+- AWS Developer Associate (DVA-C02): planned for late 2026
+- AWS SysOps Administrator Associate (SOA-C02): planned for 2027
 - Per-cert OG share images
 - Community-contributed questions via PR review
 
@@ -89,7 +89,7 @@ Sign-in offers three options (**Google, GitHub, and email/password**), brokered 
 
 ## Architecture
 
-CloudCertPrep is an **Astro hybrid** site. Astro prerenders the public SEO
+CloudCertPrep is an **Astro static** site. Astro prerenders the public SEO
 surface to static HTML at build time, and the interactive flows hydrate as
 **React islands** on top of that static shell.
 
@@ -99,7 +99,7 @@ surface to static HTML at build time, and the interactive flows hydrate as
 |                 (static hosting, global edge)               |
 +-------------------------------------------------------------+
 |                                                             |
-|  Astro static output (output: 'static') — one HTML file     |
+|  Astro static output (output: 'static'), one HTML file      |
 |  per route, prerendered at build time:                      |
 |    /  /about  /blog  /blog/:slug  /contribute               |
 |    /aws/:cert  /aws/:cert/:domain  /privacy  /terms  /404   |
@@ -220,7 +220,7 @@ npm run build
 
 CloudCertPrep is maintained by [Alex Santonastaso](https://santonastaso.me) and improved by the contributors below. Every question fix, test, and accessibility tweak helps people study for free.
 
-[![Contributors](https://contrib.rocks/image?repo=nastaso/cloudcertprep)](https://github.com/nastaso/cloudcertprep/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=nastaso/cloudcertprep&cache_bust=20260618)](https://github.com/nastaso/cloudcertprep/graphs/contributors)
 
 New here? The [good first issues](https://github.com/nastaso/cloudcertprep/labels/good%20first%20issue) are small and welcoming, and even a single-question fix counts. And if CloudCertPrep helps your own studying, a [star](https://github.com/nastaso/cloudcertprep) helps other learners find it.
 
