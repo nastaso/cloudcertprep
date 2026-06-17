@@ -9,7 +9,7 @@
       "D": "Client-side encryption"
     },
     "answer": "A",
-    "explanation": "SSE-S3 uses Amazon S3 managed keys (AES-256) with no customer involvement, no per-key policies, and no KMS audit trail. SSE-KMS uses AWS KMS keys (AWS-managed or customer-managed) and adds KMS access policies and CloudTrail integration, which is more than the requirement asks for. SSE-C requires the customer to provide and manage their own keys on every request. Client-side encryption happens before upload and is fully customer-managed.",
+    "explanation": "SSE-S3 uses Amazon S3 managed keys (AES-256) with no customer involvement, no per-key policies, and no KMS audit trail.\nSSE-KMS uses AWS KMS keys (AWS-managed or customer-managed) and adds KMS access policies and CloudTrail integration, which is more than the requirement asks for. SSE-C requires the customer to provide and manage their own keys on every request. Client-side encryption happens before upload and is fully customer-managed.",
     "isMultiAnswer": false
   },
   {
