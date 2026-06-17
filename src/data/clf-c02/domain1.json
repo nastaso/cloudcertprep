@@ -83,7 +83,8 @@
     },
     "answer": "B",
     "explanation": "Decoupling means designing components to operate independently so that a failure in one part does not cascade into failures across the rest of the application, improving overall resilience.\nTreating an application as a single cohesive unit describes a monolithic architecture, which is the opposite of decoupling and creates tightly coupled dependencies between components. Allowing quick updates to a monolithic application describes an advantage of a well-structured monolith, not of decoupling, and updating a monolith typically requires deploying the entire application as a unit. Tracking API calls made to AWS services describes the function of AWS CloudTrail, which is an auditing and logging service unrelated to application architecture design.",
-    "isMultiAnswer": false
+    "isMultiAnswer": false,
+    "services": []
   },
   {
     "id": "q019",
