@@ -110,7 +110,8 @@
     },
     "answer": "D",
     "explanation": "The three recognized AWS cloud computing service models are IaaS, PaaS, and SaaS. Networking as a Service is not one of them and does not exist as a defined cloud computing model in the AWS framework.\nPlatform as a Service is one of the three recognized cloud computing models, providing customers with a managed platform for developing and deploying applications without managing the underlying infrastructure. Infrastructure as a Service is one of the three recognized cloud computing models, giving customers virtualized compute, storage, and networking resources they manage themselves. Software as a Service is one of the three recognized cloud computing models, delivering fully managed applications to end users over the internet without any infrastructure or platform management required.",
-    "isMultiAnswer": false
+    "isMultiAnswer": false,
+    "services": []
   },
   {
     "id": "q065",
