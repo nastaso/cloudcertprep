@@ -11,5 +11,5 @@ https://cloudcertprep.io/*   https://www.cloudcertprep.io/:splat   301!
 
 # Provider hub collapse while single-provider (auto-disabled when 2nd
 # provider ships).
-/aws    /    301!
+/aws    /    301
 
