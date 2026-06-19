@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Migrated hosting from Netlify to Cloudflare Pages. The security headers and the
+  hash-based CSP are now emitted by a Pages Function (`functions/_middleware.js`),
+  scoped to HTML routes via `_routes.json` so content-hashed assets are served
+  directly.
+- Disabled Google Analytics 4 and hid the cookie-consent banner. Analytics is now
+  cookieless Umami only, so the site sets no tracking cookies and needs no consent
+  gate. The privacy policy and About page were updated to match.
+
 ### Fixed
 
 - FAQ answer links no longer break when followed by trailing punctuation (#62).

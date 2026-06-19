@@ -1,13 +1,17 @@
 /**
  * Analytics tracking utilities.
  *
- * Two providers run in parallel:
+ * Two providers are wired up to run in parallel:
  *  - Umami (cookieless, GDPR-friendly, runs without consent): always loaded.
  *  - Google Analytics 4 (cookies, requires consent): loaded only after the user
  *    accepts cookies via the cookie consent banner.
  *
+ * Note: GA4 is currently DORMANT (the consent banner is unmounted and
+ * VITE_GA_MEASUREMENT_ID is unset), so only Umami actually runs; the gtag
+ * dual-send path below is kept inert for a future re-enable.
+ *
  * Both calls are silent no-ops if the corresponding script is not loaded
- * (e.g. local dev without a Umami script tag, or guest who rejected cookies).
+ * (e.g. local dev without a Umami script tag, or GA while dormant).
  */
 
 declare global {
@@ -73,7 +77,7 @@ export const KNOWN_EVENTS = [
 
 export type KnownEvent = (typeof KNOWN_EVENTS)[number]
 
-/** Fire a named GA4/Umami event with optional parameters. */
+/** Fire a named Umami (and GA4, when re-enabled) event with optional parameters. */
 export function trackEvent(name: string, params?: Record<string, unknown>): void {
   gtag('event', name, params)
   if (typeof window.umami?.track === 'function') {

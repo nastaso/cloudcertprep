@@ -6,7 +6,7 @@
  * set of `'sha256-<base64>'` hashes of every inline executable <script>
  * emitted into the built `dist/**\/*.html`. Because `output: 'static'` makes
  * every inline script enumerable at build time, this is complete by
- * construction: the script reads the SAME bytes Netlify will serve, so every
+ * construction: the script reads the SAME bytes the host will serve, so every
  * inline script the browser sees has a matching hash.
  *
  * style-src: removes `'unsafe-inline'` and replaces it with
@@ -188,9 +188,10 @@ function main() {
 
   let headers = readFileSync(HEADERS_PATH, 'utf8')
 
-  // script-src: 'unsafe-inline' -> inline-script hashes. Keep host-source
-  // allowlists (googletagmanager / umami / cloudflare) intact — they cover
-  // dynamically injected external scripts (GA loader, Umami, Turnstile).
+  // script-src: 'unsafe-inline' -> inline-script hashes. Keep the host-source
+  // allowlists (umami / cloudflare) intact; they cover the dynamically injected
+  // external scripts (Umami, Turnstile). GA hosts (googletagmanager /
+  // google-analytics) are intentionally omitted while GA is disabled.
   const scriptList = [...scriptHashes].sort().join(' ')
   headers = rewriteDirective(headers, 'script-src', (body) => {
     const cleaned = body.replace(/'unsafe-inline'\s*/g, '').trim().replace(/\s+/g, ' ')

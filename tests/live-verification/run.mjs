@@ -190,27 +190,9 @@ function makeRecorder(meta) {
   }
 }
 
-// ---- document the first-visit cookie-consent banner ------------------------
-// One context with consent NOT pre-set, so the real banner is captured. The
-// rest of the run pre-accepts consent so the overlay never blocks interaction.
-for (const theme of THEMES) {
-  const ctx = await makeContext(browser, VIEWPORTS[VIEWPORTS.length - 1], theme, 'out', null, { consent: false })
-  const page = await ctx.newPage()
-  const sink = attachListeners(page)
-  try {
-    await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded', timeout: 30000 })
-    await page.waitForTimeout(2000)
-    const shot = resolve(SHOTS_DIR, `consent-banner_${theme}.png`)
-    await page.screenshot({ path: shot, fullPage: false }).catch(() => {})
-    const audit = await auditPage(page)
-    findings.push(...collectFindings({ viewport: 'desktop', theme, auth: 'out', page: '/ (consent banner)', shot: shot.replace(RUN_DIR + '/', '') }, sink, audit))
-  } catch (e) {
-    warnings.push(`consent-banner capture (${theme}) failed: ${e.message}`)
-  } finally {
-    await page.close().catch(() => {})
-    await ctx.close()
-  }
-}
+// (Removed) The first-visit cookie-consent banner capture: the banner is now
+// hidden (cookieless Umami, GA disabled), so there is no overlay to screenshot.
+// makeContext still defaults to seeding the consent key as a harmless no-op.
 
 // ---- run the static page matrix --------------------------------------------
 for (const viewport of VIEWPORTS) {

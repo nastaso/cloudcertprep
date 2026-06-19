@@ -95,7 +95,7 @@ surface to static HTML at build time, and the interactive flows hydrate as
 
 ```
 +-------------------------------------------------------------+
-|                       Netlify CDN                           |
+|                     Cloudflare Pages                        |
 |                 (static hosting, global edge)               |
 +-------------------------------------------------------------+
 |                                                             |
@@ -105,7 +105,7 @@ surface to static HTML at build time, and the interactive flows hydrate as
 |    /aws/:cert  /aws/:cert/:domain  /privacy  /terms  /404   |
 |                                                             |
 |  React islands hydrate inside the static shells:            |
-|    Header nav, Footer, DonateButton, CookieConsent,         |
+|    Header nav, Footer, DonateButton,                        |
 |    the practice-exam / domain-practice / history / login /  |
 |    reset-password bodies, and the /stats + cert dashboard.  |
 |                                                             |
@@ -150,9 +150,9 @@ surface to static HTML at build time, and the interactive flows hydrate as
 | Styling | Tailwind CSS 3.4 (CSS variable tokens for theming) |
 | Auth and DB | Supabase (PostgreSQL with Row Level Security, JWT auth) |
 | Bot protection | Cloudflare Turnstile (CAPTCHA on Supabase auth) |
-| Hosting | Netlify (auto-deploy from `main`) |
+| Hosting | Cloudflare Pages (auto-deploy from `main`) |
 | Email | Brevo SMTP via Supabase Auth |
-| Analytics | Umami (cookieless, always on) + GA4 (consent-gated) |
+| Analytics | Umami (cookieless, always on) |
 | CI | GitHub Actions: validate, lint, astro check, test, build, citation guard |
 
 The marketing surface is prerendered static HTML, so crawlers and LLM browse-mode read full content with no JavaScript. Interactive islands are code-split and hydrate on demand. See `npm run build` output for exact sizes against your local build.

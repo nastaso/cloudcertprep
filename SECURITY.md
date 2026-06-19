@@ -40,7 +40,7 @@ Include in the report:
 
 - Social engineering of the maintainer.
 - Denial-of-service attacks against the live site.
-- Issues in third-party services (Supabase, Netlify, Brevo, Google Analytics, Umami) that are not specific to how CloudCertPrep configures them.
+- Issues in third-party services (Supabase, Cloudflare Pages, Brevo, Umami) that are not specific to how CloudCertPrep configures them.
 - Missing security headers that do not lead to a concrete exploit.
 - Theoretical issues without a working proof-of-concept.
 

@@ -299,7 +299,7 @@ For local dev, run `npm run dev` and use the "Continue with Google" / "Continue 
 The auth forms (sign in, sign up, password reset) are protected by [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/). Verification is handled natively by Supabase, so the secret never lives in this repo:
 
 1. **Cloudflare dashboard → Turnstile → Add widget.** Add your domains (`cloudcertprep.io` and `localhost` for dev). Cloudflare gives you a **Site key** (public) and a **Secret key** (private).
-2. **Client:** put the **Site key** in `VITE_TURNSTILE_SITE_KEY` (Netlify env var for prod, `.env` for local). This is public by design.
+2. **Client:** put the **Site key** in `VITE_TURNSTILE_SITE_KEY` (a Cloudflare Pages environment variable for prod, `.env` for local). This is public by design.
 3. **Supabase Dashboard → Authentication → Settings → Bot and Abuse Protection** → enable **Turnstile** → paste the **Secret key**. Supabase validates the `captchaToken` the client sends on every auth call.
 4. Leaving `VITE_TURNSTILE_SITE_KEY` blank disables the widget locally (the form stays usable); enable the captcha in Supabase only once the site key is set, or auth requests will be rejected for a missing token.
 
@@ -309,21 +309,21 @@ The auth forms (sign in, sign up, password reset) are protected by [Cloudflare T
 
 Contributor PRs target `main` directly. Cut a short-lived feature branch
 (`fix/*`, `feat/*`, `test/*`, `docs/*`) from `main`, push it, and open a PR back
-into `main`. Squash-merge is the default. Each PR gets its own Netlify Deploy
-Preview (a noindex build, described below), so UI changes can be reviewed before
-they merge.
+into `main`. Squash-merge is the default. Each PR gets its own Cloudflare Pages
+preview deployment (a noindex build, described below), so UI changes can be
+reviewed before they merge.
 
-- **`main`** is the production branch and the integration trunk. Netlify
-  auto-deploys it; it is the only indexable surface. All contributions land here.
+- **`main`** is the production branch and the integration trunk. Cloudflare
+  Pages auto-deploys it; it is the only indexable surface. All contributions land here.
 - **`dev`** is an optional, maintainer-only staging branch. It is not a required
   hop, and it is not where contributor PRs go. When used, it is reset from `main`
   for ad-hoc integration previews.
 
-Non-production Netlify contexts (deploy previews and branch deploys) set
-`PUBLIC_NOINDEX=true`, which bakes `<meta name="robots" content="noindex">` into
-every prerendered page. That meta tag is the only noindex gate; per-context
-`X-Robots-Tag` headers are not supported by Netlify and are not used. The
-production build never emits `noindex` on any indexable route.
+Non-production Cloudflare Pages preview deployments set `PUBLIC_NOINDEX=true`
+(via the Preview environment variables), which bakes
+`<meta name="robots" content="noindex">` into every prerendered page. That meta
+tag is the noindex gate. The production build never emits `noindex` on any
+indexable route.
 
 Each production release is marked with an annotated semver tag (e.g. `v2.0.0`) and a
 GitHub Release published from that tag, so the GitHub Releases page stays a durable,

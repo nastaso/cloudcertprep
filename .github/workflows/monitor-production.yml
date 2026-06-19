@@ -2,7 +2,7 @@ name: Monitor production
 
 # Scheduled production monitoring (R19.1–R19.4, R21.6).
 # Targets ONLY the production origin https://www.cloudcertprep.io — never a
-# branch-deploy preview — so the dev/staging surface is never probed here.
+# preview deployment, so the dev/staging surface is never probed here.
 
 on:
   schedule:

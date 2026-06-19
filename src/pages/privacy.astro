@@ -31,7 +31,7 @@ import HeroMini from '../components/landing/HeroMini.astro'
 
   <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
     <div class="max-w-3xl mx-auto px-4 md:px-8">
-      <p class="font-mono text-[12px] tracking-wide text-text-muted mb-8">Last updated: May 2026</p>
+      <p class="font-mono text-[12px] tracking-wide text-text-muted mb-8">Last updated: June 2026</p>
 
       <div class="space-y-8 max-w-[68ch] mx-auto">
         <section>
@@ -89,10 +89,6 @@ import HeroMini from '../components/landing/HeroMini.astro'
             <li class="flex items-start gap-2">
               <span class="text-text-muted mt-0.5">-</span>
               <span><strong class="text-text-primary">Legitimate interests</strong>: we use anonymised, aggregated analytics (Umami) to understand how the app is used and improve it. This does not identify you personally.</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
-              <span><strong class="text-text-primary">Consent</strong>: optional Google Analytics 4 loads only on the basis of the consent you give through the cookie banner. You can withdraw it at any time using the "Cookie Preferences" link in the footer.</span>
             </li>
           </ul>
         </section>
@@ -197,23 +193,19 @@ import HeroMini from '../components/landing/HeroMini.astro'
             </li>
           </ul>
           <p class="text-text-muted text-base leading-[1.7] mt-3">
-            We do not use cookies for tracking. Google Analytics (GA4) may set its own cookies, see below.
+            We do not use any tracking cookies. Our analytics (Umami) is cookieless, so the site sets no analytics or advertising cookies at all.
           </p>
         </section>
 
         <section>
-          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Analytics and Cookies</h2>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Analytics</h2>
           <p class="text-text-muted text-base leading-[1.7] mb-3">
-            We use two analytics tools, with different consent requirements:
+            We use a single, privacy-friendly analytics tool, and it requires no consent banner because it sets no cookies:
           </p>
           <ul class="space-y-2 text-text-muted text-base mb-3">
             <li class="flex items-start gap-2">
               <span class="text-text-muted mt-0.5">-</span>
               <span><strong class="text-text-primary">Umami (cookieless, no consent required)</strong>: an open-source, privacy-focused analytics tool. Umami sets no cookies, collects no personally identifiable information, and does not track users across sites. We use it under the GDPR "legitimate interests" basis to understand which pages are visited and which features are used. You cannot opt out of Umami because it does not identify you in the first place.</span>
-            </li>
-            <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
-              <span><strong class="text-text-primary">Google Analytics 4 (GA4) (requires consent)</strong>: a more detailed analytics tool. GA4 sets cookies (such as <code class="text-xs bg-bg-dark px-1 py-0.5 rounded">_ga</code> and <code class="text-xs bg-bg-dark px-1 py-0.5 rounded">_ga_*</code>) to track anonymous usage patterns. <strong class="text-text-primary">GA4 only loads if you click "Accept" on the cookie consent banner.</strong> No personally identifiable information is sent to Google, and we do not link analytics data to your account. You can change your preference using the "Cookie Preferences" link in the footer, or use the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">Google Analytics Opt-out Add-on</a>.</span>
             </li>
           </ul>
         </section>

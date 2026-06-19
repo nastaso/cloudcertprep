@@ -3,8 +3,8 @@
  * /aws — the AWS provider hub.
  *
  * Per R1.5, while single-provider mode is confirmed (getActiveProviders()
- * returns exactly ['aws']), this collapses to `/` with a 301. The Netlify
- * `_redirects` rule also handles this at the edge, but the Astro redirect
+ * returns exactly ['aws']), this collapses to `/` with a 301. The Cloudflare
+ * Pages `_redirects` rule also handles this at the edge, but the Astro redirect
  * covers the static build output directly.
  *
  * When a second provider ships (getActiveProviders().length >= 2), this page

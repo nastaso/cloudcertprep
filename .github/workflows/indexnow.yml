@@ -7,7 +7,7 @@ name: IndexNow ping
 # preview or local build (which is why it lives here and not in
 # prebuild/postbuild).
 #
-# Timing: Netlify deploys `main` independently and asynchronously. IndexNow
+# Timing: Cloudflare Pages deploys `main` independently and asynchronously. IndexNow
 # validates the key lazily (it fetches <key>.txt at crawl time, minutes to hours
 # later), so a short deploy lag between this ping and the live key file is fine.
 # The ping reads the LIVE sitemap, so it only ever submits already-crawlable

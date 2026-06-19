@@ -6,7 +6,7 @@ import rehypeSanitize from 'rehype-sanitize';
 // (home, about, blog, cert/domain landings, legal, 404). SSR is unnecessary
 // because auth flows (Google OAuth, email/password) are client-side React islands
 // that talk directly to Supabase; the static surface never needs request-time
-// rendering. This avoids the @astrojs/netlify edge runtime.
+// rendering. This avoids needing a host SSR adapter (e.g. @astrojs/cloudflare).
 //
 // CSP NOTE: the shipped CSP source (public/_headers) carries
 // `script-src 'unsafe-inline'` as a BUILD-TIME PLACEHOLDER. The postbuild step
@@ -36,11 +36,9 @@ export default defineConfig({
     defaultStrategy: 'hover',
   },
   build: {
-    // 'file' emits /about.html (not /about/index.html) so Netlify serves the
-    // canonical no-trailing-slash URL directly with no 301. 'directory' made
-    // Netlify 301 /about -> /about/, contradicting every canonical tag
-    // (R10.8); the netlify.toml strip-slash rule that was meant to fix that
-    // was invalid and force-redirect-looped the whole site (see netlify.toml).
+    // 'file' emits /about.html (not /about/index.html) so the host serves the
+    // canonical no-trailing-slash URL directly with no 301. 'directory' makes
+    // hosts 301 /about -> /about/, contradicting every canonical tag (R10.8).
     format: 'file',
     // Inline the single ~59KB CSS bundle into each page's <head> instead of a
     // render-blocking <link>. On simulated mobile this removes the ~150ms
@@ -57,7 +55,7 @@ export default defineConfig({
   integrations: [react()],
   vite: {
     // Expose VITE_-prefixed env vars to client-side island code. The existing
-    // codebase (and the live Netlify env) use the VITE_ prefix for the Supabase
+    // codebase (and the live production env) use the VITE_ prefix for the Supabase
     // URL/key that the React islands read via import.meta.env. Without this,
     // Astro's client bundle replaces import.meta.env.VITE_* with `undefined`,
     // which makes src/lib/supabase.ts throw at module load and breaks every

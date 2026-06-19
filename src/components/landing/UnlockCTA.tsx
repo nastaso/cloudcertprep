@@ -4,8 +4,8 @@ import { trackEvent } from '../../lib/analytics'
 
 /**
  * Where on the site this UnlockCTA panel is rendered. The string is sent
- * as a GA4 / Umami event dimension so we can split sign-in conversion by
- * placement and decide which placements deserve more prominence.
+ * as a Umami event dimension (and GA4, when re-enabled) so we can split
+ * sign-in conversion by placement and decide which deserve more prominence.
  */
 export type UnlockCTALocation =
   | 'home_about'

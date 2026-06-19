@@ -545,7 +545,7 @@ async function main() {
   // Stamp only a fully clean render: a run that used fallbacks must NOT be
   // frozen, or a transient satori failure would be skipped past forever.
   if (failures.length === 0) {
-    // `.astro/` is gitignored, so on a clean checkout (Netlify/CI) it does not
+    // `.astro/` is gitignored, so on a clean checkout (Cloudflare/CI) it does not
     // exist yet at prebuild time (it is created later by `astro build`). Create
     // it so the stamp write never ENOENTs and fails the whole build.
     mkdirSync(resolve(__dirname, '../.astro'), { recursive: true })
