@@ -52,6 +52,7 @@ with `LV_WRITE_CANONICAL=1` (so concurrent runs do not clobber one file).
 
 - Prod has server-side captcha: logged-in sessions are minted via the Supabase
   admin API (`auth.mjs`), not the login form.
-- The suite pre-accepts the cookie-consent banner (localStorage
-  `cloudcertprep_cookie_consent`) so its overlay does not block the start buttons.
+- The cookie-consent banner is no longer rendered (cookieless Umami, GA
+  disabled); the suite still seeds `cloudcertprep_cookie_consent` as a defensive
+  no-op kept for backward compatibility.
 - Always `reducedMotion: 'reduce'` so below-fold reveal animations do not capture blank.

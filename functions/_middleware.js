@@ -10,6 +10,11 @@
 // The CSP value is regenerated every build by scripts/generate-cf-headers.mjs
 // (wired into `postbuild`) into ./_csp.generated.js, so the per-deploy hashes
 // stay correct without editing this file.
+//
+// Scope: public/_routes.json excludes /_astro/* so this Function runs only on
+// HTML and other dynamic routes - the content-hashed assets are served directly
+// (headers from public/_headers), which keeps Pages Function invocations down
+// (~15-20 asset requests per pageview no longer hit the Function).
 import { CSP } from './_csp.generated.js'
 
 const SECURITY_HEADERS = {

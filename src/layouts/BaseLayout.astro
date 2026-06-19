@@ -4,7 +4,6 @@ import AnalyticsBootstrap from '../components/AnalyticsBootstrap.tsx'
 import Header from '../components/Header.astro'
 import FooterIsland from '../components/FooterIsland.tsx'
 import DonateButtonIsland from '../components/DonateButtonIsland.tsx'
-import CookieConsentIsland from '../components/CookieConsentIsland.tsx'
 import AccountLinkNoticeIsland from '../components/AccountLinkNoticeIsland.tsx'
 import SchemaOrgJsonLd from '../components/SchemaOrgJsonLd.astro'
 import { BASE_GRAPH_NODES } from '../lib/base-graph'
@@ -21,8 +20,9 @@ interface Props {
   /**
    * Whether to render the global chrome (Header, Footer, DonateButton).
    * Interactive island pages that manage their own layout (e.g. the exam
-   * flow) can opt out. Defaults to true. CookieConsent + AnalyticsBootstrap
-   * always render regardless.
+   * flow) can opt out. Defaults to true. AnalyticsBootstrap always renders
+   * regardless. (The cookie-consent banner is currently unmounted; analytics is
+   * cookieless Umami only.)
    */
   showChrome?: boolean
   /** Whether the Header shows its full nav (cert switcher + links). Default true. */
@@ -72,13 +72,12 @@ const {
 const umamiWebsiteId = import.meta.env.VITE_UMAMI_WEBSITE_ID ?? ''
 const gaMeasurementId = import.meta.env.VITE_GA_MEASUREMENT_ID ?? ''
 
-// Pre-promotion noindex preview gate (R9.17, Property 7). In any non-production
-// Netlify context (deploy-preview / branch-deploy), netlify.toml sets
-// PUBLIC_NOINDEX=true and the served pages get an X-Robots-Tag: noindex header.
-// We mirror that here so the prerendered HTML itself also carries noindex on
-// the preview, regardless of each page's intended robots value. Production
-// (CONTEXT=production, BRANCH=main) leaves PUBLIC_NOINDEX unset, so indexable
-// routes emit their real robots value untouched.
+// Pre-promotion noindex preview gate (R9.17, Property 7). Non-production
+// Cloudflare Pages preview deployments set PUBLIC_NOINDEX=true (via the Preview
+// environment variables), which bakes noindex into every prerendered page here,
+// regardless of each page's intended robots value. Production leaves
+// PUBLIC_NOINDEX unset, so indexable routes emit their real robots value
+// untouched.
 const isNoindexPreview = import.meta.env.PUBLIC_NOINDEX === 'true'
 const effectiveRobots = isNoindexPreview ? 'noindex' : robots
 ---
@@ -93,8 +92,6 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
     <meta name="theme-color" content="#FF9900" />
 
     <!-- Preconnect to external origins (improves LCP) -->
-    <link rel="preconnect" href="https://www.googletagmanager.com" />
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
     <link rel="preconnect" href="https://cloud.umami.is" />
     <link rel="dns-prefetch" href="https://cloud.umami.is" />
 
@@ -170,7 +167,12 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
       })();
     </script>
 
-    <!-- Google Analytics (deferred until page is interactive, requires consent) -->
+    <!-- Google Analytics (deferred until interactive, requires consent).
+         Currently DORMANT: the consent banner is hidden (CookieConsentIsland is
+         unmounted in this file) and VITE_GA_MEASUREMENT_ID is unset, so this
+         never loads. To re-enable: set the env var, re-mount the banner, and
+         re-add the GA hosts to the CSP in public/_headers (script-src
+         googletagmanager + connect-src google-analytics). -->
     <script is:inline define:vars={{ gaMeasurementId }}>
       (function(){
         var id=gaMeasurementId;
@@ -248,7 +250,6 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
       {showChrome && <DonateButtonIsland client:idle />}
     </div>
 
-    <CookieConsentIsland client:idle />
     <AccountLinkNoticeIsland client:idle />
     {/* client:idle (was client:load): analytics is non-critical, keep its
         hydration off the critical path. Inline consumers of

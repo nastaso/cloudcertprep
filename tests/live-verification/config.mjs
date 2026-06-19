@@ -51,9 +51,10 @@ export const SESSION_STORAGE_KEY = SUPABASE_REF ? `sb-${SUPABASE_REF}-auth-token
 // `dark` class to <html>. We set both before first paint.
 export const THEME_KEY = 'cloudcertprep_theme'
 
-// Cookie-consent banner: a first-visit overlay whose backdrop intercepts clicks
-// (it would block the practice/exam start buttons). Pre-accept it so the banner
-// never blocks automation. Value confirmed against prod: 'accepted'.
+// Cookie-consent banner: previously a first-visit overlay that intercepted
+// clicks. The banner is now hidden (cookieless Umami, GA disabled), so it no
+// longer renders and seeding this key is a defensive no-op kept for backward
+// compatibility (in case an older deploy is ever tested).
 export const CONSENT_KEY = 'cloudcertprep_cookie_consent'
 export const CONSENT_VALUE = 'accepted'
 

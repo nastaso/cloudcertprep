@@ -2247,20 +2247,19 @@
   },
   {
     "id": "q1121",
-    "question": "Which AWS Cloud Adoption Framework (AWS CAF) perspectives are categorized as business capabilities? (Select THREE)",
+    "question": "Which AWS Cloud Adoption Framework (AWS CAF) perspectives are categorized as business capabilities? (Select TWO)",
     "options": {
       "A": "Business",
       "B": "Platform",
-      "C": "People",
+      "C": "Operations",
       "D": "Security",
       "E": "Governance"
     },
     "answer": [
       "A",
-      "C",
       "E"
     ],
-    "explanation": "The AWS CAF categorizes Business, People, and Governance as business capability perspectives, which focus on strategic alignment, organizational readiness, workforce skills, change management, risk governance, and ensuring cloud investments deliver business value.\nPlatform is a technical capability perspective that focuses on designing and building the cloud environment architecture, not on business alignment or organizational readiness. Security is a technical capability perspective that focuses on protecting data confidentiality, integrity, and availability through technical security controls, not on business-level planning or governance.",
+    "explanation": "The AWS CAF categorizes Business, People, and Governance as business capability perspectives, which focus on strategic alignment, organizational readiness, workforce skills, risk governance, and ensuring cloud investments deliver business value; of the options listed, Business and Governance are the two business capability perspectives.\nPlatform is a technical capability perspective that focuses on designing and building the cloud environment architecture, not on business alignment or organizational readiness. Operations is a technical capability perspective that focuses on running, monitoring, and optimizing cloud workloads day to day, not on business-level planning or governance. Security is a technical capability perspective that focuses on protecting data confidentiality, integrity, and availability through technical security controls, not on business value or governance.",
     "isMultiAnswer": true
   },
   {

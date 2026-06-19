@@ -1,4 +1,3 @@
-import { openCookieConsent } from './cookie-consent'
 import { useTheme } from '../hooks/useTheme'
 import { Sun, Moon } from 'lucide-react'
 
@@ -65,11 +64,6 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li><a href="/privacy" className={navLink}>Privacy Policy</a></li>
               <li><a href="/terms" className={navLink}>Terms of Service</a></li>
-              <li>
-                <button onClick={openCookieConsent} className={navLink}>
-                  Cookie Preferences
-                </button>
-              </li>
             </ul>
           </nav>
         </div>
