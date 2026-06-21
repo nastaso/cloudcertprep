@@ -10,6 +10,12 @@
  */
 import BaseLayout from '../layouts/BaseLayout.astro'
 import HeroMini from '../components/landing/HeroMini.astro'
+import Breadcrumb from '../components/Breadcrumb.astro'
+
+const breadcrumbItems = [
+  { label: 'Home', to: '/' },
+  { label: 'Terms' },
+]
 ---
 
 <BaseLayout
@@ -18,6 +24,9 @@ import HeroMini from '../components/landing/HeroMini.astro'
   canonical="https://www.cloudcertprep.io/terms"
   headerOverlay={true}
 >
+  {/* BreadcrumbList JSON-LD only; the visible trail is the HeroMini crumbs. */}
+  <Breadcrumb items={breadcrumbItems} visuallyHidden />
+
   <HeroMini
     kicker="Legal"
     title="Terms of Service"

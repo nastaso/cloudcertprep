@@ -454,6 +454,7 @@ async function main() {
   const expectedFiles = [
     ...targets.map(t => t.file),
     ...certs.map(c => `card-${c.code}.webp`),
+    ...certs.map(c => `card-${c.code}-360.webp`),
   ]
   if (!force && existsSync(STAMP_PATH)) {
     let prevHash = null
@@ -536,6 +537,11 @@ async function main() {
       const png = await renderCardPng({ shortName: cert.shortName, level: cert.level, logoDataUri }, fonts)
       const webp = await sharp(png).webp({ quality: 82 }).toBuffer()
       writeFileSync(resolve(OG_DIR, `card-${cert.code}.webp`), webp)
+      // 1x variant for non-retina screens (the tiles display ~366px wide);
+      // paired with the 720w original via srcset in CertTile.astro so 1x
+      // displays do not over-fetch the retina image (PageSpeed image-delivery).
+      const webpSm = await sharp(png).resize({ width: 360 }).webp({ quality: 82 }).toBuffer()
+      writeFileSync(resolve(OG_DIR, `card-${cert.code}-360.webp`), webpSm)
       cardsRendered++
     } catch (err) {
       failures.push(`card-${cert.code}.webp: ${err.message}`)

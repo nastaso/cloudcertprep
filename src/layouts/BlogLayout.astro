@@ -64,9 +64,10 @@ const blogPostingJsonLd = serializeJsonLd({
   dateModified,
   url: selfUrl,
   mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+  inLanguage: 'en',
   author: { '@type': 'Person', '@id': 'https://www.cloudcertprep.io/#author' },
   publisher: { '@id': 'https://www.cloudcertprep.io/#organization' },
-  ...(ogImage ? { image: ogImage } : {}),
+  ...(ogImage ? { image: { '@type': 'ImageObject', url: ogImage, width: 1200, height: 630 } } : {}),
   ...(data.tags && data.tags.length > 0 ? { keywords: data.tags.join(', ') } : {}),
 })
 

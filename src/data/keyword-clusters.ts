@@ -29,16 +29,29 @@ export interface KeywordCluster {
 }
 
 /**
+ * Shorter, keyword-aligned primary overrides for domains whose full name pushes
+ * the derived <title> past the ~60-char SERP budget. Each keeps the topical
+ * term plus the "practice questions" keyword while trimming filler, so the
+ * title/H1/meta stay keyword-rich but render fully in search results. Keyed by
+ * `"<certCode>-<domainId>"`. (Informed by the maintainer keyword findings: AIF
+ * domain 3 leans on "foundation models", domain 5 on AI governance/security.)
+ */
+const PRIMARY_OVERRIDES: Record<string, string> = {
+  'aif-c01-3': 'foundation models practice questions',
+  'aif-c01-5': 'ai security and governance practice questions',
+}
+
+/**
  * Resolve the keyword cluster for a `(certCode, domainId)` pair. The primary
- * keyword is derived from the domain name; secondary and body lists are empty
- * by default. (The maintainer's tuned strategy is applied out-of-band; see the
- * module header.)
+ * keyword is derived from the domain name (or a length-tuned override); secondary
+ * and body lists are empty by default. (The maintainer's tuned strategy is
+ * applied out-of-band; see the module header.)
  */
 export function getKeywordCluster(certCode: string, domainId: number): KeywordCluster {
   const domainName = CERTIFICATIONS[certCode]?.domains.find(d => d.id === domainId)?.name
   const base = domainName ? domainName.toLowerCase() : 'aws certification'
   return {
-    primary: `${base} practice questions`,
+    primary: PRIMARY_OVERRIDES[`${certCode}-${domainId}`] ?? `${base} practice questions`,
     secondary: [],
     body: [],
   }

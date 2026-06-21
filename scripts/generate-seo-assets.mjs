@@ -7,6 +7,7 @@
 // pointing at the current default cert.
 
 import { writeFileSync, readFileSync, mkdirSync, readdirSync } from 'node:fs'
+import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
@@ -198,12 +199,35 @@ const isSingleProvider = activeProviders.length <= 1
 // Cert-agnostic routes. /history is omitted (noindex/per-user), /login and
 // /reset-password are noindex. /stats is temporarily noindex (community sample
 // too small to publish yet), so it is excluded from the sitemap until re-enabled.
+// Most recent commit date (YYYY-MM-DD) across the given repo-relative source
+// paths, or null if git history is unavailable (e.g. a shallow CI clone), so
+// the caller falls back to the build date. Gives each route a real
+// content-change <lastmod> instead of bumping every URL to the build date on
+// each deploy (which trains crawlers to ignore the field). (technical-SEO audit)
+const REPO_ROOT = resolve(__dirname, '..')
+function gitLastmod(...relPaths) {
+  try {
+    let latest = ''
+    for (const rel of relPaths) {
+      const out = execSync(`git log -1 --format=%cs -- "${rel}"`, {
+        cwd: REPO_ROOT,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      }).trim()
+      if (out && out > latest) latest = out
+    }
+    return latest || null
+  } catch {
+    return null
+  }
+}
+
 const STATIC_ROUTES = [
-  { path: '/', changefreq: 'weekly', priority: '1.0' },
-  { path: '/about', changefreq: 'monthly', priority: '0.6' },
-  { path: '/contribute', changefreq: 'monthly', priority: '0.5' },
-  { path: '/privacy', changefreq: 'yearly', priority: '0.3' },
-  { path: '/terms', changefreq: 'yearly', priority: '0.3' },
+  { path: '/', changefreq: 'weekly', priority: '1.0', lastmod: gitLastmod('src/pages/index.astro', 'src/lib/citation-content.ts') },
+  { path: '/about', changefreq: 'monthly', priority: '0.6', lastmod: gitLastmod('src/pages/about.astro') },
+  { path: '/contribute', changefreq: 'monthly', priority: '0.5', lastmod: gitLastmod('src/pages/contribute.astro') },
+  { path: '/privacy', changefreq: 'yearly', priority: '0.3', lastmod: gitLastmod('src/pages/privacy.astro') },
+  { path: '/terms', changefreq: 'yearly', priority: '0.3', lastmod: gitLastmod('src/pages/terms.astro') },
 ]
 
 // Provider hubs: /aws, /azure, /gcp. While only one provider is active the
@@ -238,6 +262,7 @@ const CERT_LANDING_ROUTES = certs
     changefreq: 'weekly',
     priority: '0.9',
     image: `/og/og-${cert.code}.png`,
+    lastmod: gitLastmod(`src/data/${cert.code}`, 'src/data/certifications.ts'),
   }))
 
 // Domain_Landings: one indexable page per (active cert, domain). Practice flow
@@ -259,6 +284,7 @@ const DOMAIN_LANDING_ROUTES = certs
       changefreq: 'weekly',
       priority: '0.7',
       image: `/og/og-${cert.code}-${slugifyDomain(domain.name)}.png`,
+      lastmod: gitLastmod(`src/data/${cert.code}/domain${domain.id}.json`, 'src/data/certifications.ts'),
     })),
   )
 
