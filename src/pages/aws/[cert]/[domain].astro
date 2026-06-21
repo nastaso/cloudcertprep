@@ -177,8 +177,8 @@ const sisterDomains = cert.domains
 const allBlogPosts = (await getCollection('blog'))
   .filter((post: CollectionEntry<'blog'>) => !post.data.draft)
   .sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => b.data.date.getTime() - a.data.date.getTime())
-const domainTaggedPosts = allBlogPosts.filter(p => p.data.tags.includes(domainSlug))
-const certTaggedPosts = allBlogPosts.filter(p => p.data.tags.includes(cert.code))
+const domainTaggedPosts = allBlogPosts.filter((p: CollectionEntry<'blog'>) => p.data.tags.includes(domainSlug))
+const certTaggedPosts = allBlogPosts.filter((p: CollectionEntry<'blog'>) => p.data.tags.includes(cert.code))
 const latestPosts = (
   domainTaggedPosts.length > 0 ? domainTaggedPosts
   : certTaggedPosts.length > 0 ? certTaggedPosts
