@@ -220,7 +220,7 @@ npm run build
 
 CloudCertPrep is maintained by [Alex Santonastaso](https://santonastaso.me) and improved by the contributors below. Every question fix, test, and accessibility tweak helps people study for free.
 
-[![Contributors](https://contrib.rocks/image?repo=nastaso/cloudcertprep&cache_bust=20260618)](https://github.com/nastaso/cloudcertprep/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=nastaso/cloudcertprep&cache_bust=20260621)](https://github.com/nastaso/cloudcertprep/graphs/contributors)
 
 New here? The [good first issues](https://github.com/nastaso/cloudcertprep/labels/good%20first%20issue) are small and welcoming, and even a single-question fix counts. And if CloudCertPrep helps your own studying, a [star](https://github.com/nastaso/cloudcertprep) helps other learners find it.
 
