@@ -16,8 +16,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Disabled Google Analytics 4 and hid the cookie-consent banner. Analytics is now
   cookieless Umami only, so the site sets no tracking cookies and needs no consent
   gate. The privacy policy and About page were updated to match.
+- Technical-SEO batch: allowed the Cloudflare Web Analytics beacon in the CSP
+  (clears the blocked-script console error and restores Best Practices to 100);
+  added per-route sitemap `<lastmod>` from real content/commit dates (every URL
+  previously carried the build date, which trains crawlers to ignore the field);
+  added a responsive `srcset` 1x variant for the cert-card images; emitted the
+  `BlogPosting` image as an `ImageObject` and added `inLanguage`; added
+  `BreadcrumbList` JSON-LD to /privacy and /terms; and shortened two over-length
+  AIF-C01 domain titles to the SERP budget (keyword-aligned).
 
 ### Fixed
+
+- Domain landing pages now link to the most relevant blog posts. The
+  related-posts filter matched the domain slug, but posts are tagged with cert
+  codes, so the block silently never rendered; it now falls back cert code then
+  recent, so it is never empty.
 
 - FAQ answer links no longer break when followed by trailing punctuation (#62).
 - Corrected the CLF-C02 q978 explanation so its rationale matches the answer options shown (#84).

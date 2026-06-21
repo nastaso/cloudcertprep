@@ -189,9 +189,10 @@ function main() {
   let headers = readFileSync(HEADERS_PATH, 'utf8')
 
   // script-src: 'unsafe-inline' -> inline-script hashes. Keep the host-source
-  // allowlists (umami / cloudflare) intact; they cover the dynamically injected
-  // external scripts (Umami, Turnstile). GA hosts (googletagmanager /
-  // google-analytics) are intentionally omitted while GA is disabled.
+  // allowlists (umami / cloudflare / cloudflareinsights) intact; they cover the
+  // dynamically injected external scripts (Umami, Turnstile, and the Cloudflare
+  // Web Analytics beacon). GA hosts (googletagmanager / google-analytics) are
+  // intentionally omitted while GA is disabled.
   const scriptList = [...scriptHashes].sort().join(' ')
   headers = rewriteDirective(headers, 'script-src', (body) => {
     const cleaned = body.replace(/'unsafe-inline'\s*/g, '').trim().replace(/\s+/g, ' ')

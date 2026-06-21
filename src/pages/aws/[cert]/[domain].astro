@@ -169,13 +169,21 @@ const sisterDomains = cert.domains
   }))
 
 // --- Latest blog posts for this domain (8.7) --------------------------
-// Build-time only: list the 3 most recent non-draft posts whose `tags`
-// include this domain's slug, ordered by date descending. The block is only
-// rendered when at least one matching post exists (no empty heading).
-const latestPosts = (await getCollection('blog'))
-  .filter((post: CollectionEntry<'blog'>) => !post.data.draft && post.data.tags.includes(domainSlug))
+// Build-time only, most-recent first. Relevance ladder so the block is never
+// silently empty: posts tagged with THIS domain slug first, then posts tagged
+// with this cert code (how posts are actually tagged today, e.g. "clf-c02"),
+// then any recent non-draft post. (Previously it matched only the domain slug,
+// which no post carries, so the block never rendered.)
+const allBlogPosts = (await getCollection('blog'))
+  .filter((post: CollectionEntry<'blog'>) => !post.data.draft)
   .sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => b.data.date.getTime() - a.data.date.getTime())
-  .slice(0, 3)
+const domainTaggedPosts = allBlogPosts.filter(p => p.data.tags.includes(domainSlug))
+const certTaggedPosts = allBlogPosts.filter(p => p.data.tags.includes(cert.code))
+const latestPosts = (
+  domainTaggedPosts.length > 0 ? domainTaggedPosts
+  : certTaggedPosts.length > 0 ? certTaggedPosts
+  : allBlogPosts
+).slice(0, 3)
 
 // --- SEO ---------------------------------------------------------------
 // Per-domain keyword cluster (R6.18). The primary keyword drives the title,

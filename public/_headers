@@ -4,7 +4,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cloud.umami.is https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cloud.umami.is https://gateway.umami.is https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cloud.umami.is https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cloud.umami.is https://gateway.umami.is https://challenges.cloudflare.com https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
 
 # CSP NOTE: the `'unsafe-inline'` tokens in script-src AND style-src above are
 # BUILD-TIME PLACEHOLDERS. The postbuild step `scripts/generate-csp-hashes.mjs`
@@ -21,10 +21,13 @@
 #   - connect-src: the https://*.supabase.co + wss://*.supabase.co wildcards
 #     are pinned to the exact project host derived from VITE_SUPABASE_URL
 #     (shrinks the exfil surface if XSS ever slips the hash CSP).
-# The host-source allowlists (umami / cloudflare) stay so the dynamically-
-# injected Umami and Turnstile scripts keep loading. GA is currently disabled,
-# so googletagmanager / google-analytics are intentionally NOT allowlisted;
-# re-add them (script-src + connect-src) if GA is ever re-enabled.
+# The host-source allowlists (umami / cloudflare / cloudflareinsights) stay so
+# the dynamically-injected Umami, Turnstile, and Cloudflare Web Analytics
+# scripts keep loading. CF Web Analytics loads beacon.min.js from
+# static.cloudflareinsights.com and posts to cloudflareinsights.com (the zone
+# auto-injects it now that DNS is on Cloudflare). GA stays disabled, so
+# googletagmanager / google-analytics are intentionally NOT allowlisted; re-add
+# them (script-src + connect-src) if GA is ever re-enabled.
 # Edit inline scripts/styles freely; hashes regenerate on every build.
 
 # Static assets have content-hashed filenames (e.g. index.A8f2k3.js), so they

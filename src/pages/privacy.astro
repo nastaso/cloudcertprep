@@ -11,6 +11,12 @@
  */
 import BaseLayout from '../layouts/BaseLayout.astro'
 import HeroMini from '../components/landing/HeroMini.astro'
+import Breadcrumb from '../components/Breadcrumb.astro'
+
+const breadcrumbItems = [
+  { label: 'Home', to: '/' },
+  { label: 'Privacy' },
+]
 ---
 
 <!-- Google OAuth data fields: email, name, profile picture URL. No other data requested, no tokens stored. (R5.6, expanded in Phase 13) -->
@@ -21,6 +27,9 @@ import HeroMini from '../components/landing/HeroMini.astro'
   canonical="https://www.cloudcertprep.io/privacy"
   headerOverlay={true}
 >
+  {/* BreadcrumbList JSON-LD only; the visible trail is the HeroMini crumbs. */}
+  <Breadcrumb items={breadcrumbItems} visuallyHidden />
+
   <HeroMini
     kicker="Legal"
     title="Privacy Policy"
