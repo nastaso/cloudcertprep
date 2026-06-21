@@ -41,7 +41,7 @@ Every question lives in `src/data/<cert-code>/domain<N>.json` as an array entry:
   },
   "answer": "B",                          // Single key from options. Or array for multi-answer.
   "isMultiAnswer": false,                 // If true, answer must be an array of 2+ keys.
-  "explanation": "Amazon S3 is..."        // Plain text. Multiple paragraphs separated by \\n.
+  "explanation": "Amazon S3 is..."        // Plain text. Exactly two paragraphs separated by one \\n: correct-answer rationale, then distractor rationales.
 }
 ```
 
@@ -86,7 +86,7 @@ Some certs (AIF-C01) also use **ordering** (arrange steps into a sequence) and *
 - For multi-answer: `isMultiAnswer: true` and `answer` is an array of 2+ keys, all matching options.
 - For `type: "ordering"`: `correctOrder` is an array that is a permutation of every non-empty option key.
 - For `type: "matching"`: `targets` has keys `1`-`5`, and `correctMatches` maps every option key to a valid target key.
-- `explanation` should be non-empty (warning, not error); live banks require exactly two paragraphs (one `\n`).
+- `explanation` should be non-empty (warning, not error). For live banks, `npm run validate` enforces exactly two paragraphs separated by one `\n`: correct-answer rationale first, then distractor rationales.
 - No em dashes (use ASCII punctuation: `,`, `.`, `:`, `;`, ` - `).
 
 Run validation locally before opening a PR:
