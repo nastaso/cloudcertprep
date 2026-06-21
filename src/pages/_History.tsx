@@ -4,7 +4,7 @@ import { goToLogin } from '../lib/navigation'
 import { useAuth } from '../hooks/useAuth'
 import { useCertNavigate } from '../hooks/useCertNavigate'
 import { useSEO } from '../hooks/useSEO'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import type { Question, ExamAttempt } from '../types'
@@ -221,6 +221,7 @@ export function History() {
         return
       }
 
+      const supabase = await getSupabase()
       const { data, error } = await supabase
         .from('exam_attempts')
         .select('*')
@@ -270,6 +271,7 @@ export function History() {
 
     setReviewLoading(attemptId)
     try {
+      const supabase = await getSupabase()
       // Load this cert's question bank if not already cached.
       if (!questionBanks.has(certCode)) {
         const bank = await loadAllQuestions(certCode)
@@ -306,6 +308,7 @@ export function History() {
     if (!user?.id) return
     setResetting(true)
     try {
+      const supabase = await getSupabase()
       const scopedCert = certFilter !== CERT_FILTER_ALL ? certFilter : null
 
       const deleteExamAttempts = supabase

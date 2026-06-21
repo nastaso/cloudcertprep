@@ -23,7 +23,7 @@ import {
   Target,
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { formatRelativeDate } from '../lib/formatting'
 import { formatDuration } from '../lib/scoring'
 import { logError } from '../lib/logger'
@@ -106,34 +106,38 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
 
     let cancelled = false
 
-    Promise.all([
-      supabase
-        .from('domain_progress')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('cert_code', cert.code),
-      supabase
-        .from('exam_attempts')
-        // Only the columns RecentAttempt renders — keeps the domain_scores
-        // JSONB out of the list-view egress.
-        .select('id, attempted_at, score_percent, scaled_score, passed, time_taken_seconds', { count: 'exact' })
-        .eq('user_id', user.id)
-        .eq('cert_code', cert.code)
-        .order('attempted_at', { ascending: false })
-        .limit(5),
-    ])
-      .then(([progressRes, attemptsRes]) => {
-        if (cancelled) return
-        if (progressRes.error) logError('CertDashboard.loadProgress', progressRes.error)
-        if (attemptsRes.error) logError('CertDashboard.loadAttempts', attemptsRes.error)
-        if (progressRes.data) setDomainProgress(progressRes.data as DomainProgress[])
-        if (attemptsRes.data) setRecentAttempts(attemptsRes.data as RecentAttempt[])
-        if (typeof attemptsRes.count === 'number') setExamCount(attemptsRes.count)
-      })
-      .catch((error: unknown) => {
-        if (cancelled) return
-        logError('CertDashboard.loadDashboardData', error)
-      })
+    void (async () => {
+      const supabase = await getSupabase()
+      if (cancelled) return
+      await Promise.all([
+        supabase
+          .from('domain_progress')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('cert_code', cert.code),
+        supabase
+          .from('exam_attempts')
+          // Only the columns RecentAttempt renders — keeps the domain_scores
+          // JSONB out of the list-view egress.
+          .select('id, attempted_at, score_percent, scaled_score, passed, time_taken_seconds', { count: 'exact' })
+          .eq('user_id', user.id)
+          .eq('cert_code', cert.code)
+          .order('attempted_at', { ascending: false })
+          .limit(5),
+      ])
+        .then(([progressRes, attemptsRes]) => {
+          if (cancelled) return
+          if (progressRes.error) logError('CertDashboard.loadProgress', progressRes.error)
+          if (attemptsRes.error) logError('CertDashboard.loadAttempts', attemptsRes.error)
+          if (progressRes.data) setDomainProgress(progressRes.data as DomainProgress[])
+          if (attemptsRes.data) setRecentAttempts(attemptsRes.data as RecentAttempt[])
+          if (typeof attemptsRes.count === 'number') setExamCount(attemptsRes.count)
+        })
+        .catch((error: unknown) => {
+          if (cancelled) return
+          logError('CertDashboard.loadDashboardData', error)
+        })
+    })()
 
     return () => {
       cancelled = true

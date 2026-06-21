@@ -79,17 +79,20 @@
 /* Hero entrance stagger: direct children fade-and-rise in sequence with a
    small per-child delay, replacing a single slab animation with a settled,
    premium cascade. Capped at 6 children; further children share the last
-   delay. Gated by prefers-reduced-motion via the global block above. (§8 item 2) */
-.stagger > * {
+   delay. Gated by prefers-reduced-motion via the global block above.
+   Gated behind `html.cc-js` (like [data-reveal] below) so the hero H1 — the
+   LCP element on the home + cert landing pages — is never withheld at
+   opacity:0 for crawlers, no-JS users, or the pre-hydration window. (§8 item 2) */
+html.cc-js .stagger > * {
   opacity: 0;
   animation: enter 0.5s var(--ease-out) both;
 }
-.stagger > *:nth-child(1) { animation-delay: 0ms; }
-.stagger > *:nth-child(2) { animation-delay: 70ms; }
-.stagger > *:nth-child(3) { animation-delay: 140ms; }
-.stagger > *:nth-child(4) { animation-delay: 210ms; }
-.stagger > *:nth-child(5) { animation-delay: 280ms; }
-.stagger > *:nth-child(n+6) { animation-delay: 350ms; }
+html.cc-js .stagger > *:nth-child(1) { animation-delay: 0ms; }
+html.cc-js .stagger > *:nth-child(2) { animation-delay: 70ms; }
+html.cc-js .stagger > *:nth-child(3) { animation-delay: 140ms; }
+html.cc-js .stagger > *:nth-child(4) { animation-delay: 210ms; }
+html.cc-js .stagger > *:nth-child(5) { animation-delay: 280ms; }
+html.cc-js .stagger > *:nth-child(n+6) { animation-delay: 350ms; }
 
 /* FAQ open/close polish: animate the panel in when a <details> opens, and
    (where the browser supports interpolate-size) transition the disclosure

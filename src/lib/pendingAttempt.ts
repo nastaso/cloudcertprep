@@ -18,7 +18,7 @@
  *   silently appear in an account created days later
  * - `attempted_at` is written from the guest finish time, not the flush time
  */
-import { supabase } from './supabase'
+import { getSupabase } from './supabase'
 import { updateDomainProgress } from './supabaseUtils'
 import { logError } from './logger'
 
@@ -125,6 +125,7 @@ export async function flushPendingAttempt(userId: string): Promise<boolean> {
   if (!pending) return false
   flushing = true
   try {
+    const supabase = await getSupabase()
     const { data: attemptData, error: attemptError } = await supabase
       .from('exam_attempts')
       .insert({

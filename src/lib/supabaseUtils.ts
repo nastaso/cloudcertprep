@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { getSupabase } from './supabase'
 import { logError } from './logger'
 import { calculateDomainMastery } from './domainStats'
 import { DEFAULT_CERT_ID } from '../data/certifications'
@@ -37,6 +37,8 @@ export async function updateDomainProgress(
     logError('supabaseUtils.updateDomainProgress.loadBank', bankError)
     return
   }
+
+  const supabase = await getSupabase()
 
   // Single query - fetch both question_id and is_correct
   const { data: allQuestions, error: selectError } = await supabase

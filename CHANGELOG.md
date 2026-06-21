@@ -25,6 +25,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `BreadcrumbList` JSON-LD to /privacy and /terms; and shortened two over-length
   AIF-C01 domain titles to the SERP budget (keyword-aligned).
 
+### Performance
+
+- Lazy-load the Supabase client. `@supabase/supabase-js` (~53 KB gzipped) was
+  pulled into every marketing/blog/cert page by the always-mounted header and
+  account-link islands, even for logged-out visitors who never touch auth. It is
+  now imported on demand behind a memoised `getSupabase()`: useAuth loads it only
+  when a session token or an OAuth/recovery `?code=` callback is present, the
+  login page warms it on mount, and app surfaces load it when they query. The
+  library is now a dynamic-import-only chunk, fully off the indexable funnel.
+- Gated the hero entrance stagger behind `html.cc-js` (mirroring `[data-reveal]`)
+  so the LCP H1 on the home and cert landing pages is no longer withheld at
+  `opacity:0` for crawlers, no-JS users, or the pre-hydration window.
+
 ### Fixed
 
 - Domain landing pages now link to the most relevant blog posts. The

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import type { Question } from '../types'
 import {
@@ -21,6 +21,7 @@ export function useSpacedRepetition(
     }
 
     try {
+      const supabase = await getSupabase()
       const { data, error: fetchError } = await supabase
         .from('question_mastery')
         .select(

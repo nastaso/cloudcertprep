@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, Link } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { validatePassword, isPasswordStrongEnough } from '../lib/validation'
 import { trackEvent } from '../lib/analytics'
 import { useSEO } from '../hooks/useSEO'
@@ -61,6 +61,13 @@ export function Login() {
     turnstileRef.current?.reset()
   }
 
+  // Warm the lazy Supabase client on mount. The login page is the one place a
+  // logged-out visitor is about to need auth, so loading the ~53 KB chunk while
+  // they fill the form keeps the first sign-in click instant. (useAuth itself
+  // skips Supabase for logged-out visitors with no `?code=` callback, so this
+  // page is responsible for its own warm-up.)
+  useEffect(() => { void getSupabase() }, [])
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -73,6 +80,7 @@ export function Login() {
     setLoading(true)
 
     try {
+      const supabase = await getSupabase()
       if (isSignUp) {
         if (!acceptedTerms) {
           setError('You must accept the Terms of Service and Privacy Policy to sign up.')
@@ -133,6 +141,7 @@ export function Login() {
     setLoading(true)
     try {
       trackEvent('sign_in_initiated', { method: 'github' })
+      const supabase = await getSupabase()
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: { redirectTo: `${window.location.origin}${from}` },
@@ -149,6 +158,7 @@ export function Login() {
     setLoading(true)
     try {
       trackEvent('sign_in_initiated', { method: 'google' })
+      const supabase = await getSupabase()
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: `${window.location.origin}${from}` },
@@ -173,6 +183,7 @@ export function Login() {
     setLoading(true)
 
     try {
+      const supabase = await getSupabase()
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         captchaToken: captchaToken ?? undefined,
         redirectTo: `${window.location.origin}/reset-password`,
