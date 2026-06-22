@@ -4,7 +4,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cloud.umami.is https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cloud.umami.is https://gateway.umami.is https://challenges.cloudflare.com https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cloud.umami.is https://analytics.cloudcertprep.io https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://cloud.umami.is https://analytics.cloudcertprep.io https://gateway.umami.is https://challenges.cloudflare.com https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
 
 # CSP NOTE: the `'unsafe-inline'` tokens in script-src AND style-src above are
 # BUILD-TIME PLACEHOLDERS. The postbuild step `scripts/generate-csp-hashes.mjs`
@@ -25,7 +25,10 @@
 # the dynamically-injected Umami, Turnstile, and Cloudflare Web Analytics
 # scripts keep loading. CF Web Analytics loads beacon.min.js from
 # static.cloudflareinsights.com and posts to cloudflareinsights.com (the zone
-# auto-injects it now that DNS is on Cloudflare). GA stays disabled, so
+# auto-injects it now that DNS is on Cloudflare). analytics.cloudcertprep.io is
+# the self-hosted Umami instance (serves script.js, receives same-origin
+# /api/send posts); it is used when VITE_UMAMI_HOST points the BaseLayout beacon
+# there instead of Umami Cloud. GA stays disabled, so
 # googletagmanager / google-analytics are intentionally NOT allowlisted; re-add
 # them (script-src + connect-src) if GA is ever re-enabled.
 # Edit inline scripts/styles freely; hashes regenerate on every build.
