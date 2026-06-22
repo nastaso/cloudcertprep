@@ -24,6 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `BlogPosting` image as an `ImageObject` and added `inLanguage`; added
   `BreadcrumbList` JSON-LD to /privacy and /terms; and shortened two over-length
   AIF-C01 domain titles to the SERP budget (keyword-aligned).
+- Slimmed the per-question `question_answered` analytics event to low-cardinality
+  properties (`surface` + `domain_id`, plus `is_correct` in practice), dropping
+  the high-cardinality `question_id` and the positional `question_index`,
+  `question_number`, and `total_questions` fields. Each Umami data property is
+  billed, and those fields were the bulk of analytics data volume while adding
+  little aggregate insight. The event still fires once per answered question, so
+  guest (signed-out) engagement, which is not stored in Supabase, is still
+  tracked.
 
 ### Fixed
 
