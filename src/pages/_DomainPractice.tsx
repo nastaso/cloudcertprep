@@ -281,12 +281,9 @@ export function DomainPractice() {
     setAnswering(false)
     setShowFeedback(true)
     trackEvent('question_answered', {
+      surface: 'practice',
       domain_id: selectedDomain,
-      question_id: current.id,
       is_correct: correct,
-      mode: 'practice',
-      question_number: currentIndex + 1,
-      total_questions: questions.length
     })
   }
 

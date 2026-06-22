@@ -323,12 +323,11 @@ export function MockExam() {
     const currentState = answers.get(currentIndex) || { userAnswer: null, flagged: false }
 
     // Per-question analytics: fire `question_answered` exactly once per
-    // question, on the transition from "unanswered" to "answered". Subsequent
-    // toggles (multi-answer) or answer changes (single-answer) do not refire,
-    // so event volume scales with question count, not click count. Uses the
-    // same `question_answered` name as DomainPractice to preserve Umami
-    // dashboard continuity (the live baseline event); the `surface: 'exam'`
-    // param distinguishes exam answers from domain-practice answers.
+    // question, on the transition from "unanswered" to "answered" (toggles and
+    // answer changes do not refire). The payload is deliberately low-cardinality
+    // (surface + domain only): every Umami data property is billed, and
+    // per-question detail for signed-in users already lives in Supabase. This is
+    // the guest-inclusive engagement signal; `surface` splits it from practice.
     const wasUnanswered = !isQuestionAnswered(currentState)
 
     if (current.isMultiAnswer) {
@@ -336,24 +335,12 @@ export function MockExam() {
       const newAnswers = toggleMultiAnswer(currentAnswers, answer, MAX_MULTI_ANSWER)
       setAnswers(prev => new Map(prev).set(currentIndex, { ...currentState, userAnswer: newAnswers }))
       if (wasUnanswered && newAnswers.length > 0) {
-        trackEvent('question_answered', {
-          surface: 'exam',
-          question_index: currentIndex,
-          question_id: current.id,
-          domain_id: current.domainId,
-          is_multi_answer: true,
-        })
+        trackEvent('question_answered', { surface: 'exam', domain_id: current.domainId })
       }
     } else {
       setAnswers(prev => new Map(prev).set(currentIndex, { ...currentState, userAnswer: answer }))
       if (wasUnanswered) {
-        trackEvent('question_answered', {
-          surface: 'exam',
-          question_index: currentIndex,
-          question_id: current.id,
-          domain_id: current.domainId,
-          is_multi_answer: false,
-        })
+        trackEvent('question_answered', { surface: 'exam', domain_id: current.domainId })
       }
     }
   }
@@ -369,13 +356,7 @@ export function MockExam() {
     const wasUnanswered = !isQuestionAnswered(currentState)
     setAnswers(prev => new Map(prev).set(currentIndex, { ...currentState, userAnswer: value }))
     if (wasUnanswered && value.length > 0) {
-      trackEvent('question_answered', {
-        surface: 'exam',
-        question_index: currentIndex,
-        question_id: current.id,
-        domain_id: current.domainId,
-        question_type: getQuestionType(current),
-      })
+      trackEvent('question_answered', { surface: 'exam', domain_id: current.domainId })
     }
   }
 
