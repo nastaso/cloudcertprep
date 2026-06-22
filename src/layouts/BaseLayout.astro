@@ -70,6 +70,11 @@ const {
 } = Astro.props
 
 const umamiWebsiteId = import.meta.env.VITE_UMAMI_WEBSITE_ID ?? ''
+// Umami host. Defaults to Umami Cloud; set VITE_UMAMI_HOST to a self-hosted
+// instance (e.g. https://analytics.cloudcertprep.io) to point the beacon there.
+// The chosen host must also be allowlisted in public/_headers (script-src +
+// connect-src) or the CSP will block the script and its /api/send posts.
+const umamiHost = import.meta.env.VITE_UMAMI_HOST ?? 'https://cloud.umami.is'
 const gaMeasurementId = import.meta.env.VITE_GA_MEASUREMENT_ID ?? ''
 
 // Pre-promotion noindex preview gate (R9.17, Property 7). Non-production
@@ -92,8 +97,8 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
     <meta name="theme-color" content="#FF9900" />
 
     <!-- Preconnect to external origins (improves LCP) -->
-    <link rel="preconnect" href="https://cloud.umami.is" />
-    <link rel="dns-prefetch" href="https://cloud.umami.is" />
+    <link rel="preconnect" href={umamiHost} />
+    <link rel="dns-prefetch" href={umamiHost} />
 
     <!-- Primary Meta Tags -->
     <title>{title}</title>
@@ -157,13 +162,13 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
     ))}
 
     <!-- Umami Analytics (cookieless, GDPR-friendly, runs without consent) -->
-    <script is:inline define:vars={{ umamiWebsiteId }}>
+    <script is:inline define:vars={{ umamiWebsiteId, umamiHost }}>
       (function(){
         var id=umamiWebsiteId;
         if(!id||id.charAt(0)==='%')return;
         var s=document.createElement('script');
         s.defer=true;
-        s.src='https://cloud.umami.is/script.js';
+        s.src=umamiHost+'/script.js';
         s.setAttribute('data-website-id',id);
         document.head.appendChild(s);
       })();
