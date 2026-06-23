@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { formatRelativeDate } from '../lib/formatting'
 import { formatTime } from '../lib/scoring'
 import { CERTIFICATION_LIST, getCertTotalQuestions, getCertDomains } from '../data/certifications'
@@ -50,6 +50,7 @@ export function Stats() {
       setLoading(true)
       setError(null)
 
+      const supabase = await getSupabase()
       // Load platform stats from singleton table
       const { data: statsData, error: statsError } = await supabase
         .from('platform_stats')

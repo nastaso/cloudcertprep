@@ -17,7 +17,8 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('./supabase', () => ({
-  supabase: {
+  // getSupabase() is the lazy accessor; it resolves to the same mock client.
+  getSupabase: () => Promise.resolve({
     from: (table: string) => {
       if (table === 'attempt_questions') {
         const builder = {
@@ -30,7 +31,7 @@ vi.mock('./supabase', () => ({
       }
       return { upsert: mocks.upsert }
     },
-  },
+  }),
 }))
 
 vi.mock('../data/questions', () => ({

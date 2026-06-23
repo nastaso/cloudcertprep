@@ -19,7 +19,7 @@ import { LoadingSpinner } from '../components/LoadingSpinner'
 import { QuestionReviewCard } from '../components/QuestionReviewCard'
 import { UnlockCTA } from '../components/landing/UnlockCTA'
 import { selectExamQuestions, calculateScaledScore, isPassed, getDomainScore, formatTime, formatDuration, isAnswerCorrect, correctAnswerFor, getExamDomainTargets } from '../lib/scoring'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { updateDomainProgress } from '../lib/supabaseUtils'
 import { goToLogin } from '../lib/navigation'
@@ -432,6 +432,7 @@ export function MockExam() {
       // Only save to database if user is logged in AND exam took at least 60 seconds
       if (!isGuest && user && !isTooShort) {
         const userId = user.id
+        const supabase = await getSupabase()
         const { data: attemptData, error: attemptError } = await supabase
           .from('exam_attempts')
           .insert({

@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useCert } from '../hooks/useCert'
 import { useCertNavigate } from '../hooks/useCertNavigate'
 import { useSEO } from '../hooks/useSEO'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { AnswerButton } from '../components/AnswerButton'
 import { OrderingInput } from '../components/OrderingInput'
@@ -303,6 +303,7 @@ export function DomainPractice() {
     // Only save to database if user is logged in
     if (user) {
       try {
+        const supabase = await getSupabase()
         // Save each question result to attempt_questions table (without attempt_id for practice mode)
         const questionRecords = questions.map((q, idx) => {
           const keyMap = optionKeyMaps.get(q.id) || {}

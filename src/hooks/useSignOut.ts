@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { trackEvent } from '../lib/analytics'
 
 /**
@@ -27,6 +27,7 @@ export function useSignOut(): () => Promise<void> {
     // `scope: 'local'` clear (no network call), then a guaranteed sweep of the
     // `sb-*-auth-token` keys the app's pre-paint auth detection looks for. An
     // explicit logout must never leave a credential behind.
+    const supabase = await getSupabase()
     try {
       await supabase.auth.signOut()
     } catch {

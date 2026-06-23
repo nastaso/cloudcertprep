@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { trackEvent } from '../lib/analytics'
 import { maybeNotifyGoogleLink } from '../components/account-link'
@@ -61,86 +61,111 @@ function init() {
     }
   } catch { /* localStorage unavailable */ }
 
-  state = { user: null, loading: hasToken }
+  // An OAuth / magic-link / recovery callback returns as `?code=...` on whatever
+  // page `redirectTo` pointed at. For OAuth that is wherever the user started
+  // (often a marketing page), not only /login or /reset-password. The PKCE
+  // exchange runs when the Supabase client is constructed (detectSessionInUrl),
+  // so we MUST load Supabase to complete sign-in even with no persisted token.
+  const hasAuthCallback = /[?&]code=/.test(window.location.search)
 
-  supabase.auth.getSession()
-    .then(({ data: { session } }) => {
-      // If an onAuthStateChange event already landed, it holds the freshest
-      // state — don't overwrite it with this older getSession snapshot. (M2)
-      if (authEventLanded) return
-      const initialUser = session?.user ?? null
-      prevUser = initialUser
-      setState({ user: initialUser, loading: false })
-      // A guest exam attempt stored before this session resolved (e.g. the
-      // flush failed offline last visit) is retried on any signed-in load.
-      if (initialUser && hasPendingAttempt()) {
-        void flushPendingAttempt(initialUser.id)
-      }
-    })
-    .catch((err: unknown) => {
-      logError('useAuth.getSession', err)
-      if (authEventLanded) return
-      setState({ user: null, loading: false })
-    })
+  // Logged-out with nothing to exchange: paint the logged-out chrome and skip
+  // loading the Supabase client entirely. This is what keeps ~53 KB gz of auth
+  // JS off every marketing/blog/cert page for guests (the CWV win). The site is
+  // an MPA — sign-in is always a full navigation to /login and back — so no
+  // in-place onAuthStateChange is ever needed on a logged-out marketing page.
+  if (!hasToken && !hasAuthCallback) {
+    state = { user: null, loading: false }
+    return
+  }
 
-  supabase.auth.onAuthStateChange((event, session) => {
-    authEventLanded = true
-    const newUser = session?.user ?? null
+  state = { user: null, loading: true }
 
-    // Refuse an OAuth sign-in that returned an unverified email. Google only
-    // federates verified emails, so this is a guard for R5.5 rather than an
-    // expected path. Scope to OAuth providers: email/password users legitimately
-    // have email_verified === false when email confirmation is disabled, and
-    // must not be force-signed-out here. Also covers INITIAL_SESSION so a
-    // persisted unverified OAuth session is caught on reload, not only on the
-    // live SIGNED_IN transition. The signOut() is deferred with setTimeout to
-    // avoid the supabase-js documented deadlock when calling auth methods
-    // synchronously inside the onAuthStateChange callback. (M1)
-    const isOAuth = (newUser?.app_metadata?.provider ?? 'email') !== 'email'
-    if (
-      (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')
-      && newUser
-      && isOAuth
-      && newUser.user_metadata?.email_verified === false
-    ) {
-      setTimeout(() => {
-        supabase.auth.signOut().finally(() => {
-          window.location.assign('/login?error=email_unverified')
-        })
-      }, 0)
-      return
-    }
-
-    // Detect the real "user just signed in" moment. Excludes
-    // TOKEN_REFRESHED, USER_UPDATED, INITIAL_SESSION.
-    if (
-      event === 'SIGNED_IN'
-      && prevUser === null
-      && newUser !== null
-    ) {
-      trackEvent('sign_in', {
-        method: newUser.app_metadata?.provider ?? 'email',
+  void getSupabase().then(supabase => {
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        // If an onAuthStateChange event already landed, it holds the freshest
+        // state — don't overwrite it with this older getSession snapshot. (M2)
+        if (authEventLanded) return
+        const initialUser = session?.user ?? null
+        prevUser = initialUser
+        setState({ user: initialUser, loading: false })
+        // A guest exam attempt stored before this session resolved (e.g. the
+        // flush failed offline last visit) is retried on any signed-in load.
+        if (initialUser && hasPendingAttempt()) {
+          void flushPendingAttempt(initialUser.id)
+        }
+      })
+      .catch((err: unknown) => {
+        logError('useAuth.getSession', err)
+        if (authEventLanded) return
+        setState({ user: null, loading: false })
       })
 
-      // First-link confirmation (R5.4): when Google was merged into a
-      // pre-existing account (multiple identities incl. google), surface a
-      // one-time notice. The helper self-guards via a localStorage ack flag,
-      // so this is safe to call on every genuine sign-in.
-      maybeNotifyGoogleLink(newUser)
-    }
+    supabase.auth.onAuthStateChange((event, session) => {
+      authEventLanded = true
+      const newUser = session?.user ?? null
 
-    prevUser = newUser
-    setState({ user: newUser, loading: false })
+      // Refuse an OAuth sign-in that returned an unverified email. Google only
+      // federates verified emails, so this is a guard for R5.5 rather than an
+      // expected path. Scope to OAuth providers: email/password users legitimately
+      // have email_verified === false when email confirmation is disabled, and
+      // must not be force-signed-out here. Also covers INITIAL_SESSION so a
+      // persisted unverified OAuth session is caught on reload, not only on the
+      // live SIGNED_IN transition. The signOut() is deferred with setTimeout to
+      // avoid the supabase-js documented deadlock when calling auth methods
+      // synchronously inside the onAuthStateChange callback. (M1)
+      const isOAuth = (newUser?.app_metadata?.provider ?? 'email') !== 'email'
+      if (
+        (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')
+        && newUser
+        && isOAuth
+        && newUser.user_metadata?.email_verified === false
+      ) {
+        setTimeout(() => {
+          supabase.auth.signOut().finally(() => {
+            window.location.assign('/login?error=email_unverified')
+          })
+        }, 0)
+        return
+      }
 
-    // Flush a pending guest exam attempt to the now-signed-in account (the
-    // results-screen "Sign in to save this attempt" path). Deferred out of
-    // the auth callback per the supabase-js deadlock caution; the flush
-    // self-guards against re-entry and missing payloads, so firing on any
-    // signed-in transition (incl. INITIAL_SESSION / TOKEN_REFRESHED) is safe.
-    if (newUser && hasPendingAttempt()) {
-      const userId = newUser.id
-      setTimeout(() => { void flushPendingAttempt(userId) }, 0)
-    }
+      // Detect the real "user just signed in" moment. Excludes
+      // TOKEN_REFRESHED, USER_UPDATED, INITIAL_SESSION.
+      if (
+        event === 'SIGNED_IN'
+        && prevUser === null
+        && newUser !== null
+      ) {
+        trackEvent('sign_in', {
+          method: newUser.app_metadata?.provider ?? 'email',
+        })
+
+        // First-link confirmation (R5.4): when Google was merged into a
+        // pre-existing account (multiple identities incl. google), surface a
+        // one-time notice. The helper self-guards via a localStorage ack flag,
+        // so this is safe to call on every genuine sign-in.
+        maybeNotifyGoogleLink(newUser)
+      }
+
+      prevUser = newUser
+      setState({ user: newUser, loading: false })
+
+      // Flush a pending guest exam attempt to the now-signed-in account (the
+      // results-screen "Sign in to save this attempt" path). Deferred out of
+      // the auth callback per the supabase-js deadlock caution; the flush
+      // self-guards against re-entry and missing payloads, so firing on any
+      // signed-in transition (incl. INITIAL_SESSION / TOKEN_REFRESHED) is safe.
+      if (newUser && hasPendingAttempt()) {
+        const userId = newUser.id
+        setTimeout(() => { void flushPendingAttempt(userId) }, 0)
+      }
+    })
+  }).catch((err: unknown) => {
+    // Supabase chunk failed to load (offline / network). Resolve to logged-out
+    // so the chrome is never stuck on the loading placeholder.
+    logError('useAuth.init', err)
+    if (authEventLanded) return
+    setState({ user: null, loading: false })
   })
 }
 

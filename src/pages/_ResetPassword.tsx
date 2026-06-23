@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { validatePassword, isPasswordStrongEnough } from '../lib/validation'
 import { useAuth } from '../hooks/useAuth'
 import { useSEO } from '../hooks/useSEO'
@@ -76,6 +76,7 @@ export function ResetPassword() {
     setLoading(true)
 
     try {
+      const supabase = await getSupabase()
       const { error } = await supabase.auth.updateUser({
         password: password,
       })
