@@ -88,7 +88,16 @@ export function useFocusTrap(
       if (lockBodyScroll) {
         document.body.style.overflow = previousOverflowRef.current
       }
-      previouslyFocusedRef.current?.focus()
+      // Only restore focus if the previously focused element is still in the
+      // document. If it was removed while the trap was open (the trigger
+      // unmounted, or a navigation replaced the content underneath), calling
+      // `.focus()` on the detached node is a no-op and focus silently falls
+      // back to `<body>`, losing a keyboard or screen-reader user's place
+      // (WCAG 2.4.3 Focus Order).
+      const previous = previouslyFocusedRef.current
+      if (previous?.isConnected) {
+        previous.focus()
+      }
     }
   }, [active, containerRef, lockBodyScroll])
 }
