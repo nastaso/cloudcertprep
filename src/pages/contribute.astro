@@ -11,7 +11,10 @@
 import BaseLayout from '../layouts/BaseLayout.astro'
 import Breadcrumb from '../components/Breadcrumb.astro'
 import HeroMini from '../components/landing/HeroMini.astro'
+import Card from '../components/Card.astro'
+import Button from '../components/Button.astro'
 import { GITHUB_REPO_URL, GITHUB_ISSUES_URL } from '../lib/constants'
+import { CERTIFICATIONS, DEFAULT_CERT_ID } from '../data/certifications'
 import { SITE_URL } from '../lib/seo-data'
 import { serializeJsonLd } from '../lib/jsonld'
 
@@ -19,6 +22,9 @@ const canonical = `${SITE_URL}/contribute`
 const contributingUrl = `${GITHUB_REPO_URL}/blob/main/CONTRIBUTING.md`
 const goodFirstIssuesUrl = `${GITHUB_ISSUES_URL}?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22`
 const dataDirUrl = `${GITHUB_REPO_URL}/tree/main/src/data`
+// Quiet practice path (P2-12) for readers who want to use the platform first.
+const defaultCert = CERTIFICATIONS[DEFAULT_CERT_ID]
+const practiceHref = defaultCert ? `/${defaultCert.provider}/${defaultCert.code}/practice-exam` : '/'
 
 const breadcrumbItems = [
   { label: 'Home', to: '/' },
@@ -133,6 +139,21 @@ const contributeJsonLd = serializeJsonLd({
             for the local development setup.
           </p>
         </section>
+
+        {/* Closing CTA (P2-12): keep the GitHub-first framing but offer a quiet
+            path to just use the platform. */}
+        <Card as="section" padding="md" class="text-center">
+          <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-2">Prefer to practice first?</h2>
+          <p class="text-text-muted mb-5">You do not need an account or a contribution to use the platform.</p>
+          <div class="flex flex-wrap justify-center gap-3">
+            <Button href={practiceHref} variant="brand" size="lg" arrow>
+              Start practicing free
+            </Button>
+            <Button href="/#certifications" variant="secondary" size="lg">
+              Browse certifications
+            </Button>
+          </div>
+        </Card>
       </div>
     </div>
   </div>

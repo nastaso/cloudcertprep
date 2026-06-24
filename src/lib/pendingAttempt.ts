@@ -95,6 +95,16 @@ export function hasPendingAttempt(): boolean {
 }
 
 /**
+ * Read the stored guest attempt for read-only re-display WITHOUT consuming it.
+ * Used by the exam island to rehydrate a just-finished attempt after a /login
+ * round-trip (P1-6). Already TTL- and shape-validated by readPendingAttempt and
+ * does NOT delete on success, so a later sign-in still flushes the same snapshot.
+ */
+export function peekPendingAttempt(): PendingAttempt | null {
+  return readPendingAttempt()
+}
+
+/**
  * One-shot "your attempt was saved" notice. The flush usually completes while
  * the user is still on /login (the SIGNED_IN event), before the exam island
  * remounts, so a window event would be missed; a sessionStorage flag survives

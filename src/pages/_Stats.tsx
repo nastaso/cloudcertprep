@@ -179,7 +179,7 @@ export function Stats() {
                   <p className="text-text-muted text-sm">
                     Not enough attempts yet. Be the first to set the community benchmark.{' '}
                     <a href={`/aws/${cert.code}/practice-exam`} className="text-text-primary hover:text-text-primary/70 underline">
-                      Start practising →
+                      Start practicing →
                     </a>
                   </p>
                 </Card>

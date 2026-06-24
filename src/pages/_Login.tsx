@@ -23,6 +23,10 @@ export function Login() {
   const [isSignUp, setIsSignUp] = useState(false)
   const [isForgotPassword, setIsForgotPassword] = useState(false)
   const [signUpSuccess, setSignUpSuccess] = useState(false)
+  // Resend-confirmation state for the "Check your email" card (P0-1). The
+  // cooldown throttles repeat sends to match Supabase's resend rate limit.
+  const [resendState, setResendState] = useState<'idle' | 'sending' | 'sent'>('idle')
+  const [resendCooldown, setResendCooldown] = useState(0) // seconds remaining
 
   // Title varies by auth mode; canonical=null since auth pages are noindex.
   useSEO({
@@ -68,6 +72,13 @@ export function Login() {
   // page is responsible for its own warm-up.)
   useEffect(() => { void getSupabase() }, [])
 
+  // Tick the resend cooldown down to zero, then re-enable the resend button.
+  useEffect(() => {
+    if (resendCooldown <= 0) return
+    const id = window.setInterval(() => setResendCooldown(s => Math.max(0, s - 1)), 1000)
+    return () => window.clearInterval(id)
+  }, [resendCooldown])
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -100,7 +111,11 @@ export function Login() {
           password,
           options: {
             captchaToken: captchaToken ?? undefined,
-            data: { accepted_terms_at: new Date().toISOString() }
+            data: { accepted_terms_at: new Date().toISOString() },
+            // Land the confirmation link on home with a marker the AuthLinkNotice
+            // island reads to show the "you are in" welcome (P0-2). The actual
+            // redirect target is gated by the Supabase Site URL / Redirect allow-list.
+            emailRedirectTo: `${window.location.origin}/?verified=1`,
           }
         })
 
@@ -108,6 +123,9 @@ export function Login() {
         trackEvent('sign_up', { method: 'email' })
         setPassword('')
         setConfirmPassword('')
+        // The signup token is now consumed; clear it so the success card's
+        // Turnstile re-arms with a fresh token for a possible resend (P0-1).
+        resetCaptcha()
         setSignUpSuccess(true)
         return
       } else {
@@ -199,6 +217,33 @@ export function Login() {
     }
   }
 
+  // Resend the sign-up confirmation email (P0-1). Mirrors handleEmailAuth's
+  // captcha handling: tokens are single-use, so re-arm Turnstile after the call.
+  const handleResend = async () => {
+    if (hasCaptcha && !captchaToken) {
+      setError('Please complete the verification challenge below.')
+      return
+    }
+    setError('')
+    setResendState('sending')
+    try {
+      const supabase = await getSupabase()
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: { captchaToken: captchaToken ?? undefined },
+      })
+      if (error) throw error
+      setResendState('sent')
+      setResendCooldown(45) // matches Supabase's default resend interval
+    } catch (err: unknown) {
+      setError(authErrorMessage(err, 'sign-up'))
+      setResendState('idle')
+    } finally {
+      resetCaptcha() // token is single-use; re-arm for the next attempt
+    }
+  }
+
   return (
       // Top-anchored (items-start) so switching between sign-in / sign-up /
       // reset / check-email grows the card DOWNWARD from a stable top instead
@@ -276,9 +321,46 @@ export function Login() {
               <p className="text-text-muted text-sm leading-relaxed mb-6">
                 We sent a verification link to <span className="text-text-primary font-medium">{email}</span>. Check your spam folder if you don't see it.
               </p>
+
+              {resendState === 'sent' && (
+                <Alert tone="success" role="status" className="mb-4 text-left">
+                  Sent again. The new link is on its way. Check spam if you still don't see it.
+                </Alert>
+              )}
+              {error && (
+                <Alert tone="danger" role="alert" className="mb-4 text-left text-danger">
+                  <span id="auth-error">{error}</span>
+                </Alert>
+              )}
+
+              {/* Single-use Turnstile token for the resend call; renders nothing
+                  when no site key is configured. Shares turnstileRef because only
+                  one of the two card branches is ever mounted at a time. */}
+              <Turnstile ref={turnstileRef} onToken={setCaptchaToken} theme={theme} />
+
               <Button
-                onClick={() => { setSignUpSuccess(false); setIsSignUp(false) }}
+                onClick={handleResend}
                 variant="secondary"
+                fullWidth
+                loading={resendState === 'sending'}
+                loadingText="Sending..."
+                disabled={resendCooldown > 0 || (hasCaptcha && !captchaToken)}
+                className="mt-4 mb-3"
+              >
+                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend verification email'}
+              </Button>
+
+              <button
+                type="button"
+                onClick={() => { setSignUpSuccess(false); setIsSignUp(true); setError(''); setResendState('idle') }}
+                className="block w-full text-sm text-text-muted hover:text-text-primary transition-colors mb-4"
+              >
+                Wrong email? Edit it
+              </button>
+
+              <Button
+                onClick={() => { setSignUpSuccess(false); setIsSignUp(false); setError(''); setResendState('idle') }}
+                variant="ghost"
                 fullWidth
               >
                 Back to sign in
@@ -393,6 +475,7 @@ export function Login() {
             fullWidth
             loading={loading}
             loadingText="Loading..."
+            aria-describedby={hasCaptcha && !captchaToken ? 'captcha-pending' : undefined}
             disabled={
               (hasCaptcha && !captchaToken) ||
               (isSignUp && !acceptedTerms) ||
@@ -402,6 +485,11 @@ export function Login() {
           >
             {isForgotPassword ? 'Send reset link' : isSignUp ? 'Sign up' : 'Sign in'}
           </Button>
+          {hasCaptcha && !captchaToken && (
+            <p id="captcha-pending" className="mt-2 text-center text-sm text-text-muted">
+              Verifying you are human...
+            </p>
+          )}
         </form>
 
         {!isSignUp && !isForgotPassword && (

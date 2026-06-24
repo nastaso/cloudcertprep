@@ -14,6 +14,7 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 import CertTile from '../components/landing/CertTile.astro'
 import AboutCard from '../components/landing/AboutCard.astro'
 import HeroStage from '../components/landing/HeroStage.astro'
+import AuthLinkNotice from '../components/AuthLinkNotice.tsx'
 import Faq from '../components/Faq.astro'
 import {
   CERTIFICATIONS,
@@ -109,6 +110,12 @@ const softwareAppJsonLd = serializeJsonLd({
   {/* Content sheet slides over the stage with one large rounded corner. */}
   <div class="sheet-overlap pb-16 md:pb-24 pt-12 md:pt-20">
     <div class="max-w-6xl mx-auto px-4 md:px-8">
+      {/* Auth redirect safety net (P0-2 / P0-3): renders only for the rare
+          just-verified or expired-link cohort, null for normal traffic, so the
+          empty island adds no layout box above the content stack. */}
+      {defaultCert && (
+        <AuthLinkNotice client:idle practiceHref={`/${defaultCert.provider}/${defaultCert.code}/practice-exam`} />
+      )}
       <div class="space-y-16 md:space-y-24">
 
         {/* Locked citation paragraph + value props — the full SEO lede lives
@@ -120,8 +127,9 @@ const softwareAppJsonLd = serializeJsonLd({
           </p>
         </section>
 
-        {/* Cert tile row — editorial card grid with art headers */}
-        <section data-reveal>
+        {/* Cert tile row — editorial card grid with art headers. id anchors
+            the "Browse certifications" CTAs on /about and /contribute (P2-12). */}
+        <section id="certifications" data-reveal>
           <p class="kicker" aria-hidden="true">Certifications</p>
           <h2 class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-2">
             Pick a certification

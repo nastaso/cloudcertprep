@@ -255,8 +255,8 @@ const faqEntries = [
     answer: `There are ${totalDomainQuestions} free practice questions for the ${domain.name} domain of the ${cert.name} (${cert.shortName}) exam. They are part of a pool of ${totalCertQuestions.toLocaleString('en-US')}+ questions across the whole bank. Every question comes with a full explanation.`,
   },
   {
-    question: `How do I practise ${cert.shortName} ${domain.name} questions?`,
-    answer: `Start a free domain practice session for ${domain.name} on CloudCertPrep. No account is needed to practise as a guest. If you sign in, spaced repetition shows you the questions you got wrong, or have not seen yet, more often.`,
+    question: `How do I practice ${cert.shortName} ${domain.name} questions?`,
+    answer: `Start a free domain practice session for ${domain.name} on CloudCertPrep. No account is needed to practice as a guest. If you sign in, spaced repetition shows you the questions you got wrong, or have not seen yet, more often.`,
   },
   {
     question: `How hard is the ${domain.name} domain on the ${cert.shortName} exam?`,
@@ -320,12 +320,12 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
         <div class="mt-8 flex flex-wrap items-center gap-4">
           <a
             href={domainPracticeHref}
-            class="halo chev-link inline-flex min-h-[48px] items-center justify-center rounded-full bg-[#FF9900] px-7 py-3 text-base font-semibold text-[#16191F] transition-[background-color,transform] duration-200 ease-press hover:bg-[#FFAD33] active:scale-[0.97] active:duration-[80ms] focus:outline-none"
+            class="halo chev-link inline-flex min-h-[48px] items-center justify-center rounded-full bg-[#FF9900] px-7 py-3 text-base font-semibold text-[#16191F] transition-[background-color,transform] duration-200 ease-press hover:bg-[#EC7211] active:scale-[0.97] active:duration-[80ms] focus:outline-none"
             data-cc-event="cta_start_domain_practice"
             data-cc-param-location="domain_landing_hero"
             data-cc-param-cert={cert.code}
           >
-            Start practising<span class="chev" aria-hidden="true">›</span>
+            Start practicing<span class="chev" aria-hidden="true">›</span>
           </a>
           <a
             href={practiceExamHref}
@@ -341,7 +341,7 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
           ))}
         </ul>
 
-        <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 52 211 153;">
+        <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 74 222 128;">
           <LastUpdatedStamp examGuideVersion={cert.examGuideVersion} examGuideUrl={cert.examGuideUrl} />
         </div>
       </header>
@@ -365,7 +365,7 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
             How to use these {primaryInSentence}
           </h2>
           <p>
-            Work through the sample questions below and read each explanation in full, even when you answer correctly. The explanations are where the real learning happens. When this domain feels easy, take a full-length timed mock exam to build pacing and stamina. Your domain mastery score will show this area climb as you practise.
+            Work through the sample questions below and read each explanation in full, even when you answer correctly. The explanations are where the real learning happens. When this domain feels easy, take a full-length timed mock exam to build pacing and stamina. Your domain mastery score will show this area climb as you practice.
           </p>
         </section>
 
@@ -423,7 +423,7 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
             </div>
             <div class="flex flex-wrap gap-3 pt-2">
               <Button href={domainPracticeHref} variant="brand" arrow>
-                Practise {domain.name}
+                Practice {domain.name}
               </Button>
               <Button href={practiceExamHref} variant="secondary">
                 Take a full mock exam
@@ -436,11 +436,11 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
             above and below the sample questions. */}
         <Card as="section" padding="md" class="text-center">
           <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-4">
-            Ready to practise {domain.name}?
+            Ready to practice {domain.name}?
           </h2>
           <div class="flex justify-center">
             <Button href={domainPracticeHref} variant="brand" size="lg" arrow>
-              Start practising
+              Start practicing
             </Button>
           </div>
         </Card>

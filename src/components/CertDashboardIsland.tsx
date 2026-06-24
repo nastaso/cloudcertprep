@@ -16,7 +16,7 @@
  * Navigation uses real hrefs / window.location.assign because each Cert_Landing
  * is a separate prerendered Astro document, not an SPA route.
  */
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import {
   ArrowRight,
   FileText,
@@ -28,7 +28,7 @@ import { formatRelativeDate } from '../lib/formatting'
 import { formatDuration } from '../lib/scoring'
 import { logError } from '../lib/logger'
 import { CERTIFICATIONS } from '../data/certifications'
-import { LEVEL_ACCENT_HEX } from '../lib/levelAccent'
+import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB } from '../lib/levelAccent'
 import { calculateDomainMastery } from '../lib/domainStats'
 import type { DomainProgress } from '../types'
 
@@ -152,6 +152,9 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
   // hue as the guest hero's blueprint panel and the OG tile art).
   const level = CERTIFICATIONS[cert.code]?.level
   const levelAccent = level ? LEVEL_ACCENT_HEX[level] : '#FF9900'
+  // RGB triplet (not hex) for the .halo --halo-color custom property, so the
+  // primary practice cards bloom in the cert's level hue (P1-10).
+  const levelAccentRgb = level ? LEVEL_ACCENT_RGB[level] : '255 153 0'
   const levelLabel = level ? level.charAt(0).toUpperCase() + level.slice(1) : ''
 
   // Honest aggregates from the complete domain_progress rows (not the capped
@@ -167,7 +170,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
   const bestScore = recentAttempts.reduce((max, a) => Math.max(max, a.scaled_score), 0)
 
   return (
-    <div className="max-w-6xl mx-auto pt-6 md:pt-10 pb-16 md:pb-24 space-y-8 md:space-y-10">
+    <div className="max-w-6xl mx-auto pt-6 md:pt-10 pb-16 md:pb-24 space-y-8 md:space-y-10 stagger">
         {/* Page header: mono kicker + tracked h1 (DSv6 ladder, hero-scale) */}
         <header>
           <p className="flex items-center gap-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.22em] text-text-muted">
@@ -194,12 +197,13 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
         {/* Practice Modes: the two primary actions, full-width prominent cards. */}
         <section>
           <h2 className="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-4">
-            Start practising
+            Start practicing
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <a
               href={`${certPath}/practice-exam`}
-              className="group bg-bg-card hover:bg-bg-card-hover p-6 md:p-7 rounded-2xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-200 text-left block"
+              style={{ '--halo-color': levelAccentRgb } as CSSProperties}
+              className="halo group bg-bg-card hover:bg-bg-card-hover p-6 md:p-7 rounded-2xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-200 text-left block"
             >
               <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-bg-dark border border-border-hairline">
                 <FileText className="w-5 h-5 text-text-primary" aria-hidden="true" />
@@ -221,7 +225,8 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
 
             <a
               href={`${certPath}/domain-practice`}
-              className="group bg-bg-card hover:bg-bg-card-hover p-6 md:p-7 rounded-2xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-200 text-left block"
+              style={{ '--halo-color': levelAccentRgb } as CSSProperties}
+              className="halo group bg-bg-card hover:bg-bg-card-hover p-6 md:p-7 rounded-2xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-200 text-left block"
             >
               <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-bg-dark border border-border-hairline">
                 <Target className="w-5 h-5 text-text-primary" aria-hidden="true" />
@@ -286,7 +291,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                     />
                   </div>
                   <p className="mt-2.5 font-mono text-[12px] text-text-muted">
-                    {attempted} of {domain.questionCount} practised · {correct} correct
+                    {attempted} of {domain.questionCount} practiced · {correct} correct
                   </p>
                 </div>
               )

@@ -5,11 +5,17 @@ import { useSignOut } from '../hooks/useSignOut'
 import { trackEvent } from '../lib/analytics'
 import { KOFI_URL, GITHUB_REPO_URL } from '../lib/constants'
 import { guardExamLeave } from '../lib/examGuard'
-import { Menu, X, Heart, Sun, Moon, Github, History, Info, BookOpen, Home } from 'lucide-react'
+import { Menu, X, Heart, Sun, Moon, Github, History, Info, BookOpen, Home, Target } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
 import { Button } from './Button'
 import { CertSwitcher } from './CertSwitcher'
+import { CERTIFICATIONS, DEFAULT_CERT_ID } from '../data/certifications'
+
+// Single-sourced flagship practice route for the persistent header CTA (P1-4).
+// Kept as a real <a> so the in-exam anchor-capture leave guard already covers it.
+const DEFAULT_CERT = CERTIFICATIONS[DEFAULT_CERT_ID]
+const PRACTICE_HREF = DEFAULT_CERT ? `/${DEFAULT_CERT.provider}/${DEFAULT_CERT.code}/practice-exam` : '/'
 
 /**
  * HeaderInteractive — auth/cert/theme/mobile-drawer parts of the header.
@@ -75,6 +81,15 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
       <div className="hidden md:flex items-center gap-5 lg:gap-7">
         <CertSwitcher variant="desktop" initialPathname={initialPathname} />
         <nav className="flex items-center gap-5 lg:gap-7">
+          {/* Persistent primary action (P1-4): always visible in both auth
+              states and on every route, so warm blog/about traffic always has a
+              path into the funnel. About/Blog stay lg-only behind it. */}
+          <a
+            href={PRACTICE_HREF}
+            className="hdr-link text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
+          >
+            Practice
+          </a>
           <a
             href="/about"
             className="hdr-link hidden lg:inline-block text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
@@ -169,6 +184,14 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
             />
 
             <nav className="flex flex-col p-4 gap-1">
+              <a
+                href={PRACTICE_HREF}
+                onClick={closeMobileMenu}
+                className="px-4 py-3 text-text-primary hover:bg-bg-dark rounded-xl transition-colors active:scale-[0.98] font-medium flex items-center gap-3"
+              >
+                <Target className="w-5 h-5 text-text-muted" aria-hidden="true" />
+                Practice
+              </a>
               <a
                 href="/"
                 onClick={closeMobileMenu}

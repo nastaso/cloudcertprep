@@ -398,7 +398,7 @@ export function DomainPractice() {
                 onSignIn={() => goToLogin(navigate, location)}
                 location="domain_practice_wall"
                 title="Sign in to save your progress"
-                body="Practise free as a guest, no account needed. Sign in to save per-domain mastery and unlock spaced repetition, which repeats the questions you get wrong."
+                body="Practice free as a guest, no account needed. Sign in to save per-domain mastery and unlock spaced repetition, which repeats the questions you get wrong."
                 ctaLabel="Sign in to save progress"
                 noTopMargin
               />
@@ -582,7 +582,10 @@ export function DomainPractice() {
                 Question {currentIndex + 1} of {questions.length}
               </span>
             </div>
-            <ProgressBar percent={(currentIndex / questions.length) * 100} showLabel={false} />
+            {/* Advance when the current question is answered (showFeedback), so
+                the bar reaches 100% on the final graded question instead of
+                capping at (n-1)/n. Display-only; scoring is untouched. */}
+            <ProgressBar percent={((currentIndex + (showFeedback ? 1 : 0)) / questions.length) * 100} showLabel={false} />
           </div>
 
           {/* Question */}
@@ -807,7 +810,7 @@ export function DomainPractice() {
               </label>
               <div className="flex gap-4 mt-6">
                 <Button onClick={() => setPendingLeaveUrl(null)} variant="secondary" className="flex-1">
-                  Keep practising
+                  Keep practicing
                 </Button>
                 <Button onClick={confirmPracticeLeave} variant="danger" className="flex-1">
                   Leave practice

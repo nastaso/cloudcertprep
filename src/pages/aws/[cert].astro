@@ -66,7 +66,7 @@ const examMinutes = Math.round(cert.examTimeSeconds / 60)
 const providerLabel = getProviderLabel(cert.provider)
 const certPath = `/${cert.provider}/${cert.code}`
 const totalQuestions = getCertTotalQuestions(cert.code)
-const totalQuestionsLabel = totalQuestions.toLocaleString('en-GB')
+const totalQuestionsLabel = totalQuestions.toLocaleString('en-US')
 const levelLabel = getLevelLabel(cert.level)
 
 // Per-cert SEO. Active certs get SERP-friendly specifics (question count,
@@ -181,8 +181,8 @@ const secondaryKeyword = isActive ? CERT_SECONDARY_KEYWORD[cert.code] : undefine
 // Domain_Landing's "Looking for {primaryKeyword}?" opener); otherwise keep the
 // generic platform line.
 const heroLede = secondaryKeyword
-  ? `Looking for a free ${secondaryKeyword}? Practise realistic ${providerLabel} exam questions with adaptive domain mastery, randomised exams, and unlimited free attempts.`
-  : `Practise realistic ${providerLabel} exam questions with adaptive domain mastery, randomised exams, and unlimited free attempts.`
+  ? `Looking for a free ${secondaryKeyword}? Practice realistic ${providerLabel} exam questions with adaptive domain mastery, randomized exams, and unlimited free attempts.`
+  : `Practice realistic ${providerLabel} exam questions with adaptive domain mastery, randomized exams, and unlimited free attempts.`
 
 // DSv6 wayfinding: the exam-UI mockup is the HOME page's exclusive hero
 // signature. Cert hubs show the exam blueprint (CertSpecPanel: domain weights
@@ -260,7 +260,7 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
               <div class="mt-8 flex flex-wrap items-center gap-4">
                 <a
                   href={`${certPath}/practice-exam`}
-                  class="halo chev-link inline-flex min-h-[48px] items-center justify-center rounded-full bg-[#FF9900] px-7 py-3 text-base font-semibold text-[#16191F] transition-[background-color,transform] duration-200 ease-press hover:bg-[#FFAD33] active:scale-[0.97] active:duration-[80ms] focus:outline-none"
+                  class="halo chev-link inline-flex min-h-[48px] items-center justify-center rounded-full bg-[#FF9900] px-7 py-3 text-base font-semibold text-[#16191F] transition-[background-color,transform] duration-200 ease-press hover:bg-[#EC7211] active:scale-[0.97] active:duration-[80ms] focus:outline-none"
                   data-cc-event="cta_start_practice_exam"
                   data-cc-param-location="cert_landing_hero"
                   data-cc-param-cert={cert.code}
@@ -286,7 +286,7 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
             )}
 
             {isActive && (
-              <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 52 211 153;">
+              <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 74 222 128;">
                 <LastUpdatedStamp examGuideVersion={cert.examGuideVersion} examGuideUrl={cert.examGuideUrl} />
               </div>
             )}

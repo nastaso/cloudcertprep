@@ -29,10 +29,43 @@ import { shuffleAndMapQuestions, toggleMultiAnswer, getQuestionType, encodeAnswe
 import { trackEvent, trackPageView } from '../lib/analytics'
 import { MIN_VALID_EXAM_SECONDS, MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
 import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave } from '../lib/examGuard'
-import { storePendingAttempt, consumePendingAttemptSavedNotice, PENDING_ATTEMPT_SAVED_EVENT } from '../lib/pendingAttempt'
+import { storePendingAttempt, consumePendingAttemptSavedNotice, PENDING_ATTEMPT_SAVED_EVENT, peekPendingAttempt, type PendingAttempt } from '../lib/pendingAttempt'
 import { getProviderLabel } from '../data/certifications'
 
 type ExamScreen = 'start' | 'exam' | 'results' | 'review'
+
+// Marker set when a guest leaves the RESULTS screen toward /login, so returning
+// via "Continue as guest" re-shows that result instead of a fresh start screen
+// (P1-6). sessionStorage survives the full reload that "Continue as guest" does.
+const RESUME_RESULTS_KEY = 'cc_resume_results'
+
+/**
+ * Map a stored guest PendingAttempt back into the results-screen state shape
+ * (P1-6). Read-only re-display: the summary + per-domain breakdown need only
+ * isCorrect / domainId. The full per-question REVIEW needs the loaded Question
+ * objects, which a fresh remount does not have, so the review button is hidden
+ * for a rehydrated attempt (see rehydratedResults).
+ */
+function rebuildResultsFromPending(pending: PendingAttempt) {
+  const a = pending.attempt
+  return {
+    scaledScore: a.scaled_score,
+    percentScore: a.score_percent,
+    passed: a.passed,
+    correctCount: a.correct_answers,
+    totalQuestions: a.total_questions,
+    timeTaken: a.time_taken_seconds,
+    domainScores: a.domain_scores,
+    questionResults: pending.questions.map(q => ({
+      questionId: q.question_id,
+      domainId: q.domain_id,
+      userAnswer: q.user_answer,
+      correctAnswer: q.correct_answer,
+      isCorrect: q.is_correct,
+      wasFlagged: q.was_flagged,
+    })),
+  }
+}
 
 interface QuestionState {
   userAnswer: string | string[] | null
@@ -136,6 +169,10 @@ export function MockExam() {
     }>
   } | null>(null)
   const [loading, setLoading] = useState(false)
+  // True when the results screen was rebuilt from a stored guest snapshot after
+  // a /login round-trip (P1-6). The per-question review needs the loaded Question
+  // objects (absent on a fresh remount), so the review button is hidden then.
+  const [rehydratedResults, setRehydratedResults] = useState(false)
   // Synchronous re-entrancy guard for exam submission. setLoading is async, so a
   // state-only guard lets rapid clicks (or any re-entrant call) before the next
   // render all slip through and each insert a duplicate exam_attempts row. A ref
@@ -271,6 +308,34 @@ export function MockExam() {
       window.removeEventListener(PENDING_ATTEMPT_SAVED_EVENT, consume)
     }
   }, [])
+
+  // Rehydrate a guest's just-finished attempt after a /login round-trip (P1-6).
+  // "Continue as guest" reloads the exam route, remounting this island at the
+  // START screen with the in-memory results gone. Only when the guest explicitly
+  // left the RESULTS screen toward login (RESUME_RESULTS_KEY) AND a still-valid
+  // snapshot exists for THIS cert do we re-show the results summary, so a
+  // returning guest who just wants a fresh exam is never trapped on an old
+  // result. Read-only: peekPendingAttempt does not consume the snapshot.
+  useEffect(() => {
+    if (user || results || screen !== 'start') return
+    let marker: string | null = null
+    try { marker = sessionStorage.getItem(RESUME_RESULTS_KEY) } catch { /* ignore */ }
+    if (!marker) return
+    // Consume the marker regardless of outcome so it cannot replay later.
+    try { sessionStorage.removeItem(RESUME_RESULTS_KEY) } catch { /* ignore */ }
+    if (marker !== cert.code) return
+    const pending = peekPendingAttempt()
+    if (!pending || pending.certCode !== cert.code) return
+    // Deferred (not called synchronously in the effect body) so the mount commit
+    // settles before the screen swap, matching the saved-notice effect above.
+    const t = window.setTimeout(() => {
+      setResults(rebuildResultsFromPending(pending))
+      setRehydratedResults(true)
+      setScreen('results')
+    }, 0)
+    return () => window.clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, cert.code])
 
   function handleTimeUp() {
     const answeredCount = Array.from(answers.values()).filter(isQuestionAnswered).length
@@ -691,7 +756,12 @@ export function MockExam() {
               Reuses the permitted `unlock_cta_clicked` event via location. */}
           {!user && (
             <UnlockCTA
-              onSignIn={() => goToLogin(navigate, location)}
+              onSignIn={() => {
+                // Remember to re-show this result if the guest returns via
+                // "Continue as guest" instead of signing in (P1-6).
+                try { sessionStorage.setItem(RESUME_RESULTS_KEY, cert.code) } catch { /* ignore */ }
+                goToLogin(navigate, location)
+              }}
               location="exam_results"
               title={results!.passed ? 'Sign in to save this win' : 'Sign in to target your weak domains'}
               body={
@@ -703,20 +773,30 @@ export function MockExam() {
             />
           )}
 
+          {!user && peekPendingAttempt() && (
+            <Alert tone="info" className="text-sm">
+              Your result is saved on this device for 24 hours. Sign in anytime to keep it.
+            </Alert>
+          )}
+
           <div className="mt-6 space-y-3">
-            <Button
-              onClick={() => {
-                setReviewFilter('all')
-                setReviewDomainFilter(null)
-                setReviewQuestionIndex(0)
-                window.scrollTo(0, 0)
-                setScreen('review')
-              }}
-              variant="primary"
-              fullWidth
-            >
-              Review questions
-            </Button>
+            {/* Per-question review needs the loaded Question objects; a snapshot
+                rehydrate (P1-6) does not have them, so hide it in that case. */}
+            {!rehydratedResults && (
+              <Button
+                onClick={() => {
+                  setReviewFilter('all')
+                  setReviewDomainFilter(null)
+                  setReviewQuestionIndex(0)
+                  window.scrollTo(0, 0)
+                  setScreen('review')
+                }}
+                variant="primary"
+                fullWidth
+              >
+                Review questions
+              </Button>
+            )}
             <div className="flex gap-4">
               <Button onClick={goHome} variant="secondary" className="flex-1">
                 Back to home
