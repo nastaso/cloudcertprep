@@ -7,10 +7,11 @@
 import rss from '@astrojs/rss'
 import { getCollection, type CollectionEntry } from 'astro:content'
 import type { APIContext } from 'astro'
+import { includeDrafts } from '../../lib/posts'
 
 export async function GET(context: APIContext) {
   const posts = await getCollection('blog', ({ data }: CollectionEntry<'blog'>) =>
-    import.meta.env.PROD ? data.draft !== true : true,
+    includeDrafts || data.draft !== true,
   )
   const sorted = posts.sort(
     (a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) =>

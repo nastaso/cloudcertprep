@@ -17,6 +17,7 @@ import HeroStage from '../components/landing/HeroStage.astro'
 import Faq from '../components/Faq.astro'
 import PostCard from '../components/PostCard.astro'
 import { getCollection, type CollectionEntry } from 'astro:content'
+import { includeDrafts } from '../lib/posts'
 import {
   CERTIFICATIONS,
   DEFAULT_CERT_ID,
@@ -57,9 +58,10 @@ const homeFirstParagraph = buildHomeFirstParagraph(clfCount, aifCount)
 // Latest blog posts. The home page is the highest-authority page on the site,
 // so body-linking /blog (not just via the Header island) opens a crawl path and
 // passes link equity into the content cluster. Mirrors the proven cert-landing
-// "Latest from the blog" block. Non-draft posts only, newest first.
+// "Latest from the blog" block. Non-draft posts only (drafts also show when
+// PUBLIC_PREVIEW_DRAFTS is set, for branch previews), newest first.
 const latestPosts = (await getCollection('blog'))
-  .filter((post: CollectionEntry<'blog'>) => !post.data.draft)
+  .filter((post: CollectionEntry<'blog'>) => includeDrafts || !post.data.draft)
   .sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0, 2)
 
