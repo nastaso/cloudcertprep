@@ -101,6 +101,10 @@ AWS issues a 50% discount voucher to candidates who already hold an AWS certific
 
 The AWS Cloud Practitioner (CLF-C02) passing score is 700 on a scaled range of 100 to 1000. The score is scaled, not a simple percentage, because questions vary in difficulty, so you do not need 70% of questions correct exactly. Unscored pilot questions are mixed in and do not affect your result. Aim for 800+ on practice exams here for a comfortable margin.
 
+### How many questions are on the AWS Cloud Practitioner exam?
+
+The AWS Certified Cloud Practitioner (CLF-C02) exam has 65 questions to answer in 90 minutes. Of these, 50 are scored and 15 are unscored pilot questions mixed in at random that do not count toward your result. All questions are multiple choice or multiple response.
+
 ### Can I retake the AWS Cloud Practitioner exam if I fail?
 
 Yes. If you do not pass, you can retake the CLF-C02 exam after a 14-day waiting period. There is no limit on the total number of attempts, but you must pay the exam fee each time and wait 14 days between attempts. Use the gap to review your weakest domains in domain practice here before rebooking.
@@ -144,6 +148,22 @@ Yes. Every AIF-C01 practice question ships with a full explanation covering why 
 ### How much does the AWS AI Practitioner exam cost?
 
 The AWS Certified AI Practitioner (AIF-C01) exam costs 100 USD (prices vary slightly by region and local tax). As a foundational-level exam it is the same price tier as the Cloud Practitioner. If you already hold an AWS certification, check your AWS Certification account for a 50% discount voucher before booking. Practising on CloudCertPrep is always free.
+
+### Is there an AWS AI Practitioner exam voucher or discount?
+
+AWS issues a 50% discount voucher to candidates who already hold an AWS certification, redeemable on their next exam, and periodically runs free or discounted exam promotions. Vouchers appear in the benefits section of your AWS Certification account and are applied at checkout when you schedule the exam. CloudCertPrep practice is always free regardless of any voucher.
+
+### What is the AWS AI Practitioner passing score?
+
+The AWS Certified AI Practitioner (AIF-C01) passing score is 700 on a scaled range of 100 to 1000. The score is scaled, not a simple percentage, so you do not need exactly 70% of questions correct. Of the 65 questions, 50 are scored and 15 are unscored pilot questions that do not affect your result. Aim for 800+ on the practice exams here for a comfortable margin.
+
+### Can I retake the AWS AI Practitioner exam if I fail?
+
+Yes. If you do not pass, you can retake the AIF-C01 exam after a 14-day waiting period. There is no limit on the total number of attempts, but you pay the exam fee each time and must wait 14 days between attempts. Use the gap to review your weakest domains in domain practice here before rebooking.
+
+### How many questions are on the AWS AI Practitioner exam?
+
+The AWS Certified AI Practitioner (AIF-C01) exam has 65 questions to answer in 90 minutes. Of these, 50 are scored and 15 are unscored pilot questions mixed in at random that do not affect your result. Question formats include multiple choice, multiple response, ordering, and matching.
 
 ### Does the AWS AI Practitioner certification expire?
 
