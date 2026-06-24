@@ -740,6 +740,10 @@ export function MockExam() {
   if (screen === 'exam' && currentQuestion) {
     return (
       <div className="bg-bg-dark">
+        {/* Visually-hidden page heading so the active exam's outline starts at
+            h1 (the exam) -> h2 (the question) instead of opening on an orphan h2.
+            Screen-reader only; no visual change. */}
+        <h1 className="sr-only">{cert.shortName} Practice Exam</h1>
         {/* In-page exam toolbar: slim, neutral (NOT a second orange gradient),
             so it reads as a subordinate toolbar under the site header rather
             than a second heavy header bar. Sticks to the top while scrolling.
