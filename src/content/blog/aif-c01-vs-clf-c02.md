@@ -60,11 +60,11 @@ So once you are used to the question style on one, the other feels familiar, tho
 
 CLF-C02 spreads four domains across general cloud knowledge:
 
-- **[Cloud Concepts](/aws/clf-c02/cloud-concepts)**, **[Security and Compliance](/aws/clf-c02/security-and-compliance)**, **Cloud Technology and Services**, and **Billing, Pricing, and Support**.
+- **[Cloud Concepts](/aws/clf-c02/cloud-concepts)**, **[Security and Compliance](/aws/clf-c02/security-and-compliance)**, **[Cloud Technology and Services](/aws/clf-c02/cloud-technology-and-services)**, and **[Billing, Pricing, and Support](/aws/clf-c02/billing-pricing-and-support)**.
 
 AIF-C01 splits five domains entirely within AI/ML:
 
-- **Fundamentals of AI and ML**, **[Fundamentals of Generative AI](/aws/aif-c01/fundamentals-of-generative-ai)**, **[Applications of Foundation Models](/aws/aif-c01/applications-of-foundation-models)**, **Guidelines for Responsible AI**, and **Security, Compliance, and Governance**.
+- **[Fundamentals of AI and ML](/aws/aif-c01/fundamentals-of-ai-and-ml)**, **[Fundamentals of Generative AI](/aws/aif-c01/fundamentals-of-generative-ai)**, **[Applications of Foundation Models](/aws/aif-c01/applications-of-foundation-models)**, **[Guidelines for Responsible AI](/aws/aif-c01/guidelines-for-responsible-ai)**, and **[Security, Compliance, and Governance](/aws/aif-c01/security-compliance-and-governance)**.
 
 You can drill either set directly: the [CLF-C02 practice](/aws/clf-c02) and the [AIF-C01 practice](/aws/aif-c01) are each organised around their real exam-guide domains.
 

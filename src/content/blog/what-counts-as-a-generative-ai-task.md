@@ -29,11 +29,11 @@ A task is a generative AI task when its output is new content produced from a pr
 
 The mechanism behind that is a foundation model, a large model pre-trained on broad data and adapted at the moment you prompt it. You describe what you want, and the model produces a fresh response token by token. That is why the same system can draft an email, write code, and summarize a contract: each is the same underlying act of generation, just with a different prompt. This is the heart of the [Fundamentals of Generative AI](/aws/aif-c01/fundamentals-of-generative-ai) domain, which is 24% of the AIF-C01 exam.
 
-## Generative AI tasks vs other AI tasks
+## How are generative AI tasks different from other AI tasks?
 
 Generative AI produces new content; predictive and analytical AI produce labels, numbers, or rankings. Writing a product description is generative; classifying a review as positive or negative is not. Summarizing a contract is generative; forecasting next month's sales is not. The output type, new content versus a decision, is the test you apply.
 
-Run any task through one question: does the output exist already in some form, or does the model create it? If the answer is a category, a score, a forecast, or a ranking, you are looking at traditional machine learning. If the answer is new text, an image, audio, or code, it is generative AI. The table below applies that test to common tasks.
+Run any task through one question: does the output exist already in some form, or does the model create it? If the answer is a category, a score, a forecast, or a ranking, you are looking at traditional, predictive machine learning, the [fundamentals of AI and ML](/aws/aif-c01/fundamentals-of-ai-and-ml) that domain 1 of the exam covers. If the answer is new text, an image, audio, or code, it is generative AI. The table below applies that test to common tasks.
 
 | Task | Generative AI? | Why |
 | --- | --- | --- |
@@ -48,21 +48,21 @@ Run any task through one question: does the output exist already in some form, o
 
 Notice that classification, forecasting, fraud detection, and recommendation all read existing data and return a decision about it. None of them invents new content, so none is generative, even when they use sophisticated models.
 
-## Common generative AI use cases
+## What are common generative AI use cases?
 
 Typical generative AI tasks include drafting and rewriting text, summarizing long documents, answering questions in natural language, translating, generating or editing images, and producing or explaining code. They share one pattern: a prompt in, new content out. For AIF-C01, recognizing that pattern is usually enough to classify a task correctly.
 
 On AWS these use cases are built by sending a prompt to a managed foundation model rather than training your own. A customer-support assistant that drafts replies, a tool that turns release notes into a summary, and a feature that generates product images are all the same shape underneath. The [Applications of Foundation Models](/aws/aif-c01/applications-of-foundation-models) domain, 28% of the exam and the single largest, is where these patterns are tested in scenario form.
 
-## Where generative AI is the wrong tool
+## When is generative AI the wrong tool?
 
 Generative AI is the wrong choice when you need exact, deterministic, or guaranteed-correct results, because it can hallucinate and varies between runs. Numeric forecasting, rules-based compliance, and precise calculations belong to traditional logic or predictive models. Use generative AI to assist and draft, with human review, not as a source of guaranteed truth.
 
-Two limits drive this. First, a generative model is probabilistic, so the same prompt can give different answers and confident-sounding output can be wrong. Second, its quality depends on data: gaps, bias, or stale information in the training or retrieval data show up directly in what it generates. When a task needs a single correct answer every time, a billing calculation or a compliance check, reach for deterministic logic or a predictive model and keep generative AI for the drafting and assistance around it.
+Two limits drive this. First, a generative model is probabilistic, so the same prompt can give different answers and confident-sounding output can be wrong. Second, its quality depends on data: gaps, bias, or stale information in the training or retrieval data show up directly in what it generates. When a task needs a single correct answer every time, a billing calculation or a compliance check, reach for deterministic logic or a predictive model and keep generative AI for the drafting and assistance around it. Knowing these limits, and the guardrails that manage them, is the focus of [responsible AI](/aws/aif-c01/guidelines-for-responsible-ai), domain 4 of the exam.
 
 ## Bottom line
 
-The rule is short: if a prompt produces new content, it is a generative AI task; if it returns a label, number, or ranking from existing data, it is not. Hold onto that and the exam-style "which of these is a generative AI task" questions become quick wins. To practise the real thing, drill the free [Fundamentals of Generative AI](/aws/aif-c01/fundamentals-of-generative-ai) questions, then take a full-length [AIF-C01 practice exam](/aws/aif-c01). If you are still weighing the cert itself, see [AIF-C01 vs CLF-C02: which to take first](/blog/aif-c01-vs-clf-c02).
+The rule is short: if a prompt produces new content, it is a generative AI task; if it returns a label, number, or ranking from existing data, it is not. Hold onto that and the exam-style "which of these is a generative AI task" questions become quick wins. To practice the real thing, drill the free, open-source [Fundamentals of Generative AI](/aws/aif-c01/fundamentals-of-generative-ai) questions, each with a written explanation, then take a full-length [AIF-C01 practice exam](/aws/aif-c01). If you are still weighing the cert itself, see [AIF-C01 vs CLF-C02: which to take first](/blog/aif-c01-vs-clf-c02).
 
 ## Frequently asked questions
 
