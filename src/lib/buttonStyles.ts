@@ -17,8 +17,8 @@ export type ButtonSize = 'sm' | 'md' | 'lg'
 /** Shape, motion, focus ring, and disabled handling shared by every variant. */
 export const BUTTON_BASE =
   'font-medium rounded-full inline-flex items-center justify-center gap-2 ' +
-  'transition-[transform,box-shadow,background-color,border-color,color] duration-200 ease-press ' +
-  'active:scale-[0.97] active:duration-[80ms] ' +
+  'transition-[transform,box-shadow,background-color,border-color,color] duration-gentle ease-press ' +
+  'active:scale-[0.97] active:duration-press ' +
   'disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 ' +
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark'
 
@@ -103,8 +103,8 @@ export function filterChipClass(opts: {
   // themes: light pill/dark text on dark, dark pill/light text on light.)
   return [
     'min-h-[44px] px-4 py-2 rounded-xl font-medium border ' +
-      'transition-[transform,background-color,border-color,color] duration-200 ease-press ' +
-      'active:scale-[0.97] active:duration-[80ms]',
+      'transition-[transform,background-color,border-color,color] duration-gentle ease-press ' +
+      'active:scale-[0.97] active:duration-press',
     size === 'sm' ? 'text-xs' : 'text-xs md:text-sm',
     active ? 'bg-text-primary text-bg-dark border-text-primary' : inactive,
   ].join(' ')
@@ -205,13 +205,15 @@ export function reviewCellClass(opts: {
   const { correct, current = false, flagged = false, inSet = true } = opts
   return [
     'w-8 h-8 md:w-9 md:h-9 rounded-lg font-mono text-[10px] md:text-xs font-semibold tabular-nums',
-    'border transition-[transform,background-color,border-color] duration-150',
+    // Calm tint feedback only: a scale-pop on every cell across the grid reads
+    // twitchy (the opposite of calm). brightness is GPU-cheap, no layout.
+    'border transition-[background-color,border-color,filter] duration-base',
     correct
       ? 'bg-success/15 border-success/30 text-success'
       : 'bg-danger/10 border-danger/25 text-danger',
     flagged ? 'ring-2 ring-warning' : '',
     current ? 'ring-2 ring-brand ring-offset-1 ring-offset-bg-card' : '',
-    inSet ? 'hover:scale-105' : 'opacity-40 cursor-not-allowed',
+    inSet ? 'hover:brightness-110' : 'opacity-40 cursor-not-allowed',
   ]
     .filter(Boolean)
     .join(' ')

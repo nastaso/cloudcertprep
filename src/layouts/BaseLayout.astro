@@ -209,6 +209,14 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
          theme toggle (stored only on explicit toggle, never auto-persisted;
          no OS prefers-color-scheme mirroring by design). */
       (function(){var t=localStorage.getItem('cloudcertprep_theme');if(t==='dark'){document.documentElement.classList.add('dark')}})();
+      /* Motion gate, set BEFORE first paint so the hero stagger + scroll-reveal
+         elements ([data-reveal]) are hidden from frame ONE (deterministic — no
+         paint-then-snap-to-0 flash, which was racy when cc-js was added at the
+         end of <body>). Only when motion is allowed AND IntersectionObserver
+         exists; otherwise content paints fully visible (no-JS / reduced-motion /
+         old-browser parity). The end-of-body bootstrap then reveals it.
+         DO NOT REMOVE. */
+      (function(){try{if(!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)&&'IntersectionObserver'in window){document.documentElement.classList.add('cc-js')}}catch(e){}})();
     </script>
 
     <!-- Auth pre-paint: define a shared hasSession() helper on window, then
@@ -265,21 +273,27 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
     <script is:inline>
       (function () {
         var root = document.documentElement
-        root.classList.add('cc-js')
-        var els = function () { return Array.prototype.slice.call(document.querySelectorAll('[data-reveal]')) }
-        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        if (reduce || !('IntersectionObserver' in window)) {
-          els().forEach(function (el) { el.classList.add('is-revealed') })
-          return
-        }
+        /* cc-js is set pre-paint in <head>, but ONLY when motion is allowed +
+           IntersectionObserver exists. If it is absent (reduced-motion / no-IO /
+           no-JS parity) the content is already fully visible — nothing to do. */
+        if (!root.classList.contains('cc-js')) return
+        var els = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'))
+        if (!els.length) return
         var io = new IntersectionObserver(function (entries) {
           entries.forEach(function (e) {
             if (e.isIntersecting) { e.target.classList.add('is-revealed'); io.unobserve(e.target) }
           })
         }, { rootMargin: '0px 0px -10% 0px' })
-        function start() { els().forEach(function (el) { io.observe(el) }) }
-        if (document.readyState !== 'loading') start()
-        else document.addEventListener('DOMContentLoaded', start)
+        /* This runs at end-of-body parse, before the first paint of these
+           elements in practice. Reveal anything already in/near the viewport
+           SYNCHRONOUSLY so above-the-fold reveals never sit blank; observe only
+           the genuinely below-fold ones (hidden off-screen => no visible flash
+           when they later reveal on scroll). */
+        var vh = window.innerHeight || root.clientHeight
+        els.forEach(function (el) {
+          if (el.getBoundingClientRect().top < vh) el.classList.add('is-revealed')
+          else io.observe(el)
+        })
       })()
     </script>
     {noscriptDirectory && <noscript>

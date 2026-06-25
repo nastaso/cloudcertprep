@@ -378,8 +378,8 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                     aria-label={`${domain.name} mastery`}
                   >
                     <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{ width: `${mastery}%`, backgroundColor: levelAccent }}
+                      className="h-full w-full origin-left transition-transform duration-settle ease-out"
+                      style={{ transform: `scaleX(${mastery / 100})`, backgroundColor: levelAccent }}
                     />
                   </div>
                   <p className="mt-2.5 font-mono text-[12px] text-text-muted">

@@ -46,12 +46,32 @@ const ResetPassword = lazy(() => import('../pages/_ResetPassword').then(m => ({ 
 let lastContentHeight: number | null = null
 let contentObserver: ResizeObserver | null = null
 
+// Removes the static #cc-island-fallback skeleton the moment the real route
+// content mounts. It lives INSIDE the Suspense children, so it only renders
+// once the lazy route chunk has resolved — the skeleton is replaced by real
+// content in ONE swap (no skeleton -> spinner -> content double transition).
+function RemoveStaticFallback() {
+  useEffect(() => {
+    document.getElementById('cc-island-fallback')?.remove()
+  }, [])
+  return null
+}
+
 function AppRoutes() {
   const location = useLocation()
 
   useEffect(() => {
     trackPageView(location.pathname)
   }, [location.pathname])
+
+  // Cold load: the Astro shell paints a route-shaped #cc-island-fallback
+  // skeleton. While the lazy route chunk loads, render NOTHING (the skeleton
+  // stays visible underneath) rather than a bare spinner that collapses the
+  // layout and adds a skeleton -> spinner -> content double transition.
+  // Subsequent in-island navigations (skeleton already gone) use the
+  // height-matched spinner so a long chunk fetch isn't a blank body.
+  const hasStaticFallback =
+    typeof document !== 'undefined' && !!document.getElementById('cc-island-fallback')
 
   const contentRef = useCallback((node: HTMLDivElement | null) => {
     contentObserver?.disconnect()
@@ -68,24 +88,28 @@ function AppRoutes() {
     <Suspense
       key={location.pathname}
       fallback={
-        <div
-          className="flex-1 flex items-center justify-center p-8 min-h-[70vh]"
-          style={lastContentHeight ? { minHeight: lastContentHeight } : undefined}
-        >
-          {/* Immediate spinner (no `delayed`): on a cold island mount the lazy
-              chunk fetch is the visible wait, so a 250ms-delayed spinner just
-              renders a blank <main>. Showing the spinner immediately removes
-              that blank flash (audit S2). */}
-          <LoadingSpinner />
-        </div>
+        hasStaticFallback ? null : (
+          <div
+            className="flex-1 flex items-center justify-center p-8 min-h-[70vh]"
+            style={lastContentHeight ? { minHeight: lastContentHeight } : undefined}
+          >
+            {/* Immediate spinner (no `delayed`): on an in-island navigation the
+                lazy chunk fetch is the visible wait, so a 250ms-delayed spinner
+                just renders a blank <main>. Cold loads skip this entirely (the
+                static skeleton holds; see hasStaticFallback above). */}
+            <LoadingSpinner />
+          </div>
+        )
       }
     >
-      {/* Keyed on pathname so the entrance animation replays each time an
-          island route resolves (after the Suspense spinner), giving a gentle
-          premium "content settles in" feel on every island page entry.
+      {/* Keyed on pathname so a gentle cross-FADE replays each time an island
+          route resolves. A translate-less fade (not the rise of animate-enter):
+          replaying a rise on every in-app navigation reads as a pop/flash, so
+          high-frequency route changes use a pure opacity fade (Raycast pattern).
           min-h matches the fallback's floor; the measured height (ref above)
           keeps the footer anchored across unmount, spinner, remount. */}
-      <div key={location.pathname} ref={contentRef} className="flex-1 flex flex-col min-h-[70vh] animate-enter">
+      <div key={location.pathname} ref={contentRef} className="flex-1 flex flex-col min-h-[70vh] animate-fade-in">
+      <RemoveStaticFallback />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
@@ -107,13 +131,16 @@ function AppRoutes() {
 }
 
 export default function AppIsland() {
-  // The hosting Astro shells (practice-exam, domain-practice) server-render a
-  // static spinner placeholder (#cc-island-fallback) so the page never shows
-  // an empty, footer-only body before this client:only island hydrates.
-  // Remove it as soon as the island mounts; the Suspense fallback above takes
-  // over from here.
+  // The hosting Astro shells server-render a static #cc-island-fallback skeleton
+  // so the page never shows an empty, footer-only body before this client:only
+  // island hydrates. The NORMAL path removes it the instant the real route
+  // content mounts (RemoveStaticFallback, inside Suspense), for a seamless
+  // skeleton -> content swap with no spinner interlude. This is only a SAFETY
+  // NET: if the route chunk is pathologically slow or fails to load, clear the
+  // skeleton after a few seconds so it can never trap the page.
   useEffect(() => {
-    document.getElementById('cc-island-fallback')?.remove()
+    const t = window.setTimeout(() => document.getElementById('cc-island-fallback')?.remove(), 5000)
+    return () => window.clearTimeout(t)
   }, [])
 
   return (

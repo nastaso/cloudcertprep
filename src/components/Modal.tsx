@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { useFocusTrap } from '../hooks/useFocusTrap'
 
@@ -9,21 +9,40 @@ interface ModalProps {
   onClose: () => void
 }
 
+// Matches the exit animation duration (--dur-fast) so the dialog + backdrop
+// finish animating out before they unmount.
+const EXIT_MS = 200
+
 export function Modal({ isOpen, title, children, onClose }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
+  // Keep the modal mounted through its exit animation: a hard cut on close reads
+  // abrupt. `render` stays true until the exit completes. Opening is a derived
+  // state-during-render adjustment (React's "adjust state when a prop changes"
+  // pattern); `closing` is pure-derived (mounted but parent has closed it), so
+  // the only effect work is the delayed unmount (async setState, not sync).
+  const [render, setRender] = useState(isOpen)
+  if (isOpen && !render) setRender(true)
+  const closing = render && !isOpen
 
-  useFocusTrap(dialogRef, isOpen, {
+  useEffect(() => {
+    if (!closing) return
+    const t = window.setTimeout(() => setRender(false), EXIT_MS)
+    return () => window.clearTimeout(t)
+  }, [closing])
+
+  // Trap focus only while open (not during the exit animation).
+  useFocusTrap(dialogRef, render && !closing, {
     lockBodyScroll: true,
     onEscape: onClose,
   })
 
-  if (!isOpen) return null
+  if (!render) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in"
+        className={`absolute inset-0 bg-black/60 backdrop-blur-sm ${closing ? 'animate-fade-out' : 'animate-fade-in'}`}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -35,7 +54,7 @@ export function Modal({ isOpen, title, children, onClose }: ModalProps) {
         aria-modal="true"
         aria-labelledby="modal-title"
         tabIndex={-1}
-        className="relative bg-bg-card rounded-2xl border border-border-hairline shadow-overlay max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in"
+        className={`relative bg-bg-card rounded-2xl border border-border-hairline shadow-overlay max-w-2xl w-full max-h-[90vh] overflow-y-auto ${closing ? 'animate-scale-out' : 'animate-scale-in'}`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border-hairline">

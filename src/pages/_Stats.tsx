@@ -39,7 +39,14 @@ interface DomainStat {
   avg_score: number
 }
 
-export function Stats() {
+interface StatsProps {
+  /** Suppress the first-load skeleton (the prerendered snapshot stands in). */
+  hideInitialSkeleton?: boolean
+  /** Fired once the first data load settles, so the host can swap the snapshot. */
+  onLoaded?: () => void
+}
+
+export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}) {
   const [stats, setStats] = useState<PlatformStats | null>(null)
   const [certStats, setCertStats] = useState<Record<string, CertStats>>({})
   const [loading, setLoading] = useState(true)
@@ -88,6 +95,9 @@ export function Stats() {
       setError('Failed to load statistics')
     } finally {
       setLoading(false)
+      // Signal the host (StatsIsland) to hide the prerendered snapshot now that
+      // live numbers (or an error) have resolved - a single forward swap.
+      onLoaded?.()
     }
   }
 
@@ -99,6 +109,10 @@ export function Stats() {
   }, [])
 
   if (loading) {
+    // When the prerendered snapshot is standing in as the loading state (the
+    // /stats page), render nothing here so the snapshot stays put until live
+    // numbers replace it - no snapshot -> skeleton -> live regression.
+    if (hideInitialSkeleton) return null
     // Skeleton shaped like the stats page (header + cert cards), matching the
     // real wrapper so there is no jump when the live numbers resolve.
     return (
@@ -276,8 +290,8 @@ export function Stats() {
                           </div>
                           <div className="h-1.5 bg-bg-dark rounded-full overflow-hidden">
                             <div
-                              className={`h-full transition-all ${ds.avg_score < 60 ? 'bg-danger' : ds.avg_score < 75 ? 'bg-warning' : 'bg-success'}`}
-                              style={{ width: `${Math.min(100, ds.avg_score)}%` }}
+                              className={`h-full w-full origin-left transition-transform duration-settle ease-out ${ds.avg_score < 60 ? 'bg-danger' : ds.avg_score < 75 ? 'bg-warning' : 'bg-success'}`}
+                              style={{ transform: `scaleX(${Math.min(100, ds.avg_score) / 100})` }}
                             />
                           </div>
                         </div>

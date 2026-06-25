@@ -40,7 +40,7 @@ export function AnswerButton({ label, text, state, onClick, disabled, compact }:
       onClick={onClick}
       disabled={disabled || state === 'disabled'}
       {...(isToggleState ? { 'aria-pressed': state === 'selected' } : {})}
-      className={`w-full border rounded-xl transition-[border-color,background-color,transform] duration-200 ease-press active:scale-[0.99] active:duration-[80ms] disabled:active:scale-100 text-left flex items-start focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark ${compact ? 'p-2.5 md:p-3 gap-2.5 text-xs md:text-sm' : 'min-h-[44px] p-3 md:p-4 gap-3 md:gap-3.5 text-sm md:text-base'} ${stateStyles[state]}`}
+      className={`w-full border rounded-xl transition-[border-color,background-color,transform] duration-gentle ease-press active:scale-[0.99] active:duration-press disabled:active:scale-100 text-left flex items-start focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark ${compact ? 'p-2.5 md:p-3 gap-2.5 text-xs md:text-sm' : 'min-h-[44px] p-3 md:p-4 gap-3 md:gap-3.5 text-sm md:text-base'} ${stateStyles[state]}`}
     >
       <span
         aria-hidden="true"

@@ -879,8 +879,8 @@ export function MockExam() {
           {/* Answered-progress indicator */}
           <div className="h-1 bg-bg-dark" role="presentation">
             <div
-              className="h-full bg-brand transition-all duration-300"
-              style={{ width: `${questions.length ? (answeredCount / questions.length) * 100 : 0}%` }}
+              className="h-full w-full origin-left bg-brand transition-transform duration-settle ease-out"
+              style={{ transform: `scaleX(${questions.length ? answeredCount / questions.length : 0})` }}
             />
           </div>
         </div>

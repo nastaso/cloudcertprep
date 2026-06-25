@@ -22,7 +22,8 @@
    utilities so motion stays consistent and fast (Apple-style: quick, subtle,
    never bouncy). All respect prefers-reduced-motion via the block above. */
 @keyframes slide-up {
-  from { opacity: 0; transform: translateY(2rem); }
+  /* 8px rise (was 32px): a calm settle, not a slab launching up the page. */
+  from { opacity: 0; transform: translateY(0.5rem); }
   to { opacity: 1; transform: translateY(0); }
 }
 @keyframes fade-in {
@@ -49,16 +50,22 @@
   from { opacity: 1; }
   to { opacity: 0; }
 }
+@keyframes scale-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.98); }
+}
 
-.animate-slide-up { animation: slide-up 0.3s ease-out; }
-.animate-fade-in { animation: fade-in 0.2s ease-out; }
-.animate-scale-in { animation: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
-.animate-enter { animation: enter 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
-.animate-slide-in-right { animation: slide-in-right 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-slide-up { animation: slide-up var(--dur-slow) var(--ease-out); }
+.animate-fade-in { animation: fade-in var(--dur-base) var(--ease-out); }
+.animate-scale-in { animation: scale-in var(--dur-gentle) var(--ease-out); }
+.animate-enter { animation: enter var(--dur-gentle) var(--ease-out); }
+.animate-slide-in-right { animation: slide-in-right var(--dur-slow) var(--ease-out); }
 /* Mobile drawer exit (§8 item 5): Apple sheet curve, slightly quicker than
    entry. Paired with a fade-out on the backdrop. */
 .animate-slide-out-right { animation: slide-out-right 0.24s cubic-bezier(0.32, 0.72, 0, 1) both; }
-.animate-fade-out { animation: fade-out 0.24s ease-out both; }
+/* Dismissals accelerate away (ease-exit) and are faster than their entrance. */
+.animate-fade-out { animation: fade-out var(--dur-fast) var(--ease-exit) both; }
+.animate-scale-out { animation: scale-out var(--dur-fast) var(--ease-exit) both; }
 
 /* Delayed fade: stays invisible during the delay, fades in only if a Suspense
    spinner takes long enough to matter. `both` keeps opacity at 0 during the
@@ -74,7 +81,7 @@
    hover shadow tier (`--shadow-card-hover`) to give elevation feedback in BOTH
    themes rather than only light. (§8 item 6) */
 .lift {
-  transition: transform 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out);
+  transition: transform var(--dur-gentle) var(--ease-out), box-shadow var(--dur-gentle) var(--ease-out);
 }
 .lift:hover {
   transform: translateY(-2px);
@@ -90,14 +97,22 @@
    opacity:0 for crawlers, no-JS users, or the pre-hydration window. (§8 item 2) */
 html.cc-js .stagger > * {
   opacity: 0;
-  animation: enter 0.5s var(--ease-out) both;
+  animation: enter var(--dur-reveal) var(--ease-out) both;
 }
+/* The hero <h1> is the LCP element — never withhold it at opacity:0 behind an
+   entrance + per-child delay (hurts LCP and reads as a flash). It paints
+   immediately; only the supporting children cascade in around it. */
+html.cc-js .stagger > h1 {
+  opacity: 1;
+  animation: none;
+}
+/* Tighter cascade (60ms deltas, capped at 210ms): a quick, coordinated settle,
+   not a slow line-by-line pop. Research: Linear/Vercel stagger deltas 40-80ms. */
 html.cc-js .stagger > *:nth-child(1) { animation-delay: 0ms; }
-html.cc-js .stagger > *:nth-child(2) { animation-delay: 70ms; }
-html.cc-js .stagger > *:nth-child(3) { animation-delay: 140ms; }
-html.cc-js .stagger > *:nth-child(4) { animation-delay: 210ms; }
-html.cc-js .stagger > *:nth-child(5) { animation-delay: 280ms; }
-html.cc-js .stagger > *:nth-child(n+6) { animation-delay: 350ms; }
+html.cc-js .stagger > *:nth-child(2) { animation-delay: 60ms; }
+html.cc-js .stagger > *:nth-child(3) { animation-delay: 120ms; }
+html.cc-js .stagger > *:nth-child(4) { animation-delay: 180ms; }
+html.cc-js .stagger > *:nth-child(n+5) { animation-delay: 210ms; }
 
 /* FAQ open/close polish: animate the panel in when a <details> opens, and
    (where the browser supports interpolate-size) transition the disclosure
@@ -108,14 +123,14 @@ html.cc-js .stagger > *:nth-child(n+6) { animation-delay: 350ms; }
   details.group::details-content {
     height: 0;
     overflow: hidden;
-    transition: height 0.25s var(--ease-out), content-visibility 0.25s allow-discrete;
+    transition: height var(--dur-gentle) var(--ease-out), content-visibility var(--dur-gentle) allow-discrete;
   }
   details.group[open]::details-content {
     height: auto;
   }
 }
 details.group[open] > div {
-  animation: enter 0.25s var(--ease-out);
+  animation: enter var(--dur-gentle) var(--ease-out);
 }
 
 /* Scroll-reveal: below-the-fold elements tagged [data-reveal] fade-and-rise
@@ -126,7 +141,7 @@ details.group[open] > div {
 html.cc-js [data-reveal] {
   opacity: 0;
   transform: translateY(1rem);
-  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+  transition: opacity var(--dur-reveal) var(--ease-out), transform var(--dur-reveal) var(--ease-out);
 }
 html.cc-js [data-reveal].is-revealed {
   opacity: 1;
@@ -138,14 +153,17 @@ html.cc-js [data-reveal].is-revealed {
    quiet fade instead: no translateY rise, no per-child delay, shorter
    duration. Desktop keeps the full motion vocabulary. */
 @media (max-width: 767px) {
-  .stagger > * {
+  /* Match the html.cc-js specificity of the desktop stagger rules above, else
+     these are out-specificity'd and never apply (the mobile-calm intent was
+     silently dead). One quiet fade, no rise, no per-child delay. */
+  html.cc-js .stagger > * {
     animation-name: fade-in;
-    animation-duration: 0.35s;
+    animation-duration: var(--dur-slow);
   }
-  .stagger > *:nth-child(n) { animation-delay: 0ms; }
+  html.cc-js .stagger > *:nth-child(n) { animation-delay: 0ms; }
   html.cc-js [data-reveal] {
     transform: none;
-    transition: opacity 0.35s var(--ease-out);
+    transition: opacity var(--dur-slow) var(--ease-out);
   }
 }
 
@@ -164,9 +182,10 @@ html.cc-js [data-reveal].is-revealed {
   background: currentColor;
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform var(--dur-base) var(--ease-out);
 }
-.hdr-link:hover::after { transform: scaleX(1); }
+.hdr-link:hover::after,
+.hdr-link:focus-visible::after { transform: scaleX(1); }
 
 /* Header auth-state toggle. The header island is server-rendered in the
    logged-out state. A pre-paint inline script in BaseLayout adds `cc-authed`
@@ -184,7 +203,7 @@ html.cc-authed .cc-auth-out { display: none; }
 .chev-link .chev {
   display: inline-block;
   margin-left: 0.35em;
-  transition: transform 0.2s var(--ease-out);
+  transition: transform var(--dur-gentle) var(--ease-out);
 }
 .chev-link:hover .chev,
 .chev-link:focus-visible .chev { transform: translateX(4px); }
@@ -203,16 +222,16 @@ html.cc-authed .cc-auth-out { display: none; }
   background: rgb(var(--color-brand));
   transform: translateX(var(--tab-x, 0)) scaleX(1);
   width: var(--tab-w, 0px);
-  transition: transform 0.25s var(--ease-inout), width 0.25s var(--ease-inout);
+  transition: transform var(--dur-gentle) var(--ease-inout), width var(--dur-gentle) var(--ease-inout);
   pointer-events: none;
 }
 
 /* Instant tap feedback for chips/tabs/list rows on touch (DSv4 motion rule:
    every interactive element answers within 80ms). */
 .press {
-  transition: transform 0.2s var(--ease-press), background-color 0.2s var(--ease-press);
+  transition: transform var(--dur-gentle) var(--ease-press), background-color var(--dur-gentle) var(--ease-press);
 }
-.press:active { transform: scale(0.97); transition-duration: 80ms; }
+.press:active { transform: scale(0.97); transition-duration: var(--dur-press); }
 
 /* Lead paragraph (DSv4 type scale): opener under an h1/h2. */
 .text-lead {
@@ -258,7 +277,7 @@ html.cc-authed .cc-auth-out { display: none; }
   background: rgb(var(--color-bg-card));
   border: 1px solid rgb(var(--color-border));
   box-shadow: var(--card-shadow);
-  transition: box-shadow 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+  transition: box-shadow var(--dur-gentle) var(--ease-out), transform var(--dur-gentle) var(--ease-out);
 }
 .feature-card:hover,
 .feature-card:focus-visible {
@@ -275,7 +294,7 @@ html.cc-authed .cc-auth-out { display: none; }
   width: 100%;
   height: 100%;
   display: block;
-  transition: transform 0.6s var(--ease-out);
+  transition: transform var(--dur-settle) var(--ease-out);
 }
 .feature-card:hover .feature-art > svg,
 .feature-card:hover .feature-art > img,
@@ -285,7 +304,7 @@ html.cc-authed .cc-auth-out { display: none; }
 }
 .feature-arrow {
   display: inline-block;
-  transition: transform 0.25s var(--ease-out);
+  transition: transform var(--dur-gentle) var(--ease-out);
 }
 .feature-card:hover .feature-arrow,
 .feature-card:focus-visible .feature-arrow { transform: translateX(6px); }
@@ -324,10 +343,10 @@ html.cc-authed .cc-auth-out { display: none; }
 .halo {
   --halo-color: 255 153 0;
   transition:
-    box-shadow 0.3s var(--ease-out),
-    border-color 0.2s var(--ease-out),
-    background-color 0.2s var(--ease-press),
-    transform 0.2s var(--ease-press);
+    box-shadow var(--dur-slow) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-press),
+    transform var(--dur-gentle) var(--ease-press);
 }
 .halo:hover,
 .halo:focus-visible {
@@ -360,7 +379,7 @@ html.cc-authed .cc-auth-out { display: none; }
    .hdr-scrolled. The !important overrides beat the utility classes that
    style the default (frosted) state. */
 header[data-overlay] {
-  transition: background-color 0.35s var(--ease-out), border-color 0.35s var(--ease-out);
+  transition: background-color var(--dur-slow) var(--ease-out), border-color var(--dur-slow) var(--ease-out);
 }
 header[data-overlay]:not(.hdr-scrolled) {
   --color-on-header: 255 255 255;
@@ -393,6 +412,10 @@ header[data-overlay]:not(.hdr-scrolled) {
    body icons are NEUTRAL. Brand colour appears on CTAs, the logo mark,
    active states. Body links are neutral with an underline. */
 :root {
+  /* Native UA surfaces (scrollbar, form controls, overscroll gutter) follow the
+     theme. Without this, dark users get a light scrollbar + light-scheme inputs
+     + a white overscroll flash framing the dark page. Zero deps. */
+  color-scheme: light;
   --color-brand: 255 153 0;          /* #FF9900 */
   --color-brand-hover: 236 114 17;   /* #EC7211 — AWS CTA hover orange (DSv4) */
   --color-on-brand: 22 25 31;        /* #16191F squid ink on orange (9.4:1) */
@@ -420,6 +443,7 @@ header[data-overlay]:not(.hdr-scrolled) {
    surface, page → card → hover each one step brighter. Header keeps the same
    navy (it's chrome, not a theme surface). */
 .dark {
+  color-scheme: dark;
   --color-bg-dark: 22 25 31;         /* #16191F */
   --color-bg-card: 28 35 47;         /* #1C232F */
   --color-header-bg: 22 25 31;       /* header follows the dark ink tier */
@@ -442,11 +466,23 @@ header[data-overlay]:not(.hdr-scrolled) {
   --card-shadow: 0 1px 3px rgb(15 25 35 / 0.06), 0 1px 2px rgb(15 25 35 / 0.04);
   --shadow-card-hover: 0 8px 24px -8px rgb(15 25 35 / 0.14), 0 2px 8px -2px rgb(15 25 35 / 0.08);
   --shadow-overlay: 0 24px 64px -16px rgb(15 25 35 / 0.24);
-  /* Motion tokens (DSv4 §1.5). ease-out = entrances/settles; ease-inout =
-     indicator slides (tab underline); ease-press = button push. */
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-inout: cubic-bezier(0.45, 0, 0.15, 1);
-  --ease-press: cubic-bezier(0.2, 0, 0, 1);
+  /* Motion tokens (DSv6). ONE named duration scale + one re-scoped curve set so
+     motion stays consistent and premium-subtle. The curve is deliberately kept
+     (strong front-load + long flat tail = "settling into place"); the owner's
+     "too fast" was the curve MISUSED on 150ms micro-interactions, so lifts and
+     settles lean slightly slower (gentle/settle) while tint hovers stay
+     responsive at base. Entrances are long + ease-out; exits accelerate away. */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);    /* entrances / settles / lifts */
+  --ease-inout: cubic-bezier(0.45, 0, 0.15, 1); /* indicator slides, A->B moves */
+  --ease-press: cubic-bezier(0.2, 0, 0, 1);     /* button / tap press-release */
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);      /* dismissals: accelerate away */
+  --dur-press: 90ms;    /* :active compress (down stroke only) */
+  --dur-fast: 180ms;    /* exits / dismiss / fade-out (faster than its enter) */
+  --dur-base: 200ms;    /* tint state-change: color/bg/border hover, focus ring */
+  --dur-gentle: 250ms;  /* hover-LIFT settle, press-release, disclosure, nudge */
+  --dur-slow: 350ms;    /* popover/menu open, header frost-in, slide-up notices */
+  --dur-reveal: 520ms;  /* scroll-reveal, hero stagger entrance, modal open */
+  --dur-settle: 600ms;  /* progress-bar fill, feature-art image zoom */
 }
 .dark {
   --card-shadow: none;
