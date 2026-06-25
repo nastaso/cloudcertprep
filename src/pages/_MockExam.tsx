@@ -691,7 +691,7 @@ export function MockExam() {
               <UnlockCTA
                 onSignIn={() => goToLogin(navigate, location)}
                 location="mock_exam_start"
-                title="Sign in to save this attempt"
+                title="Save your score and progress"
                 body="Guest mode is fully functional, but your score, time, and per-domain breakdown will not be saved to your history."
                 ctaLabel="Sign in to save this attempt"
                 noTopMargin

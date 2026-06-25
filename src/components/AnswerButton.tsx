@@ -1,3 +1,5 @@
+import { Check, X } from 'lucide-react'
+
 interface AnswerButtonProps {
   label: 'A' | 'B' | 'C' | 'D' | 'E'
   text: string
@@ -15,7 +17,7 @@ interface AnswerButtonProps {
  */
 export function AnswerButton({ label, text, state, onClick, disabled, compact }: AnswerButtonProps) {
   const stateStyles = {
-    default: 'border-border-hairline bg-bg-card hover:border-text-muted/50 hover:bg-bg-card-hover',
+    default: 'border-text-muted/25 bg-bg-card hover:border-text-muted/50 hover:bg-bg-card-hover',
     selected: 'border-brand bg-brand/10',
     correct: 'border-success bg-success/10',
     wrong: 'border-danger bg-danger/10',
@@ -51,6 +53,17 @@ export function AnswerButton({ label, text, state, onClick, disabled, compact }:
       <div className={`flex-1 text-text-primary ${compact ? 'pt-0' : 'pt-0 md:pt-0.5'}`}>
         {text}
       </div>
+      {/* Non-color cue for the graded states (color alone fails colorblind
+          users): a check on the correct answer, an X on a wrong pick. */}
+      {(state === 'correct' || state === 'wrong') && (
+        <span
+          className={`flex-shrink-0 ${compact ? 'pt-0.5' : 'pt-0.5 md:pt-1'} ${state === 'correct' ? 'text-success' : 'text-danger'}`}
+        >
+          {state === 'correct'
+            ? <Check className={compact ? 'w-4 h-4' : 'w-4 h-4 md:w-5 md:h-5'} aria-label="Correct answer" />
+            : <X className={compact ? 'w-4 h-4' : 'w-4 h-4 md:w-5 md:h-5'} aria-label="Your answer (incorrect)" />}
+        </span>
+      )}
     </button>
   )
 }
