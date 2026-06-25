@@ -38,8 +38,8 @@ export const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   // practising"), matching the dark-stage hero CTAs so the funnel reads as one
   // action across home, cert hubs, and domain pages.
   brand:
-    'bg-brand hover:bg-brand-hover text-on-brand shadow-sm hover:shadow-card-hover ' +
-    'disabled:hover:bg-brand disabled:shadow-sm',
+    'bg-brand hover:bg-brand-hover text-on-brand shadow-sm hover:shadow-card-hover hover:-translate-y-px ' +
+    'disabled:hover:bg-brand disabled:hover:translate-y-0 disabled:shadow-sm',
   secondary:
     'bg-bg-card hover:bg-bg-card-hover text-text-primary border border-border-hairline ' +
     'hover:border-text-muted/60 hover:shadow-card disabled:hover:bg-bg-card disabled:hover:border-border-hairline',
