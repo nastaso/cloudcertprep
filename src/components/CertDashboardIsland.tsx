@@ -67,14 +67,18 @@ interface RecentAttempt {
 const GUEST_VIEW_ID = 'cert-guest-view'
 
 /** Compact stat tile for the dashboard summary strip. */
-function StatTile({ label, value, suffix }: { label: string; value: string; suffix?: string }) {
+// Stat tiles are READOUTS, not actions: a recessed flat panel (page-tinted bg,
+// no shadow) so they read clearly as data, distinct from the raised + shadowed
+// interactive cards below. `hint` clarifies an otherwise-ambiguous metric basis.
+function StatTile({ label, value, suffix, hint }: { label: string; value: string; suffix?: string; hint?: string }) {
   return (
-    <div className="bg-bg-card border border-border-hairline rounded-2xl p-4 md:p-5">
+    <div className="bg-bg-dark/50 border border-border-hairline rounded-2xl p-4 md:p-5">
       <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-text-muted">{label}</p>
       <p className="mt-2 font-mono text-3xl md:text-4xl font-semibold tabular-nums tracking-tight text-text-primary leading-none">
         {value}
         {suffix && <span className="ml-1 text-lg md:text-xl text-text-muted font-medium">{suffix}</span>}
       </p>
+      {hint && <p className="mt-2 font-mono text-[11px] text-text-muted">{hint}</p>}
     </div>
   )
 }
@@ -85,7 +89,7 @@ function StatTile({ label, value, suffix }: { label: string; value: string; suff
 // by the global block in index.css.
 function SkeletonStatTile({ label }: { label: string }) {
   return (
-    <div className="bg-bg-card border border-border-hairline rounded-2xl p-4 md:p-5">
+    <div className="bg-bg-dark/50 border border-border-hairline rounded-2xl p-4 md:p-5">
       <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-text-muted">{label}</p>
       <div className="mt-3 h-8 w-16 rounded bg-text-muted/15 animate-pulse" aria-hidden="true" />
     </div>
@@ -195,6 +199,8 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
   // Each row is capped at its domain's current bank size: stale rows written
   // before a bank trim can carry counts above the live total (the >100% bug).
   const domainCap = new Map(cert.domains.map(d => [d.id, d.questionCount]))
+  // Total questions in the bank, so "practiced" has a denominator for context.
+  const bankTotal = cert.domains.reduce((sum, d) => sum + d.questionCount, 0)
   const questionsPracticed = domainProgress.reduce(
     (sum, d) => sum + Math.min(d.questions_attempted || 0, domainCap.get(d.domain_id) ?? Infinity), 0)
   const questionsCorrect = domainProgress.reduce(
@@ -247,10 +253,10 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
               </>
             ) : (
               <>
-                <StatTile label="Questions practiced" value={questionsPracticed.toLocaleString()} />
-                <StatTile label="Accuracy" value={String(accuracy)} suffix="%" />
+                <StatTile label="Questions practiced" value={questionsPracticed.toLocaleString()} suffix={`/ ${bankTotal.toLocaleString()}`} />
+                <StatTile label="Accuracy" value={String(accuracy)} suffix="%" hint="correct / answered" />
                 <StatTile label="Mock exams" value={String(examCount)} />
-                <StatTile label="Best score" value={bestScore > 0 ? String(bestScore) : '0'} suffix={bestScore > 0 ? '/1000' : undefined} />
+                <StatTile label="Best score" value={bestScore > 0 ? String(bestScore) : '0'} suffix={bestScore > 0 ? '/ 1000' : undefined} />
               </>
             )}
           </div>
@@ -265,7 +271,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
             <a
               href={`${certPath}/practice-exam`}
               style={{ '--halo-color': levelAccentRgb } as CSSProperties}
-              className="halo group bg-bg-card hover:bg-bg-card-hover p-6 md:p-7 rounded-2xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-200 text-left block"
+              className="halo group bg-bg-card shadow-card hover:bg-bg-card-hover p-6 md:p-7 rounded-2xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-200 text-left block"
             >
               <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-bg-dark border border-border-hairline">
                 <FileText className="w-5 h-5 text-text-primary" aria-hidden="true" />
@@ -273,7 +279,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
               <h3 className="mt-4 text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary">
                 Mock exam
                 <ArrowRight
-                  className="ml-1.5 inline-block w-4 h-4 align-[-2px] text-text-muted transition-transform duration-200 group-hover:translate-x-1"
+                  className="ml-1.5 inline-block w-4 h-4 align-[-2px] text-text-primary/50 transition-[transform,color] duration-200 group-hover:translate-x-1 group-hover:text-text-primary"
                   aria-hidden="true"
                 />
               </h3>
@@ -288,7 +294,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
             <a
               href={`${certPath}/domain-practice`}
               style={{ '--halo-color': levelAccentRgb } as CSSProperties}
-              className="halo group bg-bg-card hover:bg-bg-card-hover p-6 md:p-7 rounded-2xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-200 text-left block"
+              className="halo group bg-bg-card shadow-card hover:bg-bg-card-hover p-6 md:p-7 rounded-2xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-200 text-left block"
             >
               <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-bg-dark border border-border-hairline">
                 <Target className="w-5 h-5 text-text-primary" aria-hidden="true" />
@@ -296,7 +302,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
               <h3 className="mt-4 text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary">
                 Domain practice
                 <ArrowRight
-                  className="ml-1.5 inline-block w-4 h-4 align-[-2px] text-text-muted transition-transform duration-200 group-hover:translate-x-1"
+                  className="ml-1.5 inline-block w-4 h-4 align-[-2px] text-text-primary/50 transition-[transform,color] duration-200 group-hover:translate-x-1 group-hover:text-text-primary"
                   aria-hidden="true"
                 />
               </h3>
@@ -348,13 +354,13 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                   key={domain.id}
                   href={`${certPath}/${domain.slug}`}
                   aria-label={`Practice ${domain.name} (${mastery}% mastery)`}
-                  className="group block bg-bg-card border border-border-hairline rounded-2xl p-5 md:p-6 transition-[background-color,border-color] duration-200 hover:bg-bg-card-hover hover:border-text-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+                  className="group block bg-bg-card shadow-card hover:shadow-card-hover hover:-translate-y-0.5 border border-border-hairline rounded-2xl p-5 md:p-6 transition-[background-color,border-color,box-shadow,transform] duration-200 hover:bg-bg-card-hover hover:border-text-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <h3 className="text-base font-semibold tracking-[-0.01em] leading-snug text-text-primary">
                       {domain.name}
                       <ArrowRight
-                        className="ml-1.5 inline-block w-4 h-4 align-[-2px] text-text-muted transition-transform duration-200 group-hover:translate-x-1"
+                        className="ml-1.5 inline-block w-4 h-4 align-[-2px] text-text-primary/50 transition-[transform,color] duration-200 group-hover:translate-x-1 group-hover:text-text-primary"
                         aria-hidden="true"
                       />
                     </h3>
@@ -440,7 +446,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                 <a
                   key={attempt.id}
                   href="/history"
-                  className="px-5 py-4 flex items-center justify-between gap-4 hover:bg-bg-card-hover transition-colors duration-200 first:rounded-t-2xl last:rounded-b-2xl"
+                  className="group px-5 py-4 flex items-center justify-between gap-4 hover:bg-bg-card-hover transition-colors duration-200 first:rounded-t-2xl last:rounded-b-2xl"
                 >
                   <div className="flex items-center gap-4 min-w-0">
                     <span
@@ -458,9 +464,12 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                       </p>
                     </div>
                   </div>
-                  <p className="font-mono text-lg md:text-xl font-semibold text-text-primary tabular-nums">
-                    {Math.round(attempt.score_percent)}<span className="text-sm text-text-muted">%</span>
-                  </p>
+                  <div className="flex items-center gap-3">
+                    <p className="font-mono text-lg md:text-xl font-semibold text-text-primary tabular-nums">
+                      {Math.round(attempt.score_percent)}<span className="text-sm text-text-muted">%</span>
+                    </p>
+                    <ArrowRight className="w-4 h-4 flex-shrink-0 text-text-muted transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
+                  </div>
                 </a>
               ))}
             </div>
