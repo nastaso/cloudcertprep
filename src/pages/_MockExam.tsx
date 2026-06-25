@@ -123,12 +123,10 @@ function ExamQuestionGrid({
             aria-label={ariaLabel}
             aria-current={isCurrent ? 'true' : undefined}
             className={`relative ${cellSize} rounded text-sm font-medium transition-colors ${
-              isCurrent
-                ? 'bg-brand text-on-brand'
-                : isAnswered
+              isAnswered
                 ? 'bg-brand/30 text-text-primary hover:bg-brand/50'
                 : 'bg-bg-dark text-text-muted hover:bg-bg-card-hover'
-            }`}
+            }${isCurrent ? ' ring-2 ring-inset ring-brand' : ''}`}
           >
             {idx + 1}
             {isFlagged && (
