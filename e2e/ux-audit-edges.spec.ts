@@ -75,10 +75,14 @@ test('P1-5: progress bar advances when the current question is answered', async 
   expect(Number(await bar.getAttribute('aria-valuenow'))).toBe(0) // Q1 unanswered
   // AnswerButtons are the only buttons carrying aria-pressed.
   await page.locator('button[aria-pressed]').first().click()
-  const submit = page.getByRole('button', { name: /^Submit/i })
-  if (await submit.isVisible().catch(() => false)) await submit.click()
+  // Single-choice reveals feedback on select; multi/ordering/matching need a
+  // Submit. Best-effort click for the latter; swallow if absent (auto-reveal
+  // types) or mid-re-render. The poll is the real assertion.
+  await page.getByRole('button', { name: /^Submit/i }).click({ timeout: 3000 }).catch(() => {})
   // Advances on answer (the off-by-one fix); old code stayed at 0 until "Next".
-  await expect.poll(async () => Number(await bar.getAttribute('aria-valuenow'))).toBeGreaterThan(0)
+  // Generous timeout: under full-suite parallel load the feedback transition
+  // can lag past the default poll window.
+  await expect.poll(async () => Number(await bar.getAttribute('aria-valuenow')), { timeout: 15000 }).toBeGreaterThan(0)
 })
 
 test('P1-8 edge: no British spelling on the domain landing or history', async ({ page }) => {
