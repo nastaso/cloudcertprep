@@ -3,9 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { useSEO } from '../hooks/useSEO'
 import { useCertNavigate } from '../hooks/useCertNavigate'
 import { trackEvent } from '../lib/analytics'
-import { CloudOff } from 'lucide-react'
 import { Button } from '../components/Button'
-import { Card } from '../components/Card'
 
 export function NotFound() {
   const location = useLocation()
@@ -20,25 +18,15 @@ export function NotFound() {
     trackEvent('page_not_found', { path: location.pathname })
   }, [location.pathname])
 
+  // Mirrors the static 404.astro exactly (mono number + 'Page not found' + the
+  // same subline + 'Back to home'), so an in-app SPA miss and a static-host miss
+  // are one consistent experience.
   return (
-    <div className="flex-1 flex items-center justify-center p-4 md:p-8">
-        <div className="max-w-md w-full">
-          <Card padding="lg" className="text-center">
-            <CloudOff className="w-16 h-16 md:w-20 md:h-20 text-brand mx-auto mb-4" />
-            
-            <h1 className="text-3xl md:text-4xl font-semibold text-text-primary mb-3">
-              404: Page not found
-            </h1>
-            
-            <p className="text-sm md:text-base text-text-muted mb-6">
-              This page must have migrated to another region.
-            </p>
-            
-            <Button variant="primary" fullWidth onClick={goHome}>
-              Back to home
-            </Button>
-          </Card>
-        </div>
+    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+      <h1 className="font-mono text-7xl md:text-8xl font-bold tracking-tight text-text-primary mb-4">404</h1>
+      <p className="text-xl font-semibold tracking-[-0.01em] text-text-primary mb-2">Page not found</p>
+      <p className="text-text-muted mb-8 max-w-md">{"The page you're looking for doesn't exist or has been moved."}</p>
+      <Button variant="primary" onClick={goHome}>Back to home</Button>
     </div>
   )
 }
