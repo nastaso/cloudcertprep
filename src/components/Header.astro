@@ -111,6 +111,13 @@ const checkPath = 'M20 6 9 17l-5-5'
         if (!ticking) { ticking = true; requestAnimationFrame(apply) }
       }
       apply()
+      // Scroll restoration happens AFTER this inline script runs, so the first
+      // apply() sees scrollY 0. Re-apply on the next frame (post-restore) and on
+      // bfcache restore (pageshow) so a reload / Back at a scrolled position
+      // paints the frosted bar immediately instead of flashing the transparent
+      // overlay state.
+      requestAnimationFrame(apply)
+      window.addEventListener('pageshow', apply)
       window.addEventListener('scroll', onScroll, { passive: true })
     })()
   </script>

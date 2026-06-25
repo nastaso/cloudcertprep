@@ -19,7 +19,10 @@ export function DonateButton({ isExamActive }: DonateButtonProps) {
   if (isExamActive) return null
 
   return (
-    <div className="hidden lg:block fixed bottom-6 left-6 z-40 group">
+    // Mounts on client:idle (after hydration), so it appears a beat after the
+    // page. Fade it in rather than snapping into place. Reduced-motion users get
+    // it instantly (global override neutralizes the animation).
+    <div className="hidden lg:block fixed bottom-6 left-6 z-40 group animate-fade-in">
       <a
         href={KOFI_URL}
         target="_blank"
