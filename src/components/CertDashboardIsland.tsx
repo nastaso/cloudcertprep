@@ -39,6 +39,8 @@ interface CertDomainProp {
   id: number
   name: string
   questionCount: number
+  /** URL slug for the per-domain landing (/{provider}/{code}/{slug}). */
+  slug: string
 }
 
 /** Serialised cert fields passed from the Astro page. */
@@ -342,10 +344,19 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
               const correct = Math.min(progress?.questions_correct || 0, attempted)
               const mastery = calculateDomainMastery(correct, domain.id, cert.code)
               return (
-                <div key={domain.id} className="bg-bg-card border border-border-hairline rounded-2xl p-5 md:p-6">
+                <a
+                  key={domain.id}
+                  href={`${certPath}/${domain.slug}`}
+                  aria-label={`Practice ${domain.name} (${mastery}% mastery)`}
+                  className="group block bg-bg-card border border-border-hairline rounded-2xl p-5 md:p-6 transition-[background-color,border-color] duration-200 hover:bg-bg-card-hover hover:border-text-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+                >
                   <div className="flex items-start justify-between gap-4">
                     <h3 className="text-base font-semibold tracking-[-0.01em] leading-snug text-text-primary">
                       {domain.name}
+                      <ArrowRight
+                        className="ml-1.5 inline-block w-4 h-4 align-[-2px] text-text-muted transition-transform duration-200 group-hover:translate-x-1"
+                        aria-hidden="true"
+                      />
                     </h3>
                     <span className="font-mono text-2xl font-semibold tabular-nums leading-none text-text-primary">
                       {mastery}<span className="text-base text-text-muted">%</span>
@@ -368,7 +379,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                   <p className="mt-2.5 font-mono text-[12px] text-text-muted">
                     {attempted} of {domain.questionCount} practiced · {correct} correct
                   </p>
-                </div>
+                </a>
               )
             })}
           </div>

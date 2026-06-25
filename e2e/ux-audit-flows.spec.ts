@@ -36,6 +36,10 @@ test('P0-3: email_unverified does NOT trigger the home banner', async ({ page })
 test('P0-2: verified=1 welcome card (direct, no auth)', async ({ page }) => {
   await page.goto('/?verified=1')
   await expect(page.getByText('Your email is confirmed')).toBeVisible({ timeout: 10000 })
+  // No real session here (direct visit, not a confirm redirect): the card must
+  // NOT falsely claim "You are signed in" and must offer a Sign in path.
+  await expect(page.getByText('You are signed in')).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'Sign in', exact: true })).toBeVisible({ timeout: 10000 })
 })
 
 test('P1-4: persistent Practice menu trigger in header on key routes', async ({ page }) => {

@@ -3,6 +3,7 @@ import { CheckCircle, AlertTriangle } from 'lucide-react'
 import { Card } from './Card'
 import { Alert } from './Alert'
 import { buttonClass } from '../lib/buttonStyles'
+import { useAuth } from '../hooks/useAuth'
 
 const ACK_KEY = 'cloudcertprep_verified_welcome_ack'
 
@@ -50,6 +51,11 @@ function readNoticeOnce(): Notice {
  */
 export default function AuthLinkNotice({ practiceHref }: { practiceHref: string }) {
   const [notice, setNotice] = useState<Notice>(readNoticeOnce)
+  // Reflect the REAL session, not the URL marker: a confirm link can land here
+  // without an established session (confirmed on another device, cookie not
+  // persisted), in which case asserting "You are signed in" is a lie that sends
+  // the user off thinking they are logged in. Resolve before claiming it.
+  const { user, loading: authLoading } = useAuth()
   if (!notice) return null
 
   if (notice.kind === 'expired') {
@@ -69,6 +75,9 @@ export default function AuthLinkNotice({ practiceHref }: { practiceHref: string 
     )
   }
 
+  // Only claim "signed in" once auth has resolved AND a session exists.
+  const signedIn = !authLoading && Boolean(user)
+
   return (
     <div className="mb-10 md:mb-12">
       <Card padding="md" className="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -77,12 +86,24 @@ export default function AuthLinkNotice({ practiceHref }: { practiceHref: string 
         </span>
         <div className="flex-1">
           <h2 className="text-lg font-semibold tracking-[-0.01em] text-text-primary">
-            Your email is confirmed. You are signed in.
+            {signedIn ? 'Your email is confirmed. You are signed in.' : 'Your email is confirmed.'}
           </h2>
-          <p className="mt-1 text-sm text-text-muted">Pick up where you left off and start your first exam.</p>
+          <p className="mt-1 text-sm text-text-muted">
+            {signedIn || authLoading
+              ? 'Pick up where you left off and start your first exam.'
+              : 'Sign in to save your progress, or jump straight into a practice exam.'}
+          </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <a href={practiceHref} className={buttonClass({ variant: 'brand', size: 'md' })}>
+          {!authLoading && !signedIn && (
+            <a href="/login" className={buttonClass({ variant: 'brand', size: 'md' })}>
+              Sign in
+            </a>
+          )}
+          <a
+            href={practiceHref}
+            className={buttonClass({ variant: signedIn || authLoading ? 'brand' : 'ghost', size: 'md' })}
+          >
             Start practice exam
           </a>
           <button
