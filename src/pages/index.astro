@@ -114,7 +114,7 @@ const softwareAppJsonLd = serializeJsonLd({
           just-verified or expired-link cohort, null for normal traffic, so the
           empty island adds no layout box above the content stack. */}
       {defaultCert && (
-        <AuthLinkNotice client:idle practiceHref={`/${defaultCert.provider}/${defaultCert.code}/practice-exam`} />
+        <AuthLinkNotice client:only="react" practiceHref={`/${defaultCert.provider}/${defaultCert.code}/practice-exam`} />
       )}
       <div class="space-y-16 md:space-y-24">
 
