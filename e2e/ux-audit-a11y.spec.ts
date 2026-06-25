@@ -1,5 +1,12 @@
 import { test, expect } from '@playwright/test'
 
+// Run axe with reduced motion so animated opacity (e.g. the LoadingSpinner /
+// skeleton `.animate-pulse`) is neutralized to its resting state. axe's
+// color-contrast check asserts the readable resting contrast; scanning a
+// mid-animation low-opacity frame is a transient false positive, not a WCAG
+// failure. Also matches the screenshot-harness convention (AGENTS.md).
+test.use({ reducedMotion: 'reduce' })
+
 // WCAG 2.1 A + AA audit (axe-core, injected from the local transitive dep - no new
 // npm dependency) across the UX-audit surfaces in BOTH themes.
 const AXE = 'node_modules/axe-core/axe.min.js'
