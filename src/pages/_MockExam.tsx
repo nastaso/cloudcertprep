@@ -90,12 +90,19 @@ function ExamQuestionGrid({
   answers: Map<number, QuestionState>
   currentIndex: number
   onSelect: (idx: number) => void
-  variant?: 'sidebar' | 'modal'
+  variant?: 'sidebar' | 'modal' | 'review'
   /** Pre-submit review filter: show only unanswered or only flagged cells. */
   filter?: 'all' | 'unanswered' | 'flagged'
 }) {
+  // 'review' wraps compact fixed cells (like a real exam review grid) so 65
+  // questions stay scannable in a wide panel; 'modal' fills the narrow mobile
+  // sheet with a 5-col grid; 'sidebar' is the slim in-exam navigator.
+  const containerClass = variant === 'review'
+    ? 'flex flex-wrap gap-2'
+    : `grid grid-cols-5 gap-2${variant === 'modal' ? ' max-h-96 overflow-y-auto' : ''}`
+  const cellSize = variant === 'modal' ? 'w-full aspect-square' : 'w-10 h-10'
   return (
-    <div className={`grid grid-cols-5 gap-2${variant === 'modal' ? ' max-h-96 overflow-y-auto' : ''}`}>
+    <div className={containerClass}>
       {questions.map((_, idx) => {
         const state = answers.get(idx)
         const isAnswered = isQuestionAnswered(state)
@@ -115,7 +122,7 @@ function ExamQuestionGrid({
             onClick={() => onSelect(idx)}
             aria-label={ariaLabel}
             aria-current={isCurrent ? 'true' : undefined}
-            className={`relative ${variant === 'sidebar' ? 'w-10 h-10' : 'w-full aspect-square'} rounded text-sm font-medium transition-colors ${
+            className={`relative ${cellSize} rounded text-sm font-medium transition-colors ${
               isCurrent
                 ? 'bg-brand text-on-brand'
                 : isAnswered
@@ -934,7 +941,7 @@ export function MockExam() {
                     answers={answers}
                     currentIndex={currentIndex}
                     filter={reviewPreFilter}
-                    variant="modal"
+                    variant="review"
                     onSelect={(idx) => { goToQuestion(idx); setReviewing(false); window.scrollTo(0, 0) }}
                   />
                 </div>

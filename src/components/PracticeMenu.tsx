@@ -108,9 +108,8 @@ export function PracticeMenu({ variant, isAuthed = false, onNavigate }: { varian
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-1.5">
                 {certs.map(cert => (
                   <div key={cert.code}>
-                    <p className="px-2 pt-1.5 pb-1 text-[13px] font-semibold text-text-primary">
+                    <p className="px-2 pt-1.5 pb-1 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-text-muted">
                       {cert.shortName}
-                      <span className="ml-1.5 text-xs font-normal text-text-muted">{cert.name}</span>
                     </p>
                     <ul className="list-none p-0 m-0 space-y-0.5">
                       {itemsFor(cert, isAuthed).map(({ href, label, desc, Icon }) => (
