@@ -545,7 +545,7 @@ export function History() {
           {/* Guest User: a calm neutral sign-in funnel (no warning styling —
               nothing is wrong, it's just gated). The CTA carries the action. */}
           {!user ? (
-            <div className="bg-bg-card border border-border-hairline rounded-2xl p-6 md:p-8">
+            <div className="max-w-2xl bg-bg-card border border-border-hairline rounded-2xl p-6 md:p-8">
               <div className="flex items-center gap-2.5 mb-2">
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-bg-dark border border-border-hairline">
                   <TrendingUp className="w-4 h-4 text-text-primary" aria-hidden="true" />

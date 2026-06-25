@@ -410,7 +410,7 @@ export function DomainPractice() {
               <UnlockCTA
                 onSignIn={() => goToLogin(navigate, location)}
                 location="domain_practice_wall"
-                title="Sign in to save your progress"
+                title="Unlock spaced repetition and saved mastery"
                 body="Practice free as a guest, no account needed. Sign in to save per-domain mastery and unlock spaced repetition, which repeats the questions you get wrong."
                 ctaLabel="Sign in to save progress"
                 noTopMargin
@@ -557,7 +557,7 @@ export function DomainPractice() {
               <UnlockCTA
                 onSignIn={() => goToLogin(navigate, location)}
                 location="practice_results"
-                title="Sign in to save your practice progress"
+                title="Don't lose this progress"
                 body="This session's results were not saved. Create a free account to track per-domain mastery and get spaced repetition focused on what you got wrong."
                 ctaLabel="Sign in to save progress"
               />
