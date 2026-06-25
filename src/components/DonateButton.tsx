@@ -9,11 +9,11 @@ interface DonateButtonProps {
 /**
  * Floating "support the developer" affordance — bottom-left, desktop only.
  *
- * Visual: a small neutral surface card with a red heart icon. The heart
- * carries the meaning ("love / support"); the surface is the same
- * `bg-bg-card` as every other card on the page, so the float doesn't
- * compete with body CTAs that own the brand orange. Hover reveals the
- * tooltip text. Hidden during a timed exam.
+ * Visual: a small neutral surface PILL with a red heart icon and a visible
+ * label (it used to be a heart that only revealed its label on hover, which
+ * made it easy to miss). The heart carries the meaning; the surface is solid
+ * `bg-bg-card` so it reads clearly without competing with the body CTAs that
+ * own the brand orange. Hidden during a timed exam.
  */
 export function DonateButton({ isExamActive }: DonateButtonProps) {
   if (isExamActive) return null
@@ -25,19 +25,14 @@ export function DonateButton({ isExamActive }: DonateButtonProps) {
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => trackEvent('donate_click', { location: 'floating' })}
-        className="flex items-center bg-bg-card/90 backdrop-blur-md text-text-primary rounded-full shadow-card hover:shadow-card-hover border border-border-hairline hover:border-text-muted/40 transition-[box-shadow,transform,border-color] duration-300 ease-out hover:-translate-y-0.5 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
-        aria-label="Support CloudCertPrep"
+        className="flex items-center gap-2 bg-bg-card text-text-primary rounded-full pl-3 pr-4 py-2 shadow-card hover:shadow-card-hover border border-border-hairline hover:border-text-muted/40 transition-[box-shadow,transform,border-color] duration-300 ease-out hover:-translate-y-0.5 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
       >
-        <div className="w-10 h-10 flex items-center justify-center">
-          <Heart
-            className="w-[18px] h-[18px] text-danger group-hover:scale-110 transition-transform duration-300 ease-out"
-            fill="currentColor"
-            aria-hidden="true"
-          />
-        </div>
-        <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs group-hover:pr-4 transition-all duration-300 ease-out font-medium text-sm">
-          Support the developer
-        </span>
+        <Heart
+          className="w-[18px] h-[18px] shrink-0 text-danger group-hover:scale-110 transition-transform duration-300 ease-out"
+          fill="currentColor"
+          aria-hidden="true"
+        />
+        <span className="whitespace-nowrap font-medium text-sm">Support this project</span>
       </a>
     </div>
   )

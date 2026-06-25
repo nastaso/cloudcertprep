@@ -1,5 +1,7 @@
 import { useTheme } from '../hooks/useTheme'
 import { Sun, Moon } from 'lucide-react'
+import { KOFI_URL } from '../lib/constants'
+import { trackEvent } from '../lib/analytics'
 
 // Inline links inside muted prose stay underlined (WCAG 1.4.1 / Lighthouse
 // link-in-text-block). Nav-column links are distinguishable as a list, so
@@ -56,6 +58,17 @@ export function Footer() {
               <li><a href="/about" className={navLink}>About</a></li>
               <li><a href="/blog" className={navLink}>Blog</a></li>
               <li><a href="/contribute" className={navLink}>Contribute</a></li>
+              <li>
+                <a
+                  href={KOFI_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent('donate_click', { location: 'footer' })}
+                  className={navLink}
+                >
+                  Support this project
+                </a>
+              </li>
             </ul>
           </nav>
 

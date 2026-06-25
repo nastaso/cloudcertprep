@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Flag, AlertCircle, LayoutGrid } from 'lucide-react'
+import { Flag, AlertCircle, LayoutGrid, Heart } from 'lucide-react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
@@ -27,6 +27,7 @@ import type { Question, OptionKey } from '../types'
 import { loadAllQuestions } from '../data/questions'
 import { shuffleAndMapQuestions, toggleMultiAnswer, getQuestionType, encodeAnswerForDb, type OptionKeyMap } from '../lib/utils'
 import { trackEvent, trackPageView } from '../lib/analytics'
+import { KOFI_URL } from '../lib/constants'
 import { MIN_VALID_EXAM_SECONDS, MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
 import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave, SIGN_OUT_SENTINEL, markIntentionalLeave } from '../lib/examGuard'
 import { useSignOut } from '../hooks/useSignOut'
@@ -829,6 +830,26 @@ export function MockExam() {
                 Retake exam
               </Button>
             </div>
+
+            {/* Quiet support ask at the highest-intent moment (just finished an
+                exam). Results screen only, never mid-exam, no orange (that is
+                for exam CTAs). One of three donate surfaces; distinct location. */}
+            <a
+              href={KOFI_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent('donate_click', { location: 'results' })}
+              className="block rounded-2xl border border-border-hairline bg-bg-card p-5 text-center transition-colors duration-200 hover:border-text-muted/40"
+            >
+              <p className="text-sm font-semibold text-text-primary">CloudCertPrep is free, and stays free.</p>
+              <p className="mt-1 text-sm text-text-muted">
+                It runs on Ko-fi tips, not ads. If this helped you study, you can buy me a coffee.
+              </p>
+              <span className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-text-primary">
+                <Heart className="w-4 h-4 text-danger" fill="currentColor" aria-hidden="true" />
+                Buy me a coffee
+              </span>
+            </a>
           </div>
         </div>
       </div>
