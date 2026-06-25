@@ -725,7 +725,7 @@ export function DomainPractice() {
             })()}
 
             {showFeedback && (
-              <Alert tone={isCorrect ? 'success' : 'danger'} className="mt-4 p-4 animate-enter">
+              <Alert tone={isCorrect ? 'success' : 'danger'} role="status" className="mt-4 p-4 animate-enter">
                 <div className={`font-semibold mb-2 flex items-center gap-2 text-sm md:text-base ${isCorrect ? 'text-success' : 'text-danger'}`}>
                   {isCorrect ? <Check className="w-4 h-4 md:w-5 md:h-5" /> : <X className="w-4 h-4 md:w-5 md:h-5" />}
                   <p>{isCorrect ? 'Correct!' : 'Incorrect'}</p>

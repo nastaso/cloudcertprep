@@ -141,7 +141,7 @@ export function ResetPassword() {
           </div>
 
           {success && (
-            <Alert tone="success">
+            <Alert tone="success" role="status">
               Password updated successfully! Redirecting to sign in...
             </Alert>
           )}

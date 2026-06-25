@@ -20,8 +20,10 @@ import { useEffect, useState, type CSSProperties } from 'react'
 import {
   ArrowRight,
   FileText,
+  RotateCw,
   Target,
 } from 'lucide-react'
+import { Alert } from './Alert'
 import { useAuth } from '../hooks/useAuth'
 import { getSupabase } from '../lib/supabase'
 import { formatRelativeDate } from '../lib/formatting'
@@ -75,6 +77,19 @@ function StatTile({ label, value, suffix }: { label: string; value: string; suff
   )
 }
 
+// Loading placeholder for a StatTile: keeps the (static) label, swaps the value
+// for a pulsing bar so a returning user never sees a flash of "0" before their
+// real numbers resolve. The pulse is neutralized under prefers-reduced-motion
+// by the global block in index.css.
+function SkeletonStatTile({ label }: { label: string }) {
+  return (
+    <div className="bg-bg-card border border-border-hairline rounded-2xl p-4 md:p-5">
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-text-muted">{label}</p>
+      <div className="mt-3 h-8 w-16 rounded bg-text-muted/15 animate-pulse" aria-hidden="true" />
+    </div>
+  )
+}
+
 function setGuestViewHidden(hidden: boolean) {
   if (typeof document === 'undefined') return
   const el = document.getElementById(GUEST_VIEW_ID)
@@ -86,6 +101,14 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
   const [domainProgress, setDomainProgress] = useState<DomainProgress[]>([])
   const [recentAttempts, setRecentAttempts] = useState<RecentAttempt[]>([])
   const [examCount, setExamCount] = useState(0)
+  // Data-fetch status for the data-dependent sections (stat strip, domain
+  // mastery, recent attempts). While loading, they render a skeleton instead
+  // of a flash of all-zeros (which reads as a wiped account to a returning
+  // user); on a hard failure they render an inline error with retry instead of
+  // a silently-empty dashboard. `reloadKey` re-runs the fetch without remount.
+  const [dataLoading, setDataLoading] = useState(true)
+  const [dataError, setDataError] = useState(false)
+  const [reloadKey, setReloadKey] = useState(0)
 
   const examMinutes = Math.round(cert.examTimeSeconds / 60)
   const certPath = `/${cert.provider}/${cert.code}`
@@ -132,17 +155,23 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
           if (progressRes.data) setDomainProgress(progressRes.data as DomainProgress[])
           if (attemptsRes.data) setRecentAttempts(attemptsRes.data as RecentAttempt[])
           if (typeof attemptsRes.count === 'number') setExamCount(attemptsRes.count)
+          // Surface an error only when BOTH queries failed; a partial failure
+          // still has useful data to show. Either way the skeleton resolves.
+          if (progressRes.error && attemptsRes.error) setDataError(true)
+          setDataLoading(false)
         })
         .catch((error: unknown) => {
           if (cancelled) return
           logError('CertDashboard.loadDashboardData', error)
+          setDataError(true)
+          setDataLoading(false)
         })
     })()
 
     return () => {
       cancelled = true
     }
-  }, [authLoading, user, cert.code])
+  }, [authLoading, user, cert.code, reloadKey])
 
   // Logged-out (or still resolving): render nothing. The static guest view
   // stays visible.
@@ -170,7 +199,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
   const bestScore = recentAttempts.reduce((max, a) => Math.max(max, a.scaled_score), 0)
 
   return (
-    <div className="max-w-6xl mx-auto pt-6 md:pt-10 pb-16 md:pb-24 space-y-8 md:space-y-10 stagger">
+    <div className="max-w-6xl mx-auto pt-6 md:pt-10 pb-16 md:pb-24 space-y-8 md:space-y-10 stagger" aria-busy={dataLoading}>
         {/* Page header: mono kicker + tracked h1 (DSv6 ladder, hero-scale) */}
         <header>
           <p className="flex items-center gap-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.22em] text-text-muted">
@@ -186,13 +215,44 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
           </h1>
         </header>
 
-        {/* Stat strip: honest, beautified big-number summary. */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-          <StatTile label="Questions practiced" value={questionsPracticed.toLocaleString()} />
-          <StatTile label="Accuracy" value={String(accuracy)} suffix="%" />
-          <StatTile label="Mock exams" value={String(examCount)} />
-          <StatTile label="Best score" value={bestScore > 0 ? String(bestScore) : '0'} suffix={bestScore > 0 ? '/1000' : undefined} />
-        </div>
+        {/* Stat strip: honest, beautified big-number summary. While the fetch
+            is in flight, show a skeleton (never a flash of all-zeros); on a
+            hard failure, an inline error with retry instead of false zeros. */}
+        {dataError ? (
+          <Alert
+            tone="danger"
+            role="alert"
+            className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <span>We could not load your latest progress. Check your connection and try again.</span>
+            <button
+              type="button"
+              onClick={() => { setDataError(false); setDataLoading(true); setReloadKey(k => k + 1) }}
+              className="inline-flex min-h-[44px] flex-shrink-0 items-center justify-center gap-2 rounded-full border border-danger/40 px-5 text-sm font-medium text-danger transition-colors duration-200 hover:bg-danger/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40"
+            >
+              <RotateCw className="h-4 w-4" aria-hidden="true" />
+              Try again
+            </button>
+          </Alert>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+            {dataLoading ? (
+              <>
+                <SkeletonStatTile label="Questions practiced" />
+                <SkeletonStatTile label="Accuracy" />
+                <SkeletonStatTile label="Mock exams" />
+                <SkeletonStatTile label="Best score" />
+              </>
+            ) : (
+              <>
+                <StatTile label="Questions practiced" value={questionsPracticed.toLocaleString()} />
+                <StatTile label="Accuracy" value={String(accuracy)} suffix="%" />
+                <StatTile label="Mock exams" value={String(examCount)} />
+                <StatTile label="Best score" value={bestScore > 0 ? String(bestScore) : '0'} suffix={bestScore > 0 ? '/1000' : undefined} />
+              </>
+            )}
+          </div>
+        )}
 
         {/* Practice Modes: the two primary actions, full-width prominent cards. */}
         <section>
@@ -249,13 +309,27 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
         </section>
 
         {/* Domain Mastery: full-width grid of domain cards (fills the page and
-            scales with the domain count). */}
+            scales with the domain count). Hidden on a hard fetch error (the
+            stat-strip alert covers it); skeleton cards while loading. */}
+        {!dataError && (
         <section>
           <h2 className="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-4">
             Domain mastery
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-            {cert.domains.map(domain => {
+            {dataLoading
+              ? cert.domains.map(domain => (
+                  <div
+                    key={domain.id}
+                    className="rounded-2xl border border-border-hairline bg-bg-card p-5 md:p-6 animate-pulse"
+                    aria-hidden="true"
+                  >
+                    <div className="h-4 w-2/3 rounded bg-text-muted/15" />
+                    <div className="mt-5 h-1.5 w-full rounded-full bg-text-muted/15" />
+                    <div className="mt-4 h-3 w-1/2 rounded bg-text-muted/10" />
+                  </div>
+                ))
+              : cert.domains.map(domain => {
               const progress = domainProgress.find(d => d.domain_id === domain.id)
               // Cap displayed figures to the current bank, and DERIVE mastery from
               // the bank-capped `correct` below rather than the stored mastery_percent.
@@ -283,6 +357,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                     aria-valuenow={mastery}
                     aria-valuemin={0}
                     aria-valuemax={100}
+                    aria-valuetext={`${mastery}% mastery`}
                     aria-label={`${domain.name} mastery`}
                   >
                     <div
@@ -298,8 +373,11 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
             })}
           </div>
         </section>
+        )}
 
-        {/* Recent Attempts: hairline list, mono scores. */}
+        {/* Recent Attempts: hairline list, mono scores. Hidden on a hard fetch
+            error; skeleton rows while loading. */}
+        {!dataError && (
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary">
@@ -319,7 +397,22 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
             )}
           </div>
 
-          {recentAttempts.length === 0 ? (
+          {dataLoading ? (
+            <div className="bg-bg-card rounded-2xl border border-border-hairline shadow-card divide-y divide-border-hairline/60">
+              {[0, 1, 2].map(i => (
+                <div key={i} className="px-5 py-4 flex items-center justify-between gap-4 animate-pulse" aria-hidden="true">
+                  <div className="flex items-center gap-4">
+                    <div className="h-5 w-12 rounded-full bg-text-muted/15" />
+                    <div className="space-y-2">
+                      <div className="h-3.5 w-20 rounded bg-text-muted/15" />
+                      <div className="h-3 w-28 rounded bg-text-muted/10" />
+                    </div>
+                  </div>
+                  <div className="h-5 w-10 rounded bg-text-muted/15" />
+                </div>
+              ))}
+            </div>
+          ) : recentAttempts.length === 0 ? (
             <div className="bg-bg-card rounded-2xl border border-border-hairline p-8 md:p-10 text-center">
               <p className="text-text-primary font-medium">No attempts yet</p>
               <p className="mt-1 text-sm text-text-muted">Take your first mock exam to start tracking your progress.</p>
@@ -362,6 +455,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
             </div>
           )}
         </section>
+        )}
     </div>
   )
 }

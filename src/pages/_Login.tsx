@@ -459,7 +459,7 @@ export function Login() {
           )}
 
           {success && (
-            <Alert tone="success">
+            <Alert tone="success" role="status">
               {success}
             </Alert>
           )}

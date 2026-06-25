@@ -8,6 +8,11 @@
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    /* Reset the per-child entrance delays too (e.g. `.stagger`), so reduced-
+       motion users never see content held at opacity:0 for up to 350ms while
+       its delay elapses. Neutralizing only duration/iteration leaves the
+       `both`-fill animations invisible during the delay window. */
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
