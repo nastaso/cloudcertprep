@@ -15,5 +15,58 @@ import AppIsland from '../components/AppIsland.tsx'
   robots="noindex"
   noscriptDirectory={true}
 >
-  <AppIsland client:only="react" />
+  {/* Static skeleton of the sign-in layout, shown until the client:only island
+      hydrates so the page never flashes an empty, footer-only body first (the
+      same #cc-island-fallback contract the practice shells use; AppIsland
+      removes it on mount). Mirrors _Login's two-column shape: marketing rail
+      (desktop) + auth card. Token-based colors so it reads in dark and light. */}
+  <div class="relative flex-1 flex flex-col min-h-[70vh]">
+    <div
+      id="cc-island-fallback"
+      class="absolute inset-0 flex items-center justify-center px-4 py-10 md:py-16"
+      role="status"
+      aria-label="Loading sign in"
+    >
+      <div class="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 md:items-center gap-8 lg:gap-12">
+        {/* Left: marketing rail skeleton (desktop only, mirrors the real column) */}
+        <div class="hidden md:flex flex-col justify-center space-y-6 md:pr-6 lg:pr-8 animate-pulse" aria-hidden="true">
+          <div class="h-9 w-3/4 rounded-lg bg-text-muted/15"></div>
+          <div class="space-y-4">
+            {[0, 1, 2, 3, 4].map(() => (
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-lg bg-text-muted/15 flex-shrink-0"></div>
+                <div class="flex-1 space-y-2 pt-1">
+                  <div class="h-3.5 w-1/2 rounded bg-text-muted/15"></div>
+                  <div class="h-3 w-4/5 rounded bg-text-muted/10"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: auth card skeleton (matches Card padding="lg") */}
+        <div class="bg-bg-card rounded-2xl shadow-card border border-border-hairline p-8 md:p-10 animate-pulse" aria-hidden="true">
+          <div class="mx-auto h-7 w-28 rounded bg-text-muted/15 mb-6"></div>
+          <div class="space-y-4">
+            <div class="h-3.5 w-14 rounded bg-text-muted/15"></div>
+            <div class="h-11 w-full rounded-lg bg-text-muted/10"></div>
+            <div class="h-3.5 w-20 rounded bg-text-muted/15"></div>
+            <div class="h-11 w-full rounded-lg bg-text-muted/10"></div>
+            <div class="h-11 w-full rounded-full bg-text-muted/20 mt-2"></div>
+          </div>
+          <div class="my-5 flex items-center gap-4">
+            <div class="flex-1 h-px bg-border-hairline"></div>
+            <div class="h-3 w-6 rounded bg-text-muted/10"></div>
+            <div class="flex-1 h-px bg-border-hairline"></div>
+          </div>
+          <div class="space-y-3">
+            <div class="h-11 w-full rounded-full bg-text-muted/10"></div>
+            <div class="h-11 w-full rounded-full bg-text-muted/10"></div>
+            <div class="h-11 w-full rounded-full bg-text-muted/10"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <AppIsland client:only="react" />
+  </div>
 </BaseLayout>
