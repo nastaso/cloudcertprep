@@ -207,11 +207,9 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
         {/* Page header: mono kicker + tracked h1 (DSv6 ladder, hero-scale) */}
         <header>
           <p className="flex items-center gap-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.22em] text-text-muted">
-            <span
-              className="h-2 w-2 rounded-full"
-              style={{ backgroundColor: levelAccent }}
-              aria-hidden="true"
-            />
+            {/* Brand DASH, not a level-colored dot: a colored status dot reads as
+                "paused/warning"; the dash matches the sitewide .kicker eyebrow. */}
+            <span className="h-0.5 w-[22px] rounded-full bg-brand" aria-hidden="true" />
             {levelLabel ? `${levelLabel} · ` : ''}Your dashboard
           </p>
           <h1 className="mt-3 text-3xl md:text-4xl font-semibold tracking-[-0.025em] text-text-primary">

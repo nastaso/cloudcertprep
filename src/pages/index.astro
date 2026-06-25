@@ -15,7 +15,7 @@ import CertTile from '../components/landing/CertTile.astro'
 import AboutCard from '../components/landing/AboutCard.astro'
 import HeroStage from '../components/landing/HeroStage.astro'
 import AuthLinkNotice from '../components/AuthLinkNotice.tsx'
-import HomeWelcome from '../components/HomeWelcome.tsx'
+import { buttonClass } from '../lib/buttonStyles'
 import Faq from '../components/Faq.astro'
 import {
   CERTIFICATIONS,
@@ -98,8 +98,11 @@ const softwareAppJsonLd = serializeJsonLd({
       copy. HOME_H1 is the single page <h1>; the lede carries the locked
       citation phrases verbatim. Community social-proof TrustLine stays
       hidden until the attempt sample is credible. */}
+  {/* Guest billboard: shown to crawlers + logged-out via cc-auth-out (CSS-hidden
+      once html.cc-authed). Carries the locked HOME_H1, and stays BEFORE the
+      welcome hero so HOME_H1 remains the page's first <h1> (citation guard). */}
   {defaultCert && (
-    <div id="home-guest-hero">
+    <div id="home-guest-hero" class="cc-auth-out">
       <HeroStage
         h1={HOME_H1}
         subline={`Pass your AWS exam with ${totalQuestions.toLocaleString('en-US')}+ exam-realistic practice questions. Every answer explained, free forever, no signup.`}
@@ -110,24 +113,43 @@ const softwareAppJsonLd = serializeJsonLd({
     </div>
   )}
 
-  {/*
-    Synchronous guest-hero pre-hide. Runs before paint (and on bfcache restore
-    via pageshow) so a signed-in visitor never sees the prerendered guest
-    billboard (with its "no signup / start free" pitch) flash before HomeWelcome
-    hydrates. Reuses the `window.__ccHasSession` helper installed by the
-    BaseLayout pre-paint script; HomeWelcome self-heals a stale token once auth
-    resolves. Also drops the header overlay (its transparent white-text state
-    assumes the dark stage is behind it; the welcome hero is on the page bg, so
-    in light theme the overlay would paint white-on-white). Mirrors the
-    cert-page guest-view pre-hide.
-  */}
+  {/* Returning-user hero: STATIC markup (props are build-time constants), shown
+      only when signed in via cc-auth-in (the BaseLayout pre-paint script toggles
+      html.cc-authed BEFORE paint). Static, not a client island, so the correct
+      hero paints in the FIRST frame with zero blank-gap / pop-in flash;
+      HeaderInteractive's cc-authed sync self-heals a stale token. NO entrance
+      animation here - a .stagger/rise would reintroduce the flash. */}
+  {defaultCert && (
+    <section class="cc-auth-in pt-10 md:pt-14 pb-12 md:pb-16">
+      <div class="max-w-6xl mx-auto px-4 md:px-8">
+        <p class="kicker">Welcome back</p>
+        <h1 class="mt-3 text-3xl md:text-4xl lg:text-5xl font-semibold tracking-[-0.025em] text-text-primary">
+          Ready when you are.
+        </h1>
+        <p class="mt-4 max-w-2xl text-base md:text-lg leading-relaxed text-text-muted">
+          Pick up your prep where you left off. Head to your dashboard, or choose a certification below.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href={`/${defaultCert.provider}/${defaultCert.code}`} class={buttonClass({ variant: 'brand', size: 'md' })}>
+            Go to your {defaultCert.shortName} dashboard
+          </a>
+          <a href="#certifications" class={buttonClass({ variant: 'ghost', size: 'md' })}>
+            Browse certifications
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* Pre-paint (also on bfcache pageshow): drop the header overlay for signed-in
+      visitors - the transparent white-text overlay assumes the dark stage behind
+      it, but the welcome hero is on the page bg. The hero swap itself is pure CSS
+      (cc-auth-*); only the overlay attribute needs JS. */}
   {defaultCert && (
     <script is:inline>
       (function () {
         function apply() {
           if (!(window.__ccHasSession && window.__ccHasSession())) return
-          var el = document.getElementById('home-guest-hero')
-          if (el) el.style.display = 'none'
           var hdr = document.getElementById('site-header')
           if (hdr) hdr.removeAttribute('data-overlay')
         }
@@ -135,17 +157,6 @@ const softwareAppJsonLd = serializeJsonLd({
         window.addEventListener('pageshow', apply)
       })()
     </script>
-  )}
-
-  {/* Returning-user hero: shown only to a resolved real session (renders null
-      for crawlers, logged-out, and the loading window). Sits where the guest
-      billboard was; the content sheet below overlaps it invisibly (same bg). */}
-  {defaultCert && (
-    <HomeWelcome
-      client:only="react"
-      dashboardHref={`/${defaultCert.provider}/${defaultCert.code}`}
-      certShortName={defaultCert.shortName}
-    />
   )}
 
   {/* Content sheet slides over the stage with one large rounded corner. */}

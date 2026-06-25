@@ -82,7 +82,11 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
           auth button. Auth-dependent pieces are always in the DOM and
           toggled by the `cc-authed` class via CSS. */}
       <div className="hidden md:flex items-center gap-5 lg:gap-7">
-        <CertSwitcher variant="desktop" initialPathname={initialPathname} />
+        {/* Desktop cert-switcher pill removed: redundant with the Practice menu
+            (which lists every cert + Dashboard from any page) and not SEO-bearing
+            (client island; every cert URL is already linked from the home grid,
+            footer, and BaseLayout SEO list). The mobile drawer keeps its switcher
+            (the only one there). */}
         <nav className="flex items-center gap-5 lg:gap-7">
           {/* Persistent primary action (P1-4): a Practice menu (every active
               cert x its practice modes), always visible in both auth states and
@@ -201,7 +205,7 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
                   className="px-4 py-3 text-text-primary hover:bg-bg-dark rounded-xl transition-colors active:scale-[0.98] font-medium flex items-center gap-3"
                 >
                   <History className="w-5 h-5 text-text-muted" aria-hidden="true" />
-                  History
+                  Exam history
                 </a>
               )}
               {user && (

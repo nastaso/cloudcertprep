@@ -48,7 +48,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li><a href="/aws/clf-c02" className={navLink}>Cloud Practitioner</a></li>
               <li><a href="/aws/aif-c01" className={navLink}>AI Practitioner</a></li>
-              <li><a href="/history" className={navLink}>Exam History</a></li>
+              <li><a href="/history" className={navLink}>Exam history</a></li>
             </ul>
           </nav>
 

@@ -78,7 +78,7 @@ export function UserMenu() {
           )}
           <a href="/history" className={itemClass}>
             <History className="h-4 w-4 shrink-0 text-text-muted" aria-hidden="true" />
-            History
+            Exam history
           </a>
           <a href="/account" className={itemClass}>
             <Settings className="h-4 w-4 shrink-0 text-text-muted" aria-hidden="true" />
