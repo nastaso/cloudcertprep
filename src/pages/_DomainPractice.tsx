@@ -617,7 +617,7 @@ export function DomainPractice() {
                   options={currentQuestion.options}
                   value={Array.isArray(userAnswer) ? userAnswer : null}
                   correctOrder={currentQuestion.correctOrder}
-                  onChange={order => setUserAnswer(order)}
+                  onChange={order => { setUserAnswer(order); setMultiAnswerWarning(false) }}
                 />
               ) : currentType === 'matching' ? (
                 <MatchingInput
@@ -626,7 +626,7 @@ export function DomainPractice() {
                   targets={currentQuestion.targets ?? {}}
                   value={Array.isArray(userAnswer) ? userAnswer : null}
                   correctMatches={currentQuestion.correctMatches}
-                  onChange={tokens => setUserAnswer(tokens)}
+                  onChange={tokens => { setUserAnswer(tokens); setMultiAnswerWarning(false) }}
                 />
               ) : (
                 Object.entries(currentQuestion.options).map(([key, value]) => {
@@ -736,7 +736,24 @@ export function DomainPractice() {
                   ) : !touched && (
                     <div className="mb-3 text-xs md:text-sm text-text-muted">Reorder the steps to set your answer.</div>
                   )}
-                  <Button onClick={() => checkAnswer()} disabled={!complete} variant="primary" fullWidth>
+                  {multiAnswerWarning && !complete && (
+                    <Alert tone="warning" role="alert" className="mb-3 text-sm">
+                      {currentType === 'matching'
+                        ? `Match all ${leftCount} items to continue. You have ${selectedCount} of ${leftCount} matched.`
+                        : 'Reorder the steps to set your answer before submitting.'}
+                    </Alert>
+                  )}
+                  {/* Enabled even when incomplete (see the multi-answer note above):
+                      clicking without finishing shows the warning instead of a
+                      silently dead button. */}
+                  <Button
+                    onClick={() => {
+                      if (!complete) { setMultiAnswerWarning(true); return }
+                      checkAnswer()
+                    }}
+                    variant="primary"
+                    fullWidth
+                  >
                     Submit answer
                   </Button>
                 </>
