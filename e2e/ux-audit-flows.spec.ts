@@ -50,7 +50,14 @@ test('P1-4: persistent Practice CTA in header on key routes', async ({ page }) =
 test('P1-4: Practice is the first item in the mobile drawer', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/')
-  await page.getByRole('button', { name: 'Toggle menu' }).click()
+  // Open robustly: under load the header island may not have attached its onClick
+  // yet, so retry the toggle until aria-expanded flips (idempotent - the guard
+  // skips the click once it is already open, so it never toggles back closed).
+  const toggle = page.getByRole('button', { name: 'Toggle menu' })
+  await expect(async () => {
+    if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click()
+    await expect(page.getByRole('dialog', { name: 'Menu' })).toBeVisible({ timeout: 1000 })
+  }).toPass({ timeout: 15000 })
   const drawer = page.getByRole('dialog', { name: 'Menu' })
   await expect(drawer.getByRole('link', { name: 'Practice' })).toBeVisible()
 })

@@ -352,14 +352,14 @@ export function Login() {
 
               <button
                 type="button"
-                onClick={() => { setSignUpSuccess(false); setIsSignUp(true); setError(''); setResendState('idle') }}
+                onClick={() => { setSignUpSuccess(false); setIsSignUp(true); setError(''); setResendState('idle'); setResendCooldown(0) }}
                 className="block w-full text-sm text-text-muted hover:text-text-primary transition-colors mb-4"
               >
                 Wrong email? Edit it
               </button>
 
               <Button
-                onClick={() => { setSignUpSuccess(false); setIsSignUp(false); setError(''); setResendState('idle') }}
+                onClick={() => { setSignUpSuccess(false); setIsSignUp(false); setError(''); setResendState('idle'); setResendCooldown(0) }}
                 variant="ghost"
                 fullWidth
               >
