@@ -148,3 +148,22 @@ test('P1-7: in-exam Sign out routes through the leave modal, then completes', as
   await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
   await expect(page.getByRole('button', { name: 'Sign in' }).first()).toBeVisible({ timeout: 15000 })
 })
+
+test('Practice menu (signed in): includes a Dashboard link per active cert', async ({ page }) => {
+  const email = mk('dashmenu')
+  await admin.auth.admin.createUser({ email, password: PW, email_confirm: true })
+  await page.goto('/login')
+  await page.locator('#email').fill(email)
+  await page.locator('#password').fill(PW)
+  await submitForm(page)
+  await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
+
+  const trigger = page.getByRole('button', { name: 'Practice', exact: true })
+  await expect(trigger).toBeVisible({ timeout: 10000 })
+  await expect(async () => {
+    if ((await trigger.getAttribute('aria-expanded')) !== 'true') await trigger.click()
+    await expect(page.locator('#site-header a[href="/aws/clf-c02"]')).toBeVisible({ timeout: 1000 })
+  }).toPass({ timeout: 15000 })
+  // one Dashboard link per active cert (the logged-out menu has none)
+  await expect(page.locator('#site-header').getByRole('link', { name: 'Dashboard' })).toHaveCount(2)
+})

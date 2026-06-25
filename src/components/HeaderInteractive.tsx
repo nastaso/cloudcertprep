@@ -7,6 +7,7 @@ import { KOFI_URL, GITHUB_REPO_URL } from '../lib/constants'
 import { guardExamLeave, SIGN_OUT_SENTINEL } from '../lib/examGuard'
 import { Menu, X, Heart, Sun, Moon, Github, History, Info, BookOpen, Home } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
+import { useExamActive } from '../hooks/useExamActive'
 import { useTheme } from '../hooks/useTheme'
 import { Button } from './Button'
 import { CertSwitcher } from './CertSwitcher'
@@ -21,10 +22,15 @@ import { PracticeMenu } from './PracticeMenu'
  * other islands on the same page without instantiating duplicate context
  * trees. See src/hooks/useAuth.ts and src/hooks/useTheme.ts.
  */
-export default function HeaderInteractive({ initialPathname, hideMobileMenu = false }: { initialPathname?: string; hideMobileMenu?: boolean }) {
+export default function HeaderInteractive({ initialPathname }: { initialPathname?: string }) {
   const { user, loading: authLoading } = useAuth()
   const signOut = useSignOut()
   const { theme, toggleTheme } = useTheme()
+  // Hide the mobile drawer ONLY while a timed exam is ACTIVE (no-distraction
+  // lockdown, matching pro exam UX). It stays available on the exam start/
+  // results screens and throughout domain practice, where the in-app leave
+  // guard warns before navigating away.
+  const examActive = useExamActive()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [drawerClosing, setDrawerClosing] = useState(false)
   const drawerRef = useRef<HTMLDivElement>(null)
@@ -55,10 +61,11 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
 
   return (
     <>
-      {/* Hamburger - mobile only. Suppressed on the exam shell
-          (hideMobileMenu) where the drawer overlaps/breaks the in-exam
-          toolbar UI on mobile. */}
-      {!hideMobileMenu && (
+      {/* Hamburger - mobile only. Hidden only while a timed exam is ACTIVE
+          (examActive), where the drawer would overlap the in-exam toolbar;
+          available everywhere else, including the exam start screen and
+          domain practice (which has its own leave guard). */}
+      {!examActive && (
         <button
           onClick={() => (mobileMenuOpen ? closeMobileMenu() : setMobileMenuOpen(true))}
           className="md:hidden inline-flex items-center justify-center w-11 h-11 text-on-header hover:bg-on-header/10 rounded-full transition-colors active:scale-[0.92]"
@@ -79,7 +86,7 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
           {/* Persistent primary action (P1-4): a Practice menu (every active
               cert x its practice modes), always visible in both auth states and
               on every route. Link+Disclosure widget; see PracticeMenu. */}
-          <PracticeMenu variant="desktop" />
+          <PracticeMenu variant="desktop" isAuthed={Boolean(user)} />
           <a
             href="/about"
             className="hdr-link hidden lg:inline-block text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
@@ -138,7 +145,7 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
           gets clipped to the 48px header bar on non-overlay pages (e.g. /login).
           Rendering into <body> escapes that containing block so the overlay +
           panel cover the full viewport everywhere. */}
-      {!hideMobileMenu && mobileMenuOpen && typeof document !== 'undefined' && createPortal(
+      {!examActive && mobileMenuOpen && typeof document !== 'undefined' && createPortal(
         <>
           <button
             type="button"
@@ -174,7 +181,7 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
             />
 
             <nav className="flex flex-col p-4 gap-1">
-              <PracticeMenu variant="mobile" onNavigate={closeMobileMenu} />
+              <PracticeMenu variant="mobile" onNavigate={closeMobileMenu} isAuthed={Boolean(user)} />
               <a
                 href="/"
                 onClick={closeMobileMenu}

@@ -62,6 +62,30 @@ test('mobile: accordion expands to cert x mode links', async ({ page }) => {
   await expect(drawer.locator('a[href="/aws/aif-c01/domain-practice"]')).toBeVisible()
 })
 
+test('logged-out: menu shows the two modes and NO Dashboard link', async ({ page }) => {
+  await page.goto('/')
+  await openDesktopMenu(page)
+  const panel = page.locator('#site-header')
+  await expect(panel.locator('a[href$="/practice-exam"]')).toHaveCount(2)
+  await expect(panel.getByRole('link', { name: 'Dashboard' })).toHaveCount(0)
+})
+
+test('mobile hamburger: shown on the exam START screen, hidden during the ACTIVE exam', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/aws/clf-c02/practice-exam')
+  const burger = page.getByRole('button', { name: 'Toggle menu' })
+  await expect(burger).toBeVisible({ timeout: 10000 })
+  await page.getByRole('button', { name: 'Start exam', exact: true }).click()
+  await page.waitForFunction(() => document.body.dataset.examActive === 'true', { timeout: 25000 })
+  await expect(burger).toHaveCount(0)
+})
+
+test('mobile hamburger: available throughout domain practice', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/aws/clf-c02/domain-practice')
+  await expect(page.getByRole('button', { name: 'Toggle menu' })).toBeVisible({ timeout: 10000 })
+})
+
 async function axeViolations(page: Page) {
   await page.addScriptTag({ path: AXE })
   const results = await page.evaluate(async () => {

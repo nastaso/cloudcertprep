@@ -1,7 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { ChevronDown, FileText, Target } from 'lucide-react'
+import { ChevronDown, FileText, Target, Gauge } from 'lucide-react'
 import { getSortedCerts } from '../data/certifications'
 import { useExamActive } from '../hooks/useExamActive'
+import type { Certification } from '../data/certifications'
 
 /**
  * Practice menu - the global entry into the funnel from any page/header.
@@ -16,22 +17,36 @@ import { useExamActive } from '../hooks/useExamActive'
  * accordion (NN/g: outperforms slide-in submenus), >=44px targets, indented
  * levels.
  *
- * Scales by DATA: every ACTIVE cert x its practice modes, in a wrapping grid;
- * a "Browse all certifications" link is the overflow valve to the home catalog
- * (which also covers coming-soon certs), so the panel never gets cramped.
+ * Auth-aware (SaaS nav best practice): signed-in users also get the cert
+ * Dashboard (their progress hub at /provider/cert), surfaced ABOVE the practice
+ * modes; signed-out users get just the two practice modes. Scales by DATA: every
+ * ACTIVE cert x its destinations in a wrapping grid, with a "Browse all
+ * certifications" overflow valve to the home catalog.
  *
- * Links are real anchors, so the in-exam anchor-capture leave-guard already
- * routes a mid-exam click through the "Leave the exam?" modal.
+ * Links are real anchors, so the in-exam / in-practice anchor-capture leave
+ * guards already route a mid-session click through a "leave?" confirm.
  */
 
-const MODES = [
+const PRACTICE_MODES = [
   { seg: 'practice-exam', label: 'Practice exam', desc: 'Full-length, timed, scored', Icon: FileText },
   { seg: 'domain-practice', label: 'Domain practice', desc: 'One domain at a time', Icon: Target },
 ] as const
 
-export function PracticeMenu({ variant, onNavigate }: { variant: 'desktop' | 'mobile'; onNavigate?: () => void }) {
+type MenuItem = { href: string; label: string; desc: string; Icon: typeof FileText }
+
+function itemsFor(cert: Certification, isAuthed: boolean): MenuItem[] {
+  const modes: MenuItem[] = PRACTICE_MODES.map(m => ({
+    href: `/${cert.provider}/${cert.code}/${m.seg}`, label: m.label, desc: m.desc, Icon: m.Icon,
+  }))
+  // Signed-in: the cert dashboard (progress + mastery) is the returning-user hub.
+  return isAuthed
+    ? [{ href: `/${cert.provider}/${cert.code}`, label: 'Dashboard', desc: 'Your progress and mastery', Icon: Gauge }, ...modes]
+    : modes
+}
+
+export function PracticeMenu({ variant, isAuthed = false, onNavigate }: { variant: 'desktop' | 'mobile'; isAuthed?: boolean; onNavigate?: () => void }) {
   const certs = getSortedCerts().filter(c => c.status === 'active')
-  // Locked while an exam is in progress, consistent with CertSwitcher: the
+  // Locked while a timed exam is in progress, consistent with CertSwitcher: the
   // user is already practicing, the exam page's relative-z header would let its
   // sticky toolbar cover an open dropdown, and the leave-guard still catches any
   // other in-exam navigation.
@@ -98,10 +113,10 @@ export function PracticeMenu({ variant, onNavigate }: { variant: 'desktop' | 'mo
                       <span className="ml-1.5 text-xs font-normal text-text-muted">{cert.name}</span>
                     </p>
                     <ul className="list-none p-0 m-0 space-y-0.5">
-                      {MODES.map(({ seg, label, desc, Icon }) => (
-                        <li key={seg}>
+                      {itemsFor(cert, isAuthed).map(({ href, label, desc, Icon }) => (
+                        <li key={href}>
                           <a
-                            href={`/${cert.provider}/${cert.code}/${seg}`}
+                            href={href}
                             onClick={() => { setOpen(false); onNavigate?.() }}
                             className="flex items-start gap-2.5 rounded-lg px-2 py-2 hover:bg-bg-card-hover transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                           >
@@ -151,10 +166,10 @@ export function PracticeMenu({ variant, onNavigate }: { variant: 'desktop' | 'mo
           {certs.map(cert => (
             <div key={cert.code} className="mt-0.5">
               <p className="px-4 pt-2 pb-0.5 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">{cert.shortName}</p>
-              {MODES.map(({ seg, label, Icon }) => (
+              {itemsFor(cert, isAuthed).map(({ href, label, Icon }) => (
                 <a
-                  key={seg}
-                  href={`/${cert.provider}/${cert.code}/${seg}`}
+                  key={href}
+                  href={href}
                   onClick={onNavigate}
                   className="ml-3 pl-5 pr-4 py-2.5 min-h-11 text-text-primary hover:bg-bg-dark rounded-xl transition-colors active:scale-[0.98] flex items-center gap-3 text-sm border-l border-border-hairline"
                 >

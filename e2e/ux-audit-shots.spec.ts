@@ -59,4 +59,25 @@ for (const theme of ['light', 'dark'] as const) {
     await page.waitForTimeout(900)
     await page.screenshot({ path: `${DIR}/dashboard-${theme}.png`, fullPage: true })
   })
+
+  test(`shots/${theme}: signed-in practice menu (with Dashboard)`, async ({ page }) => {
+    await page.addInitScript((t) => localStorage.setItem('cloudcertprep_theme', t), theme)
+    await page.setViewportSize({ width: 1280, height: 820 })
+    const email = `cc-e2e-shot-menu-${theme}-${Date.now()}@example.com`
+    await admin.auth.admin.createUser({ email, password: PW, email_confirm: true })
+    await page.goto('/login')
+    await page.locator('#email').fill(email)
+    await page.locator('#password').fill(PW)
+    const btn = page.locator('form button[type="submit"]')
+    await expect(btn).toBeEnabled({ timeout: 25000 })
+    await btn.click()
+    await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
+    const trigger = page.getByRole('button', { name: 'Practice', exact: true })
+    await expect(async () => {
+      if ((await trigger.getAttribute('aria-expanded')) !== 'true') await trigger.click()
+      await expect(page.locator('#site-header a[href="/aws/clf-c02"]')).toBeVisible({ timeout: 1000 })
+    }).toPass({ timeout: 15000 })
+    await page.waitForTimeout(300)
+    await page.screenshot({ path: `${DIR}/practice-menu-signedin-${theme}.png` })
+  })
 }

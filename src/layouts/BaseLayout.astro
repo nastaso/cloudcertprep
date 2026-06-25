@@ -36,13 +36,6 @@ interface Props {
    */
   headerSticky?: boolean
   /**
-   * Hide the mobile hamburger/drawer in the Header. Default false (drawer
-   * shown site-wide). The exam shells (practice-exam, domain-practice) pass
-   * true because the drawer overlaps the in-exam toolbar; everywhere else the
-   * drawer is the only mobile navigation, so it must stay visible.
-   */
-  headerHideMobileMenu?: boolean
-  /**
    * Render the no-JS site-directory fallback block. Default false: prerendered
    * marketing/content pages are fully readable without JS, so the directory
    * would only duplicate content (and a second raw-HTML <h1>) for crawlers.
@@ -65,7 +58,6 @@ const {
   headerShowNav = true,
   headerOverlay = false,
   headerSticky = true,
-  headerHideMobileMenu = false,
   noscriptDirectory = false,
 } = Astro.props
 
@@ -247,7 +239,7 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
         Skip to main content
       </a>
 
-      {showChrome && <Header showNav={headerShowNav} sticky={headerSticky} hideMobileMenu={headerHideMobileMenu} overlay={headerOverlay} />}
+      {showChrome && <Header showNav={headerShowNav} sticky={headerSticky} overlay={headerOverlay} />}
 
       <main id="main" class="flex-1 flex flex-col">
         <slot />
