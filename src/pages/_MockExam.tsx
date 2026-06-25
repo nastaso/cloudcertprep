@@ -85,22 +85,16 @@ function ExamQuestionGrid({
   currentIndex,
   onSelect,
   variant = 'sidebar',
-  filter = 'all',
 }: {
   questions: Question[]
   answers: Map<number, QuestionState>
   currentIndex: number
   onSelect: (idx: number) => void
-  variant?: 'sidebar' | 'modal' | 'review'
-  /** Pre-submit review filter: show only unanswered or only flagged cells. */
-  filter?: 'all' | 'unanswered' | 'flagged'
+  variant?: 'sidebar' | 'modal'
 }) {
-  // 'review' wraps compact fixed cells (like a real exam review grid) so 65
-  // questions stay scannable in a wide panel; 'modal' fills the narrow mobile
-  // sheet with a 5-col grid; 'sidebar' is the slim in-exam navigator.
-  const containerClass = variant === 'review'
-    ? 'flex flex-wrap gap-2'
-    : `grid grid-cols-5 gap-2${variant === 'modal' ? ' max-h-96 overflow-y-auto' : ''}`
+  // 'modal' fills the narrow mobile sheet with a 5-col grid; 'sidebar' is the
+  // slim in-exam navigator.
+  const containerClass = `grid grid-cols-5 gap-2${variant === 'modal' ? ' max-h-96 overflow-y-auto' : ''}`
   const cellSize = variant === 'modal' ? 'w-full aspect-square' : 'w-10 h-10'
   return (
     <div className={containerClass}>
@@ -108,8 +102,6 @@ function ExamQuestionGrid({
         const state = answers.get(idx)
         const isAnswered = isQuestionAnswered(state)
         const isFlagged = state?.flagged || false
-        if (filter === 'unanswered' && isAnswered) return null
-        if (filter === 'flagged' && !isFlagged) return null
         const isCurrent = idx === currentIndex
         const stateLabel = [
           isCurrent ? 'current' : null,
@@ -153,12 +145,6 @@ export function MockExam() {
   const [answers, setAnswers] = useState<Map<number, QuestionState>>(new Map())
   const [showEndModal, setShowEndModal] = useState(false)
   const [showQuestionNav, setShowQuestionNav] = useState(false)
-  // Pre-submit review: a navigable summary of every question (answered /
-  // unanswered / flagged) shown before the final submit confirm. It is a VIEW
-  // within screen==='exam' (not a separate screen) so the timer keeps running
-  // and the leave-guard stays armed. Time-up still force-submits regardless.
-  const [reviewing, setReviewing] = useState(false)
-  const [reviewPreFilter, setReviewPreFilter] = useState<'all' | 'unanswered' | 'flagged'>('all')
   // Pending in-app leave target. When set, the custom "Leave the exam?" modal
   // is shown (replacing the un-stylable native dialog for intercepted nav).
   const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null)
@@ -371,8 +357,6 @@ export function MockExam() {
       setOptionKeyMaps(keyMaps)
       setAnswers(new Map())
       setCurrentIndex(0)
-      setReviewing(false)
-      setReviewPreFilter('all')
       submittingRef.current = false // re-arm the dup-submit guard for this fresh attempt
       setScreen('exam')
       setStartTime(Date.now())
@@ -871,7 +855,7 @@ export function MockExam() {
           <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
               <span className="text-text-primary text-sm md:text-base font-medium whitespace-nowrap">
-                {reviewing ? 'Review your answers' : `Question ${currentIndex + 1} of ${questions.length}`}
+                Question {currentIndex + 1} of {questions.length}
               </span>
               <span className="text-text-muted text-xs hidden sm:inline whitespace-nowrap">
                 {answeredCount} answered
@@ -887,15 +871,9 @@ export function MockExam() {
                 {formatTime(timer.seconds)}
               </div>
               <TimerAnnouncer seconds={timer.seconds} />
-              {!reviewing && (
-                <Button
-                  onClick={() => { setReviewPreFilter('all'); setReviewing(true); window.scrollTo(0, 0) }}
-                  variant="secondary"
-                  size="sm"
-                >
-                  Review
-                </Button>
-              )}
+              <Button onClick={() => setShowEndModal(true)} variant="secondary" size="sm">
+                End exam
+              </Button>
             </div>
           </div>
           {/* Answered-progress indicator */}
@@ -907,82 +885,6 @@ export function MockExam() {
           </div>
         </div>
 
-        {reviewing ? (
-          <div className="pt-8 pb-10 px-4 md:px-8">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-xl md:text-2xl font-semibold text-text-primary mb-2">Review before you submit</h2>
-              <p className="text-text-muted text-sm md:text-base mb-3">
-                Check anything you skipped or flagged before you submit. Select a question to jump back to it; your answers are kept.
-              </p>
-              <p className="text-sm mb-6 text-text-muted">
-                <span className="text-text-primary font-medium tabular-nums">{answeredCount}</span> of {questions.length} answered
-                {' · '}
-                <span className="text-text-primary font-medium tabular-nums">{flaggedCount}</span> flagged
-                {questions.length - answeredCount > 0 && (
-                  <>
-                    {' · '}
-                    <span className="text-warning font-medium tabular-nums">{questions.length - answeredCount}</span> unanswered
-                  </>
-                )}
-              </p>
-
-              {questions.length - answeredCount > 0 && (
-                <p className="text-warning text-sm mb-5" role="alert">
-                  Unanswered questions are marked incorrect when you submit.
-                </p>
-              )}
-
-              <div className="flex flex-wrap gap-2 mb-4" role="group" aria-label="Filter questions">
-                {([['all', 'All'], ['unanswered', 'Unanswered'], ['flagged', 'Flagged']] as const).map(([key, label]) => {
-                  const count = key === 'all' ? questions.length : key === 'unanswered' ? questions.length - answeredCount : flaggedCount
-                  return (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => setReviewPreFilter(key)}
-                      aria-pressed={reviewPreFilter === key}
-                      className={filterChipClass({ active: reviewPreFilter === key })}
-                    >
-                      {label} <span className="tabular-nums opacity-80">{count}</span>
-                    </button>
-                  )
-                })}
-              </div>
-
-              {reviewPreFilter === 'unanswered' && questions.length - answeredCount === 0 ? (
-                <p className="bg-bg-card rounded-xl p-6 text-center text-sm text-text-muted shadow-card">You answered every question.</p>
-              ) : reviewPreFilter === 'flagged' && flaggedCount === 0 ? (
-                <p className="bg-bg-card rounded-xl p-6 text-center text-sm text-text-muted shadow-card">No questions flagged for review.</p>
-              ) : (
-                <div className="bg-bg-card rounded-xl p-4 shadow-card">
-                  <ExamQuestionGrid
-                    questions={questions}
-                    answers={answers}
-                    currentIndex={currentIndex}
-                    filter={reviewPreFilter}
-                    variant="review"
-                    onSelect={(idx) => { goToQuestion(idx); setReviewing(false); window.scrollTo(0, 0) }}
-                  />
-                </div>
-              )}
-
-              <div className="flex flex-wrap gap-x-5 gap-y-2 mt-4 text-xs text-text-muted">
-                <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-brand/30 inline-block" aria-hidden="true" />Answered</span>
-                <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-bg-dark border border-text-muted/30 inline-block" aria-hidden="true" />Unanswered</span>
-                <span className="flex items-center gap-1.5"><Flag className="w-3 h-3 text-warning fill-warning" aria-hidden="true" />Flagged</span>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3 mt-8">
-                <Button onClick={() => setReviewing(false)} variant="secondary" className="flex-1">
-                  Back to questions
-                </Button>
-                <Button onClick={() => setShowEndModal(true)} variant="primary" className="flex-1">
-                  Submit exam
-                </Button>
-              </div>
-            </div>
-          </div>
-        ) : (
         <div className="pt-6 pb-6 px-4 md:px-8">
           <div className="max-w-7xl mx-auto flex gap-6">
             {/* Main Content */}
@@ -1118,8 +1020,8 @@ export function MockExam() {
                 Previous
               </Button>
               {currentIndex === questions.length - 1 ? (
-                <Button onClick={() => { setReviewPreFilter('all'); setReviewing(true); window.scrollTo(0, 0) }} variant="primary" className="flex-1">
-                  Review answers
+                <Button onClick={() => setShowEndModal(true)} variant="primary" className="flex-1">
+                  Submit exam
                 </Button>
               ) : (
                 <Button onClick={nextQuestion} variant="secondary" className="flex-1">
@@ -1143,7 +1045,6 @@ export function MockExam() {
             </div>
           </div>
         </div>
-        )}
 
         {/* Question Navigation Modal (Mobile/Tablet) */}
         <Modal isOpen={showQuestionNav} title="Questions" onClose={() => setShowQuestionNav(false)}>
@@ -1162,9 +1063,11 @@ export function MockExam() {
           </div>
         </Modal>
 
-        {/* Final submit confirm (reached from the review screen). Distinct
-            button label ("Submit for grading") so it never collides with the
-            review screen's "Submit exam" behind the overlay. */}
+        {/* Final submit confirm + summary - opened by the toolbar "End exam"
+            and the last-question "Submit exam" buttons. Shows answered/flagged/
+            unanswered counts + the unanswered warning before the irreversible
+            "Submit for grading". (Replaces the removed review screen, whose job
+            the question sidebar/modal navigator already covered.) */}
         <Modal isOpen={showEndModal} title="Ready to submit?" onClose={() => setShowEndModal(false)}>
           <div className="space-y-4">
             <p className="text-text-primary">You have answered <span className="font-bold">{answeredCount}</span> of {questions.length} questions.</p>
