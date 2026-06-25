@@ -59,13 +59,11 @@ test('P1-6 edge: expired pending (>24h) does NOT rehydrate', async ({ page }) =>
   await expect(page.getByText(INFO)).toHaveCount(0)
 })
 
-test('P1-4 edge: clicking Practice during an exam opens the leave modal', async ({ page }) => {
+test('P1-4 edge: the Practice menu is locked during an exam (like cert switching)', async ({ page }) => {
   await page.goto('/aws/clf-c02/practice-exam')
   await page.getByRole('button', { name: 'Start exam', exact: true }).click()
   await page.waitForFunction(() => document.body.dataset.examActive === 'true', { timeout: 25000 })
-  await page.getByRole('link', { name: 'Practice', exact: true }).first().click()
-  await expect(page.getByText('Leave the exam?')).toBeVisible()
-  await page.getByRole('button', { name: 'Stay in exam' }).click()
+  await expect(page.getByRole('button', { name: 'Practice', exact: true }).first()).toBeDisabled()
 })
 
 test('P1-5: progress bar advances when the current question is answered', async ({ page }) => {

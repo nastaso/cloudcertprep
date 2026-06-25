@@ -475,7 +475,6 @@ export function Login() {
             fullWidth
             loading={loading}
             loadingText="Loading..."
-            aria-describedby={hasCaptcha && !captchaToken ? 'captcha-pending' : undefined}
             disabled={
               (hasCaptcha && !captchaToken) ||
               (isSignUp && !acceptedTerms) ||
@@ -485,11 +484,6 @@ export function Login() {
           >
             {isForgotPassword ? 'Send reset link' : isSignUp ? 'Sign up' : 'Sign in'}
           </Button>
-          {hasCaptcha && !captchaToken && (
-            <p id="captcha-pending" className="mt-2 text-center text-sm text-text-muted">
-              Verifying you are human...
-            </p>
-          )}
         </form>
 
         {!isSignUp && !isForgotPassword && (

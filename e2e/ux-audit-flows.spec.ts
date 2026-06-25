@@ -38,12 +38,12 @@ test('P0-2: verified=1 welcome card (direct, no auth)', async ({ page }) => {
   await expect(page.getByText('Your email is confirmed')).toBeVisible({ timeout: 10000 })
 })
 
-test('P1-4: persistent Practice CTA in header on key routes', async ({ page }) => {
+test('P1-4: persistent Practice menu trigger in header on key routes', async ({ page }) => {
   for (const route of ['/', '/about', '/blog', '/aws/clf-c02']) {
     await page.goto(route)
-    const practice = page.getByRole('link', { name: 'Practice', exact: true }).first()
-    await expect(practice).toBeVisible({ timeout: 10000 })
-    await expect(practice).toHaveAttribute('href', '/aws/clf-c02/practice-exam')
+    // Practice is now a disclosure menu (button) present on every route; the
+    // ux-audit-practice-menu spec covers its contents.
+    await expect(page.getByRole('button', { name: 'Practice', exact: true }).first()).toBeVisible({ timeout: 10000 })
   }
 })
 
@@ -59,7 +59,7 @@ test('P1-4: Practice is the first item in the mobile drawer', async ({ page }) =
     await expect(page.getByRole('dialog', { name: 'Menu' })).toBeVisible({ timeout: 1000 })
   }).toPass({ timeout: 15000 })
   const drawer = page.getByRole('dialog', { name: 'Menu' })
-  await expect(drawer.getByRole('link', { name: 'Practice' })).toBeVisible()
+  await expect(drawer.getByRole('button', { name: 'Practice', exact: true })).toBeVisible()
 })
 
 test('P1-6: guest result rehydrates after the login round-trip (marker set)', async ({ page }) => {
