@@ -180,6 +180,7 @@ export function History() {
   const { user, loading: authLoading } = useAuth()
   const { goCertExam } = useCertNavigate()
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [attempts, setAttempts] = useState<ExamAttempt[]>([])
 
   // Multi-cert: no single "active" cert. Title and meta are platform-level.
@@ -216,6 +217,7 @@ export function History() {
 
   async function loadHistory() {
     try {
+      setLoadError(false)
       if (!user?.id) {
         setAttempts([])
         setLoading(false)
@@ -233,6 +235,9 @@ export function History() {
       setAttempts(data || [])
     } catch (error: unknown) {
       logError('History.loadHistory', error)
+      // Surface the failure instead of falling through to the 'no attempts yet'
+      // empty state, which would tell a returning user their history is gone.
+      setLoadError(true)
     } finally {
       setLoading(false)
     }
@@ -562,7 +567,19 @@ export function History() {
                 </div>
               )}
 
-              {filteredAttempts.length === 0 ? (
+              {loadError ? (
+                <Card padding="lg" className="text-center !py-12">
+                  <p className="text-text-primary font-medium">We could not load your exam history.</p>
+                  <p className="mt-1 text-sm text-text-muted">Check your connection and try again.</p>
+                  <Button
+                    onClick={() => { setLoading(true); void loadHistory() }}
+                    variant="secondary"
+                    className="mt-6"
+                  >
+                    Try again
+                  </Button>
+                </Card>
+              ) : filteredAttempts.length === 0 ? (
                 <Card padding="lg" className="text-center !py-12">
                   <p className="text-text-muted text-lg">
                     {filter === 'all' && certFilter === CERT_FILTER_ALL

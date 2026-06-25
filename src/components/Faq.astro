@@ -76,12 +76,15 @@ const chevron = '<polyline points="6 9 12 15 18 9"></polyline>'
 
 <section aria-labelledby={headingId} class="mt-8 md:mt-12 max-w-3xl mx-auto">
   <script type="application/ld+json" set:html={faqJsonLd} />
-  <div class="text-center mb-10 md:mb-12">
+  {/* Left-aligned at the same H2 scale + left kicker as every other section
+      header on the page (was centered + oversized via font-display, which read
+      as a different template and out-ranked the core sections). */}
+  <div class="mb-8 md:mb-10">
     <p class="kicker" aria-hidden="true">FAQ</p>
-    <h2 id={headingId} class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary">
+    <h2 id={headingId} class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary">
       {headingLabel}
     </h2>
-    <p class="mt-4 text-base leading-relaxed text-text-muted max-w-xl mx-auto [text-wrap:balance]">
+    <p class="mt-3 text-base leading-relaxed text-text-muted max-w-2xl [text-wrap:pretty]">
       Something not covered? <a href="https://github.com/nastaso/cloudcertprep/issues" target="_blank" rel="noopener noreferrer" class="text-link underline underline-offset-2 hover:text-link/80">Open an issue</a> and we will answer it.
     </p>
   </div>

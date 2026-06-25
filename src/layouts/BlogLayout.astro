@@ -18,6 +18,7 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 import Breadcrumb from '../components/Breadcrumb.astro'
 import { SITE_URL } from '../lib/seo-data'
 import { serializeJsonLd } from '../lib/jsonld'
+import { buttonClass } from '../lib/buttonStyles'
 
 interface BlogFrontmatter {
   title: string
@@ -209,6 +210,25 @@ const updatedDisplay = data.updated
             </aside>
           )}
         </div>
+
+        {/* End-of-post CTA: close the funnel (a post's job is to push readers
+            into practice) and fill the dead band before the footer. Aligned to
+            the prose column (lg:mx-0 under the wide TOC frame). */}
+        <aside class={`mt-14 md:mt-20 max-w-[68ch] mx-auto${showToc ? ' lg:mx-0' : ''}`}>
+          <div class="rounded-2xl border border-border-hairline bg-bg-card shadow-card p-6 md:p-8 text-center">
+            <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary">Ready to put this into practice?</h2>
+            <p class="mt-2 text-text-muted">Free, full-length practice exams with every answer explained. No signup required.</p>
+            <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a href="/aws/clf-c02/practice-exam" class={buttonClass({ variant: 'brand', size: 'lg' })}>Start a CLF-C02 practice exam</a>
+              <a href="/aws/aif-c01/practice-exam" class={buttonClass({ variant: 'secondary', size: 'lg' })}>Try AIF-C01</a>
+            </div>
+          </div>
+          <div class="mt-6 text-center">
+            <a href="/blog" class="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-primary transition-colors">
+              <span aria-hidden="true">←</span> Back to all posts
+            </a>
+          </div>
+        </aside>
       </div>
     </div>
   </article>

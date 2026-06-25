@@ -440,26 +440,22 @@ const levelAccentUi = LEVEL_ACCENT_UI_HEX[cert.level]
                 />
               ))}
             </div>
-            <div class="flex flex-wrap gap-3 pt-2">
-              <Button href={domainPracticeHref} variant="brand" arrow>
-                Practice {domain.name}
-              </Button>
-              <Button href={practiceExamHref} variant="secondary">
-                Take a full mock exam
-              </Button>
-            </div>
           </section>
         )}
 
-        {/* 7b. Repeat primary CTA below the fold so there is a conversion path
-            above and below the sample questions. */}
+        {/* Single closing CTA below the samples (was two back-to-back rows: an
+            inline button pair + this card). Both practice paths live in the one
+            prominent card so the conversion point isn't duplicated. */}
         <Card as="section" padding="md" class="text-center">
           <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-4">
             Ready to practice {domain.name}?
           </h2>
-          <div class="flex justify-center">
+          <div class="flex flex-col sm:flex-row justify-center gap-3">
             <Button href={domainPracticeHref} variant="brand" size="lg" arrow>
               Start practicing
+            </Button>
+            <Button href={practiceExamHref} variant="secondary" size="lg">
+              Take a full mock exam
             </Button>
           </div>
         </Card>

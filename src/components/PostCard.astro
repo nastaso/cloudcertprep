@@ -30,12 +30,15 @@ const dateDisplay = data.date.toLocaleDateString('en-GB', {
 
 {/* DSv6: hairline card, mono date, quiet tag chips (brand colour is rare —
     orange tags violated the accent budget). Hover = border/surface only. */}
-<article class="bg-bg-card border border-border-hairline rounded-2xl p-5 md:p-6 hover:border-text-muted/40 hover:bg-bg-card-hover transition-[border-color,background-color] duration-200">
+{/* `relative` + a stretched title link (before:absolute inset-0) make the WHOLE
+    card clickable, so the card-wide hover state matches a real click target,
+    while the <a> stays on the <h2> for SEO/a11y. */}
+<article class="relative bg-bg-card border border-border-hairline rounded-2xl p-5 md:p-6 hover:border-text-muted/40 hover:bg-bg-card-hover transition-[border-color,background-color] duration-200">
   <p class="font-mono text-[12px] tracking-wide text-text-muted">
     <time datetime={dateIso}>{dateDisplay}</time>
   </p>
   <h2 class="mt-1.5 text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary">
-    <a href={href} class="hover:text-text-primary transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card">{data.title}</a>
+    <a href={href} class="before:absolute before:inset-0 hover:text-text-primary transition-colors rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card">{data.title}</a>
   </h2>
   <p class="mt-2 text-sm md:text-base text-text-muted leading-relaxed">{data.description}</p>
   {data.tags && data.tags.length > 0 && (
