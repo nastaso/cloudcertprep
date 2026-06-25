@@ -28,7 +28,8 @@ import { loadAllQuestions } from '../data/questions'
 import { shuffleAndMapQuestions, toggleMultiAnswer, getQuestionType, encodeAnswerForDb, type OptionKeyMap } from '../lib/utils'
 import { trackEvent, trackPageView } from '../lib/analytics'
 import { MIN_VALID_EXAM_SECONDS, MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
-import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave } from '../lib/examGuard'
+import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave, SIGN_OUT_SENTINEL, markIntentionalLeave } from '../lib/examGuard'
+import { useSignOut } from '../hooks/useSignOut'
 import { storePendingAttempt, consumePendingAttemptSavedNotice, PENDING_ATTEMPT_SAVED_EVENT, peekPendingAttempt, type PendingAttempt } from '../lib/pendingAttempt'
 import { getProviderLabel } from '../data/certifications'
 
@@ -133,6 +134,7 @@ export function MockExam() {
   const location = useLocation()
   const { goHome } = useCertNavigate()
   const { user } = useAuth()
+  const signOut = useSignOut()
   const cert = useCert()
   const [screen, setScreen] = useState<ExamScreen>('start')
   const [questions, setQuestions] = useState<Question[]>([])
@@ -1087,7 +1089,17 @@ export function MockExam() {
                 Stay in exam
               </Button>
               <Button
-                onClick={() => { if (pendingLeaveUrl) confirmExamLeave(pendingLeaveUrl) }}
+                onClick={() => {
+                  if (pendingLeaveUrl === SIGN_OUT_SENTINEL) {
+                    // P1-7 (Alex B4): confirming the leave COMPLETES the sign-out.
+                    // Mark the unload intentional so the native beforeunload net
+                    // stays silent, then let useSignOut do its own redirect.
+                    markIntentionalLeave()
+                    void signOut()
+                  } else if (pendingLeaveUrl) {
+                    confirmExamLeave(pendingLeaveUrl)
+                  }
+                }}
                 variant="danger"
                 className="flex-1"
               >

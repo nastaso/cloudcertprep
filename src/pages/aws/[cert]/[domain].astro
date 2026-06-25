@@ -314,7 +314,7 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
         </h1>
 
         <p class="mt-5 text-lg md:text-xl leading-relaxed text-[#9AA6B2]">
-          {totalDomainQuestions}+ free practice questions for the {domain.name} domain of the {cert.name} ({cert.shortName}) exam, each with a detailed explanation. Practise right in your browser.
+          {totalDomainQuestions}+ free practice questions for the {domain.name} domain of the {cert.name} ({cert.shortName}) exam, each with a detailed explanation. Practice right in your browser.
         </p>
 
         <div class="mt-8 flex flex-wrap items-center gap-4">
@@ -359,7 +359,7 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
             The <strong class="text-text-primary">{domain.name}</strong> domain of the {cert.name} ({cert.shortName}) exam covers {domain.blurb ?? `the ${domain.name.toLowerCase()} area of the exam`}.{domain.weight && domain.taskRange ? ` It makes up ${domain.weight}% of your exam score (task statements ${domain.taskRange} in the official AWS exam guide).` : ''} These {primaryInSentence} match the real exam: the same scenario style and the same difficulty. Every question comes with a full explanation of why the right answer is right and why each wrong option is wrong.
           </p>
           <p>
-            Practise free, with no signup. Every question is original and open source, so you can check it against the official AWS exam guide and documentation. You never have to trust a hidden answer key. There are {totalDomainQuestions}+ questions in this domain alone, and {totalCertQuestions.toLocaleString('en-US')}+ across the whole {cert.shortName} bank.{secondaryList ? ` If you searched for ${secondaryList}, these questions cover the same ground.` : ''} Create a free account to unlock spaced repetition: questions you get wrong come back more often, so your weakest topics get the most practice.
+            Practice free, with no signup. Every question is original and open source, so you can check it against the official AWS exam guide and documentation. You never have to trust a hidden answer key. There are {totalDomainQuestions}+ questions in this domain alone, and {totalCertQuestions.toLocaleString('en-US')}+ across the whole {cert.shortName} bank.{secondaryList ? ` If you searched for ${secondaryList}, these questions cover the same ground.` : ''} Create a free account to unlock spaced repetition: questions you get wrong come back more often, so your weakest topics get the most practice.
           </p>
           <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary pt-2">
             How to use these {primaryInSentence}

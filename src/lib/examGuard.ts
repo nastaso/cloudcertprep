@@ -16,6 +16,13 @@
 let leaveHandler: ((url: string) => void) | null = null
 let intentionalLeave = false
 
+/**
+ * Reserved leave target meaning "sign the user out" rather than navigate to a
+ * URL. Passed through the same guardExamLeave / leaveHandler string channel so
+ * this module stays framework-agnostic; the exam island branches on it (P1-7).
+ */
+export const SIGN_OUT_SENTINEL = '__signout__'
+
 /** True while a timed exam is running (mirrors the body dataset flag the exam island sets). */
 export function isExamActive(): boolean {
   return typeof document !== 'undefined' && document.body.dataset.examActive === 'true'
@@ -58,4 +65,13 @@ export function confirmExamLeave(url: string): void {
 /** True when the current unload was triggered by a confirmed in-app leave. */
 export function isIntentionalLeave(): boolean {
   return intentionalLeave
+}
+
+/**
+ * Mark the next unload intentional WITHOUT navigating. Used when the confirmed
+ * action performs its own redirect (e.g. sign-out calls window.location.assign),
+ * so the beforeunload net stays silent for that navigation (P1-7).
+ */
+export function markIntentionalLeave(): void {
+  intentionalLeave = true
 }

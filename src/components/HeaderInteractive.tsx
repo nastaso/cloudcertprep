@@ -4,7 +4,7 @@ import { useFocusTrap } from '../hooks/useFocusTrap'
 import { useSignOut } from '../hooks/useSignOut'
 import { trackEvent } from '../lib/analytics'
 import { KOFI_URL, GITHUB_REPO_URL } from '../lib/constants'
-import { guardExamLeave } from '../lib/examGuard'
+import { guardExamLeave, SIGN_OUT_SENTINEL } from '../lib/examGuard'
 import { Menu, X, Heart, Sun, Moon, Github, History, Info, BookOpen, Home, Target } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
@@ -124,7 +124,7 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
             Use the shared <Button> component so the system focus-visible ring
             and transition apply (a11y findings 3 + 4). */}
         <Button
-          onClick={signOut}
+          onClick={() => { if (!guardExamLeave(SIGN_OUT_SENTINEL)) void signOut() }}
           variant="secondary"
           size="sm"
           className="cc-auth-in whitespace-nowrap"
@@ -253,9 +253,9 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
             <div className="p-4 border-t border-text-muted/20">
               {user ? (
                 <Button
-                  onClick={async () => {
+                  onClick={() => {
                     closeMobileMenu()
-                    await signOut()
+                    if (!guardExamLeave(SIGN_OUT_SENTINEL)) void signOut()
                   }}
                   variant="secondary"
                   fullWidth

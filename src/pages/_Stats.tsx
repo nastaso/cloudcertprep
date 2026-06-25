@@ -191,7 +191,7 @@ export function Stats() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="px-2 py-1 rounded text-xs font-medium bg-success/20 text-success">ACTIVE</span>
+                      <span className="px-2 py-0.5 rounded-full font-mono text-[11px] font-semibold uppercase tracking-wide bg-success/15 text-success">Active</span>
                       <h2 className="text-lg md:text-xl font-semibold text-text-primary">{cert.shortName}</h2>
                     </div>
                     <p className="text-text-muted text-xs md:text-sm">{cert.name}</p>

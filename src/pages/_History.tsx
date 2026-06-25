@@ -524,7 +524,7 @@ export function History() {
                 <p className="text-text-primary font-semibold tracking-[-0.01em]">Track your progress</p>
               </div>
               <p className="text-text-muted text-sm mb-5 max-w-md">
-                Sign in to track your practice exam history and see your domain mastery improve over time. Practising as a guest works without an account.
+                Sign in to track your practice exam history and see your domain mastery improve over time. Practicing as a guest works without an account.
               </p>
               <Button onClick={() => goToLogin(navigate, location)} variant="primary" size="md">
                 Sign in
