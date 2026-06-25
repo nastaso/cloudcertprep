@@ -26,6 +26,7 @@ import SampleQuestionCard from '../../../components/SampleQuestionCard.astro'
 import GitHubPermalinkCallout from '../../../components/GitHubPermalinkCallout.astro'
 import Faq from '../../../components/Faq.astro'
 import PostCard from '../../../components/PostCard.astro'
+import DomainProgressStrip from '../../../components/DomainProgressStrip.tsx'
 import {
   CERTIFICATIONS,
   getCertDomainSlug,
@@ -43,7 +44,7 @@ import {
 import { getFeaturedSampleIds } from '../../../data/featured-samples'
 import { SITE_URL } from '../../../lib/seo-data'
 import { GITHUB_REPO_URL } from '../../../lib/constants'
-import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB } from '../../../lib/levelAccent'
+import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB, LEVEL_ACCENT_UI_HEX } from '../../../lib/levelAccent'
 
 // Static imports of every active cert's question banks. Keyed lookup:
 // QUESTION_BANKS[certCode][domainId] -> question array.
@@ -277,6 +278,9 @@ const faqEntries = [
 const levelAccent = LEVEL_ACCENT_HEX[cert.level]
 const levelGlow = LEVEL_ACCENT_RGB[cert.level]
 const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
+// Light-surface UI accent (not the pale badge color) for the signed-in
+// progress strip's bar fill, matching the cert dashboard's domain cards.
+const levelAccentUi = LEVEL_ACCENT_UI_HEX[cert.level]
 ---
 
 <BaseLayout
@@ -351,6 +355,21 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
   {/* Content sheet slides over the stage (one system with home/cert/blog). */}
   <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
     <div class="max-w-4xl mx-auto px-4 md:px-8">
+      {/* Signed-in personalization: this domain's mastery + practice CTA + a
+          route back to the dashboard. Renders nothing for guests (the SEO page
+          below is untouched). Mounted OUTSIDE the space-y stack so the empty
+          guest island leaves no phantom gap. */}
+      <DomainProgressStrip
+        certCode={cert.code}
+        certShortName={cert.shortName}
+        domainId={domain.id}
+        domainName={domain.name}
+        questionCount={totalDomainQuestions}
+        domainPracticeHref={domainPracticeHref}
+        certPath={certPath}
+        accentHex={levelAccentUi}
+        client:only="react"
+      />
       <div class="space-y-10 md:space-y-14">
         {/* 4. Intro — unique per domain (blurb + exam-guide facts). Primary
             keyword in the first paragraph and an H2 (R6.5); 200-400 words. */}
