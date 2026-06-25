@@ -469,6 +469,22 @@ h2 {
   text-wrap: balance;
 }
 
+/* Question stems are body-length running text, not display headings. The
+   balance rule above equalizes line lengths, which on a two-sentence stem
+   forces an early break at the sentence boundary with a big trailing gap (it
+   reads as "wrapped wrong"). Opt these back into greedy wrapping; use `pretty`
+   where supported to also avoid a lone last-line word. (Tailwind's
+   `[text-wrap:normal]` arbitrary property emits an empty rule, so this lives
+   here.) */
+.cc-question-stem {
+  text-wrap: normal;
+}
+@supports (text-wrap: pretty) {
+  .cc-question-stem {
+    text-wrap: pretty;
+  }
+}
+
 /* Apple San Francisco font stack — applied to entire site. */
 /* html carries the theme bg too (not just body): the stage hero uses a
    rem-based negative margin to slide under the overlay header, and at large

@@ -912,7 +912,11 @@ export function MockExam() {
                 <span className="text-text-muted text-xs md:text-sm">Question {currentIndex + 1} of {questions.length}</span>
               </div>
 
-              <h2 className="text-base md:text-lg text-text-primary mb-4 md:mb-5">
+              {/* cc-question-stem overrides the global `h1,h2 { text-wrap: balance }`
+                  (index.css): balance equalizes line lengths, which on a 2-sentence
+                  question stem forces an early break with a big trailing gap (reads
+                  as "wrapped wrong"). Body-length text wants greedy wrapping. */}
+              <h2 className="cc-question-stem text-base md:text-lg text-text-primary mb-4 md:mb-5">
                 {currentQuestion.question}
                 {currentType === 'multi' && (
                   <span className="text-text-primary font-semibold ml-2">(Select {Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER})</span>
