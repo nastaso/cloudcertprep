@@ -35,9 +35,21 @@ interface BlogFrontmatter {
 
 interface Props {
   data: BlogFrontmatter
+  /** Heading tree from render(post); drives the wide-screen "On this page" TOC. */
+  headings?: { depth: number; slug: string; text: string }[]
 }
 
-const { data } = Astro.props
+const { data, headings = [] } = Astro.props
+
+// On-this-page TOC entries (h2/h3 only; the H1 is the page title). Only switch
+// to the wide three-column reading frame when a post has enough sections to
+// make a TOC worthwhile; short posts keep the centered single column (so we
+// never widen into an empty right gutter). Heading `slug`s match the ids Astro
+// injects into the rendered headings, so the anchors resolve.
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3)
+const showToc = toc.length >= 3
+// Scoped to lg+: < lg stays byte-identical to the original centered layout.
+const frameWide = showToc ? 'max-w-3xl lg:max-w-5xl' : 'max-w-3xl'
 
 const selfUrl = `${SITE_URL}/blog/${data.slug}`
 const canonical = data.canonical ?? selfUrl
@@ -131,8 +143,10 @@ const updatedDisplay = data.updated
     <section class="stage relative overflow-hidden -mt-[calc(3rem+1px)] md:-mt-[calc(3.5rem+1px)]">
       {/* pb clears the .sheet-overlap (-3rem) so the tags/byline are never
           clipped by the content sheet sliding up over the header. */}
-      <div class="relative max-w-3xl mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-16 md:pb-20">
-        <header class="stagger max-w-[68ch] mx-auto">
+      <div class={`relative ${frameWide} mx-auto px-4 md:px-8 pt-24 md:pt-32 pb-16 md:pb-20`}>
+        {/* When the wide TOC frame is active, left-align the header on lg so the
+            title's left edge lines up with the body prose column below. */}
+        <header class={`stagger max-w-[68ch] mx-auto${showToc ? ' lg:mx-0' : ''}`}>
           <nav class="font-mono text-[12px] tracking-wide text-[#8B95A3]" aria-label="Breadcrumb">
             <a href="/" class="hover:text-[#C9D2DC] transition-colors">Home</a>
             <span class="mx-1.5 text-white/25">›</span>
@@ -164,9 +178,36 @@ const updatedDisplay = data.updated
     </section>
 
     <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
-      <div class="max-w-3xl mx-auto px-4 md:px-8">
-        <div class="blog-content max-w-[68ch] mx-auto">
-          <slot />
+      <div class={`${frameWide} mx-auto px-4 md:px-8`}>
+        {/* Wide screens: prose column + a sticky "On this page" rail that fills
+            the otherwise-empty right gutter (the owner's 1440p complaint). The
+            prose measure stays 68ch. < lg and short posts keep a single
+            centered column (no grid, no rail). */}
+        <div class={showToc ? 'lg:grid lg:grid-cols-[minmax(0,68ch)_1fr] lg:gap-12' : ''}>
+          <div class={`blog-content max-w-[68ch] mx-auto${showToc ? ' lg:mx-0 [&_:is(h2,h3)]:scroll-mt-24' : ''}`}>
+            <slot />
+          </div>
+          {showToc && (
+            <aside class="hidden lg:block" aria-label="Table of contents">
+              <nav class="sticky top-24">
+                <p class="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted mb-3">
+                  On this page
+                </p>
+                <ul class="space-y-1 list-none p-0 m-0 border-l border-border-hairline">
+                  {toc.map((h) => (
+                    <li>
+                      <a
+                        href={`#${h.slug}`}
+                        class={`-ml-px block border-l border-transparent py-1 text-sm leading-snug text-text-muted transition-colors duration-200 hover:border-text-muted hover:text-text-primary focus-visible:outline-none focus-visible:text-text-primary ${h.depth === 3 ? 'pl-6' : 'pl-3'}`}
+                      >
+                        {h.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </aside>
+          )}
         </div>
       </div>
     </div>

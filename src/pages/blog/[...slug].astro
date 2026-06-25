@@ -25,9 +25,9 @@ interface Props {
 }
 
 const { post } = Astro.props
-const { Content } = await render(post)
+const { Content, headings } = await render(post)
 ---
 
-<BlogLayout data={post.data}>
+<BlogLayout data={post.data} headings={headings}>
   <Content />
 </BlogLayout>
