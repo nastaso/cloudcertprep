@@ -416,7 +416,7 @@ export function History() {
     <div className="p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4 md:mb-6">
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-[-0.02em] text-text-primary">Exam History</h1>
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-text-primary">Exam history</h1>
             {user && attempts.length > 0 && (
               <Button
                 onClick={() => setShowResetModal(true)}
@@ -565,7 +565,7 @@ export function History() {
                       <Card key={attempt.id} padding="md">
                         <div className="flex items-start justify-between mb-3 gap-3">
                           <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${attempt.passed ? 'bg-success/20' : 'bg-danger/20'}`}>
+                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${attempt.passed ? 'bg-success/15' : 'bg-danger/15'}`}>
                               {attempt.passed ? (
                                 <Check className="w-5 h-5 md:w-6 md:h-6 text-success" />
                               ) : (
@@ -601,7 +601,7 @@ export function History() {
                         </div>
 
                         <div>
-                          <p className="text-xs md:text-sm font-semibold text-text-primary mb-2">Domain Breakdown</p>
+                          <p className="text-xs md:text-sm font-semibold text-text-primary mb-2">Domain breakdown</p>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             {Object.entries(attemptDomains).map(([id, name]) => {
                               const domainId = Number(id)

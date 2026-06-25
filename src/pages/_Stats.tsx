@@ -202,7 +202,7 @@ export function Stats() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6">
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_attempts.toLocaleString()}</p>
-                    <p className="text-text-muted text-xs md:text-sm mt-1">Total Attempts</p>
+                    <p className="text-text-muted text-xs md:text-sm mt-1">Total attempts</p>
                   </div>
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_passes.toLocaleString()}</p>
@@ -216,7 +216,7 @@ export function Stats() {
                   </div>
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{Math.round(cs.avg_score)}</p>
-                    <p className="text-text-muted text-xs md:text-sm mt-1">Avg Score (Passed)</p>
+                    <p className="text-text-muted text-xs md:text-sm mt-1">Avg score (passed)</p>
                   </div>
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{Math.round(cs.avg_time_minutes)} min</p>
@@ -233,7 +233,7 @@ export function Stats() {
                 {/* Domain Difficulty Ranking */}
                 {cs.domain_stats && cs.domain_stats.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="text-sm md:text-base font-semibold text-text-primary mb-3">Domain Difficulty (Hardest First)</h3>
+                    <h3 className="text-sm md:text-base font-semibold text-text-primary mb-3">Domain difficulty (hardest first)</h3>
                     <div className="space-y-3">
                       {(() => {
                         const certDomainNames = getCertDomains(cs.cert_code)
@@ -267,7 +267,7 @@ export function Stats() {
                   <div>
                     <h3 className="text-sm md:text-base font-semibold text-text-primary mb-3 flex items-center gap-2">
                       <Trophy className="w-4 h-4 text-success" />
-                      Recent Passes
+                      Recent passes
                     </h3>
                     <div className="space-y-2">
                       {cs.recent_passes.map((pass, i) => (
@@ -282,7 +282,7 @@ export function Stats() {
                                 <span>{formatRelativeDate(pass.passed_at)}</span>
                                 {pass.time_taken_seconds && (
                                   <>
-                                    <span>•</span>
+                                    <span>·</span>
                                     <Clock className="w-3 h-3 inline" />
                                     <span>{formatTime(pass.time_taken_seconds)}</span>
                                   </>
@@ -303,7 +303,7 @@ export function Stats() {
           {stats && (
             <div className="border-t border-text-muted/10 pt-6">
               <p className="text-text-muted text-xs md:text-sm text-center">
-                {stats.total_users.toLocaleString()} users • {stats.total_questions_answered.toLocaleString()} questions answered across all certifications
+                {stats.total_users.toLocaleString()} users · {stats.total_questions_answered.toLocaleString()} questions answered across all certifications
               </p>
             </div>
           )}
