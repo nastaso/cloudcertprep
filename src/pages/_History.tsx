@@ -7,6 +7,7 @@ import { useSEO } from '../hooks/useSEO'
 import { getSupabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { Skeleton } from '../components/Skeleton'
 import type { Question, ExamAttempt } from '../types'
 import { formatDuration } from '../lib/scoring'
 import { formatRelativeDate } from '../lib/formatting'
@@ -381,9 +382,32 @@ export function History() {
   }, [attempts, filter, certFilter])
 
   if (loading) {
+    // Skeleton shaped like the history list (matches the real wrapper, so the
+    // page does not jump when data resolves). Reduced-motion-safe via Skeleton.
     return (
-      <div className="flex-1 flex items-center justify-center p-8">
-        <LoadingSpinner text="Loading history..." />
+      <div className="p-4 md:p-8">
+        <div className="max-w-7xl mx-auto" aria-busy="true">
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-text-primary mb-4 md:mb-6">Exam history</h1>
+          <p className="sr-only" role="status">Loading your exam history</p>
+          <div className="flex flex-wrap gap-2 mb-4" aria-hidden="true">
+            <Skeleton className="h-9 w-28 rounded-xl" />
+            <Skeleton className="h-9 w-24 rounded-xl" />
+          </div>
+          <div className="space-y-3" aria-hidden="true">
+            {[0, 1, 2, 3, 4].map(i => (
+              <div key={i} className="bg-bg-card border border-border-hairline rounded-2xl p-4 md:p-5 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4 min-w-0">
+                  <Skeleton className="h-6 w-14 rounded-full" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-3 w-32" />
+                  </div>
+                </div>
+                <Skeleton className="h-7 w-12" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }

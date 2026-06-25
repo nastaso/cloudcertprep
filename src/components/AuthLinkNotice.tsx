@@ -1,9 +1,39 @@
-import { useState } from 'react'
-import { CheckCircle, AlertTriangle } from 'lucide-react'
-import { Card } from './Card'
-import { Alert } from './Alert'
+import { useState, type ReactNode } from 'react'
+import { CheckCircle, AlertTriangle, X } from 'lucide-react'
 import { buttonClass } from '../lib/buttonStyles'
 import { useAuth } from '../hooks/useAuth'
+
+/**
+ * Non-modal top notice: a dismissible toast pinned just below the header,
+ * centered, above the fold. The fixed wrapper has pointer-events-none so the
+ * empty gutters pass clicks through to the page (it never blocks like a modal);
+ * only the card itself is interactive. `animate-enter` is reduced-motion-safe.
+ */
+function TopNotice({ role, borderClass, children }: { role: string; borderClass: string; children: ReactNode }) {
+  return (
+    <div className="fixed inset-x-0 top-16 z-[60] flex justify-center px-3 pointer-events-none">
+      <div
+        role={role}
+        className={`pointer-events-auto flex w-full max-w-xl items-center gap-3 rounded-2xl border bg-bg-card p-3.5 shadow-card-hover animate-enter ${borderClass}`}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function DismissButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label="Dismiss"
+      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-bg-card-hover hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+    >
+      <X className="h-4 w-4" aria-hidden="true" />
+    </button>
+  )
+}
 
 const ACK_KEY = 'cloudcertprep_verified_welcome_ack'
 
@@ -62,32 +92,26 @@ export default function AuthLinkNotice({ practiceHref }: { practiceHref: string 
 
   if (notice.kind === 'expired') {
     return (
-      <div className="mb-10 md:mb-12">
-        <Alert tone="warning" role="alert" className="flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
-          <span className="flex-1">
-            That link has expired or was already used.{' '}
-            <a href="/login" className="font-semibold underline">Request a new one</a>.
-          </span>
-          <button type="button" onClick={() => setNotice(null)} className="text-sm underline shrink-0">
-            Dismiss
-          </button>
-        </Alert>
-      </div>
+      <TopNotice role="alert" borderClass="border-warning/40">
+        <AlertTriangle className="h-5 w-5 shrink-0 text-warning" aria-hidden="true" />
+        <span className="min-w-0 flex-1 text-sm text-text-primary">
+          That link has expired or was already used.{' '}
+          <a href="/login" className="font-semibold underline">Request a new one</a>.
+        </span>
+        <DismissButton onClick={() => setNotice(null)} />
+      </TopNotice>
     )
   }
 
   if (notice.kind === 'deleted') {
     return (
-      <div className="mb-10 md:mb-12">
-        <Alert tone="success" role="status" className="flex items-start gap-3">
-          <CheckCircle className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
-          <span className="flex-1">Your account and all your data have been deleted. Thanks for trying CloudCertPrep.</span>
-          <button type="button" onClick={() => setNotice(null)} className="text-sm underline shrink-0">
-            Dismiss
-          </button>
-        </Alert>
-      </div>
+      <TopNotice role="status" borderClass="border-success/30">
+        <CheckCircle className="h-5 w-5 shrink-0 text-success" aria-hidden="true" />
+        <span className="min-w-0 flex-1 text-sm text-text-primary">
+          Your account and all your data have been deleted. Thanks for trying CloudCertPrep.
+        </span>
+        <DismissButton onClick={() => setNotice(null)} />
+      </TopNotice>
     )
   }
 
@@ -95,42 +119,21 @@ export default function AuthLinkNotice({ practiceHref }: { practiceHref: string 
   const signedIn = !authLoading && Boolean(user)
 
   return (
-    <div className="mb-10 md:mb-12">
-      <Card padding="md" className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-success/10">
-          <CheckCircle className="w-6 h-6 text-success" aria-hidden="true" />
-        </span>
-        <div className="flex-1">
-          <h2 className="text-lg font-semibold tracking-[-0.01em] text-text-primary">
-            {signedIn ? 'Your email is confirmed. You are signed in.' : 'Your email is confirmed.'}
-          </h2>
-          <p className="mt-1 text-sm text-text-muted">
-            {signedIn || authLoading
-              ? 'Pick up where you left off and start your first exam.'
-              : 'Sign in to save your progress, or jump straight into a practice exam.'}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {!authLoading && !signedIn && (
-            <a href="/login" className={buttonClass({ variant: 'brand', size: 'md' })}>
-              Sign in
-            </a>
-          )}
-          <a
-            href={practiceHref}
-            className={buttonClass({ variant: signedIn || authLoading ? 'brand' : 'ghost', size: 'md' })}
-          >
-            Start practice exam
-          </a>
-          <button
-            type="button"
-            onClick={() => setNotice(null)}
-            className={buttonClass({ variant: 'ghost', size: 'md' })}
-          >
-            Dismiss
-          </button>
-        </div>
-      </Card>
-    </div>
+    <TopNotice role="status" borderClass="border-success/30">
+      <CheckCircle className="h-5 w-5 shrink-0 text-success" aria-hidden="true" />
+      <span className="min-w-0 flex-1 text-sm text-text-primary">
+        {signedIn ? 'Your email is confirmed. You are signed in.' : 'Your email is confirmed.'}
+      </span>
+      {!authLoading && !signedIn ? (
+        <a href="/login" className={`${buttonClass({ variant: 'brand', size: 'sm' })} shrink-0`}>
+          Sign in
+        </a>
+      ) : (
+        <a href={practiceHref} className={`${buttonClass({ variant: 'brand', size: 'sm' })} shrink-0`}>
+          Start exam
+        </a>
+      )}
+      <DismissButton onClick={() => setNotice(null)} />
+    </TopNotice>
   )
 }

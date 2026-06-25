@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { LoadingSpinner } from '../components/LoadingSpinner'
+import { Skeleton } from '../components/Skeleton'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
 import { getSupabase } from '../lib/supabase'
@@ -99,9 +99,35 @@ export function Stats() {
   }, [])
 
   if (loading) {
+    // Skeleton shaped like the stats page (header + cert cards), matching the
+    // real wrapper so there is no jump when the live numbers resolve.
     return (
-      <div className="flex-1 flex items-center justify-center p-8">
-        <LoadingSpinner text="Loading stats..." />
+      <div className="p-4 md:p-8">
+        <div className="max-w-6xl mx-auto space-y-8" aria-busy="true">
+          <header className="space-y-2">
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-text-primary">Community statistics</h1>
+            <p className="text-text-muted text-sm md:text-base">
+              Aggregated, anonymous results from the CloudCertPrep community. Your individual scores stay private to your account.
+            </p>
+          </header>
+          <p className="sr-only" role="status">Loading community statistics</p>
+          {[0, 1].map(i => (
+            <div key={i} className="bg-bg-card border border-border-hairline rounded-2xl p-4 md:p-6" aria-hidden="true">
+              <div className="flex items-center gap-2 mb-4">
+                <Skeleton className="h-5 w-16 rounded-full" />
+                <Skeleton className="h-5 w-24" />
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                {[0, 1, 2, 3, 4, 5].map(j => (
+                  <div key={j} className="space-y-2">
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
