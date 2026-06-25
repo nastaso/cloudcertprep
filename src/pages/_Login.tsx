@@ -267,7 +267,7 @@ export function Login() {
                   </div>
                   <div>
                     <h3 className="text-text-primary font-semibold mb-1">{getActiveTotalQuestions().toLocaleString()}+ Practice Questions</h3>
-                    <p className="text-text-muted text-sm">Up to date with the latest exam guides, across multiple cloud certifications</p>
+                    <p className="text-text-muted text-sm">Up to date with the latest exam guides, across multiple AWS certifications</p>
                   </div>
                 </div>
 

@@ -36,7 +36,7 @@ export function QuestionReviewCard({
   const correctAnswerArray = Array.isArray(question.answer) ? question.answer : [question.answer]
 
   return (
-    <div className="bg-bg-card rounded-xl p-4 md:p-5 shadow-card">
+    <div className="bg-bg-card rounded-2xl p-4 md:p-5 shadow-card border border-border-hairline">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">

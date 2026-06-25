@@ -621,15 +621,20 @@ export function MockExam() {
             <p className="text-sm md:text-base text-text-muted mb-6 md:mb-8">{cert.examQuestionCount} questions, {Math.round(cert.examTimeSeconds / 60)} minutes. No answer feedback during exam.</p>
 
             <div className="bg-bg-dark rounded-xl p-4 md:p-6 mb-6 md:mb-8">
-              <h2 className="text-lg md:text-xl font-semibold text-text-primary mb-3 md:mb-4">Domain Breakdown</h2>
-              <div className="space-y-1.5 md:space-y-2 text-sm md:text-base text-text-muted">
+              <h2 className="text-lg md:text-xl font-semibold text-text-primary mb-3 md:mb-4">Domain breakdown</h2>
+              <ul className="space-y-2 md:space-y-2.5 text-sm md:text-base">
                 {(() => {
                   const targets = getExamDomainTargets(cert)
                   return cert.domains.map(d => (
-                    <p key={d.id}>- {targets[d.id]} {d.name} ({Math.round(d.examProportion * 100)}%)</p>
+                    <li key={d.id} className="flex items-baseline justify-between gap-4">
+                      <span className="text-text-muted">{d.name}</span>
+                      <span className="font-mono tabular-nums whitespace-nowrap text-text-primary font-medium">
+                        {targets[d.id]}<span className="ml-1.5 font-normal text-text-muted">· {Math.round(d.examProportion * 100)}%</span>
+                      </span>
+                    </li>
                   ))
                 })()}
-              </div>
+              </ul>
             </div>
 
             <Alert tone="warning" className="mb-6 md:mb-8">
@@ -646,7 +651,10 @@ export function MockExam() {
               </Alert>
             )}
 
-            <div className="flex flex-col md:flex-row gap-3 md:gap-4">
+            {/* flex-col-reverse on mobile so the PRIMARY 'Start exam' (last in
+                DOM, kept right on desktop) stacks on TOP when the row wraps -
+                the primary action should lead, not the 'Back to home' escape. */}
+            <div className="flex flex-col-reverse md:flex-row gap-3 md:gap-4">
               <Button
                 onClick={goHome}
                 disabled={loading}

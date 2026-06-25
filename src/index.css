@@ -434,7 +434,9 @@ header[data-overlay]:not(.hdr-scrolled) {
   --color-link: 0 115 187;           /* #0073BB AWS link blue, 5.1:1 on white (DSv4) */
   --color-success: 22 101 52;        /* #166534 — 6.1:1 on its bg-success/10 tint, 5.2:1 on /20 (WCAG AA); deepened from #16A34A which read ~2.6:1 on those correct-answer tints */
   --color-danger: 185 28 28;         /* #B91C1C (Tailwind red-700) - 5.0:1 on bg-danger/15 over white, 4.8:1 on /15 over the #F8F9FA page tint (WCAG AA); deepened from #DC2626 which read ~3.8:1 on those tinted surfaces */
-  --color-warning: 154 69 9;         /* #9A4509 — 6.5:1 on white, 5.3:1 on its own bg-warning/15 badge tint (WCAG AA) */
+  --color-on-danger: 255 255 255;    /* white on the deep-crimson danger FILL (light) */
+  --color-warning: 154 69 9;         /* #9A4509 — 6.5:1 on white, 5.3:1 on its own bg-warning/15 badge tint (WCAG AA) — tuned for TEXT/badges, NOT solid fills */
+  --color-warning-fill: 217 119 6;   /* #D97706 amber-600 — legible amber for solid BAR/METER fills (the #9A4509 text token reads muddy brown as a large fill) */
   --color-text-primary: 22 25 31;    /* #16191F AWS squid ink (DSv4) */
   --color-text-muted: 84 91 100;     /* #545B64 AWS gray — 6.5:1 on white */
 }
@@ -456,7 +458,9 @@ header[data-overlay]:not(.hdr-scrolled) {
   --color-link: 68 156 214;          /* #449CD6 — 5.4:1 on card */
   --color-success: 74 222 128;       /* #4ADE80 — passes 4.5:1 on dark */
   --color-danger: 248 113 113;       /* #F87171 — passes 4.5:1 on dark */
+  --color-on-danger: 22 25 31;       /* near-black on the light-coral danger FILL (dark): ~8:1 (white was ~2.8:1, AA FAIL) */
   --color-warning: 251 191 36;       /* #FBBF24 — passes 4.5:1 on dark */
+  --color-warning-fill: 251 191 36;  /* #FBBF24 — already a bright amber, good as a fill on dark */
   --color-text-primary: 244 246 248; /* #F4F6F8 */
   --color-text-muted: 141 153 168;   /* #8D99A8 — 5.6:1 on card */
 }

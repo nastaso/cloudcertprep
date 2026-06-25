@@ -27,7 +27,6 @@ const { cert, accent, glowRgb } = Astro.props
 
 const examMinutes = Math.round(cert.examTimeSeconds / 60)
 const totalQuestions = getCertTotalQuestions(cert.code)
-const maxProportion = Math.max(...cert.domains.map(d => d.examProportion))
 ---
 
 <div class="relative hidden sm:block" aria-hidden="true">
@@ -60,7 +59,7 @@ const maxProportion = Math.max(...cert.domains.map(d => d.examProportion))
             <div class="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
               <div
                 class="h-full rounded-full"
-                style={`width: ${Math.round((d.examProportion / maxProportion) * 100)}%; background-color: ${accent};`}
+                style={`width: ${Math.round(d.examProportion * 100)}%; background-color: ${accent};`}
               >
               </div>
             </div>

@@ -246,13 +246,13 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
                   </div>
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_passes.toLocaleString()}</p>
-                    <p className="text-text-muted text-xs md:text-sm mt-1">Total Passes</p>
+                    <p className="text-text-muted text-xs md:text-sm mt-1">Total passes</p>
                   </div>
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">
                       {cs.total_attempts > 0 ? Math.round((cs.total_passes / cs.total_attempts) * 100) : 0}%
                     </p>
-                    <p className="text-text-muted text-xs md:text-sm mt-1">Pass Rate</p>
+                    <p className="text-text-muted text-xs md:text-sm mt-1">Pass rate</p>
                   </div>
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{Math.round(cs.avg_score)}</p>
@@ -260,13 +260,13 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
                   </div>
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{Math.round(cs.avg_time_minutes)} min</p>
-                    <p className="text-text-muted text-xs md:text-sm mt-1">Avg Time (Passed)</p>
+                    <p className="text-text-muted text-xs md:text-sm mt-1">Avg time (passed)</p>
                   </div>
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">
                       {cs.fastest_pass_seconds ? formatTime(cs.fastest_pass_seconds) : 'N/A'}
                     </p>
-                    <p className="text-text-muted text-xs md:text-sm mt-1">Fastest Pass</p>
+                    <p className="text-text-muted text-xs md:text-sm mt-1">Fastest pass</p>
                   </div>
                 </div>
 
@@ -290,7 +290,7 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
                           </div>
                           <div className="h-1.5 bg-bg-dark rounded-full overflow-hidden">
                             <div
-                              className={`h-full w-full origin-left transition-transform duration-settle ease-out ${ds.avg_score < 60 ? 'bg-danger' : ds.avg_score < 75 ? 'bg-warning' : 'bg-success'}`}
+                              className={`h-full w-full origin-left transition-transform duration-settle ease-out ${ds.avg_score < 60 ? 'bg-danger' : ds.avg_score < 75 ? 'bg-warning-fill' : 'bg-success'}`}
                               style={{ transform: `scaleX(${Math.min(100, ds.avg_score) / 100})` }}
                             />
                           </div>

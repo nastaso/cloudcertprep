@@ -24,7 +24,7 @@ export function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps) 
   if (password.length === 0) return null
 
   const barColour =
-    score <= 1 ? 'bg-danger' : score === 2 ? 'bg-warning' : 'bg-success'
+    score <= 1 ? 'bg-danger' : score === 2 ? 'bg-warning-fill' : 'bg-success'
   const labelColour =
     score <= 1 ? 'text-danger' : score === 2 ? 'text-warning' : 'text-success'
 

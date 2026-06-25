@@ -37,7 +37,7 @@ import { SITE_URL } from '../../lib/seo-data'
 import { serializeJsonLd } from '../../lib/jsonld'
 import snapshot from '../../lib/generated/stats-snapshot.json'
 import CertSpecPanel from '../../components/landing/CertSpecPanel.astro'
-import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB } from '../../lib/levelAccent'
+import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB, LEVEL_ACCENT_UI_HEX } from '../../lib/levelAccent'
 import { getCollection, type CollectionEntry } from 'astro:content'
 import PostCard from '../../components/PostCard.astro'
 
@@ -191,6 +191,10 @@ const heroLede = secondaryKeyword
 // a glance.
 const levelAccent = LEVEL_ACCENT_HEX[cert.level]
 const levelGlow = LEVEL_ACCENT_RGB[cert.level]
+// UI-accent variant for fills on the LIGHT card surface (the #domains weight
+// bars): the pale badge color (Foundational #A8B9C9) is invisible on white, so
+// the bars use the darker slate UI accent, same as the signed-in dashboard.
+const levelAccentUi = LEVEL_ACCENT_UI_HEX[cert.level]
 
 // Per-domain landing links. These keyword-rich pages are the indexable SEO
 // surface for each exam domain; linking them here creates the
@@ -330,7 +334,7 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
                       <span class="font-mono text-[12px] text-text-muted whitespace-nowrap">{Math.round(d.examProportion * 100)}%</span>
                     </span>
                     <span class="h-1 w-full overflow-hidden rounded-full bg-border-hairline/60">
-                      <span class="block h-full rounded-full" style={`width: ${Math.round(d.examProportion * 100)}%; background-color: ${levelAccent}`}></span>
+                      <span class="block h-full rounded-full" style={`width: ${Math.round(d.examProportion * 100)}%; background-color: ${levelAccentUi}`}></span>
                     </span>
                     <span class="flex items-center justify-between text-sm text-text-muted">
                       <span>{d.questionCount}+ practice questions</span>

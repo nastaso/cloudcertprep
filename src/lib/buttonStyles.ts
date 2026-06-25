@@ -44,7 +44,7 @@ export const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
     'bg-bg-card hover:bg-bg-card-hover text-text-primary border border-border-hairline ' +
     'hover:border-text-muted/60 hover:shadow-card disabled:hover:bg-bg-card disabled:hover:border-border-hairline',
   danger:
-    'bg-danger hover:bg-danger/90 text-white shadow-sm hover:shadow-card-hover disabled:hover:bg-danger disabled:shadow-sm',
+    'bg-danger hover:bg-danger/90 text-on-danger shadow-sm hover:shadow-card-hover disabled:hover:bg-danger disabled:shadow-sm',
   ghost:
     'bg-transparent hover:bg-bg-card-hover text-text-muted hover:text-text-primary',
   tinted:
