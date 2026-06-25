@@ -154,9 +154,7 @@ const softwareAppJsonLd = serializeJsonLd({
       {/* Auth redirect safety net (P0-2 / P0-3): renders only for the rare
           just-verified or expired-link cohort, null for normal traffic, so the
           empty island adds no layout box above the content stack. */}
-      {defaultCert && (
-        <AuthLinkNotice client:only="react" practiceHref={`/${defaultCert.provider}/${defaultCert.code}/practice-exam`} />
-      )}
+      <AuthLinkNotice client:only="react" />
       <div class="space-y-16 md:space-y-24">
 
         {/* Locked citation paragraph + value props — the full SEO lede lives

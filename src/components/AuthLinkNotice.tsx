@@ -81,7 +81,7 @@ function readNoticeOnce(): Notice {
  * Home-side safety net for the two auth redirects that previously dead-ended on
  * the marketing home with no signal. Renders null for normal traffic.
  */
-export default function AuthLinkNotice({ practiceHref }: { practiceHref: string }) {
+export default function AuthLinkNotice() {
   const [notice, setNotice] = useState<Notice>(readNoticeOnce)
   // Reflect the REAL session, not the URL marker: a confirm link can land here
   // without an established session (confirmed on another device, cookie not
@@ -115,24 +115,22 @@ export default function AuthLinkNotice({ practiceHref }: { practiceHref: string 
     )
   }
 
-  // Only claim "signed in" once auth has resolved AND a session exists.
-  const signedIn = !authLoading && Boolean(user)
+  // Verified case. A just-verified user who IS signed in already gets the
+  // returning-user welcome hero on the home page (HomeWelcome), so a toast on
+  // top of it is redundant and, on small screens, overlaps that hero's heading.
+  // So only show the verified toast when the session did NOT establish - the
+  // one case where there is no welcome hero and the user must still sign in.
+  // Wait for auth to resolve before deciding (avoids a flash either way).
+  if (authLoading) return null
+  if (user) return null
 
   return (
     <TopNotice role="status" borderClass="border-success/30">
       <CheckCircle className="h-5 w-5 shrink-0 text-success" aria-hidden="true" />
-      <span className="min-w-0 flex-1 text-sm text-text-primary">
-        {signedIn ? 'Your email is confirmed. You are signed in.' : 'Your email is confirmed.'}
-      </span>
-      {!authLoading && !signedIn ? (
-        <a href="/login" className={`${buttonClass({ variant: 'brand', size: 'sm' })} shrink-0`}>
-          Sign in
-        </a>
-      ) : (
-        <a href={practiceHref} className={`${buttonClass({ variant: 'brand', size: 'sm' })} shrink-0`}>
-          Start exam
-        </a>
-      )}
+      <span className="min-w-0 flex-1 text-sm text-text-primary">Your email is confirmed.</span>
+      <a href="/login" className={`${buttonClass({ variant: 'brand', size: 'sm' })} shrink-0`}>
+        Sign in
+      </a>
       <DismissButton onClick={() => setNotice(null)} />
     </TopNotice>
   )
