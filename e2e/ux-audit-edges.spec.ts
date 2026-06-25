@@ -75,10 +75,19 @@ test('P1-5: progress bar advances when the current question is answered', async 
   expect(Number(await bar.getAttribute('aria-valuenow'))).toBe(0) // Q1 unanswered
   // AnswerButtons are the only buttons carrying aria-pressed.
   await page.locator('button[aria-pressed]').first().click()
-  // Single-choice reveals feedback on select; multi/ordering/matching need a
-  // Submit. Best-effort click for the latter; swallow if absent (auto-reveal
-  // types) or mid-re-render. The poll is the real assertion.
-  await page.getByRole('button', { name: /^Submit/i }).click({ timeout: 3000 }).catch(() => {})
+  // Single-choice reveals feedback on select (no Submit). Multi-answer needs the
+  // required number selected before Submit grades (since the under-select warning
+  // shipped), so pick the remaining options (unselected ones lock at the required
+  // count) then submit. The poll below is the real assertion.
+  const submitAnswer = page.getByRole('button', { name: 'Submit answer', exact: true })
+  if (await submitAnswer.isVisible().catch(() => false)) {
+    for (let k = 0; k < 4; k++) {
+      const unselected = page.locator('button[aria-pressed="false"]:not([disabled])')
+      if ((await unselected.count()) === 0) break
+      await unselected.first().click().catch(() => {})
+    }
+    await submitAnswer.click({ timeout: 3000 }).catch(() => {})
+  }
   // Advances on answer (the off-by-one fix); old code stayed at 0 until "Next".
   // Generous timeout: under full-suite parallel load the feedback transition
   // can lag past the default poll window.

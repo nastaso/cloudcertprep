@@ -91,6 +91,10 @@ export function DomainPractice() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [userAnswer, setUserAnswer] = useState<string | string[] | null>(null)
   const [showFeedback, setShowFeedback] = useState(false)
+  // Shown when the user tries to submit a multi-answer question without picking
+  // the required number (e.g. selected 1 of 2). Cleared on any selection change
+  // and on moving to the next question.
+  const [multiAnswerWarning, setMultiAnswerWarning] = useState(false)
   const [results, setResults] = useState<boolean[]>([])
   const [questionResults, setQuestionResults] = useState<QuestionResult[]>([])
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0)
@@ -232,6 +236,7 @@ export function DomainPractice() {
       setCurrentIndex(0)
       setUserAnswer(null)
       setShowFeedback(false)
+      setMultiAnswerWarning(false)
       setResults([])
       setQuestionResults([])
       finishingRef.current = false // re-arm the dup-write guard for this fresh session
@@ -254,6 +259,7 @@ export function DomainPractice() {
       const currentAnswers = Array.isArray(userAnswer) ? userAnswer : []
       const newAnswers = toggleMultiAnswer(currentAnswers, answer, MAX_MULTI_ANSWER)
       setUserAnswer(newAnswers)
+      setMultiAnswerWarning(false)
     } else {
       setAnswering(true)
       setUserAnswer(answer)
@@ -292,6 +298,7 @@ export function DomainPractice() {
       setCurrentIndex(currentIndex + 1)
       setUserAnswer(null)
       setShowFeedback(false)
+      setMultiAnswerWarning(false)
     } else {
       finishPractice()
     }
@@ -682,14 +689,26 @@ export function DomainPractice() {
               const requiredCount = Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER
               const selectedCount = Array.isArray(userAnswer) ? userAnswer.length : 0
               return (
-                <Button
-                  onClick={() => checkAnswer()}
-                  disabled={selectedCount !== requiredCount}
-                  variant="primary"
-                  fullWidth
-                >
-                  Submit answer
-                </Button>
+                <>
+                  {multiAnswerWarning && selectedCount < requiredCount && (
+                    <Alert tone="warning" role="alert" className="mb-3 text-sm">
+                      Select {requiredCount} answers to continue. You have {selectedCount} of {requiredCount} selected.
+                    </Alert>
+                  )}
+                  {/* Enabled even when incomplete: a silently-disabled button left
+                      users stuck with no idea why. Clicking under-selected shows
+                      the warning above instead of grading a half-answer. */}
+                  <Button
+                    onClick={() => {
+                      if (selectedCount < requiredCount) { setMultiAnswerWarning(true); return }
+                      checkAnswer()
+                    }}
+                    variant="primary"
+                    fullWidth
+                  >
+                    Submit answer
+                  </Button>
+                </>
               )
             })()}
 
