@@ -45,7 +45,7 @@ const RESUME_RESULTS_KEY = 'cc_resume_results'
  * (P1-6). Read-only re-display: the summary + per-domain breakdown need only
  * isCorrect / domainId. The full per-question REVIEW needs the loaded Question
  * objects, which a fresh remount does not have, so the review button is hidden
- * for a rehydrated attempt (see rehydratedResults).
+ * for a rehydrated attempt (the results screen gates review on questions.length).
  */
 function rebuildResultsFromPending(pending: PendingAttempt) {
   const a = pending.attempt
@@ -171,10 +171,6 @@ export function MockExam() {
     }>
   } | null>(null)
   const [loading, setLoading] = useState(false)
-  // True when the results screen was rebuilt from a stored guest snapshot after
-  // a /login round-trip (P1-6). The per-question review needs the loaded Question
-  // objects (absent on a fresh remount), so the review button is hidden then.
-  const [rehydratedResults, setRehydratedResults] = useState(false)
   // Synchronous re-entrancy guard for exam submission. setLoading is async, so a
   // state-only guard lets rapid clicks (or any re-entrant call) before the next
   // render all slip through and each insert a duplicate exam_attempts row. A ref
@@ -332,7 +328,6 @@ export function MockExam() {
     // settles before the screen swap, matching the saved-notice effect above.
     const t = window.setTimeout(() => {
       setResults(rebuildResultsFromPending(pending))
-      setRehydratedResults(true)
       setScreen('results')
     }, 0)
     return () => window.clearTimeout(t)
@@ -782,9 +777,11 @@ export function MockExam() {
           )}
 
           <div className="mt-6 space-y-3">
-            {/* Per-question review needs the loaded Question objects; a snapshot
-                rehydrate (P1-6) does not have them, so hide it in that case. */}
-            {!rehydratedResults && (
+            {/* Per-question review needs the loaded Question objects. A snapshot
+                rehydrate (P1-6) has none (questions stays empty on a fresh remount),
+                so gate on questions.length. Stateless, so it also stays correct
+                after a rehydrate -> Retake -> real exam, where a flag would go stale. */}
+            {questions.length > 0 && (
               <Button
                 onClick={() => {
                   setReviewFilter('all')

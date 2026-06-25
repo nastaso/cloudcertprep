@@ -91,3 +91,30 @@ test('P1-8 edge: no British spelling on the domain landing or history', async ({
     expect(txt, `British spelling on ${route}`).not.toMatch(/practis|randomis|prioritis|memoris/i)
   }
 })
+
+test('P0 edge: ?verified=1 + otp_expired -> expired wins (actionable failure)', async ({ page }) => {
+  await page.goto('/?verified=1&error_code=otp_expired')
+  await expect(page.getByText('That link has expired')).toBeVisible({ timeout: 10000 })
+  await expect(page.getByText('Your email is confirmed')).toHaveCount(0)
+})
+
+test('P0 edge: auth params stripped, but UTM/other query params preserved', async ({ page }) => {
+  await page.goto('/?utm_source=newsletter&verified=1&utm_medium=email')
+  await expect(page.getByText('Your email is confirmed')).toBeVisible({ timeout: 10000 })
+  await page.waitForTimeout(400)
+  const url = new URL(page.url())
+  expect(url.searchParams.get('verified')).toBeNull()
+  expect(url.searchParams.get('utm_source')).toBe('newsletter')
+  expect(url.searchParams.get('utm_medium')).toBe('email')
+})
+
+test('P1-6 regression: a real completed exam DOES show Review (questions loaded)', async ({ page }) => {
+  // Guards the stateless review gate: rehydrate hides Review (no questions), but
+  // a real exam - including one started via Retake after a rehydrate - must show it.
+  await page.goto('/aws/clf-c02/practice-exam')
+  await page.getByRole('button', { name: 'Start exam', exact: true }).click()
+  await page.waitForFunction(() => document.body.dataset.examActive === 'true', { timeout: 25000 })
+  await page.getByRole('button', { name: 'End exam', exact: true }).first().click()
+  await page.getByRole('button', { name: 'Submit exam', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Review questions' })).toBeVisible({ timeout: 15000 })
+})
