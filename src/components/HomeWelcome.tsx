@@ -45,7 +45,10 @@ export default function HomeWelcome({ dashboardHref, certShortName }: HomeWelcom
 
   return (
     <section className="pt-10 md:pt-14 pb-12 md:pb-16">
-      <div className="max-w-6xl mx-auto px-4 md:px-8 stagger">
+      {/* No entrance animation: this island mounts AFTER auth resolves (the
+          guest hero is already pre-hidden), so a .stagger fade-rise here reads
+          as a flash on the post-login redirect. Appear cleanly instead. */}
+      <div className="max-w-6xl mx-auto px-4 md:px-8">
         <p className="flex items-center gap-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.22em] text-text-muted">
           <span className="h-2 w-2 rounded-full bg-brand" aria-hidden="true" />
           Welcome back

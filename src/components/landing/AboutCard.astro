@@ -53,10 +53,13 @@ const features = [
   <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
     {features.map((f) => (
       <div class="border-t border-border-hairline pt-5">
-        <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-bg-card border border-border-hairline" aria-hidden="true">
-          <svg class="h-[18px] w-[18px] text-text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={f.icon} />
-        </span>
-        <h3 class="mt-3 text-lg md:text-xl font-semibold text-text-primary">{f.title}</h3>
+        {/* Icon inline-left of the title (Stripe/Linear pattern): a quiet
+            monochrome prefix, one reading unit with the heading - not a boxed
+            badge stacked on top. */}
+        <div class="flex items-center gap-2.5">
+          <svg class="h-[18px] w-[18px] shrink-0 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={f.icon} />
+          <h3 class="text-lg md:text-xl font-semibold text-text-primary">{f.title}</h3>
+        </div>
         <p class="mt-2 text-base md:text-lg leading-[1.7] text-text-muted">{f.body}</p>
       </div>
     ))}

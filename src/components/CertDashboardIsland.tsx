@@ -30,7 +30,7 @@ import { formatRelativeDate } from '../lib/formatting'
 import { formatDuration } from '../lib/scoring'
 import { logError } from '../lib/logger'
 import { CERTIFICATIONS } from '../data/certifications'
-import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB } from '../lib/levelAccent'
+import { LEVEL_ACCENT_UI_HEX, LEVEL_ACCENT_UI_RGB } from '../lib/levelAccent'
 import { calculateDomainMastery } from '../lib/domainStats'
 import type { DomainProgress } from '../types'
 
@@ -182,10 +182,12 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
   // Level accent ties the signed-in dashboard to the cert's identity (same
   // hue as the guest hero's blueprint panel and the OG tile art).
   const level = CERTIFICATIONS[cert.code]?.level
-  const levelAccent = level ? LEVEL_ACCENT_HEX[level] : '#FF9900'
+  // UI-accent variant (not the pale badge color): Foundational's silver reads
+  // washed-out on the light dashboard, so the dot/halo/bars use a darker slate.
+  const levelAccent = level ? LEVEL_ACCENT_UI_HEX[level] : '#FF9900'
   // RGB triplet (not hex) for the .halo --halo-color custom property, so the
   // primary practice cards bloom in the cert's level hue (P1-10).
-  const levelAccentRgb = level ? LEVEL_ACCENT_RGB[level] : '255 153 0'
+  const levelAccentRgb = level ? LEVEL_ACCENT_UI_RGB[level] : '255 153 0'
   const levelLabel = level ? level.charAt(0).toUpperCase() + level.slice(1) : ''
 
   // Honest aggregates from the complete domain_progress rows (not the capped

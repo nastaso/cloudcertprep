@@ -245,13 +245,15 @@ export function Login() {
   }
 
   return (
-      // Top-anchored (items-start) so switching between sign-in / sign-up /
-      // reset / check-email grows the card DOWNWARD from a stable top instead
-      // of re-centering the whole card (which made it visibly jump).
-      <div className="flex-1 flex items-start justify-center px-4 py-10 md:py-16">
-        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+      // Vertically centered in the viewport (owner preference) so the content
+      // sits balanced rather than crammed at the top with empty space below.
+      // The left marketing column is centered against the (taller) auth card via
+      // the grid's items-center. A minor reflow when switching sign-in/sign-up/
+      // reset is acceptable; the card stays the visual anchor.
+      <div className="flex-1 flex items-center justify-center px-4 py-10 md:py-16">
+        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 md:items-center gap-8 lg:gap-12">
           {/* Left Column - Features/Benefits */}
-          <div className="hidden md:flex flex-col justify-start space-y-6 md:pr-6 lg:pr-8 md:pt-2">
+          <div className="hidden md:flex flex-col justify-center space-y-6 md:pr-6 lg:pr-8">
               <div>
                 <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-text-primary mb-3">
                   Free AWS certification practice exams

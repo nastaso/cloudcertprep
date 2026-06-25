@@ -127,7 +127,7 @@ test('P1-6 regression: a real completed exam DOES show Review (questions loaded)
   await page.waitForFunction(() => document.body.dataset.examActive === 'true', { timeout: 25000 })
   // New flow: Review (toolbar) -> review screen -> Submit exam -> final confirm.
   await page.getByRole('button', { name: 'Review', exact: true }).first().click()
-  await expect(page.getByRole('heading', { name: 'Review your answers' })).toBeVisible({ timeout: 10000 })
+  await expect(page.getByRole('heading', { name: 'Review before you submit' })).toBeVisible({ timeout: 10000 })
   await page.getByRole('button', { name: 'Submit exam', exact: true }).click()
   await page.getByRole('button', { name: 'Submit for grading', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Review questions' })).toBeVisible({ timeout: 15000 })

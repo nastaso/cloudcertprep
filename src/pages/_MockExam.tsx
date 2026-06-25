@@ -889,7 +889,7 @@ export function MockExam() {
         {reviewing ? (
           <div className="pt-8 pb-10 px-4 md:px-8">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-xl md:text-2xl font-semibold text-text-primary mb-2">Review your answers</h2>
+              <h2 className="text-xl md:text-2xl font-semibold text-text-primary mb-2">Review before you submit</h2>
               <p className="text-text-muted text-sm md:text-base mb-3">
                 Check anything you skipped or flagged before you submit. Select a question to jump back to it; your answers are kept.
               </p>
