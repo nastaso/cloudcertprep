@@ -12,6 +12,7 @@ import { useTheme } from '../hooks/useTheme'
 import { Button } from './Button'
 import { CertSwitcher } from './CertSwitcher'
 import { PracticeMenu } from './PracticeMenu'
+import { UserMenu } from './UserMenu'
 
 /**
  * HeaderInteractive — auth/cert/theme/mobile-drawer parts of the header.
@@ -100,18 +101,6 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
             Blog
           </a>
           <a
-            href="/history"
-            className="hdr-link cc-auth-in text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
-          >
-            History
-          </a>
-          <a
-            href="/account"
-            className="hdr-link cc-auth-in text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
-          >
-            Account
-          </a>
-          <a
             href={GITHUB_REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -123,17 +112,10 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
           </a>
         </nav>
 
-        {/* Both auth buttons always rendered, CSS-toggled by `cc-authed`.
-            Use the shared <Button> component so the system focus-visible ring
-            and transition apply (a11y findings 3 + 4). */}
-        <Button
-          onClick={() => { if (!guardExamLeave(SIGN_OUT_SENTINEL)) void signOut() }}
-          variant="secondary"
-          size="sm"
-          className="cc-auth-in whitespace-nowrap"
-        >
-          Sign out
-        </Button>
+        {/* Account/user menu (signed in) + Sign in (signed out), CSS-toggled by
+            `cc-authed`. History/Account/theme/Sign out now live inside the user
+            menu instead of as flat top-level links. */}
+        <UserMenu />
         <Button
           onClick={() => { if (!guardExamLeave('/login')) window.location.assign('/login') }}
           variant="primary"

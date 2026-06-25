@@ -48,7 +48,9 @@ test('sign in (confirmed user) lands authenticated + dashboard renders (P1-10 ro
   // Sign-in success does window.location.assign(from='/'); wait for it so the
   // session is persisted before we navigate on (fixes the earlier race).
   await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
-  await expect(page.getByRole('button', { name: 'Sign out' }).first()).toBeVisible({ timeout: 15000 })
+  // Signed-in indicator is now the account/user menu avatar (Sign out moved
+  // inside it).
+  await expect(page.getByRole('button', { name: 'Account menu' }).first()).toBeVisible({ timeout: 15000 })
 
   await page.goto('/aws/clf-c02')
   await expect(page.getByText('Your dashboard')).toBeVisible({ timeout: 20000 })
@@ -132,8 +134,10 @@ test('P1-7: in-exam Sign out routes through the leave modal, then completes', as
   await page.getByRole('button', { name: 'Start exam', exact: true }).click()
   await page.waitForFunction(() => document.body.dataset.examActive === 'true', { timeout: 25000 })
 
-  // Sign out during the exam must open the leave modal, NOT sign out immediately.
-  await page.getByRole('button', { name: 'Sign out' }).first().click()
+  // Sign out (inside the account menu) during the exam must open the leave
+  // modal, NOT sign out immediately.
+  await page.getByRole('button', { name: 'Account menu' }).click()
+  await page.getByRole('button', { name: 'Sign out' }).click()
   await expect(page.getByText('Leave the exam?')).toBeVisible()
 
   // Stay keeps the attempt alive.
@@ -142,7 +146,8 @@ test('P1-7: in-exam Sign out routes through the leave modal, then completes', as
   expect(await page.evaluate(() => document.body.dataset.examActive)).toBe('true')
 
   // Confirming completes the sign-out (back on '/', signed out -> Sign in shows).
-  await page.getByRole('button', { name: 'Sign out' }).first().click()
+  await page.getByRole('button', { name: 'Account menu' }).click()
+  await page.getByRole('button', { name: 'Sign out' }).click()
   await expect(page.getByText('Leave the exam?')).toBeVisible()
   await page.getByRole('button', { name: 'Leave exam' }).click()
   await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
