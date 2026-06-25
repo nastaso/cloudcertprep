@@ -1,0 +1,18 @@
+---
+/**
+ * /account — interactive page body island. Noindexed (signed-in app route).
+ * Static Astro chrome comes from BaseLayout; AppIsland renders only the body.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro'
+import AppIsland from '../components/AppIsland.tsx'
+---
+
+<BaseLayout
+  title="Account · CloudCertPrep"
+  description="Manage your CloudCertPrep account: export your data or delete your account."
+  canonical="https://www.cloudcertprep.io/account"
+  robots="noindex"
+  noscriptDirectory={true}
+>
+  <AppIsland client:only="react" />
+</BaseLayout>

@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth'
 
 const ACK_KEY = 'cloudcertprep_verified_welcome_ack'
 
-type Notice = { kind: 'verified' } | { kind: 'expired' } | null
+type Notice = { kind: 'verified' } | { kind: 'expired' } | { kind: 'deleted' } | null
 
 /**
  * Read the auth redirect markers from the URL exactly once on mount, then strip
@@ -23,6 +23,7 @@ function readNoticeOnce(): Notice {
   if (typeof window === 'undefined') return null
   const params = new URLSearchParams(window.location.search)
   const verified = params.get('verified') === '1'
+  const deleted = params.get('account_deleted') === '1'
   const errorCode = params.get('error_code') || ''
   const errorVal = params.get('error') || ''
   const isExpired =
@@ -30,14 +31,15 @@ function readNoticeOnce(): Notice {
     || errorVal === 'access_denied'
     || (errorVal !== '' && errorVal !== 'email_unverified')
 
-  if (!verified && !isExpired) return null
+  if (!verified && !deleted && !isExpired) return null
 
   // Strip every auth param so a refresh is clean (mirror _Login.tsx read-once).
-  ;['verified', 'error', 'error_code', 'error_description'].forEach(k => params.delete(k))
+  ;['verified', 'account_deleted', 'error', 'error_code', 'error_description'].forEach(k => params.delete(k))
   const qs = params.toString()
   window.history.replaceState(null, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash)
 
   if (isExpired) return { kind: 'expired' } // the actionable failure wins
+  if (deleted) return { kind: 'deleted' } // post-deletion acknowledgement
   try {
     if (localStorage.getItem(ACK_KEY)) return null
     localStorage.setItem(ACK_KEY, new Date().toISOString())
@@ -67,6 +69,20 @@ export default function AuthLinkNotice({ practiceHref }: { practiceHref: string 
             That link has expired or was already used.{' '}
             <a href="/login" className="font-semibold underline">Request a new one</a>.
           </span>
+          <button type="button" onClick={() => setNotice(null)} className="text-sm underline shrink-0">
+            Dismiss
+          </button>
+        </Alert>
+      </div>
+    )
+  }
+
+  if (notice.kind === 'deleted') {
+    return (
+      <div className="mb-10 md:mb-12">
+        <Alert tone="success" role="status" className="flex items-start gap-3">
+          <CheckCircle className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
+          <span className="flex-1">Your account and all your data have been deleted. Thanks for trying CloudCertPrep.</span>
           <button type="button" onClick={() => setNotice(null)} className="text-sm underline shrink-0">
             Dismiss
           </button>

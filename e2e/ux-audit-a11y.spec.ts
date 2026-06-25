@@ -15,7 +15,7 @@ const SURFACES = [
   '/', '/login', '/about', '/contribute', '/blog',
   '/aws/clf-c02', '/aws/clf-c02/cloud-concepts',
   '/aws/clf-c02/practice-exam', '/aws/clf-c02/domain-practice',
-  '/history', '/stats',
+  '/history', '/stats', '/account',
   '/?verified=1', '/?error=access_denied&error_code=otp_expired',
 ]
 

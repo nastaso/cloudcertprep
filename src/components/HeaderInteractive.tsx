@@ -5,7 +5,7 @@ import { useSignOut } from '../hooks/useSignOut'
 import { trackEvent } from '../lib/analytics'
 import { KOFI_URL, GITHUB_REPO_URL } from '../lib/constants'
 import { guardExamLeave, SIGN_OUT_SENTINEL } from '../lib/examGuard'
-import { Menu, X, Heart, Sun, Moon, Github, History, Info, BookOpen, Home } from 'lucide-react'
+import { Menu, X, Heart, Sun, Moon, Github, History, Info, BookOpen, Home, UserCircle } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useExamActive } from '../hooks/useExamActive'
 import { useTheme } from '../hooks/useTheme'
@@ -104,6 +104,12 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
             className="hdr-link cc-auth-in text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
           >
             History
+          </a>
+          <a
+            href="/account"
+            className="hdr-link cc-auth-in text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
+          >
+            Account
           </a>
           <a
             href={GITHUB_REPO_URL}
@@ -214,6 +220,16 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
                 >
                   <History className="w-5 h-5 text-text-muted" aria-hidden="true" />
                   History
+                </a>
+              )}
+              {user && (
+                <a
+                  href="/account"
+                  onClick={closeMobileMenu}
+                  className="px-4 py-3 text-text-primary hover:bg-bg-dark rounded-xl transition-colors active:scale-[0.98] font-medium flex items-center gap-3"
+                >
+                  <UserCircle className="w-5 h-5 text-text-muted" aria-hidden="true" />
+                  Account
                 </a>
               )}
               <a

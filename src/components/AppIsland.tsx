@@ -31,6 +31,7 @@ import { NotFound } from '../pages/_NotFound'
 const MockExam = lazy(() => import('../pages/_MockExam').then(m => ({ default: m.MockExam })))
 const DomainPractice = lazy(() => import('../pages/_DomainPractice').then(m => ({ default: m.DomainPractice })))
 const History = lazy(() => import('../pages/_History').then(m => ({ default: m.History })))
+const Account = lazy(() => import('../pages/_Account').then(m => ({ default: m.Account })))
 const Login = lazy(() => import('../pages/_Login').then(m => ({ default: m.Login })))
 const ResetPassword = lazy(() => import('../pages/_ResetPassword').then(m => ({ default: m.ResetPassword })))
 
@@ -89,6 +90,7 @@ function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/history" element={<History />} />
+        <Route path="/account" element={<Account />} />
 
         {/* Cert-scoped interactive routes. CertRouteGuard validates the
             (provider, cert) pair, then renders the nested practice flow. */}

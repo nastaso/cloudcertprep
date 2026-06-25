@@ -138,6 +138,30 @@ Full source: see `src/pages/_Stats.tsx` for the call site. If you change the fun
 
 ---
 
+## Edge Functions
+
+### `delete-account` (`supabase/functions/delete-account/index.ts`)
+
+Self-service GDPR "right to erasure" backing the **Delete account** button on `/account`.
+RLS lets a user delete their own data rows but cannot remove the `auth.users` row itself
+(only the service_role can), so deletion runs server-side. The function authenticates the
+caller from their forwarded JWT, deletes their `attempt_questions`, `exam_attempts`, and
+`domain_progress` rows, then deletes the `auth.users` row.
+
+**Deploy (owner, one-time):**
+
+```
+supabase functions deploy delete-account --project-ref <project-ref>
+```
+
+Supabase injects `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` into
+the function runtime automatically - no extra secrets to set. Until it is deployed, the
+`/account` Delete button surfaces an error that falls back to the email-based erasure path
+(still GDPR-compliant), so the UI degrades gracefully. The data **export** button on
+`/account` needs no function (it reads the user's own RLS-scoped rows directly).
+
+---
+
 ## Authentication
 
 - Email/password sign-up enabled.
