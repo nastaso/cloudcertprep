@@ -916,10 +916,8 @@ export function MockExam() {
             </Button>
 
             <Card className="mb-3">
-              <div className="hidden lg:flex items-center justify-end mb-2">
-                <span className="text-text-muted text-xs md:text-sm">Question {currentIndex + 1} of {questions.length}</span>
-              </div>
-
+              {/* (No in-card "Question X of Y": the sticky toolbar above already
+                  shows it persistently - it was rendered twice on desktop.) */}
               {/* cc-question-stem overrides the global `h1,h2 { text-wrap: balance }`
                   (index.css): balance equalizes line lengths, which on a 2-sentence
                   question stem forces an early break with a big trailing gap (reads
@@ -1036,7 +1034,7 @@ export function MockExam() {
                   Submit exam
                 </Button>
               ) : (
-                <Button onClick={nextQuestion} variant="secondary" className="flex-1">
+                <Button onClick={nextQuestion} variant="secondary" className="flex-1" arrow>
                   Next
                 </Button>
               )}

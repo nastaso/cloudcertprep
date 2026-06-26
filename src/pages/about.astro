@@ -147,17 +147,14 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
   <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
     <div class="max-w-3xl mx-auto px-4 md:px-8">
       <div class="space-y-10 max-w-[68ch] mx-auto">
-        {/* Maintainer + source (E-E-A-T anchor) */}
-        <section class="space-y-3">
-          <p class={bodyText}>
-            CloudCertPrep is built and maintained by{' '}
-            <a href="https://santonastaso.me" target="_blank" rel="noopener noreferrer" class={link}>Alex Santonastaso</a>, and the entire codebase and question bank are public on{' '}
-            <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class={link}>GitHub</a>.
-          </p>
-        </section>
+        {/* Mission standfirst (distinct from the maintainer detail below, which
+            used to be restated here almost verbatim). */}
+        <p class="text-lg md:text-xl leading-relaxed text-text-primary [text-wrap:balance]">
+          A free, open, and fully auditable way to prepare for AWS certifications: no ads, no paywalls, no signup to start, and no "exam dumps".
+        </p>
 
         {/* Who maintains it */}
-        <section class="space-y-3">
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>Who maintains it</h2>
           <p class={bodyText}>
             CloudCertPrep is created and maintained by{' '}
@@ -166,7 +163,7 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
         </section>
 
         {/* Methodology */}
-        <section class="space-y-3">
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>How the question banks are built</h2>
           <p class={bodyText}>
             Every question is aligned to the official AWS exam guide and its task statements, so the topic coverage and difficulty mirror what you will actually face on exam day. Each question ships with a detailed explanation of why the correct answer is right and why each distractor is wrong. The explanations are where the real learning happens.
@@ -177,20 +174,20 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
         </section>
 
         {/* Question and explanation methodology */}
-        <section class="space-y-3">
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>Question and Explanation Methodology</h2>
           <p class={bodyText}>
             Building on how the banks are assembled above, this is the editorial standard every question is held to before it ships.
           </p>
-          <h3 class="text-base md:text-lg font-semibold text-text-primary">How questions are written</h3>
+          <h3 class="text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary pt-2">How questions are written</h3>
           <p class={bodyText}>
             Each question is authored against a specific task statement in the official AWS exam guide, so coverage and difficulty track the scored exam rather than drifting into trivia. New questions arrive as community contributions through a GitHub pull request, where anyone can propose, discuss, and refine them in the open. Questions are never sourced from braindumps or exam dumps. Reproducing real exam content breaches the AWS certification agreement and teaches recall instead of understanding, so we write original questions from the published exam guide and documentation.
           </p>
-          <h3 class="text-base md:text-lg font-semibold text-text-primary">How explanations are structured</h3>
+          <h3 class="text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary pt-2">How explanations are structured</h3>
           <p class={bodyText}>
             Every explanation has two parts: a rationale for the correct answer that explains why it is right, and a per-distractor rationale that explains why each incorrect option is wrong. Reading why the wrong answers are wrong is what turns a practice question into genuine understanding you can carry into the exam.
           </p>
-          <h3 class="text-base md:text-lg font-semibold text-text-primary">How the banks are reviewed</h3>
+          <h3 class="text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary pt-2">How the banks are reviewed</h3>
           <p class={bodyText}>
             Changes are reviewed through GitHub pull requests before merging, so every edit has a visible author and review trail. The entire bank is publicly auditable: each question links to its source file by{' '}
             <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class={link}>permalink on GitHub</a>, so you can verify any claim against the AWS documentation yourself. Everything is{' '}
@@ -199,7 +196,7 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
         </section>
 
         {/* Free + open-source rationale */}
-        <section class="space-y-3">
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>Why it is free and open source</h2>
           <p class={bodyText}>
             CloudCertPrep is MIT licensed with no ads, no paywalls, and no premium tier. Good exam prep should not be locked behind a subscription. The project is sustained by optional{' '}
@@ -208,7 +205,7 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
         </section>
 
         {/* Contributor credits */}
-        <section class="space-y-3">
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>Contributors</h2>
           <p class={bodyText}>
             CloudCertPrep is built in the open and welcomes contributions. See the{' '}
@@ -221,7 +218,7 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
         </section>
 
         {/* Privacy */}
-        <section class="space-y-3">
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>Privacy</h2>
           <p class={bodyText}>
             CloudCertPrep is GDPR-compliant. Guest users generate no server-side personal data. Authenticated user data is stored in the EU (Supabase, Ireland) and is never sold or shared. For analytics, cookieless, privacy-friendly{' '}
@@ -231,7 +228,7 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
         </section>
 
         {/* Contact */}
-        <section class="space-y-3">
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>Contact</h2>
           <p class={bodyText}>
             Questions, corrections, or ideas? Email{' '}
