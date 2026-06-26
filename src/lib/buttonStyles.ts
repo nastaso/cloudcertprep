@@ -104,7 +104,9 @@ export function filterChipClass(opts: {
   return [
     'min-h-[44px] px-4 py-2 rounded-xl font-medium border ' +
       'transition-[transform,background-color,border-color,color] duration-gentle ease-press ' +
-      'active:scale-[0.97] active:duration-press',
+      'active:scale-[0.97] active:duration-press ' +
+      'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ' +
+      (surface === 'dark' ? 'focus-visible:ring-offset-bg-dark' : 'focus-visible:ring-offset-bg-card'),
     size === 'sm' ? 'text-xs' : 'text-xs md:text-sm',
     active ? 'bg-text-primary text-bg-dark border-text-primary' : inactive,
   ].join(' ')

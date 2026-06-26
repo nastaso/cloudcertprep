@@ -274,7 +274,7 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
                 </a>
                 <a
                   href="#domains"
-                  class="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-medium text-[#F4F6F8] transition-[border-color,background-color,transform] duration-gentle ease-press hover:border-white/40 hover:bg-white/5 active:scale-[0.97] active:duration-press focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                  class="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-medium text-[#F4F6F8] transition-[border-color,background-color,transform] duration-gentle ease-press hover:border-white/40 hover:bg-white/5 active:scale-[0.97] active:duration-press focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1116]"
                 >
                   Practice by domain
                 </a>
@@ -329,7 +329,7 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
                 {cert.domains.map(d => (
                   <a
                     href={`/${cert.provider}/${cert.code}/${getCertDomainSlug(cert, d.id)}`}
-                    class="halo group flex flex-col gap-2 rounded-2xl border border-border-hairline bg-bg-card p-5 md:p-6 shadow-card transition-[background-color,border-color] duration-200 ease-out hover:bg-bg-card-hover focus:outline-none"
+                    class="halo group flex flex-col gap-2 rounded-2xl border border-border-hairline bg-bg-card p-5 md:p-6 shadow-card transition-[background-color,border-color] duration-200 ease-out hover:bg-bg-card-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card"
                     style={`--halo-color: ${levelGlow}`}
                   >
                     <span class="flex items-baseline justify-between gap-4">
@@ -341,7 +341,7 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
                     </span>
                     <span class="flex items-center justify-between text-sm text-text-muted">
                       <span>{d.questionCount}+ practice questions</span>
-                      <span class="feature-arrow text-text-primary" aria-hidden="true">→</span>
+                      <span class="feature-arrow text-text-primary group-hover:translate-x-1 group-focus-visible:translate-x-1" aria-hidden="true">→</span>
                     </span>
                   </a>
                 ))}

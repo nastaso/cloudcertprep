@@ -667,7 +667,7 @@ export function History() {
                             onClick={() => handleExpandAttempt(attempt.id, attempt.cert_code)}
                             aria-expanded={expandedAttempt === attempt.id}
                             aria-controls={`attempt-details-${attempt.id}`}
-                            className="w-full px-4 py-2 bg-bg-dark hover:bg-bg-dark/70 text-text-primary font-medium rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+                            className="w-full px-4 py-2 bg-bg-dark hover:bg-bg-dark/70 text-text-primary font-medium rounded-lg transition-colors flex items-center justify-center gap-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card"
                           >
                             {expandedAttempt === attempt.id
                               ? <ChevronDown className="w-4 h-4" aria-hidden="true" />
@@ -733,7 +733,7 @@ export function History() {
                           onClick={() => setCurrentPage(pageNum)}
                           aria-label={`Go to page ${pageNum}`}
                           aria-current={safeCurrentPage === pageNum ? 'page' : undefined}
-                          className={`w-11 h-11 rounded-full font-medium transition-[background-color,border-color,color] duration-200 active:scale-[0.97] text-sm border ${
+                          className={`w-11 h-11 rounded-full font-medium transition-[background-color,border-color,color] duration-200 active:scale-[0.97] text-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card ${
                             safeCurrentPage === pageNum
                               ? 'bg-header-bg text-on-header border-header-bg'
                               : 'bg-bg-card hover:bg-bg-card-hover text-text-primary border-border-hairline'

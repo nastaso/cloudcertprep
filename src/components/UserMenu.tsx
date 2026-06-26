@@ -55,7 +55,7 @@ export function UserMenu() {
         ref={triggerRef}
         type="button"
         aria-expanded={open}
-        aria-controls={panelId}
+        aria-controls={open ? panelId : undefined}
         aria-label="Account menu"
         onClick={() => setOpen(o => !o)}
         className="inline-flex items-center gap-1 rounded-full text-on-header transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
@@ -69,7 +69,7 @@ export function UserMenu() {
       {open && (
         <div
           id={panelId}
-          className="absolute right-0 top-full z-50 mt-2 w-60 rounded-2xl border border-border-hairline bg-bg-card p-2 shadow-card-hover"
+          className="absolute right-0 top-full z-50 mt-2 w-60 origin-top-right animate-scale-in rounded-2xl border border-border-hairline bg-bg-card p-2 shadow-card-hover"
         >
           {user?.email && (
             <p className="truncate px-2.5 pb-2 pt-1 text-xs text-text-muted" title={user.email}>

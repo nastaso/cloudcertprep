@@ -210,6 +210,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
 
   return (
     <div className="max-w-6xl mx-auto pt-6 md:pt-10 pb-16 md:pb-24 space-y-8 md:space-y-10 stagger" aria-busy={dataLoading}>
+        {dataLoading && <p className="sr-only" role="status">Loading your dashboard</p>}
         {/* Page header: mono kicker + tracked h1 (DSv6 ladder, hero-scale) */}
         <header>
           <p className="flex items-center gap-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.22em] text-text-muted">
@@ -358,7 +359,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                 <a
                   key={domain.id}
                   href={`${certPath}/${domain.slug}`}
-                  aria-label={`Practice ${domain.name} (${mastery}% mastery)`}
+                  aria-label={`${domain.name}, ${mastery}% mastery`}
                   className="group block bg-bg-card shadow-card hover:shadow-card-hover hover:-translate-y-0.5 border border-border-hairline rounded-2xl p-5 md:p-6 transition-[background-color,border-color,box-shadow,transform] duration-200 hover:bg-bg-card-hover hover:border-text-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
                 >
                   <div className="flex items-start justify-between gap-4">

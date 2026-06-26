@@ -115,7 +115,7 @@ function ExamQuestionGrid({
             onClick={() => onSelect(idx)}
             aria-label={ariaLabel}
             aria-current={isCurrent ? 'true' : undefined}
-            className={`relative ${cellSize} rounded text-sm font-medium transition-colors ${
+            className={`relative ${cellSize} rounded text-sm font-medium transition-colors focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${
               isAnswered
                 ? 'bg-brand/30 text-text-primary hover:bg-brand/50'
                 : 'bg-bg-dark text-text-muted hover:bg-bg-card-hover'
@@ -1014,7 +1014,7 @@ export function MockExam() {
               <button
                 onClick={toggleFlag}
                 aria-pressed={!!currentState?.flagged}
-                className={`flex items-center gap-2 min-h-[44px] px-4 py-2 md:py-2.5 rounded-lg transition-colors text-sm ${
+                className={`flex items-center gap-2 min-h-[44px] px-4 py-2 md:py-2.5 rounded-lg transition-colors text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card ${
                   currentState?.flagged
                     ? 'bg-warning/20 text-warning border border-warning'
                     : 'bg-bg-dark text-text-muted hover:text-text-primary'
@@ -1057,12 +1057,12 @@ export function MockExam() {
                 onSelect={goToQuestion}
               />
               {/* Legend: the grid's colors were previously unexplained. */}
-              <dl className="mt-4 pt-3 border-t border-border-hairline/60 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px] text-text-muted">
-                <div className="flex items-center gap-1.5"><span className="h-3 w-3 flex-shrink-0 rounded-sm bg-brand/30" aria-hidden="true" /> Answered</div>
-                <div className="flex items-center gap-1.5"><span className="h-3 w-3 flex-shrink-0 rounded-sm bg-bg-dark border border-border-hairline" aria-hidden="true" /> Unanswered</div>
-                <div className="flex items-center gap-1.5"><span className="h-3 w-3 flex-shrink-0 rounded-sm ring-2 ring-inset ring-brand" aria-hidden="true" /> Current</div>
-                <div className="flex items-center gap-1.5"><Flag className="h-3 w-3 flex-shrink-0 text-warning fill-warning" aria-hidden="true" /> Flagged</div>
-              </dl>
+              <ul className="mt-4 pt-3 border-t border-border-hairline/60 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px] text-text-muted list-none p-0 m-0">
+                <li className="flex items-center gap-1.5"><span className="h-3 w-3 flex-shrink-0 rounded-sm bg-brand/30" aria-hidden="true" /> Answered</li>
+                <li className="flex items-center gap-1.5"><span className="h-3 w-3 flex-shrink-0 rounded-sm bg-bg-dark border border-border-hairline" aria-hidden="true" /> Unanswered</li>
+                <li className="flex items-center gap-1.5"><span className="h-3 w-3 flex-shrink-0 rounded-sm ring-2 ring-inset ring-brand" aria-hidden="true" /> Current</li>
+                <li className="flex items-center gap-1.5"><Flag className="h-3 w-3 flex-shrink-0 text-warning fill-warning" aria-hidden="true" /> Flagged</li>
+              </ul>
             </div>
             </div>
           </div>

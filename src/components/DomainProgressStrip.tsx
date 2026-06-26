@@ -53,6 +53,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 function Skeleton() {
   return (
     <Shell>
+      <p className="sr-only" role="status">Loading your progress</p>
       <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between md:gap-8" aria-hidden="true">
         <div className="min-w-0 flex-1 animate-pulse">
           <div className="h-3 w-28 rounded bg-text-muted/15" />
@@ -77,6 +78,7 @@ function Strip(props: DomainProgressStripProps) {
     typeof document !== 'undefined' && document.documentElement.classList.contains('cc-authed'))
   const [progress, setProgress] = useState<DomainProgress | null>(null)
   const [loaded, setLoaded] = useState(false)
+  const [loadFailed, setLoadFailed] = useState(false)
 
   useEffect(() => {
     if (authLoading || !user) return
@@ -92,7 +94,7 @@ function Strip(props: DomainProgressStripProps) {
         .eq('domain_id', domainId)
         .maybeSingle()
       if (cancelled) return
-      if (error) logError('DomainProgressStrip.load', error)
+      if (error) { logError('DomainProgressStrip.load', error); setLoadFailed(true) }
       else setProgress((data as DomainProgress | null) ?? null)
       setLoaded(true)
     })()
@@ -103,6 +105,10 @@ function Strip(props: DomainProgressStripProps) {
   if (authLoading) return authedHint ? <Skeleton /> : null
   if (!user) return null
   if (!loaded) return <Skeleton />
+  // On a transient network/RLS error, hide the personalization rather than
+  // asserting a false "Not started yet" to a user who has practiced. The
+  // prerendered SEO content below is untouched (this island renders nothing).
+  if (loadFailed) return null
 
   // Cap to the live bank (stale rows can exceed it) and DERIVE mastery from the
   // capped `correct`, matching the cert dashboard's domain cards exactly.

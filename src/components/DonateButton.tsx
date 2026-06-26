@@ -68,6 +68,8 @@ export function DonateButton({ isExamActive, pathname }: DonateButtonProps) {
         href={KOFI_URL}
         target="_blank"
         rel="noopener noreferrer"
+        aria-hidden={nearFooter}
+        tabIndex={nearFooter ? -1 : undefined}
         onClick={() => trackEvent('donate_click', { location: 'floating' })}
         className="flex items-center gap-2 bg-bg-card text-text-primary rounded-full pl-3 pr-4 py-2 shadow-card hover:shadow-card-hover border border-border-hairline hover:border-text-muted/40 transition-[box-shadow,transform,border-color] duration-gentle ease-out hover:-translate-y-0.5 active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark"
       >

@@ -86,7 +86,7 @@ export function PracticeMenu({ variant, isAuthed = false, onNavigate }: { varian
           ref={triggerRef}
           type="button"
           aria-expanded={open}
-          aria-controls={panelId}
+          aria-controls={open ? panelId : undefined}
           disabled={examActive}
           title={examActive ? 'Finish your exam to open the practice menu' : undefined}
           onClick={() => setOpen(o => !o)}
@@ -98,7 +98,7 @@ export function PracticeMenu({ variant, isAuthed = false, onNavigate }: { varian
         {open && !examActive && (
           <div
             id={panelId}
-            className="absolute right-0 top-full mt-2 w-[min(94vw,30rem)] rounded-2xl border border-border-hairline bg-bg-card shadow-card-hover p-3 md:p-4 z-50"
+            className="absolute right-0 top-full mt-2 w-[min(94vw,30rem)] origin-top-right animate-scale-in rounded-2xl border border-border-hairline bg-bg-card shadow-card-hover p-3 md:p-4 z-50"
           >
             {/* Plain container, NOT a nav landmark: the footer already owns the
                 "Practice" nav, and a disclosure panel should not add duplicate
