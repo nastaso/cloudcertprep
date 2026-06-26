@@ -817,7 +817,7 @@ export function DomainPractice() {
                   href={buildGitHubIssueUrl(currentQuestion.id)}
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-text-primary hover:text-text-primary/70 hover:underline"
+                  className="text-text-primary underline underline-offset-2 hover:text-text-primary/70"
                 >
                   Report on GitHub
                 </a>

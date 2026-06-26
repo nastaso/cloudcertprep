@@ -294,12 +294,12 @@ const explanationParagraphs = (explanation ?? '')
         const badge = btn.querySelector<HTMLElement>('.sample-badge')
         btn.setAttribute('aria-pressed', on ? 'true' : 'false')
         if (on) {
-          btn.classList.remove('border-border-hairline', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover')
+          btn.classList.remove('border-text-muted/25', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover')
           btn.classList.add('border-brand', 'bg-brand/10')
           badge?.classList.remove('text-text-muted')
           badge?.classList.add('text-brand')
         } else {
-          btn.classList.add('border-border-hairline', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover')
+          btn.classList.add('border-text-muted/25', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover')
           btn.classList.remove('border-brand', 'bg-brand/10')
           badge?.classList.add('text-text-muted')
           badge?.classList.remove('text-brand')
@@ -314,7 +314,7 @@ const explanationParagraphs = (explanation ?? '')
           const wasSelected = selected.has(btn)
           // Clear interim/default styling.
           btn.classList.remove(
-            'border-border-hairline', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover',
+            'border-text-muted/25', 'bg-bg-card', 'hover:border-text-muted/50', 'hover:bg-bg-card-hover',
             'border-brand', 'bg-brand/10',
           )
           badge?.classList.remove('text-text-muted', 'text-brand')
@@ -325,7 +325,7 @@ const explanationParagraphs = (explanation ?? '')
             btn.classList.add('border-danger', 'bg-danger/10')
             badge?.classList.add('text-danger')
           } else {
-            btn.classList.add('border-border-hairline', 'bg-bg-card', 'opacity-60')
+            btn.classList.add('border-text-muted/25', 'bg-bg-card', 'opacity-60')
             badge?.classList.add('text-text-muted')
           }
           btn.disabled = true

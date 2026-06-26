@@ -127,7 +127,7 @@ function Strip(props: DomainProgressStripProps) {
             <span className="text-sm text-text-muted">mastery</span>
           </div>
           <div
-            className="mt-3 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-bg-dark"
+            className="mt-3 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-text-muted/15"
             role="progressbar"
             aria-valuenow={mastery}
             aria-valuemin={0}

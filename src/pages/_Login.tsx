@@ -263,7 +263,7 @@ export function Login() {
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
-                    <BookOpen className="w-5 h-5 text-text-muted" aria-hidden="true" />
+                    <BookOpen className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-text-primary font-semibold mb-1">{getActiveTotalQuestions().toLocaleString()}+ Practice Questions</h3>
@@ -273,7 +273,7 @@ export function Login() {
 
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
-                    <FileText className="w-5 h-5 text-text-muted" aria-hidden="true" />
+                    <FileText className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-text-primary font-semibold mb-1">Full-Length Practice Exams</h3>
@@ -283,7 +283,7 @@ export function Login() {
 
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
-                    <Target className="w-5 h-5 text-text-muted" aria-hidden="true" />
+                    <Target className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-text-primary font-semibold mb-1">Domain Practice</h3>
@@ -293,7 +293,7 @@ export function Login() {
 
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="w-5 h-5 text-text-muted" aria-hidden="true" />
+                    <TrendingUp className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-text-primary font-semibold mb-1">Progress Tracking</h3>
@@ -303,7 +303,7 @@ export function Login() {
 
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />
+                    <CheckCircle className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-text-primary font-semibold mb-1">100% Free</h3>

@@ -34,6 +34,10 @@ interface Props {
   headingId?: string
   /** Visible heading text (defaults to "Frequently asked questions"). */
   headingLabel?: string
+  /** Heading type scale, to match the host page's other section H2s. Default is
+   *  the large editorial scale used by home + cert hubs; denser pages (domain
+   *  landings, whose section H2s are text-xl/2xl) pass the smaller scale. */
+  headingClass?: string
 }
 
 const {
@@ -42,6 +46,7 @@ const {
   entries: customEntries,
   headingId = 'faq-heading',
   headingLabel = 'Frequently asked questions',
+  headingClass = 'font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em]',
 } = Astro.props
 
 const useCustom = !!customEntries
@@ -76,12 +81,13 @@ const chevron = '<polyline points="6 9 12 15 18 9"></polyline>'
 
 <section aria-labelledby={headingId} class="mt-8 md:mt-12 max-w-3xl mx-auto">
   <script type="application/ld+json" set:html={faqJsonLd} />
-  {/* Left-aligned at the same H2 scale + left kicker as every other section
-      header on the page (was centered + oversized via font-display, which read
-      as a different template and out-ranked the core sections). */}
+  {/* Left-aligned with a left kicker, matching the host page's section headers.
+      The heading SCALE is the host's via `headingClass` (large editorial scale
+      on home + cert hubs; text-xl/2xl on the denser domain landings) so the FAQ
+      always matches its neighbors instead of out-ranking or under-ranking them. */}
   <div class="mb-8 md:mb-10">
     <p class="kicker" aria-hidden="true">FAQ</p>
-    <h2 id={headingId} class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary">
+    <h2 id={headingId} class={`${headingClass} text-text-primary`}>
       {headingLabel}
     </h2>
     <p class="mt-3 text-base leading-relaxed text-text-muted max-w-2xl [text-wrap:pretty]">

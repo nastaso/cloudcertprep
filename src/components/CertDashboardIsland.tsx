@@ -374,7 +374,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                     </span>
                   </div>
                   <div
-                    className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-bg-dark"
+                    className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-text-muted/15"
                     role="progressbar"
                     aria-valuenow={mastery}
                     aria-valuemin={0}

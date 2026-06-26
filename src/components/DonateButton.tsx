@@ -39,6 +39,13 @@ export function DonateButton({ isExamActive }: DonateButtonProps) {
   }, [])
 
   if (isExamActive) return null
+  // Don't float the donate pill over the user's OWN data pages (stats / history
+  // / account): on common desktop widths the fixed bottom-left pill overlaps the
+  // left edge of the wide content cards, and a donate prompt over personal data
+  // reads as nagging. The footer 'Support this project' link still carries the
+  // ask on those pages. (Pathname is constant per page load - separate Astro
+  // documents - so this early-return is stable across renders.)
+  if (typeof window !== 'undefined' && /^\/(stats|history|account)(\/|$)/.test(window.location.pathname)) return null
 
   return (
     // Mounts on client:idle (after hydration), so it appears a beat after the

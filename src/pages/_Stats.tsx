@@ -51,6 +51,10 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
   const [certStats, setCertStats] = useState<Record<string, CertStats>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  // The prerendered snapshot stands in ONLY for the first load; once it has been
+  // hidden (first settle), a re-entered loading state (retry / re-fetch) must
+  // render the real skeleton, not null over the hidden snapshot (= blank page).
+  const [hasSettled, setHasSettled] = useState(false)
 
   async function loadStats() {
     try {
@@ -95,6 +99,7 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
       setError('Failed to load statistics')
     } finally {
       setLoading(false)
+      setHasSettled(true)
       // Signal the host (StatsIsland) to hide the prerendered snapshot now that
       // live numbers (or an error) have resolved - a single forward swap.
       onLoaded?.()
@@ -109,10 +114,12 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
   }, [])
 
   if (loading) {
-    // When the prerendered snapshot is standing in as the loading state (the
-    // /stats page), render nothing here so the snapshot stays put until live
-    // numbers replace it - no snapshot -> skeleton -> live regression.
-    if (hideInitialSkeleton) return null
+    // FIRST load only: the prerendered snapshot is standing in, so render
+    // nothing (no snapshot -> skeleton -> live regression). After the first
+    // settle the snapshot is gone, so a re-entered loading state (retry /
+    // re-fetch) must show the real skeleton, never null (which would blank the
+    // page over the now-hidden snapshot).
+    if (hideInitialSkeleton && !hasSettled) return null
     // Skeleton shaped like the stats page (header + cert cards), matching the
     // real wrapper so there is no jump when the live numbers resolve.
     return (
