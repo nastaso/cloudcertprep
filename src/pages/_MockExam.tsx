@@ -1051,6 +1051,13 @@ export function MockExam() {
                 currentIndex={currentIndex}
                 onSelect={goToQuestion}
               />
+              {/* Legend: the grid's colors were previously unexplained. */}
+              <dl className="mt-4 pt-3 border-t border-border-hairline/60 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px] text-text-muted">
+                <div className="flex items-center gap-1.5"><span className="h-3 w-3 flex-shrink-0 rounded-sm bg-brand/30" aria-hidden="true" /> Answered</div>
+                <div className="flex items-center gap-1.5"><span className="h-3 w-3 flex-shrink-0 rounded-sm bg-bg-dark border border-border-hairline" aria-hidden="true" /> Unanswered</div>
+                <div className="flex items-center gap-1.5"><span className="h-3 w-3 flex-shrink-0 rounded-sm ring-2 ring-inset ring-brand" aria-hidden="true" /> Current</div>
+                <div className="flex items-center gap-1.5"><Flag className="h-3 w-3 flex-shrink-0 text-warning fill-warning" aria-hidden="true" /> Flagged</div>
+              </dl>
             </div>
             </div>
           </div>

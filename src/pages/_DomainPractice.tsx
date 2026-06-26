@@ -396,9 +396,13 @@ export function DomainPractice() {
               })}
             </div>
 
-            <Button onClick={goHome} variant="secondary" fullWidth>
-              Back to home
-            </Button>
+            {/* Lowest-priority action: a quiet centered ghost, not a full-width
+                button competing with the domain grid above it. */}
+            <div className="flex justify-center pt-1">
+              <Button onClick={goHome} variant="ghost" size="sm">
+                Back to home
+              </Button>
+            </div>
           </Card>
 
           {/* Guest-only sign-in nudge — rendered as a sibling card BELOW the

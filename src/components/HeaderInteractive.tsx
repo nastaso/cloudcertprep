@@ -120,14 +120,18 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
             `cc-authed`. History/Account/theme/Sign out now live inside the user
             menu instead of as flat top-level links. */}
         <UserMenu />
-        <Button
-          onClick={() => { if (!guardExamLeave('/login')) window.location.assign('/login') }}
-          variant="primary"
-          size="sm"
-          className="cc-auth-out whitespace-nowrap"
-        >
-          Sign in
-        </Button>
+        {/* Hide the header 'Sign in' on the login page itself (it would point to
+            the page the user is already on). */}
+        {initialPathname !== '/login' && (
+          <Button
+            onClick={() => { if (!guardExamLeave('/login')) window.location.assign('/login') }}
+            variant="primary"
+            size="sm"
+            className="cc-auth-out whitespace-nowrap"
+          >
+            Sign in
+          </Button>
+        )}
       </div>
 
       {/* Mobile drawer. Also gated on !hideMobileMenu so it can never mount on

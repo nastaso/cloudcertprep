@@ -27,6 +27,9 @@ export function NotFound() {
       <p className="text-xl font-semibold tracking-[-0.01em] text-text-primary mb-2">Page not found</p>
       <p className="text-text-muted mb-8 max-w-md">{"The page you're looking for doesn't exist or has been moved."}</p>
       <Button variant="primary" onClick={goHome}>Back to home</Button>
+      <a href="/#certifications" className="mt-4 text-sm text-text-muted underline underline-offset-2 hover:text-text-primary transition-colors">
+        Browse certifications
+      </a>
     </div>
   )
 }
