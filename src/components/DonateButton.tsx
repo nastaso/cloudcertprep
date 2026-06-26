@@ -51,7 +51,11 @@ export function DonateButton({ isExamActive, pathname }: DonateButtonProps) {
   // ask on those pages. Uses the Astro-provided pathname (falls back to window
   // for safety) so the check holds during SSR, not just after hydration.
   const path = pathname ?? (typeof window !== 'undefined' ? window.location.pathname : '')
-  if (/^\/(stats|history|account)(\/|$)/.test(path)) return null
+  // Robust to the route in any form: '/stats' (dev), '/stats/' (trailing slash),
+  // and '/stats.html' (the static `format: 'file'` build emits Astro.url.pathname
+  // with the extension). The delimiter after the route name ('/', '.', or end)
+  // also prevents false matches like '/statistics'.
+  if (/^\/(stats|history|account)(\/|\.|$)/.test(path)) return null
 
   return (
     // Mounts on client:idle (after hydration), so it appears a beat after the
