@@ -57,7 +57,9 @@ const {
       )}
 
       {kicker && (
-        <p class="font-mono text-[12px] font-bold uppercase tracking-[0.22em] text-[#FF9900]">
+        <p class="flex items-center gap-2.5 font-mono text-[12px] font-bold uppercase tracking-[0.22em] text-[#FF9900]">
+          {/* Leading brand rule, matching the sitewide .kicker eyebrow. */}
+          <span class="h-0.5 w-[22px] rounded-full bg-[#FF9900]" aria-hidden="true"></span>
           {kicker}
         </p>
       )}

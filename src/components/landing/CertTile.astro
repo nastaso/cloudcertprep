@@ -30,11 +30,20 @@ const domains = cert.domains.length
 
 <a
   href={href}
-  class:list={['feature-card halo group']}
+  class:list={['feature-card group relative', !isComingSoon && 'halo']}
   style={`--halo-color: ${LEVEL_ACCENT_RGB[cert.level]}`}
   aria-label={`${cert.name}: ${isComingSoon ? 'coming soon' : `${questions.toLocaleString('en-US')}+ practice questions`}`}
 >
-  <div class:list={['feature-art relative', isComingSoon && 'opacity-90']} aria-hidden="true">
+  {/* Coming-soon badge as a corner overlay (not in the body flow) so the title
+      row shares a baseline with the live tiles. */}
+  {isComingSoon && (
+    <span class="absolute top-3 right-3 z-10 inline-flex items-center rounded-md bg-warning/15 px-2 py-0.5 text-[11px] font-medium text-warning backdrop-blur-sm">
+      Coming soon
+    </span>
+  )}
+  {/* De-emphasized art for coming-soon so a roadmap tile never out-ranks a live
+      practice exam (the live tiles also keep the halo lift; this one does not). */}
+  <div class:list={['feature-art relative', isComingSoon && 'opacity-50']} aria-hidden="true">
     {/* Brand art from the OG pipeline (scripts/generate-og-images.mjs emits
         /og/card-<code>.webp at prebuild): one visual system for share cards
         and site tiles. */}
@@ -51,13 +60,7 @@ const domains = cert.domains.length
   </div>
 
   <div class="flex flex-1 flex-col gap-2 p-5 md:p-6 bg-bg-card rounded-b-2xl">
-    {isComingSoon && (
-      <span class="self-start inline-flex items-center rounded-md bg-warning/15 px-2 py-0.5 text-[11px] font-medium text-warning">
-        Coming soon
-      </span>
-    )}
-
-    <h3 class="text-lg md:text-xl font-semibold tracking-tight text-text-primary">
+    <h3 class:list={['text-lg md:text-xl font-semibold tracking-tight', isComingSoon ? 'text-text-muted' : 'text-text-primary']}>
       {cert.name}
     </h3>
 

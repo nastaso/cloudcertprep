@@ -19,7 +19,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border-hairline mt-auto">
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-16">
         {/* 2x2 on mobile (brand + 3 nav columns = 4 even cells, no orphan),
             1x4 on desktop. The previous 2-col grid with a full-width brand
             stranded "Legal" next to an empty cell on phones. */}
