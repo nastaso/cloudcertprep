@@ -303,7 +303,7 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
                             </div>
                             <p className="font-mono text-xs md:text-sm text-text-muted tabular-nums">{Math.round(ds.avg_score)}% avg</p>
                           </div>
-                          <div className="h-1.5 bg-bg-dark rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-text-muted/15 rounded-full overflow-hidden">
                             <div
                               className={`h-full w-full origin-left transition-transform duration-settle ease-out ${ds.avg_score < 60 ? 'bg-danger' : ds.avg_score < 75 ? 'bg-warning-fill' : 'bg-success'}`}
                               style={{ transform: `scaleX(${Math.min(100, ds.avg_score) / 100})` }}

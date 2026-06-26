@@ -431,6 +431,7 @@ export function Login() {
                     onChange={setConfirmPassword}
                     required
                     autoComplete="new-password"
+                    placeholder="Re-enter your password"
                   />
                 </div>
 

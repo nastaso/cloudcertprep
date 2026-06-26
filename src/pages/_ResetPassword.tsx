@@ -123,6 +123,7 @@ export function ResetPassword() {
               onChange={setPassword}
               required
               autoComplete="new-password"
+              placeholder="Enter a new password"
             />
             <PasswordStrengthMeter password={password} />
           </div>
@@ -137,6 +138,7 @@ export function ResetPassword() {
               onChange={setConfirmPassword}
               required
               autoComplete="new-password"
+              placeholder="Re-enter your password"
             />
           </div>
 

@@ -9,7 +9,7 @@ import { logError } from '../lib/logger'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { Skeleton } from '../components/Skeleton'
 import type { Question, ExamAttempt } from '../types'
-import { formatDuration } from '../lib/scoring'
+import { formatTime } from '../lib/scoring'
 import { formatRelativeDate } from '../lib/formatting'
 import { loadAllQuestions } from '../data/questions'
 import { CERTIFICATIONS, getCertDomains } from '../data/certifications'
@@ -631,7 +631,7 @@ export function History() {
                                 )}
                               </div>
                               <p className="mt-1 font-mono text-[12px] text-text-muted">
-                                {formatRelativeDate(attempt.attempted_at)} · {formatDuration(attempt.time_taken_seconds)}
+                                {formatRelativeDate(attempt.attempted_at)} · {formatTime(attempt.time_taken_seconds)}
                               </p>
                               <p className="text-text-muted text-xs md:text-sm mt-0.5">
                                 {attempt.correct_answers}/{attempt.total_questions} correct ({Math.round(attempt.score_percent)}%)
