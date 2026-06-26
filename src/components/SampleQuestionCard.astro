@@ -51,9 +51,16 @@ interface Props {
   certCode?: string
   domainSlug?: string
   questionId?: string
+  /**
+   * Showcase mode: reveal the correct answer + explanation by default (no click
+   * needed), for the marketing "Every question includes a detailed explanation"
+   * section where hiding the explanation defeats the point. The domain-landing
+   * samples leave this off and keep the attempt-then-reveal interaction.
+   */
+  reveal?: boolean
 }
 
-const { question, options, answer, explanation, index, type, correctOrder, targets, correctMatches, certCode, domainSlug, questionId } = Astro.props
+const { question, options, answer, explanation, index, type, correctOrder, targets, correctMatches, certCode, domainSlug, questionId, reveal } = Astro.props
 
 // Response format. Ordering/matching render as interactive attempt-then-check
 // cards (like the MCQ sample), with the correct answer kept in the static HTML.
@@ -219,6 +226,7 @@ const explanationParagraphs = (explanation ?? '')
 <div
   class="sample-question bg-bg-card rounded-2xl border border-border-hairline shadow-card p-4 md:p-6"
   data-answer-count={correctKeys.size}
+  data-showcase={reveal ? 'true' : undefined}
 >
   <div class="flex items-start gap-2 mb-3">
     <span class="flex-shrink-0 font-mono text-xs md:text-sm font-semibold text-text-muted pt-px">Q{index}.</span>
@@ -353,6 +361,11 @@ const explanationParagraphs = (explanation ?? '')
           if (selected.size === needed) resolve()
         })
       })
+
+      // Showcase mode (the cert-hub "detailed explanation" section): reveal the
+      // correct answer + explanation immediately, no click - the section exists
+      // to SHOW the explanation, so hiding it behind an interaction defeats it.
+      if (card.dataset.showcase === 'true') resolve()
     })
   }
 
