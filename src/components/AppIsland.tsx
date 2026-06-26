@@ -48,7 +48,7 @@ let contentObserver: ResizeObserver | null = null
 
 // Removes the static #cc-island-fallback skeleton the moment the real route
 // content mounts. It lives INSIDE the Suspense children, so it only renders
-// once the lazy route chunk has resolved — the skeleton is replaced by real
+// once the lazy route chunk has resolved - the skeleton is replaced by real
 // content in ONE swap (no skeleton -> spinner -> content double transition).
 function RemoveStaticFallback() {
   useEffect(() => {

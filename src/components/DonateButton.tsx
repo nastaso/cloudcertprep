@@ -13,7 +13,7 @@ interface DonateButtonProps {
 }
 
 /**
- * Floating "support the developer" affordance — bottom-left, desktop only.
+ * Floating "Support this project" affordance - bottom-left, desktop only.
  *
  * Visual: a small neutral surface PILL with a red heart icon and a visible
  * label (it used to be a heart that only revealed its label on hover, which

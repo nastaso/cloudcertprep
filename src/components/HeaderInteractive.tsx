@@ -283,7 +283,7 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
                 className="flex items-center justify-center gap-2 text-text-muted hover:text-text-primary transition-colors text-sm"
               >
                 <Heart className="w-4 h-4 text-danger" aria-hidden="true" />
-                Support the developer
+                Support this project
               </a>
             </div>
           </div>

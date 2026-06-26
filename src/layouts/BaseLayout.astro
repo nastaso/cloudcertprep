@@ -210,7 +210,7 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
          no OS prefers-color-scheme mirroring by design). */
       (function(){var t=localStorage.getItem('cloudcertprep_theme');if(t==='dark'){document.documentElement.classList.add('dark')}})();
       /* Motion gate, set BEFORE first paint so the hero stagger + scroll-reveal
-         elements ([data-reveal]) are hidden from frame ONE (deterministic — no
+         elements ([data-reveal]) are hidden from frame ONE (deterministic - no
          paint-then-snap-to-0 flash, which was racy when cc-js was added at the
          end of <body>). Only when motion is allowed AND IntersectionObserver
          exists; otherwise content paints fully visible (no-JS / reduced-motion /
@@ -275,7 +275,7 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
         var root = document.documentElement
         /* cc-js is set pre-paint in <head>, but ONLY when motion is allowed +
            IntersectionObserver exists. If it is absent (reduced-motion / no-IO /
-           no-JS parity) the content is already fully visible — nothing to do. */
+           no-JS parity) the content is already fully visible - nothing to do. */
         if (!root.classList.contains('cc-js')) return
         var els = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'))
         if (!els.length) return

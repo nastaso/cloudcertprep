@@ -10,11 +10,11 @@ export default {
         'overlay': 'var(--shadow-overlay)',
       },
       transitionTimingFunction: {
-        // Shared premium curves — single source of truth is --ease-* in
+        // Shared premium curves - single source of truth is --ease-* in
         // index.css (:root motion block); these reference the vars so the two
         // systems can never drift. DEFAULT re-points every bare `transition` /
         // `transition-colors` utility onto the signature curve (was Tailwind's
-        // generic Material cubic-bezier(0.4,0,0.2,1)) — the highest-leverage
+        // generic Material cubic-bezier(0.4,0,0.2,1)) - the highest-leverage
         // single edit for site-wide motion consistency.
         DEFAULT: 'var(--ease-out)',
         'out': 'var(--ease-out)',     // entrances/settles/lifts

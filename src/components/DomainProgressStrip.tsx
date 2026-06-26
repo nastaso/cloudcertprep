@@ -1,5 +1,5 @@
 /**
- * DomainProgressStrip — logged-in personalization for a single Domain_Landing.
+ * DomainProgressStrip - logged-in personalization for a single Domain_Landing.
  *
  * The Domain_Landing (/aws/:cert/:domain) is prerendered SEO content (intro,
  * sample questions, FAQ) that stays visible for EVERYONE, guests included. This
@@ -9,7 +9,7 @@
  *
  * Mounted with `client:only="react"`. On mount:
  *   - Guests (and visitors still resolving auth without a pre-paint session)
- *     render NOTHING — the SEO page is untouched.
+ *     render NOTHING - the SEO page is untouched.
  *   - Returning users (pre-paint `cc-authed`) get a skeleton while the single
  *     domain_progress row loads, then this domain's mastery, a "practice this
  *     domain" CTA, and a link back to their cert dashboard.

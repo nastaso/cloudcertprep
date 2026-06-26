@@ -4,9 +4,9 @@
  * (prerendered pages). Keeping the recipe here means the two systems can never
  * drift again (they previously disagreed on radius, shadow, and font weight).
  *
- * Design language (DSv4, AWS marketing): rounded-lg rectangles (NOT pills —
- * aws.amazon.com buttons are 8px-radius), `font-medium`, asymmetric press
- * (80ms down via .press-style active, 200ms eased release), orange primary
+ * Design language (DSv6): pill buttons (`rounded-full`), `font-medium`,
+ * asymmetric press (90ms compress via `active:duration-press` = --dur-press,
+ * 250ms eased release via `duration-gentle` = --dur-gentle), orange primary
  * that darkens to the AWS hover orange `brand-hover` (#EC7211) instead of
  * fading via opacity. All colours use project tokens so light/dark themes
  * switch automatically.

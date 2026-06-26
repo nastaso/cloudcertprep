@@ -391,7 +391,7 @@ function formatActiveCertBlock(cert) {
   // Business-driver phrases (R23.13). `cert.shortName` is the uppercase exam
   // code (e.g. CLF-C02) used on the official AWS exam guide.
   const driverLine =
-    `- Why practise here: realistic exam simulation, detailed explanations for every question, ` +
+    `- Why practice here: realistic exam simulation, detailed explanations for every question, ` +
     `aligned to the current ${cert.shortName} exam guide.`
   // One indexable Domain_Landing bullet per active domain (R6.14). The
   // noindex practice-flow shells (practice-exam, domain-practice) are
