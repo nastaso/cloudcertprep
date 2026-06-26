@@ -8,8 +8,6 @@ import { logError } from '../lib/logger'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
-import { Modal } from '../components/Modal'
-import { Input } from '../components/Input'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { Download, Trash2, UserCircle } from 'lucide-react'
 
@@ -18,14 +16,13 @@ const SUPPORT_EMAIL = 'alex@cloudcertprep.io'
 /**
  * Account settings (signed-in only, noindex app route).
  *
- * Self-service GDPR controls promised on /privacy:
+ * GDPR controls:
  *   - Right to portability: "Download my data (JSON)" reads the user's own
  *     rows (RLS-scoped) and saves a JSON file entirely client-side.
- *   - Right to erasure: "Delete my account" invokes the `delete-account` Edge
- *     Function (RLS cannot remove an auth.users row from the client; only the
- *     service_role can). On success the local session is cleared and the user
- *     is sent home. If the function is unreachable, the copy falls back to the
- *     email path (still compliant) rather than failing silently.
+ *   - Right to erasure: handled via an email request for now. In-app
+ *     self-service deletion (the `delete-account` Edge Function) is deferred
+ *     until that function is deployed and its table list is audited against
+ *     the live schema. See .kiro/ux/audit-2026-06-24/DEFERRED-delete-account.md.
  */
 export function Account() {
   const { user, loading: authLoading } = useAuth()
@@ -34,18 +31,13 @@ export function Account() {
 
   useSEO({
     title: 'Account · CloudCertPrep',
-    description: 'Manage your CloudCertPrep account: export your data or delete your account.',
+    description: 'Manage your CloudCertPrep account: export your data or request account deletion.',
     canonical: null,
   })
 
   const [exporting, setExporting] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
   const [exportDone, setExportDone] = useState(false)
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [confirmText, setConfirmText] = useState('')
-  const [deleting, setDeleting] = useState(false)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   async function handleExport() {
     if (!user?.id) return
@@ -114,27 +106,6 @@ export function Account() {
     }
   }
 
-  async function handleDelete() {
-    if (!user?.id) return
-    setDeleting(true)
-    setDeleteError(null)
-    try {
-      const supabase = await getSupabase()
-      const { error } = await supabase.functions.invoke('delete-account', { method: 'POST' })
-      if (error) throw error
-      // The account (and session) no longer exist; clear the local token and
-      // leave the app. The home banner acknowledges the deletion.
-      await supabase.auth.signOut({ scope: 'local' }).catch(() => {})
-      window.location.assign('/?account_deleted=1')
-    } catch (err: unknown) {
-      logError('Account.delete', err)
-      setDeleting(false)
-      setDeleteError(
-        `We could not delete your account automatically. Please email ${SUPPORT_EMAIL} and we will erase it within 30 days.`,
-      )
-    }
-  }
-
   if (authLoading) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
@@ -199,63 +170,31 @@ export function Account() {
               </Button>
             </Card>
 
-            {/* Danger zone (GDPR erasure) */}
+            {/* Danger zone (GDPR erasure). In-app self-service deletion is
+                deferred until the delete-account Edge Function is deployed and
+                its table list audited; erasure is handled via an email request
+                meanwhile. See .kiro/ux/audit-2026-06-24/DEFERRED-delete-account.md. */}
             <Card padding="md" className="!border-danger/30">
               <h2 className="text-lg font-semibold tracking-[-0.01em] text-danger mb-1">Delete account</h2>
               <p className="text-text-muted text-sm mb-4 max-w-prose">
-                Permanently delete your account and all your data: exam attempts, domain progress, and your sign-in. This cannot be undone.
+                To permanently delete your account and all your data (exam attempts, domain progress, and your sign-in), email us from your account address and we will erase everything within 30 days. This cannot be undone.
               </p>
               <Button
-                onClick={() => { setConfirmText(''); setDeleteError(null); setShowDeleteModal(true) }}
-                variant="danger"
+                onClick={() => {
+                  window.location.href =
+                    `mailto:${SUPPORT_EMAIL}` +
+                    `?subject=${encodeURIComponent('Account deletion request')}` +
+                    `&body=${encodeURIComponent(`Please delete my CloudCertPrep account and all associated data.\n\nAccount email: ${user.email ?? ''}`)}`
+                }}
+                variant="secondary"
                 leftIcon={<Trash2 className="w-4 h-4" aria-hidden="true" />}
               >
-                Delete my account
+                Email a deletion request
               </Button>
             </Card>
           </div>
         )}
       </div>
-
-      <Modal
-        isOpen={showDeleteModal}
-        title="Delete your account?"
-        onClose={() => { if (!deleting) setShowDeleteModal(false) }}
-      >
-        <div className="space-y-4">
-          <p className="text-text-primary">
-            This permanently erases your account, exam history, and progress. It cannot be undone.
-          </p>
-          <p className="text-sm text-text-muted">
-            Type <span className="font-mono font-semibold text-text-primary">DELETE</span> to confirm.
-          </p>
-          <Input
-            value={confirmText}
-            onChange={e => setConfirmText(e.target.value)}
-            aria-label="Type DELETE to confirm account deletion"
-            placeholder="DELETE"
-            autoComplete="off"
-            autoCorrect="off"
-            spellCheck={false}
-            disabled={deleting}
-          />
-          {deleteError && <Alert tone="danger" role="alert">{deleteError}</Alert>}
-          {deleting ? (
-            <div className="py-4">
-              <LoadingSpinner text="Deleting your account..." />
-            </div>
-          ) : (
-            <div className="flex gap-3 mt-2">
-              <Button onClick={() => setShowDeleteModal(false)} variant="secondary" className="flex-1">
-                Cancel
-              </Button>
-              <Button onClick={handleDelete} disabled={confirmText !== 'DELETE'} variant="danger" className="flex-1">
-                Delete account
-              </Button>
-            </div>
-          )}
-        </div>
-      </Modal>
     </div>
   )
 }
