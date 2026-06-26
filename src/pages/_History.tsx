@@ -533,7 +533,7 @@ export function History() {
                 <select
                   value={itemsPerPage}
                   onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                  className={inputClass({ className: 'w-auto px-3 py-2 text-sm' })}
+                  className={inputClass({ surface: 'page', className: 'w-auto px-3 py-2 text-sm' })}
                 >
                   <option value={3}>3 per page</option>
                   <option value={5}>5 per page</option>

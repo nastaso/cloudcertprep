@@ -359,17 +359,25 @@ const levelAccentUi = LEVEL_ACCENT_UI_HEX[cert.level]
           route back to the dashboard. Renders nothing for guests (the SEO page
           below is untouched). Mounted OUTSIDE the space-y stack so the empty
           guest island leaves no phantom gap. */}
-      <DomainProgressStrip
-        certCode={cert.code}
-        certShortName={cert.shortName}
-        domainId={domain.id}
-        domainName={domain.name}
-        questionCount={totalDomainQuestions}
-        domainPracticeHref={domainPracticeHref}
-        certPath={certPath}
-        accentHex={levelAccentUi}
-        client:only="react"
-      />
+      {/* Reserve the strip's height for signed-in users (cc-auth-in =
+          display:none for guests, so SEO/CLS is untouched for them) so the
+          client:only island mounting does not push the content sheet down.
+          Heights match the rendered strip (mobile column ~125px / desktop row
+          ~93px); the margin lives here, not on the Shell, so the reservation is
+          exact. */}
+      <div class="cc-auth-in mb-10 md:mb-14 min-h-[125px] md:min-h-[93px]">
+        <DomainProgressStrip
+          certCode={cert.code}
+          certShortName={cert.shortName}
+          domainId={domain.id}
+          domainName={domain.name}
+          questionCount={totalDomainQuestions}
+          domainPracticeHref={domainPracticeHref}
+          certPath={certPath}
+          accentHex={levelAccentUi}
+          client:only="react"
+        />
+      </div>
       <div class="space-y-10 md:space-y-14">
         {/* 4. Intro — unique per domain (blurb + exam-guide facts). Primary
             keyword in the first paragraph and an H2 (R6.5); 200-400 words. */}

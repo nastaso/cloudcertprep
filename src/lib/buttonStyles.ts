@@ -118,13 +118,15 @@ export function filterChipClass(opts: {
  * the cool page gray, hairline border, 44px height, orange focus ring.
  * Pass `hasError` to swap the border/ring to the danger token.
  */
-export function inputClass(opts?: { hasError?: boolean; className?: string }): string {
-  const { hasError = false, className = '' } = opts ?? {}
+export function inputClass(opts?: { hasError?: boolean; className?: string; surface?: 'card' | 'page' }): string {
+  const { hasError = false, className = '', surface = 'card' } = opts ?? {}
+  // Default (in a Card): recessed fill (bg-bg-dark, a step darker than the card)
+  // so the field reads as a distinct, fillable well. On a bare PAGE surface,
+  // bg-bg-dark equals the page background in dark mode and the field nearly
+  // disappears, so a flush-surface field raises to bg-bg-card instead.
+  const fill = surface === 'page' ? 'bg-bg-card' : 'bg-bg-dark'
   return [
-    // Recessed fill (bg-bg-dark, a step darker than the card it sits on) so a
-    // field reads as a distinct, fillable well instead of blending into the
-    // card; the border strengthens to a visible hairline.
-    'w-full px-4 py-2.5 min-h-[44px] rounded-lg bg-bg-dark text-text-primary placeholder:text-text-muted/60',
+    `w-full px-4 py-2.5 min-h-[44px] rounded-lg ${fill} text-text-primary placeholder:text-text-muted/60`,
     'border transition-[border-color,box-shadow] duration-200 focus:outline-none',
     hasError
       ? 'border-danger focus:border-danger focus-visible:ring-2 focus-visible:ring-danger/40'

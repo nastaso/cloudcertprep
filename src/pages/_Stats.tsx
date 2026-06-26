@@ -51,12 +51,13 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
   const [certStats, setCertStats] = useState<Record<string, CertStats>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  // The prerendered snapshot stands in ONLY for the first load; once it has been
-  // hidden (first settle), a re-entered loading state (retry / re-fetch) must
-  // render the real skeleton, not null over the hidden snapshot (= blank page).
-  const [hasSettled, setHasSettled] = useState(false)
+  // True once a fetch has actually succeeded. The prerendered snapshot is hidden
+  // ONLY then (not on an errored settle), so a flaky first load keeps the real
+  // cached numbers instead of swapping them for an error over empty placeholders.
+  const [liveLoaded, setLiveLoaded] = useState(false)
 
   async function loadStats() {
+    let ok = false
     try {
       setLoading(true)
       setError(null)
@@ -93,16 +94,20 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
         }
         setCertStats(certStatsMap)
       }
+      ok = true
 
     } catch (err: unknown) {
       logError('Stats.loadStats', err)
       setError('Failed to load statistics')
     } finally {
       setLoading(false)
-      setHasSettled(true)
-      // Signal the host (StatsIsland) to hide the prerendered snapshot now that
-      // live numbers (or an error) have resolved - a single forward swap.
-      onLoaded?.()
+      // Hide the prerendered snapshot ONLY on a successful load (a single
+      // forward swap to live numbers). On an errored first load we keep it, so
+      // the real cached numbers stay on screen behind a compact retry.
+      if (ok) {
+        setLiveLoaded(true)
+        onLoaded?.()
+      }
     }
   }
 
@@ -113,13 +118,37 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
     loadStats()
   }, [])
 
+  // First-load phase: the prerendered snapshot is still standing in (it is
+  // hidden only on a SUCCESSFUL load). Never replace it with a skeleton or the
+  // empty-placeholder grid. While fetching, render nothing (the snapshot is the
+  // loading state); on a flaky load, show a compact retry OVER the real cached
+  // numbers instead of an error banner above wrong "Be the first" placeholders.
+  if (hideInitialSkeleton && !liveLoaded) {
+    if (error) {
+      return (
+        <div className="p-4 md:p-8">
+          <div className="max-w-6xl mx-auto">
+            <Alert tone="danger" role="status" className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <span>Showing the latest saved figures. We could not refresh the live statistics.</span>
+              <button
+                type="button"
+                onClick={() => loadStats()}
+                className="inline-flex min-h-[44px] flex-shrink-0 items-center justify-center gap-2 rounded-full border border-danger/40 px-5 text-sm font-medium text-danger transition-colors duration-200 hover:bg-danger/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40"
+              >
+                <RotateCw className="h-4 w-4" aria-hidden="true" />
+                Try again
+              </button>
+            </Alert>
+          </div>
+        </div>
+      )
+    }
+    return null
+  }
+
   if (loading) {
-    // FIRST load only: the prerendered snapshot is standing in, so render
-    // nothing (no snapshot -> skeleton -> live regression). After the first
-    // settle the snapshot is gone, so a re-entered loading state (retry /
-    // re-fetch) must show the real skeleton, never null (which would blank the
-    // page over the now-hidden snapshot).
-    if (hideInitialSkeleton && !hasSettled) return null
+    // A re-fetch after live data is already present: show the real skeleton
+    // (the snapshot is gone), never null (which would blank the page).
     // Skeleton shaped like the stats page (header + cert cards), matching the
     // real wrapper so there is no jump when the live numbers resolve.
     return (

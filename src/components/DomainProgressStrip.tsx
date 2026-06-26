@@ -44,7 +44,7 @@ export interface DomainProgressStripProps {
 /** Shared outer shell so the skeleton and the loaded strip line up exactly. */
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <aside className="mb-10 md:mb-14 rounded-2xl border border-border-hairline bg-bg-card shadow-card p-5 md:p-6">
+    <aside className="rounded-2xl border border-border-hairline bg-bg-card shadow-card p-5 md:p-6">
       {children}
     </aside>
   )
