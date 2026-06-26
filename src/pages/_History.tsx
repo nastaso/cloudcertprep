@@ -621,9 +621,9 @@ export function History() {
                                   (date · duration) so middots never orphan at a
                                   wrapped line start on mobile. */}
                               <div className="flex items-center gap-2">
-                                <h3 className="text-sm md:text-base font-semibold text-text-primary">
+                                <h2 className="text-sm md:text-base font-semibold text-text-primary">
                                   {attempt.passed ? 'Passed' : 'Failed'}
-                                </h3>
+                                </h2>
                                 {attemptCert && (
                                   <span className="px-2 py-0.5 rounded-full font-mono text-[10px] md:text-[11px] font-semibold bg-bg-dark border border-border-hairline text-text-muted uppercase tracking-wide">
                                     {attemptCert.shortName}

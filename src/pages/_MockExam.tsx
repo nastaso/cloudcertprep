@@ -715,15 +715,16 @@ export function MockExam() {
     )
   }
 
-  if (screen === 'results') return (
+    if (screen === 'results') return (
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="max-w-2xl w-full space-y-6 animate-enter">
+          <h1 className="sr-only">{cert.shortName} Exam Results</h1>
+
           <PassFailBanner
             passed={results!.passed}
             scaledScore={results!.scaledScore}
             percent={results!.percentScore}
           />
-
           {submitError && (
             <Alert tone="warning">
               {submitError}
@@ -1241,9 +1242,11 @@ export function MockExam() {
     const originalQuestion = questions.find(q => q.id === currentReviewQuestion.questionId)!
 
     return (
-      <div className="flex-1">
-        <div className="p-4 md:p-8">
-          <div className="max-w-4xl mx-auto">
+    <div className="flex-1">
+      <h1 className="sr-only">{cert.shortName} Exam Review</h1>
+
+      <div className="p-4 md:p-8">
+        <div className="max-w-4xl mx-auto">
             {/* Filter Controls */}
             <Card padding="sm" className="mb-4">
               <div className="space-y-3">
