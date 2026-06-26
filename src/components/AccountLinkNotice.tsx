@@ -32,7 +32,7 @@ export function AccountLinkNotice() {
       <Alert
         tone="success"
         role="status"
-        className="relative w-full max-w-md pr-10 shadow-2xl pointer-events-auto animate-slide-up"
+        className="relative w-full max-w-md pr-12 shadow-2xl pointer-events-auto animate-slide-up"
       >
         {ACCOUNT_LINK_MESSAGE}
         <button
