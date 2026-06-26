@@ -27,9 +27,13 @@ interface Props {
 const { post } = Astro.props
 const { Content, headings } = await render(post)
 
-// Estimated reading time from the raw markdown body (~200 wpm), for a
-// scannability cue in the byline.
-const wordCount = post.body ? post.body.trim().split(/\s+/).length : 0
+// Estimated reading time (~200 wpm) for a scannability cue in the byline.
+// Strip fenced + inline code first so code tokens (and markdown punctuation
+// they carry) do not inflate the count on technical posts.
+const prose = post.body
+  ? post.body.replace(/```[\s\S]*?```/g, '').replace(/`[^`]*`/g, '')
+  : ''
+const wordCount = prose.trim() ? prose.trim().split(/\s+/).length : 0
 const readingMinutes = Math.max(1, Math.round(wordCount / 200))
 ---
 

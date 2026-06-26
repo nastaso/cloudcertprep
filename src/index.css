@@ -61,8 +61,10 @@
 .animate-enter { animation: enter var(--dur-gentle) var(--ease-out); }
 .animate-slide-in-right { animation: slide-in-right var(--dur-slow) var(--ease-out); }
 /* Mobile drawer exit (§8 item 5): Apple sheet curve, slightly quicker than
-   entry. Paired with a fade-out on the backdrop. */
-.animate-slide-out-right { animation: slide-out-right 0.24s cubic-bezier(0.32, 0.72, 0, 1) both; }
+   entry. Paired with a fade-out on the backdrop - both run var(--dur-fast)
+   (180ms) so the scrim and panel leave together (was 0.24s, 60ms after the
+   180ms backdrop). */
+.animate-slide-out-right { animation: slide-out-right var(--dur-fast) cubic-bezier(0.32, 0.72, 0, 1) both; }
 /* Dismissals accelerate away (ease-exit) and are faster than their entrance. */
 .animate-fade-out { animation: fade-out var(--dur-fast) var(--ease-exit) both; }
 .animate-scale-out { animation: scale-out var(--dur-fast) var(--ease-exit) both; }
