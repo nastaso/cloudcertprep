@@ -7,7 +7,7 @@ import { DonateButton } from './DonateButton'
  * timed exam (same behavior as the React SPA). No router context needed —
  * DonateButton only renders an external Ko-fi link.
  */
-export default function DonateButtonIsland() {
+export default function DonateButtonIsland({ pathname }: { pathname?: string }) {
   const isExamActive = useExamActive()
-  return <DonateButton isExamActive={isExamActive} />
+  return <DonateButton isExamActive={isExamActive} pathname={pathname} />
 }

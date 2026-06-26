@@ -254,7 +254,7 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
       </main>
 
       {showChrome && <FooterIsland client:idle />}
-      {showChrome && <DonateButtonIsland client:idle />}
+      {showChrome && <DonateButtonIsland client:idle pathname={Astro.url.pathname} />}
     </div>
 
     <AccountLinkNoticeIsland client:idle />

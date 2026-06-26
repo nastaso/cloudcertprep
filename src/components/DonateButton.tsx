@@ -5,6 +5,11 @@ import { trackEvent } from '../lib/analytics'
 
 interface DonateButtonProps {
   isExamActive: boolean
+  /** Current path, passed from Astro (Astro.url.pathname). Needed because this
+   *  island is SSR'd (client:idle), where `window` is undefined - reading the
+   *  path from `window` would skip the check on the server and bake the pill
+   *  into the static HTML. */
+  pathname?: string
 }
 
 /**
@@ -16,7 +21,7 @@ interface DonateButtonProps {
  * `bg-bg-card` so it reads clearly without competing with the body CTAs that
  * own the brand orange. Hidden during a timed exam.
  */
-export function DonateButton({ isExamActive }: DonateButtonProps) {
+export function DonateButton({ isExamActive, pathname }: DonateButtonProps) {
   // Hide the floating pill while the footer is on screen: the footer has its
   // own "Support this project" link, and a fixed bottom-left pill otherwise
   // sits ON TOP of the footer's first column on short pages. (Hooks run before
@@ -43,9 +48,10 @@ export function DonateButton({ isExamActive }: DonateButtonProps) {
   // / account): on common desktop widths the fixed bottom-left pill overlaps the
   // left edge of the wide content cards, and a donate prompt over personal data
   // reads as nagging. The footer 'Support this project' link still carries the
-  // ask on those pages. (Pathname is constant per page load - separate Astro
-  // documents - so this early-return is stable across renders.)
-  if (typeof window !== 'undefined' && /^\/(stats|history|account)(\/|$)/.test(window.location.pathname)) return null
+  // ask on those pages. Uses the Astro-provided pathname (falls back to window
+  // for safety) so the check holds during SSR, not just after hydration.
+  const path = pathname ?? (typeof window !== 'undefined' ? window.location.pathname : '')
+  if (/^\/(stats|history|account)(\/|$)/.test(path)) return null
 
   return (
     // Mounts on client:idle (after hydration), so it appears a beat after the
