@@ -849,7 +849,12 @@ export function MockExam() {
 
   if (screen === 'exam' && currentQuestion) {
     return (
-      <div className="bg-bg-dark">
+      // Fade the exam screen in on entry. The intro card (max-w-2xl) and the
+      // in-exam layout (max-w-7xl, needs the width for the question navigator)
+      // are intentionally different widths; a cross-screen fade reads as
+      // "entered the exam" instead of the content jarringly reflowing wider.
+      // Opacity-only + reduced-motion-safe. (M3 [O])
+      <div className="bg-bg-dark animate-fade-in">
         {/* Visually-hidden page heading so the active exam's outline starts at
             h1 (the exam) -> h2 (the question) instead of opening on an orphan h2.
             Screen-reader only; no visual change. */}
@@ -858,7 +863,7 @@ export function MockExam() {
             so it reads as a subordinate toolbar under the site header rather
             than a second heavy header bar. Sticks to the top while scrolling.
             Carries question position, a thin answered-progress bar, the timer,
-            and the End exam action. */}
+            and the Submit exam action. */}
         <div className="sticky top-0 z-30 bg-bg-card/95 backdrop-blur-sm border-b border-text-muted/15 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
@@ -880,7 +885,7 @@ export function MockExam() {
               </div>
               <TimerAnnouncer seconds={timer.seconds} />
               <Button onClick={() => setShowEndModal(true)} variant="secondary" size="sm">
-                End exam
+                Submit exam
               </Button>
             </div>
           </div>
@@ -1080,8 +1085,8 @@ export function MockExam() {
           </div>
         </Modal>
 
-        {/* Final submit confirm + summary - opened by the toolbar "End exam"
-            and the last-question "Submit exam" buttons. Shows answered/flagged/
+        {/* Final submit confirm + summary - opened by both the toolbar and the
+            last-question "Submit exam" buttons. Shows answered/flagged/
             unanswered counts + the unanswered warning before the irreversible
             "Submit for grading". (Replaces the removed review screen, whose job
             the question sidebar/modal navigator already covered.) */}

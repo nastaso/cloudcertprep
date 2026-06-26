@@ -21,7 +21,8 @@ import { UnlockCTA } from '../components/landing/UnlockCTA'
 import { updateDomainProgress } from '../lib/supabaseUtils'
 import { reviewCellClass } from '../lib/buttonStyles'
 import { goToLogin } from '../lib/navigation'
-import type { Question, OptionKey } from '../types'
+import { calculateDomainMastery } from '../lib/domainStats'
+import type { Question, OptionKey, DomainProgress } from '../types'
 import { loadDomainQuestions } from '../data/questions'
 import { isAnswerCorrect, correctAnswerFor } from '../lib/scoring'
 import { trackEvent, trackPageView } from '../lib/analytics'
@@ -103,12 +104,42 @@ export function DomainPractice() {
   const [answering, setAnswering] = useState(false)
   const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null)
   const [dontShowLeaveGuard, setDontShowLeaveGuard] = useState(false)
+  // "End session early" confirm. Distinct from the leave guard: ending the
+  // session SAVES the answered questions and shows results, rather than
+  // discarding them like a navigate-away. (M3 [B])
+  const [showEndConfirm, setShowEndConfirm] = useState(false)
   // Synchronous re-entrancy guard for finishPractice (mirrors _MockExam's
   // submittingRef). React state is async, so a rapid double-click on "Finish
   // session" would otherwise run the attempt_questions insert twice before the
   // screen swaps to results, inflating per-domain mastery.
   const finishingRef = useRef(false)
   const { selectQuestions, refreshMastery } = useSpacedRepetition(user?.id ?? null, selectedDomain, cert.code)
+
+  // Per-domain mastery for the SELECTION screen tiles, so a returning signed-in
+  // user sees where they stand before picking a domain (same source + math as
+  // the cert dashboard). Logged-out users get nothing here. (M3 [A])
+  const [domainMastery, setDomainMastery] = useState<DomainProgress[]>([])
+  useEffect(() => {
+    if (authLoading || !user || effectiveScreen !== 'selection') return
+    let cancelled = false
+    void (async () => {
+      try {
+        const supabase = await getSupabase()
+        if (cancelled) return
+        const { data, error } = await supabase
+          .from('domain_progress')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('cert_code', cert.code)
+        if (cancelled) return
+        if (error) { logError('DomainPractice.loadMastery', error); return }
+        if (data) setDomainMastery(data as DomainProgress[])
+      } catch (err) {
+        if (!cancelled) logError('DomainPractice.loadMastery', err)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [authLoading, user, effectiveScreen, cert.code])
 
   const domains = Object.fromEntries(cert.domains.map(d => [d.id, d.name]))
 
@@ -307,23 +338,28 @@ export function DomainPractice() {
   async function finishPractice() {
     if (finishingRef.current) return
     finishingRef.current = true
-    // Only save to database if user is logged in
-    if (user) {
+    // Persist ONLY the questions actually answered this session (driven by
+    // questionResults, which gets one push per graded question). Mapping over
+    // all `questions` would fabricate "answered incorrectly" rows for questions
+    // never seen when a session is ended early - that would pollute the
+    // spaced-repetition weights and inflate the mastery denominator with false
+    // misses. For a full run-through questionResults already covers every
+    // question, so this is identical to the previous behaviour there. Only save
+    // for a logged-in user with at least one answered question. (M3 [B])
+    if (user && questionResults.length > 0) {
       try {
         const supabase = await getSupabase()
-        // Save each question result to attempt_questions table (without attempt_id for practice mode)
-        const questionRecords = questions.map((q, idx) => {
+        const questionRecords = questionResults.map((qr) => {
+          const q = qr.question
           const keyMap = optionKeyMaps.get(q.id) || {}
           const type = getQuestionType(q)
-          const ua = questionResults[idx]?.userAnswer ?? (type === 'single' ? '' : [])
-
           return {
             attempt_id: null, // Practice mode doesn't have an exam attempt
             user_id: user.id,
             question_id: q.id,
-            user_answer: encodeAnswerForDb(ua, keyMap, type),
+            user_answer: encodeAnswerForDb(qr.userAnswer, keyMap, type),
             correct_answer: encodeAnswerForDb(correctAnswerFor(q), keyMap, type),
-            is_correct: results[idx] || false,
+            is_correct: qr.isCorrect,
             was_flagged: false,
             domain_id: selectedDomain,
             cert_code: cert.code,
@@ -343,7 +379,7 @@ export function DomainPractice() {
       }
     }
 
-    trackEvent('practice_completed', { domain_id: selectedDomain, correct: results.filter(r => r).length, total: questions.length })
+    trackEvent('practice_completed', { domain_id: selectedDomain, correct: results.filter(r => r).length, total: questionResults.length })
     setScreen('results')
     window.scrollTo(0, 0)
   }
@@ -367,30 +403,56 @@ export function DomainPractice() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
               {cert.domains.map(domain => {
+                // Per-domain mastery for signed-in users who've practiced this
+                // domain. Same bank-capped derivation as the dashboard so the two
+                // surfaces never disagree. (M3 [A])
+                const progress = domainMastery.find(d => d.domain_id === domain.id)
+                const attempted = Math.min(progress?.questions_attempted || 0, domain.questionCount)
+                const correct = Math.min(progress?.questions_correct || 0, attempted)
+                const mastery = calculateDomainMastery(correct, domain.id, cert.code)
+                const showMastery = !!user && attempted > 0
                 return (
                   <button
                     key={domain.id}
                     onClick={() => selectDomain(domain.id)}
-                    aria-label={`Practice ${domain.name}: ${domain.questionCount} questions`}
-                    className="group bg-bg-dark hover:bg-bg-card-hover p-4 md:p-6 rounded-xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-gentle ease-out text-left flex items-center justify-between gap-3"
+                    aria-label={showMastery
+                      ? `Practice ${domain.name}: ${domain.questionCount} questions, ${mastery}% mastery`
+                      : `Practice ${domain.name}: ${domain.questionCount} questions`}
+                    className="group bg-bg-dark hover:bg-bg-card-hover p-4 md:p-6 rounded-xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-gentle ease-out text-left flex flex-col gap-3"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      {/* Brand-tinted index chip; the digit is theme-aware text
-                          (orange-on-peach read low-contrast in light mode). */}
-                      <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center font-mono text-base md:text-lg font-semibold flex-shrink-0 bg-brand/15 text-text-primary">
-                        {domain.id}
+                    <div className="flex items-center justify-between gap-3 w-full">
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Brand-tinted index chip; the digit is theme-aware text
+                            (orange-on-peach read low-contrast in light mode). */}
+                        <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center font-mono text-base md:text-lg font-semibold flex-shrink-0 bg-brand/15 text-text-primary">
+                          {domain.id}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm md:text-base font-semibold text-text-primary [text-wrap:balance]">
+                            {domain.name}
+                          </h3>
+                          <p className="text-xs md:text-sm text-text-muted">{domain.questionCount} questions</p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm md:text-base font-semibold text-text-primary [text-wrap:balance]">
-                          {domain.name}
-                        </h3>
-                        <p className="text-xs md:text-sm text-text-muted">{domain.questionCount} questions</p>
-                      </div>
+                      <ArrowRight
+                        className="flex-shrink-0 w-4 h-4 md:w-5 md:h-5 text-text-muted/40 transition-[transform,color] duration-gentle group-hover:translate-x-0.5 group-hover:text-text-primary"
+                        aria-hidden="true"
+                      />
                     </div>
-                    <ArrowRight
-                      className="flex-shrink-0 w-4 h-4 md:w-5 md:h-5 text-text-muted/40 transition-[transform,color] duration-gentle group-hover:translate-x-0.5 group-hover:text-text-primary"
-                      aria-hidden="true"
-                    />
+                    {showMastery && (
+                      <div className="w-full">
+                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                          <span className="text-[11px] uppercase tracking-wide text-text-muted">Mastery</span>
+                          <span className="font-mono text-xs font-semibold tabular-nums text-text-primary">{mastery}%</span>
+                        </div>
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-text-muted/15" role="presentation">
+                          <div
+                            className="h-full w-full origin-left bg-brand transition-transform duration-settle ease-out"
+                            style={{ transform: `scaleX(${mastery / 100})` }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </button>
                 )
               })}
@@ -585,11 +647,25 @@ export function DomainPractice() {
     return (
       <div className="p-4 md:p-8">
           <div className="max-w-3xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-center mb-6">
-            <h2 className="text-base md:text-lg lg:text-xl font-semibold text-text-primary">
+          {/* Header. Centered title until the first answer; once there's
+              progress to save, it becomes title-left / "End session"-right so
+              the escape hatch never overlaps or cramps the title (it stays
+              clear down to 320px, unlike a centered title with a side button).
+              The button is gated on >=1 answered: before that there's nothing
+              to save, so Back is the exit. (M3 [B]) */}
+          <div className={`flex items-center gap-3 mb-6 min-h-[2rem] ${questionResults.length > 0 ? 'justify-between' : 'justify-center'}`}>
+            <h2 className="text-base md:text-lg lg:text-xl font-semibold text-text-primary [text-wrap:balance] min-w-0">
               {domains[selectedDomain!]}
             </h2>
+            {questionResults.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowEndConfirm(true)}
+                className="shrink-0 text-sm text-text-muted hover:text-text-primary transition-colors whitespace-nowrap"
+              >
+                End session
+              </button>
+            )}
           </div>
 
           {/* Progress */}
@@ -860,6 +936,35 @@ export function DomainPractice() {
                 </Button>
                 <Button onClick={confirmPracticeLeave} variant="danger" className="flex-1">
                   Leave practice
+                </Button>
+              </div>
+            </div>
+          </Modal>
+
+          {/* End-session-early confirm. Unlike "Leave practice", this SAVES the
+              answered questions and goes to results. (M3 [B]) */}
+          <Modal
+            isOpen={showEndConfirm}
+            title="End this session?"
+            onClose={() => setShowEndConfirm(false)}
+          >
+            <div className="space-y-4">
+              <p className="text-text-primary">
+                You've answered {questionResults.length} of {questions.length} questions.
+                {user
+                  ? ' They will be saved and your results shown.'
+                  : ' Your results will be shown (sign in to save progress).'}
+              </p>
+              <div className="flex gap-4 mt-6">
+                <Button onClick={() => setShowEndConfirm(false)} variant="secondary" className="flex-1">
+                  Keep practicing
+                </Button>
+                <Button
+                  onClick={() => { setShowEndConfirm(false); void finishPractice() }}
+                  variant="primary"
+                  className="flex-1"
+                >
+                  End &amp; see results
                 </Button>
               </div>
             </div>

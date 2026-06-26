@@ -27,6 +27,10 @@ export function Login() {
   // cooldown throttles repeat sends to match Supabase's resend rate limit.
   const [resendState, setResendState] = useState<'idle' | 'sending' | 'sent'>('idle')
   const [resendCooldown, setResendCooldown] = useState(0) // seconds remaining
+  // Cooldown after a password-reset email is sent, so a user who doesn't see it
+  // immediately can't hammer the button (Supabase rate-limits server-side; this
+  // is the visible feedback that a send is in flight). (M3 [H])
+  const [resetCooldown, setResetCooldown] = useState(0)
 
   // Title varies by auth mode; canonical=null since auth pages are noindex.
   useSEO({
@@ -78,6 +82,13 @@ export function Login() {
     const id = window.setInterval(() => setResendCooldown(s => Math.max(0, s - 1)), 1000)
     return () => window.clearInterval(id)
   }, [resendCooldown])
+
+  // Same, for the forgot-password "Send reset link" button.
+  useEffect(() => {
+    if (resetCooldown <= 0) return
+    const id = window.setInterval(() => setResetCooldown(s => Math.max(0, s - 1)), 1000)
+    return () => window.clearInterval(id)
+  }, [resetCooldown])
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -209,6 +220,7 @@ export function Login() {
 
       if (error) throw error
       setSuccess('Check your email for a reset link')
+      setResetCooldown(45) // matches Supabase's default reset-email interval
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
@@ -313,8 +325,12 @@ export function Login() {
               </div>
             </div>
 
-          {/* Right Column - Auth Form */}
-          <Card padding="lg" className="flex flex-col">
+          {/* Right Column - Auth Form. Force the elevated shadow tier so the
+              card lifts off the page even in dark mode, where the base card
+              shadow is `none` and the hairline border alone barely separates
+              it from the background (M3 [F]). Inline style beats the utility
+              class reliably regardless of Tailwind's generated rule order. */}
+          <Card padding="lg" className="flex flex-col" style={{ boxShadow: 'var(--shadow-card-hover)' }}>
 
           {signUpSuccess ? (
             <div className="text-center">
@@ -406,9 +422,23 @@ export function Login() {
           {!isForgotPassword && (
             <>
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-2">
-                  Password
-                </label>
+                <div className="flex items-baseline justify-between mb-2 gap-3">
+                  <label htmlFor="password" className="block text-sm font-medium text-text-primary">
+                    Password
+                  </label>
+                  {/* Forgot-password lives next to the field it relates to (the
+                      conventional spot), not orphaned below the submit button
+                      (M3 [D]). Sign-in mode only. */}
+                  {!isSignUp && (
+                    <button
+                      type="button"
+                      onClick={() => { setIsForgotPassword(true); setError(''); setSuccess('') }}
+                      className="text-sm text-text-muted hover:text-text-primary transition-colors"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
                 <PasswordInput
                   id="password"
                   value={password}
@@ -487,27 +517,15 @@ export function Login() {
               // since those have visible inline feedback.)
               (isSignUp && !acceptedTerms) ||
               (isSignUp && !isPasswordStrongEnough(password)) ||
-              (isSignUp && password !== confirmPassword)
+              (isSignUp && password !== confirmPassword) ||
+              (isForgotPassword && resetCooldown > 0)
             }
           >
-            {isForgotPassword ? 'Send reset link' : isSignUp ? 'Sign up' : 'Sign in'}
+            {isForgotPassword
+              ? (resetCooldown > 0 ? `Resend in ${resetCooldown}s` : 'Send reset link')
+              : isSignUp ? 'Sign up' : 'Sign in'}
           </Button>
         </form>
-
-        {!isSignUp && !isForgotPassword && (
-          <div className="mt-4 text-right">
-            <button
-              onClick={() => {
-                setIsForgotPassword(true)
-                setError('')
-                setSuccess('')
-              }}
-              className="text-sm text-text-muted hover:text-text-primary transition-colors"
-            >
-              Forgot password?
-            </button>
-          </div>
-        )}
 
         <div className="mt-6 text-center">
           <button

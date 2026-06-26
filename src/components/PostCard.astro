@@ -44,7 +44,7 @@ const dateDisplay = data.date.toLocaleDateString('en-US', {
   {data.tags && data.tags.length > 0 && (
     <ul class="mt-3 flex flex-wrap gap-2 list-none p-0 m-0">
       {data.tags.map((tag) => (
-        <li class="font-mono text-[11px] px-2.5 py-1 rounded-full bg-bg-dark text-text-muted">#{tag}</li>
+        <li class="font-mono text-[11px] px-2.5 py-1 rounded-full bg-bg-dark border border-border-hairline text-text-muted">#{tag}</li>
       ))}
     </ul>
   )}

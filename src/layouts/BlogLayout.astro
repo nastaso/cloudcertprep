@@ -188,6 +188,32 @@ const updatedDisplay = data.updated
             prose measure stays 68ch. < lg and short posts keep a single
             centered column (no grid, no rail). */}
         <div class={showToc ? 'lg:grid lg:grid-cols-[minmax(0,68ch)_1fr] lg:gap-12' : ''}>
+          {showToc && (
+            // Mobile / tablet "On this page": the wide-screen rail is hidden
+            // below lg, so a collapsible native <details> gives the same jump
+            // links without a sticky sidebar. lg:hidden -> removed from the grid
+            // entirely on wide screens (display:none items don't form a track),
+            // so the 2-column rail layout is unaffected. (M3 [C])
+            <details class="lg:hidden mb-8 max-w-[68ch] mx-auto rounded-xl border border-border-hairline bg-bg-card/70">
+              <summary class="flex items-center justify-between gap-2 cursor-pointer list-none px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted [&::-webkit-details-marker]:hidden">
+                On this page
+                <svg class="w-4 h-4 transition-transform duration-gentle [details[open]_&]:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              </summary>
+              <ul class="list-none p-0 m-0 px-4 pb-3 space-y-0.5">
+                {toc.map((h) => (
+                  <li>
+                    <a
+                      href={`#${h.slug}`}
+                      data-toc-link
+                      class={`block py-1 text-sm leading-snug text-text-muted transition-colors duration-200 hover:text-text-primary [&[data-active=true]]:text-text-primary [&[data-active=true]]:font-medium ${h.depth === 3 ? 'pl-4' : ''}`}
+                    >
+                      {h.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
           <div class={`blog-content max-w-[68ch] mx-auto${showToc ? ' lg:mx-0 [&_:is(h2,h3)]:scroll-mt-24' : ''}`}>
             <slot />
           </div>
@@ -202,7 +228,8 @@ const updatedDisplay = data.updated
                     <li>
                       <a
                         href={`#${h.slug}`}
-                        class={`-ml-px block border-l border-transparent py-1 text-sm leading-snug text-text-muted transition-colors duration-200 hover:border-text-muted hover:text-text-primary focus-visible:outline-none focus-visible:text-text-primary ${h.depth === 3 ? 'pl-6' : 'pl-3'}`}
+                        data-toc-link
+                        class={`-ml-px block border-l border-transparent py-1 text-sm leading-snug text-text-muted transition-colors duration-200 hover:border-text-muted hover:text-text-primary focus-visible:outline-none focus-visible:text-text-primary [&[data-active=true]]:border-text-primary [&[data-active=true]]:text-text-primary [&[data-active=true]]:font-medium ${h.depth === 3 ? 'pl-6' : 'pl-3'}`}
                       >
                         {h.text}
                       </a>
@@ -235,4 +262,52 @@ const updatedDisplay = data.updated
       </div>
     </div>
   </article>
+
+  {/* Scroll-spy: highlight the heading currently at the top of the viewport in
+      both the desktop rail and the mobile <details> TOC. The IntersectionObserver
+      only acts as a cheap "a heading crossed the top" trigger; the active heading
+      is recomputed by position so it stays correct scrolling up AND down. No-ops
+      on posts without a TOC (no [data-toc-link] nodes). State only, no motion, so
+      it is reduced-motion-safe. (M3 [C]) */}
+  <script>
+    const links = Array.from(document.querySelectorAll('[data-toc-link]'))
+    if (links.length) {
+      const idOf = (l: Element) => l.getAttribute('href')?.slice(1) || ''
+      const ids = new Set(links.map(idOf))
+      const headings = Array.from(
+        document.querySelectorAll('.blog-content h2, .blog-content h3')
+      ).filter((h) => h.id && ids.has(h.id)) as HTMLElement[]
+
+      let activeId: string | null = null
+      const setActive = (id: string) => {
+        if (id === activeId) return
+        activeId = id
+        for (const l of links) {
+          if (idOf(l) === id) {
+            l.setAttribute('data-active', 'true')
+            l.setAttribute('aria-current', 'location')
+          } else {
+            l.removeAttribute('data-active')
+            l.removeAttribute('aria-current')
+          }
+        }
+      }
+
+      const update = () => {
+        let current = headings[0]?.id
+        for (const h of headings) {
+          if (h.getBoundingClientRect().top - 120 <= 0) current = h.id
+          else break
+        }
+        if (current) setActive(current)
+      }
+
+      const io = new IntersectionObserver(update, {
+        rootMargin: '-120px 0px 0px 0px',
+        threshold: [0, 1],
+      })
+      headings.forEach((h) => io.observe(h))
+      update()
+    }
+  </script>
 </BaseLayout>

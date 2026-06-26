@@ -88,8 +88,9 @@ const howToJsonLd = serializeJsonLd({
 
 // HowTo JSON-LD describing the question-and-explanation methodology: the
 // editorial process every question goes through before it ships. Distinct
-// from the study-methodology HowTo above (different @id). Mirrors the visible
-// "Question and Explanation Methodology" section. (R23.6 / E-E-A-T)
+// from the study-methodology HowTo above (different @id). Mirrors the three
+// subsections (write / explain / review) of the visible "How the question
+// banks are built" section. (R23.6 / E-E-A-T)
 const methodologyHowToJsonLd = serializeJsonLd({
   '@context': 'https://schema.org',
   '@type': 'HowTo',
@@ -162,22 +163,14 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
           </p>
         </section>
 
-        {/* Methodology */}
+        {/* How the question banks are built - one section: the editorial
+            standard (lede) followed by the three-part methodology (write /
+            explain / review). Was two adjacent, overlapping H2 sections; the
+            methodologyHowToJsonLd above mirrors the three subsections. */}
         <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>How the question banks are built</h2>
           <p class={bodyText}>
-            Every question is aligned to the official AWS exam guide and its task statements, so the topic coverage and difficulty mirror what you will actually face on exam day. Each question ships with a detailed explanation of why the correct answer is right and why each distractor is wrong. The explanations are where the real learning happens.
-          </p>
-          <p class={bodyText}>
-            Questions are validated by an automated schema checker before they are merged, and the whole bank is publicly auditable on GitHub. Anyone can read a question, cross-reference it against the AWS documentation, report an error, or open a pull request with a correction. Community contributions are reviewed against the validator and the exam guide before they go live.
-          </p>
-        </section>
-
-        {/* Question and explanation methodology */}
-        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
-          <h2 class={sectionHeading}>Question and Explanation Methodology</h2>
-          <p class={bodyText}>
-            Building on how the banks are assembled above, this is the editorial standard every question is held to before it ships.
+            Every question is aligned to the official AWS exam guide and its task statements, so topic coverage and difficulty mirror what you will face on exam day, and each ships with a detailed explanation of why the correct answer is right and why every distractor is wrong. The whole bank is validated by an automated schema checker and is publicly auditable on GitHub. This is the editorial standard every question is held to before it ships.
           </p>
           <h3 class="text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary pt-2">How questions are written</h3>
           <p class={bodyText}>
