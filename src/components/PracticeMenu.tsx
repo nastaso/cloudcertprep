@@ -151,7 +151,7 @@ export function PracticeMenu({ variant, isAuthed = false, onNavigate }: { varian
       <button
         type="button"
         aria-expanded={open}
-        aria-controls={panelId}
+        aria-controls={open ? panelId : undefined}
         disabled={examActive}
         onClick={() => setOpen(o => !o)}
         className={`w-full px-4 py-3 text-text-primary hover:bg-bg-dark rounded-xl transition-colors active:scale-[0.98] font-medium flex items-center gap-3 ${examActive ? 'opacity-50 cursor-not-allowed' : ''}`}
