@@ -141,10 +141,11 @@ const softwareAppJsonLd = serializeJsonLd({
             </div>
           </div>
 
-          {/* Quick-actions card balances the hero (the right half was empty for
-              returning users) and gives one-tap routes into practice. Static
-              markup (no client data) so it paints in the first frame, no flash. */}
-          <div class="hidden lg:block">
+          {/* Quick-actions card: one-tap routes into practice. On lg+ it balances
+              the hero's right half; below lg it stacks under the text so mobile
+              returning users keep the same fast routes. Static markup (no client
+              data) so it paints in the first frame, no flash. */}
+          <div>
             <div class="rounded-2xl border border-border-hairline bg-bg-card shadow-card p-6">
               <p class="kicker">Jump back in</p>
               <div class="mt-4 space-y-2">

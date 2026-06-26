@@ -44,8 +44,19 @@ function itemsFor(cert: Certification, isAuthed: boolean): MenuItem[] {
     : modes
 }
 
-export function PracticeMenu({ variant, isAuthed = false, onNavigate }: { variant: 'desktop' | 'mobile'; isAuthed?: boolean; onNavigate?: () => void }) {
+export function PracticeMenu({ variant, isAuthed = false, onNavigate, currentPath }: { variant: 'desktop' | 'mobile'; isAuthed?: boolean; onNavigate?: () => void; currentPath?: string }) {
   const certs = getSortedCerts().filter(c => c.status === 'active')
+  // Mobile only: when the drawer is open ON a cert's pages, trim this accordion
+  // to that one cert (its modes), since the mobile drawer also shows the full
+  // CertSwitcher roster just above - listing every cert twice is redundant on a
+  // phone. Off a cert page (home/about/blog) there is no active cert, so show
+  // all certs as the practice funnel. Desktop always shows all (it is the funnel
+  // and there is no CertSwitcher beside it). "Browse all certifications" below
+  // always keeps the other certs one tap away.
+  const activeCert = variant === 'mobile' && currentPath
+    ? certs.find(c => currentPath.startsWith(`/${c.provider}/${c.code}`))
+    : undefined
+  const drawerCerts = activeCert ? [activeCert] : certs
   // Locked while a timed exam is in progress, consistent with CertSwitcher: the
   // user is already practicing, the exam page's relative-z header would let its
   // sticky toolbar cover an open dropdown, and the leave-guard still catches any
@@ -162,7 +173,7 @@ export function PracticeMenu({ variant, isAuthed = false, onNavigate }: { varian
       </button>
       {open && !examActive && (
         <div id={panelId} className="pb-1">
-          {certs.map(cert => (
+          {drawerCerts.map(cert => (
             <div key={cert.code} className="mt-0.5">
               <p className="px-4 pt-2 pb-0.5 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">{cert.shortName}</p>
               {itemsFor(cert, isAuthed).map(({ href, label, Icon }) => (

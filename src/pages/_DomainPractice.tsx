@@ -440,7 +440,7 @@ export function DomainPractice() {
                       />
                     </div>
                     {showMastery && (
-                      <div className="w-full">
+                      <div className="w-full animate-fade-in">
                         <div className="flex items-center justify-between gap-2 mb-1.5">
                           <span className="text-[11px] uppercase tracking-wide text-text-muted">Mastery</span>
                           <span className="font-mono text-xs font-semibold tabular-nums text-text-primary">{mastery}%</span>

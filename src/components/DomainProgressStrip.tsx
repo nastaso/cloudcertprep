@@ -79,6 +79,11 @@ function Strip(props: DomainProgressStripProps) {
   const [progress, setProgress] = useState<DomainProgress | null>(null)
   const [loaded, setLoaded] = useState(false)
   const [loadFailed, setLoadFailed] = useState(false)
+  // Fill the mastery bar from 0 on the first frame after the data resolves, so
+  // the headline progress gets a gentle reveal instead of mounting pre-filled
+  // (which made the duration-settle transition inert). Reduced-motion users get
+  // it instantly via the global block.
+  const [barFilled, setBarFilled] = useState(false)
 
   useEffect(() => {
     if (authLoading || !user) return
@@ -100,6 +105,12 @@ function Strip(props: DomainProgressStripProps) {
     })()
     return () => { cancelled = true }
   }, [authLoading, user, certCode, domainId])
+
+  useEffect(() => {
+    if (!loaded) return
+    const r = requestAnimationFrame(() => setBarFilled(true))
+    return () => cancelAnimationFrame(r)
+  }, [loaded])
 
   // Resolving auth: a returning user gets the skeleton; a guest gets nothing.
   if (authLoading) return authedHint ? <Skeleton /> : null
@@ -143,7 +154,7 @@ function Strip(props: DomainProgressStripProps) {
           >
             <div
               className="h-full w-full origin-left transition-transform duration-settle ease-out"
-              style={{ transform: `scaleX(${mastery / 100})`, backgroundColor: accentHex }}
+              style={{ transform: `scaleX(${barFilled ? mastery / 100 : 0})`, backgroundColor: accentHex }}
             />
           </div>
           <p className="mt-2.5 font-mono text-[12px] text-text-muted">

@@ -177,7 +177,7 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
             />
 
             <nav className="flex flex-col p-4 gap-1">
-              <PracticeMenu variant="mobile" onNavigate={closeMobileMenu} isAuthed={Boolean(user)} />
+              <PracticeMenu variant="mobile" onNavigate={closeMobileMenu} isAuthed={Boolean(user)} currentPath={initialPathname} />
               <a
                 href="/"
                 onClick={closeMobileMenu}

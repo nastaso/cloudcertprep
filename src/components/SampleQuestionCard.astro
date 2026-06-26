@@ -126,7 +126,7 @@ const explanationParagraphs = (explanation ?? '')
     <p class="text-xs text-text-muted mb-2.5">Use the arrows to order the steps, then check your answer.</p>
     <ol class="sample-ord-list space-y-2 mb-3">
       {orderDisplayKeys.map((key, i) => (
-        <li class="sample-ord-row flex items-center gap-2.5 md:gap-3 border border-border-hairline bg-bg-card rounded-xl p-2.5 md:p-3 text-xs md:text-sm" data-key={key}>
+        <li class="sample-ord-row flex items-center gap-2.5 md:gap-3 border border-text-muted/25 bg-bg-card rounded-xl p-2.5 md:p-3 text-xs md:text-sm" data-key={key}>
           <span class="sample-ord-badge flex-shrink-0 grid place-items-center w-6 h-6 rounded-lg bg-bg-dark border border-border-hairline font-mono font-semibold text-[11px] text-text-muted">{i + 1}</span>
           <span class="flex-1 text-text-primary">{options[key]}</span>
           <span class="flex items-center gap-1.5 flex-shrink-0">
@@ -180,7 +180,7 @@ const explanationParagraphs = (explanation ?? '')
     <p class="text-xs text-text-muted mb-2.5">Pick a match for each item, then check your answer.</p>
     <ul class="space-y-2.5 mb-3">
       {matchLeftKeys.map(k => (
-        <li class="sample-mat-row flex flex-col sm:flex-row sm:items-center sm:gap-3 border border-border-hairline bg-bg-card rounded-xl p-2.5 md:p-3 text-xs md:text-sm" data-key={k} data-correct-target={correctMatches?.[k] ?? ''}>
+        <li class="sample-mat-row flex flex-col sm:flex-row sm:items-center sm:gap-3 border border-text-muted/25 bg-bg-card rounded-xl p-2.5 md:p-3 text-xs md:text-sm" data-key={k} data-correct-target={correctMatches?.[k] ?? ''}>
           <span class="flex-1 min-w-0 text-text-primary font-medium">{options[k]}</span>
           <svg class="hidden sm:block w-4 h-4 text-text-muted/70 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
           <select class="sample-mat-select flex-1 min-w-0 min-h-[40px] bg-bg-dark border border-border-hairline rounded-lg px-3 py-2 text-text-primary hover:border-text-muted/50 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand" aria-label={`Match for: ${options[k]}`}>
@@ -414,7 +414,7 @@ const explanationParagraphs = (explanation ?? '')
         rows().forEach((row, i) => {
           const right = row.dataset.key === correct[i]
           const badge = row.querySelector<HTMLElement>('.sample-ord-badge')
-          row.classList.remove('border-border-hairline', 'bg-bg-card')
+          row.classList.remove('border-text-muted/25', 'bg-bg-card')
           row.classList.add(right ? 'border-success' : 'border-danger', right ? 'bg-success/10' : 'bg-danger/10')
           badge?.classList.remove('bg-bg-dark', 'border-border-hairline', 'text-text-muted')
           badge?.classList.add('bg-bg-card', right ? 'border-success/40' : 'border-danger/40', right ? 'text-success' : 'text-danger')
@@ -440,7 +440,7 @@ const explanationParagraphs = (explanation ?? '')
         rows.forEach((row) => {
           const select = row.querySelector<HTMLSelectElement>('.sample-mat-select')
           const right = !!select && select.value !== '' && select.value === row.dataset.correctTarget
-          row.classList.remove('border-border-hairline', 'bg-bg-card')
+          row.classList.remove('border-text-muted/25', 'bg-bg-card')
           row.classList.add(right ? 'border-success' : 'border-danger', right ? 'bg-success/10' : 'bg-danger/10')
           if (select) select.disabled = true
         })
