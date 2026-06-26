@@ -122,20 +122,51 @@ const softwareAppJsonLd = serializeJsonLd({
   {defaultCert && (
     <section class="cc-auth-in pt-10 md:pt-14 pb-12 md:pb-16">
       <div class="max-w-6xl mx-auto px-4 md:px-8">
-        <p class="kicker">Welcome back</p>
-        <h1 class="mt-3 text-3xl md:text-4xl lg:text-5xl font-semibold tracking-[-0.025em] text-text-primary">
-          Ready when you are.
-        </h1>
-        <p class="mt-4 max-w-2xl text-base md:text-lg leading-relaxed text-text-muted">
-          Pick up your prep where you left off. Head to your dashboard, or choose a certification below.
-        </p>
-        <div class="mt-8 flex flex-wrap gap-3">
-          <a href={`/${defaultCert.provider}/${defaultCert.code}`} class={buttonClass({ variant: 'brand', size: 'md' })}>
-            Go to your {defaultCert.shortName} dashboard
-          </a>
-          <a href="#certifications" class={buttonClass({ variant: 'ghost', size: 'md' })}>
-            Browse certifications
-          </a>
+        <div class="grid lg:grid-cols-[1.05fr_0.85fr] gap-10 lg:gap-12 lg:items-center">
+          <div>
+            <p class="kicker">Welcome back</p>
+            <h1 class="mt-3 text-3xl md:text-4xl lg:text-5xl font-semibold tracking-[-0.025em] text-text-primary">
+              Ready when you are.
+            </h1>
+            <p class="mt-4 max-w-2xl text-base md:text-lg leading-relaxed text-text-muted">
+              Pick up your prep where you left off. Head to your dashboard, or jump straight into practice.
+            </p>
+            <div class="mt-8 flex flex-wrap gap-3">
+              <a href={`/${defaultCert.provider}/${defaultCert.code}`} class={buttonClass({ variant: 'brand', size: 'md' })}>
+                Go to your {defaultCert.shortName} dashboard
+              </a>
+              <a href="#certifications" class={buttonClass({ variant: 'ghost', size: 'md' })}>
+                Browse certifications
+              </a>
+            </div>
+          </div>
+
+          {/* Quick-actions card balances the hero (the right half was empty for
+              returning users) and gives one-tap routes into practice. Static
+              markup (no client data) so it paints in the first frame, no flash. */}
+          <div class="hidden lg:block">
+            <div class="rounded-2xl border border-border-hairline bg-bg-card shadow-card p-6">
+              <p class="kicker">Jump back in</p>
+              <div class="mt-4 space-y-2">
+                {[
+                  { href: `/${defaultCert.provider}/${defaultCert.code}/practice-exam`, label: 'Mock exam', sub: 'Full-length, timed, scored' },
+                  { href: `/${defaultCert.provider}/${defaultCert.code}/domain-practice`, label: 'Domain practice', sub: 'One domain, instant feedback' },
+                  { href: '/history', label: 'Exam history', sub: 'Review your past attempts' },
+                ].map((item) => (
+                  <a
+                    href={item.href}
+                    class="group flex items-center justify-between gap-3 rounded-xl border border-border-hairline bg-bg-dark/40 px-4 py-3 transition-[background-color,border-color] duration-gentle ease-out hover:bg-bg-card-hover hover:border-text-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+                  >
+                    <span class="min-w-0">
+                      <span class="block text-sm font-semibold text-text-primary">{item.label}</span>
+                      <span class="block font-mono text-[12px] text-text-muted">{item.sub}</span>
+                    </span>
+                    <svg class="h-4 w-4 flex-shrink-0 text-text-muted/50 transition-[transform,color] duration-gentle group-hover:translate-x-0.5 group-hover:text-text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

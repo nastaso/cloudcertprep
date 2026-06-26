@@ -119,11 +119,14 @@ export function filterChipClass(opts: {
 export function inputClass(opts?: { hasError?: boolean; className?: string }): string {
   const { hasError = false, className = '' } = opts ?? {}
   return [
-    'w-full px-4 py-2.5 min-h-[44px] rounded-lg bg-bg-card text-text-primary placeholder:text-text-muted/60',
+    // Recessed fill (bg-bg-dark, a step darker than the card it sits on) so a
+    // field reads as a distinct, fillable well instead of blending into the
+    // card; the border strengthens to a visible hairline.
+    'w-full px-4 py-2.5 min-h-[44px] rounded-lg bg-bg-dark text-text-primary placeholder:text-text-muted/60',
     'border transition-[border-color,box-shadow] duration-200 focus:outline-none',
     hasError
       ? 'border-danger focus:border-danger focus-visible:ring-2 focus-visible:ring-danger/40'
-      : 'border-border-hairline hover:border-text-muted/50 focus:border-brand focus-visible:ring-2 focus-visible:ring-brand/30',
+      : 'border-text-muted/25 hover:border-text-muted/50 focus:border-brand focus-visible:ring-2 focus-visible:ring-brand/30',
     className,
   ]
     .filter(Boolean)

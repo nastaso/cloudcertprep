@@ -281,8 +281,11 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
               </div>
             )}
 
+            {/* Exam facts - MOBILE ONLY. On sm+ the CertSpecPanel blueprint
+                (right column) shows the same four facts in its footer, so the
+                facts rendered twice side by side; hide this strip there. */}
             {!isComingSoon && (
-              <ul class="mt-10 grid grid-cols-2 gap-x-6 gap-y-2 sm:flex sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-1.5 list-none font-mono text-[13px] tracking-wide text-[#8B95A3] sm:[&>li+li]:before:content-['·'] sm:[&>li+li]:before:mr-3 sm:[&>li+li]:before:text-white/25">
+              <ul class="mt-10 grid grid-cols-2 gap-x-6 gap-y-2 sm:hidden list-none font-mono text-[13px] tracking-wide text-[#8B95A3]">
                 <li class="whitespace-nowrap">{cert.examQuestionCount} questions</li>
                 <li class="whitespace-nowrap">{examMinutes} minutes</li>
                 <li class="whitespace-nowrap">pass {cert.passingScore}/1000</li>
