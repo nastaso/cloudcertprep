@@ -125,9 +125,9 @@ test('P1-6 regression: a real completed exam DOES show Review (questions loaded)
   await page.goto('/aws/clf-c02/practice-exam')
   await page.getByRole('button', { name: 'Start exam', exact: true }).click()
   await page.waitForFunction(() => document.body.dataset.examActive === 'true', { timeout: 25000 })
-  // Flow (review screen removed): End exam (toolbar) -> "Ready to submit?" confirm
-  // -> Submit for grading -> results.
-  await page.getByRole('button', { name: 'End exam', exact: true }).first().click()
+  // Flow (review screen removed): Submit exam (toolbar) -> "Ready to submit?"
+  // confirm -> Submit for grading -> results.
+  await page.getByRole('button', { name: 'Submit exam', exact: true }).first().click()
   await page.getByRole('button', { name: 'Submit for grading', exact: true }).click()
   await expect(page.getByRole('button', { name: 'Review questions' })).toBeVisible({ timeout: 15000 })
 })
