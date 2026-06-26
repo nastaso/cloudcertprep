@@ -54,22 +54,47 @@ export function Account() {
     setExportDone(false)
     try {
       const supabase = await getSupabase()
+      const userId = user.id
       // RLS scopes each table to the signed-in user; select('*') so the export
-      // carries every column we hold (portability = the full record).
+      // carries every column we hold (portability = the full record). Page each
+      // table so a heavy user (attempt_questions grows one row per answered
+      // question) gets the COMPLETE record, not a silently truncated first page
+      // if the project ever sets a PostgREST max-rows cap.
+      const fetchAll = async (table: string): Promise<unknown[]> => {
+        const PAGE = 1000
+        const rows: unknown[] = []
+        for (let from = 0; ; from += PAGE) {
+          const { data, error } = await supabase
+            .from(table)
+            .select('*')
+            .eq('user_id', userId)
+            .range(from, from + PAGE - 1)
+          if (error) throw error
+          if (!data?.length) break
+          rows.push(...data)
+          if (data.length < PAGE) break
+        }
+        return rows
+      }
       const [attempts, progress, questions] = await Promise.all([
-        supabase.from('exam_attempts').select('*').eq('user_id', user.id),
-        supabase.from('domain_progress').select('*').eq('user_id', user.id),
-        supabase.from('attempt_questions').select('*').eq('user_id', user.id),
+        fetchAll('exam_attempts'),
+        fetchAll('domain_progress'),
+        fetchAll('attempt_questions'),
       ])
-      const firstError = attempts.error || progress.error || questions.error
-      if (firstError) throw firstError
 
       const payload = {
         exported_at: new Date().toISOString(),
-        account: { id: user.id, email: user.email, created_at: user.created_at },
-        exam_attempts: attempts.data ?? [],
-        domain_progress: progress.data ?? [],
-        attempt_questions: questions.data ?? [],
+        // The consent record (accepted_terms_at) is written to user_metadata at
+        // sign-up, so include it - it is personal data we hold about the user.
+        account: {
+          id: user.id,
+          email: user.email,
+          created_at: user.created_at,
+          user_metadata: user.user_metadata ?? {},
+        },
+        exam_attempts: attempts,
+        domain_progress: progress,
+        attempt_questions: questions,
       }
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
       const url = URL.createObjectURL(blob)

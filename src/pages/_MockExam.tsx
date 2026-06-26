@@ -183,6 +183,18 @@ export function MockExam() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [startTime, setStartTime] = useState<number>(0)
   const [reviewFilter, setReviewFilter] = useState<'all' | 'incorrect' | 'flagged'>('all')
+  // Whether a guest's just-finished attempt is held on this device (drives the
+  // results "saved on this device" notice). Read in an effect, NOT during
+  // render: peekPendingAttempt touches localStorage (and can removeItem an
+  // expired snapshot), which must not run as a side-effect of every render. The
+  // setState is deferred (setTimeout) for the same reason the rehydrate effect
+  // below is: synchronous setState in an effect cascades a render.
+  const [hasPendingResult, setHasPendingResult] = useState(false)
+  useEffect(() => {
+    if (screen !== 'results') return
+    const t = window.setTimeout(() => setHasPendingResult(!!peekPendingAttempt()), 0)
+    return () => window.clearTimeout(t)
+  }, [screen])
   const [reviewDomainFilter, setReviewDomainFilter] = useState<number | null>(null)
   const [reviewQuestionIndex, setReviewQuestionIndex] = useState(0)
   const [optionKeyMaps, setOptionKeyMaps] = useState<Map<string, OptionKeyMap>>(new Map())
@@ -781,7 +793,7 @@ export function MockExam() {
             />
           )}
 
-          {!user && peekPendingAttempt() && (
+          {!user && hasPendingResult && (
             <Alert tone="info" className="text-sm">
               Your result is saved on this device for 24 hours. Sign in anytime to keep it.
             </Alert>

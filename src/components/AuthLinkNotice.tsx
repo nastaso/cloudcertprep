@@ -37,7 +37,7 @@ function DismissButton({ onClick }: { onClick: () => void }) {
 
 const ACK_KEY = 'cloudcertprep_verified_welcome_ack'
 
-type Notice = { kind: 'verified' } | { kind: 'expired' } | { kind: 'deleted' } | null
+type Notice = { kind: 'verified' } | { kind: 'expired' } | { kind: 'error' } | { kind: 'deleted' } | null
 
 /**
  * Read the auth redirect markers from the URL exactly once on mount, then strip
@@ -56,12 +56,14 @@ function readNoticeOnce(): Notice {
   const deleted = params.get('account_deleted') === '1'
   const errorCode = params.get('error_code') || ''
   const errorVal = params.get('error') || ''
-  const isExpired =
-    errorCode === 'otp_expired'
-    || errorVal === 'access_denied'
-    || (errorVal !== '' && errorVal !== 'email_unverified')
+  const isExpired = errorCode === 'otp_expired' || errorVal === 'access_denied'
+  // Any OTHER non-empty error (server_error, validation_failed, provider
+  // misconfig) is not an expired link, so it gets neutral copy instead of
+  // telling the user to re-request a link that may have been fine.
+  // email_unverified is the OAuth refusal handled on /login, so it is ignored.
+  const isOtherError = !isExpired && errorVal !== '' && errorVal !== 'email_unverified'
 
-  if (!verified && !deleted && !isExpired) return null
+  if (!verified && !deleted && !isExpired && !isOtherError) return null
 
   // Strip every auth param so a refresh is clean (mirror _Login.tsx read-once).
   ;['verified', 'account_deleted', 'error', 'error_code', 'error_description'].forEach(k => params.delete(k))
@@ -69,6 +71,7 @@ function readNoticeOnce(): Notice {
   window.history.replaceState(null, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash)
 
   if (isExpired) return { kind: 'expired' } // the actionable failure wins
+  if (isOtherError) return { kind: 'error' } // transient/unknown failure, still actionable
   if (deleted) return { kind: 'deleted' } // post-deletion acknowledgement
   try {
     if (localStorage.getItem(ACK_KEY)) return null
@@ -97,6 +100,19 @@ export default function AuthLinkNotice() {
         <span className="min-w-0 flex-1 text-sm text-text-primary">
           That link has expired or was already used.{' '}
           <a href="/login" className="font-semibold underline">Request a new one</a>.
+        </span>
+        <DismissButton onClick={() => setNotice(null)} />
+      </TopNotice>
+    )
+  }
+
+  if (notice.kind === 'error') {
+    return (
+      <TopNotice role="alert" borderClass="border-warning/40">
+        <AlertTriangle className="h-5 w-5 shrink-0 text-warning" aria-hidden="true" />
+        <span className="min-w-0 flex-1 text-sm text-text-primary">
+          We could not complete that sign-in link.{' '}
+          <a href="/login" className="font-semibold underline">Request a new one</a> or try again.
         </span>
         <DismissButton onClick={() => setNotice(null)} />
       </TopNotice>
