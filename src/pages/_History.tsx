@@ -455,6 +455,9 @@ export function History() {
                 className="min-h-[44px]"
                 aria-label="Reset progress"
               >
+                {/* A lone trash icon on mobile reads as 'delete one'; keep a
+                    short text label so the destructive scope is clear. */}
+                <span className="md:hidden">Reset</span>
                 <span className="hidden md:inline">Reset progress</span>
               </Button>
             )}

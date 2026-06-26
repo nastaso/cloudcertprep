@@ -6,7 +6,7 @@ import { getSupabase } from '../lib/supabase'
 import { formatRelativeDate } from '../lib/formatting'
 import { formatTime } from '../lib/scoring'
 import { CERTIFICATION_LIST, getCertTotalQuestions, getCertDomains } from '../data/certifications'
-import { Trophy, TrendingUp, Clock, Check } from 'lucide-react'
+import { Trophy, TrendingUp, Clock, Check, RotateCw } from 'lucide-react'
 import { logError } from '../lib/logger'
 
 interface PlatformStats {
@@ -166,8 +166,16 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
           </header>
 
           {error && (
-            <Alert tone="danger" role="alert" className="text-danger">
-              <p className="text-danger text-sm">{error}</p>
+            <Alert tone="danger" role="alert" className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <span>We could not load the community statistics. Check your connection and try again.</span>
+              <button
+                type="button"
+                onClick={() => loadStats()}
+                className="inline-flex min-h-[44px] flex-shrink-0 items-center justify-center gap-2 rounded-full border border-danger/40 px-5 text-sm font-medium text-danger transition-colors duration-200 hover:bg-danger/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40"
+              >
+                <RotateCw className="h-4 w-4" aria-hidden="true" />
+                Try again
+              </button>
             </Alert>
           )}
 
