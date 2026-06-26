@@ -148,7 +148,10 @@ function Strip(props: DomainProgressStripProps) {
         </div>
 
         <div className="flex flex-shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
-          <a href={domainPracticeHref} className={`group ${buttonClass({ variant: 'brand', size: 'md' })}`}>
+          {/* Secondary, not brand: the prerendered hero already shows an orange
+              'Start practicing' CTA to the same destination just above, so two
+              orange primaries within ~150px is one too many. */}
+          <a href={domainPracticeHref} className={`group ${buttonClass({ variant: 'secondary', size: 'md' })}`}>
             {started ? 'Keep practicing' : 'Practice this domain'}
             <ArrowRight
               className="ml-1.5 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1"

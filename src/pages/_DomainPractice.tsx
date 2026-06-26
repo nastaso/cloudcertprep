@@ -374,14 +374,14 @@ export function DomainPractice() {
                     aria-label={`Practice ${domain.name}: ${domain.questionCount} questions`}
                     className="group bg-bg-dark hover:bg-bg-card-hover p-4 md:p-6 rounded-xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-gentle ease-out text-left flex items-center justify-between gap-3"
                   >
-                    <div className="flex items-center gap-3 md:gap-4 min-w-0">
+                    <div className="flex items-center gap-3 min-w-0">
                       {/* Brand-tinted index chip; the digit is theme-aware text
                           (orange-on-peach read low-contrast in light mode). */}
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center font-mono text-lg md:text-xl font-semibold flex-shrink-0 bg-brand/15 text-text-primary">
+                      <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center font-mono text-base md:text-lg font-semibold flex-shrink-0 bg-brand/15 text-text-primary">
                         {domain.id}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm md:text-base lg:text-lg font-semibold text-text-primary">
+                        <h3 className="text-sm md:text-base font-semibold text-text-primary [text-wrap:balance]">
                           {domain.name}
                         </h3>
                         <p className="text-xs md:text-sm text-text-muted">{domain.questionCount} questions</p>

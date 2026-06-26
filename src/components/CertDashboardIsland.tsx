@@ -27,7 +27,7 @@ import { Alert } from './Alert'
 import { useAuth } from '../hooks/useAuth'
 import { getSupabase } from '../lib/supabase'
 import { formatRelativeDate } from '../lib/formatting'
-import { formatDuration } from '../lib/scoring'
+import { formatTime } from '../lib/scoring'
 import { logError } from '../lib/logger'
 import { CERTIFICATIONS } from '../data/certifications'
 import { LEVEL_ACCENT_UI_HEX, LEVEL_ACCENT_UI_RGB } from '../lib/levelAccent'
@@ -465,7 +465,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                       </p>
                       <p className="font-mono text-[12px] text-text-muted">
                         {formatRelativeDate(attempt.attempted_at)} ·{' '}
-                        {formatDuration(attempt.time_taken_seconds)}
+                        {formatTime(attempt.time_taken_seconds)}
                       </p>
                     </div>
                   </div>
