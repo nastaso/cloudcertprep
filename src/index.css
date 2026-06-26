@@ -357,6 +357,18 @@ html.cc-authed .cc-auth-out { display: none; }
     0 0 22px 2px rgb(var(--halo-color) / 0.35),
     0 0 56px 8px rgb(var(--halo-color) / 0.18);
 }
+/* A halo card (has a base card shadow) keeps its elevation AND blooms on
+   hover/focus; the glow-only box-shadow above otherwise fully overrides
+   shadow-card and flattens the card. Bare CTAs use .halo WITHOUT .shadow-card,
+   so they stay glow-only. Works in both themes (--shadow-card-hover is themed). */
+.halo.shadow-card:hover,
+.halo.shadow-card:focus-visible {
+  box-shadow:
+    var(--shadow-card-hover),
+    0 0 0 1px rgb(var(--halo-color) / 0.55),
+    0 0 22px 2px rgb(var(--halo-color) / 0.35),
+    0 0 56px 8px rgb(var(--halo-color) / 0.18);
+}
 
 /* Aurora drift on the stage: two soft color fields slowly breathing behind
    the art. GPU-only (transform), reduced-motion safe. */

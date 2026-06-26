@@ -257,12 +257,12 @@ export function Login() {
   }
 
   return (
-      // Vertically centered in the viewport (owner preference) so the content
-      // sits balanced rather than crammed at the top with empty space below.
-      // The left marketing column is centered against the (taller) auth card via
-      // the grid's items-center. A minor reflow when switching sign-in/sign-up/
-      // reset is acceptable; the card stays the visual anchor.
-      <div className="flex-1 flex items-center justify-center px-4 py-10 md:py-16">
+      // Top-anchored (items-start) so switching sign-in <-> sign-up <-> reset
+      // grows the card DOWNWARD from a stable top instead of re-centering and
+      // visibly jumping the whole card (the taller sign-up form adds confirm
+      // password + terms + strength meter). The grid still centers the marketing
+      // column against the card on md+.
+      <div className="flex-1 flex items-start justify-center px-4 py-10 md:py-16">
         <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 md:items-center gap-8 lg:gap-12">
           {/* Left Column - Features/Benefits */}
           <div className="hidden md:flex flex-col justify-center space-y-6 md:pr-6 lg:pr-8">

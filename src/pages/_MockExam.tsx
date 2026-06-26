@@ -18,7 +18,7 @@ import { PassFailBanner } from '../components/PassFailBanner'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { QuestionReviewCard } from '../components/QuestionReviewCard'
 import { UnlockCTA } from '../components/landing/UnlockCTA'
-import { selectExamQuestions, calculateScaledScore, isPassed, getDomainScore, formatTime, isAnswerCorrect, correctAnswerFor, getExamDomainTargets } from '../lib/scoring'
+import { selectExamQuestions, calculateScaledScore, isPassed, getDomainScore, formatTime, formatTotalTime, isAnswerCorrect, correctAnswerFor, getExamDomainTargets } from '../lib/scoring'
 import { getSupabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { updateDomainProgress } from '../lib/supabaseUtils'
@@ -744,7 +744,7 @@ export function MockExam() {
               </div>
               <div>
                 <p className="text-text-muted text-sm mb-1">Time Taken</p>
-                <p className="font-mono text-2xl font-semibold tabular-nums text-text-primary">{formatTime(results!.timeTaken)}</p>
+                <p className="font-mono text-2xl font-semibold tabular-nums text-text-primary">{formatTotalTime(Math.round(results!.timeTaken / 60))}</p>
               </div>
             </div>
 

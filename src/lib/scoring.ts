@@ -89,25 +89,6 @@ export function formatTime(seconds: number): string {
 }
 
 /**
- * Format seconds into human-readable duration
- * e.g., "45 minutes 30 seconds"
- */
-export function formatDuration(seconds: number): string {
-  const minutes = Math.floor(seconds / 60)
-  const remainingSeconds = seconds % 60
-  
-  if (minutes === 0) {
-    return `${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}`
-  }
-  
-  if (remainingSeconds === 0) {
-    return `${minutes} minute${minutes !== 1 ? 's' : ''}`
-  }
-  
-  return `${minutes} minute${minutes !== 1 ? 's' : ''} ${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}`
-}
-
-/**
  * The correct-answer value to compare a user's answer against, in whatever key
  * space `q` is currently in (original bank keys, or shuffled display keys if it
  * went through `shuffleQuestionOptions`). Single/multi use `answer`; ordering
