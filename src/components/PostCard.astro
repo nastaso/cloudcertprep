@@ -21,7 +21,7 @@ const { data, slug } = Astro.props
 
 const href = `/blog/${slug}`
 const dateIso = data.date.toISOString()
-const dateDisplay = data.date.toLocaleDateString('en-GB', {
+const dateDisplay = data.date.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',

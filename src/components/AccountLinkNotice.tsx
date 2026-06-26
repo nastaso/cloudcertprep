@@ -38,7 +38,7 @@ export function AccountLinkNotice() {
         <button
           type="button"
           onClick={() => setVisible(false)}
-          className="absolute top-1.5 right-1.5 w-9 h-9 inline-flex items-center justify-center text-success hover:text-success/70 transition-colors rounded-md"
+          className="absolute top-0.5 right-0.5 w-11 h-11 inline-flex items-center justify-center text-success hover:text-success/70 transition-colors rounded-md"
           aria-label="Dismiss"
         >
           <X className="w-4 h-4" />

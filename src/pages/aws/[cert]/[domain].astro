@@ -487,7 +487,8 @@ const levelAccentUi = LEVEL_ACCENT_UI_HEX[cert.level]
             <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-4">
               Other {cert.shortName} domains
             </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* 3 sisters -> a single row of 3 (no lone card); otherwise 2-up. */}
+            <div class:list={['grid grid-cols-1 gap-3', sisterDomains.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2']}>
               {sisterDomains.map(sister => (
                 <a
                   href={sister.href}

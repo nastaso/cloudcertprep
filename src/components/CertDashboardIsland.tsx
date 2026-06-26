@@ -321,9 +321,14 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
             stat-strip alert covers it); skeleton cards while loading. */}
         {!dataError && (
         <section>
-          <h2 className="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-4">
+          <h2 className="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-1">
             Domain mastery
           </h2>
+          {/* Clarify the metric: the headline % is correct-out-of-the-full-bank
+              (so '8%' next to '30 correct' of 384 isn't read as wrong). */}
+          <p className="text-sm text-text-muted mb-4">
+            The percentage is how much of each domain's full question bank you have answered correctly.
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
             {dataLoading
               ? cert.domains.map(domain => (

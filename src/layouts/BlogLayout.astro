@@ -38,9 +38,11 @@ interface Props {
   data: BlogFrontmatter
   /** Heading tree from render(post); drives the wide-screen "On this page" TOC. */
   headings?: { depth: number; slug: string; text: string }[]
+  /** Estimated reading time (minutes) for the byline. */
+  readingMinutes?: number
 }
 
-const { data, headings = [] } = Astro.props
+const { data, headings = [], readingMinutes } = Astro.props
 
 // On-this-page TOC entries (h2/h3 only; the H1 is the page title). Only switch
 // to the wide three-column reading frame when a post has enough sections to
@@ -102,13 +104,13 @@ const faqJsonLd =
       })
     : null
 
-const publishedDisplay = data.date.toLocaleDateString('en-GB', {
+const publishedDisplay = data.date.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
 })
 const updatedDisplay = data.updated
-  ? data.updated.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })
+  ? data.updated.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
   : null
 ---
 
@@ -165,6 +167,7 @@ const updatedDisplay = data.updated
 
           <p class="mt-4 text-sm text-[#9AA6B2]">
             By <a href="https://santonastaso.me" class="text-[#C9D2DC] underline underline-offset-2 hover:text-white transition-colors">Alex Santonastaso</a>
+            {readingMinutes && <span>{' · '}{readingMinutes} min read</span>}
           </p>
 
           {data.tags && data.tags.length > 0 && (

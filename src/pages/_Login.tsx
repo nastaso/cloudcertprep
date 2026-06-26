@@ -478,7 +478,12 @@ export function Login() {
             loading={loading}
             loadingText="Loading..."
             disabled={
-              (hasCaptcha && !captchaToken) ||
+              // NOT gated on the Turnstile token: the security boundary is
+              // Supabase verifying the token server-side, so disabling the
+              // primary CTA here only made it look broken on load. The submit
+              // handlers validate the captcha and show an inline message if the
+              // challenge isn't solved. (Sign-up form requirements still gate,
+              // since those have visible inline feedback.)
               (isSignUp && !acceptedTerms) ||
               (isSignUp && !isPasswordStrongEnough(password)) ||
               (isSignUp && password !== confirmPassword)
@@ -564,10 +569,14 @@ export function Login() {
                 Continue with GitHub
               </Button>
 
+              {/* Quieter than the bordered OAuth buttons: on the login page the
+                  goal is account creation, so the guest escape hatch shouldn't
+                  carry equal weight. Still a full-width tap target + clearly
+                  visible (the product's 'free, no signup' promise depends on it). */}
               <Button
                 type="button"
                 onClick={() => window.location.assign(from)}
-                variant="secondary"
+                variant="ghost"
                 fullWidth
               >
                 Continue as guest

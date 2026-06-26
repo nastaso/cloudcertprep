@@ -8,7 +8,9 @@
  * yesterday at 23:00 read at today 09:00 returns "yesterday", not
  * "10 hours ago"). Old dates fall back to a localised absolute date.
  */
-const LOCALE = 'en-GB'
+// US English, to match the site's content language (the copy was normalized to
+// US spelling). Date display follows: "Jun 1, 2026" rather than en-GB "1 Jun 2026".
+const LOCALE = 'en-US'
 const rtf = new Intl.RelativeTimeFormat(LOCALE, { numeric: 'auto' })
 const absoluteDateFmt = new Intl.DateTimeFormat(LOCALE, {
   month: 'short',
