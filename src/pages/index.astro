@@ -124,19 +124,16 @@ const softwareAppJsonLd = serializeJsonLd({
       <div class="max-w-6xl mx-auto px-4 md:px-8">
         <div class="grid lg:grid-cols-[1.05fr_0.85fr] gap-10 lg:gap-12 lg:items-center">
           <div>
-            {/* Greeting swaps for a first-ever login (bug 6): "Welcome back" is
-                the default (common case, no flash); the cc-greet-first variant
-                shows only when the home pre-paint script flags a first visit. */}
-            <p class="kicker cc-greet-return">Welcome back</p>
-            <p class="kicker cc-greet-first">Welcome to CloudCertPrep</p>
+            {/* Default copy is the returning-user greeting (the common case).
+                On a first-ever signed-in home visit the pre-paint script below
+                swaps the text in place (bug 6) - no CSS display toggle, which
+                collided with .kicker's own `display`. */}
+            <p class="kicker" id="cc-hero-kicker">Welcome back</p>
             <h1 class="font-display mt-3 text-3xl md:text-4xl lg:text-5xl font-bold tracking-[-0.025em] text-text-primary">
               Ready when you are.
             </h1>
-            <p class="mt-4 max-w-2xl text-base md:text-lg leading-relaxed text-text-muted cc-greet-return">
+            <p class="mt-4 max-w-2xl text-base md:text-lg leading-relaxed text-text-muted" id="cc-hero-subline">
               Pick up your prep where you left off. Head to your dashboard, or jump straight into practice.
-            </p>
-            <p class="mt-4 max-w-2xl text-base md:text-lg leading-relaxed text-text-muted cc-greet-first">
-              Your account is ready. Head to your dashboard, or jump straight into practice.
             </p>
             <div class="mt-8 flex flex-wrap gap-3">
               <a href={`/${defaultCert.provider}/${defaultCert.code}`} class={buttonClass({ variant: 'brand', size: 'md' })}>
@@ -192,12 +189,15 @@ const softwareAppJsonLd = serializeJsonLd({
           var hdr = document.getElementById('site-header')
           if (hdr) hdr.removeAttribute('data-overlay')
           // First signed-in home visit on this device: greet as new, not
-          // "Welcome back" (bug 6). Device-local flag; set before paint so the
-          // CSS variant swaps with no flash on the common returning case.
+          // "Welcome back" (bug 6). Device-local flag; the text is swapped in
+          // place before paint so the common returning case never flashes.
           try {
             if (!localStorage.getItem('cc_home_greeted')) {
               localStorage.setItem('cc_home_greeted', '1')
-              document.documentElement.classList.add('cc-greet-first')
+              var k = document.getElementById('cc-hero-kicker')
+              var s = document.getElementById('cc-hero-subline')
+              if (k) k.textContent = 'Welcome to CloudCertPrep'
+              if (s) s.textContent = 'Your account is ready. Head to your dashboard, or jump straight into practice.'
             }
           } catch (e) { /* private mode: fall back to the default greeting */ }
         }

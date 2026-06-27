@@ -198,15 +198,6 @@ html.cc-js [data-reveal].is-revealed {
 html.cc-authed .cc-auth-in { display: unset; }
 html.cc-authed .cc-auth-out { display: none; }
 
-/* First-login greeting toggle (bug 6). The returning-user hero defaults to its
-   "Welcome back" copy (the common case, so no flash for it). A pre-paint inline
-   script on the home page adds `cc-greet-first` to <html> on a user's first
-   signed-in home visit (a device-local flag), swapping in a neutral first-time
-   greeting so a brand-new account is not greeted as a returning one. */
-.cc-greet-first { display: none; }
-html.cc-greet-first .cc-greet-first { display: unset; }
-html.cc-greet-first .cc-greet-return { display: none; }
-
 /* Chrome hidden DURING an active timed exam (the exam island sets
    body[data-exam-active="true"]). Used for the in-exam breadcrumb: a noindex
    route you should not navigate away from mid-exam, so it is pure clutter while
