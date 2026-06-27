@@ -6,6 +6,8 @@ import { trackEvent } from '../lib/analytics'
 import { useSEO } from '../hooks/useSEO'
 import { BookOpen, FileText, Target, TrendingUp, CheckCircle, Mail, Github } from 'lucide-react'
 import { useTheme } from '../hooks/useTheme'
+import { useAuth } from '../hooks/useAuth'
+import { LoadingSpinner } from '../components/LoadingSpinner'
 import { PasswordInput } from '../components/PasswordInput'
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter'
 import { Button } from '../components/Button'
@@ -27,6 +29,14 @@ const RESEND_COOLDOWN_SECONDS = 60
 export function Login() {
   const location = useLocation()
   const from = safeFrom((location.state as { from?: string })?.from)
+  // A signed-in visitor has no reason to see the login form, so bounce them away
+  // (to `from`, which is "/" for a directly-typed /login). useAuth resolves the
+  // REAL session (not a stale token); for an in-page sign-in the form does its
+  // own navigation to the same `from`, so this never fights it. (owner request)
+  const { user: authedUser, loading: authLoading } = useAuth()
+  useEffect(() => {
+    if (!authLoading && authedUser) window.location.replace(from)
+  }, [authLoading, authedUser, from])
   const [isSignUp, setIsSignUp] = useState(false)
   const [isForgotPassword, setIsForgotPassword] = useState(false)
   const [signUpSuccess, setSignUpSuccess] = useState(false)
@@ -306,19 +316,26 @@ export function Login() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resendChallenge, captchaToken])
 
+  // A signed-in (or still-resolving) visitor is being redirected away by the
+  // effect above; show a spinner instead of flashing the form. A logged-out
+  // guest resolves synchronously (useAuth skips Supabase with no token), so the
+  // form still paints immediately for the conversion path.
+  if (authLoading || authedUser) {
+    return (
+      <div className="flex-1 flex items-center justify-center px-4">
+        <LoadingSpinner />
+      </div>
+    )
+  }
+
   return (
-      // Top-anchored (items-start) so switching sign-in <-> sign-up <-> reset
-      // grows the card DOWNWARD from a stable top instead of re-centering and
-      // visibly jumping the whole card (the taller sign-up form adds confirm
-      // password + terms + strength meter). The grid is also top-aligned (see
-      // below), so the marketing column stays put as the card grows.
-      <div className="flex-1 flex items-start justify-center px-4 py-10 md:py-16">
-        {/* md:items-start (was items-center): the marketing column is top-pinned
-            and fixed-height, so switching sign-in <-> sign-up grows the auth card
-            DOWNWARD without re-centering the marketing column against it (bug 4).
-            Combined with the wrapper's items-start, neither the left column nor
-            the footer visibly reflow on a mode toggle. */}
-        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 md:items-start gap-8 lg:gap-12">
+      // items-center on both the wrapper and the grid keeps the marketing column
+      // vertically centered against the auth card. The card itself is given a
+      // consistent min-height (below) so switching sign-in <-> sign-up does not
+      // change the card size, and therefore does not shift the centered marketing
+      // column or the footer (bug 4 + the owner's sign-in/sign-up review).
+      <div className="flex-1 flex items-center justify-center px-4 py-10 md:py-16">
+        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 md:items-center gap-8 lg:gap-12">
           {/* Left Column - Features/Benefits */}
           <div className="hidden md:flex flex-col justify-center space-y-6 md:pr-6 lg:pr-8">
               <div>
@@ -385,7 +402,19 @@ export function Login() {
               shadow is `none` and the hairline border alone barely separates
               it from the background (M3 [F]). Inline style beats the utility
               class reliably regardless of Tailwind's generated rule order. */}
-          <Card padding="lg" className="flex flex-col" style={{ boxShadow: 'var(--shadow-card-hover)' }}>
+          {/* Consistent min-height for the sign-in / sign-up modes (md+ only, so
+              mobile stays natural) so toggling between them does NOT change the
+              card size - and therefore does not shift the centered marketing
+              column or footer. Sized to fit sign-up incl. the Turnstile widget
+              (~80px) that renders on the deployed origin but not on localhost.
+              Content is vertically centered so the shorter sign-in form reads as
+              balanced rather than top-heavy. The focused reset / success cards
+              keep their natural (smaller) height. */}
+          <Card
+            padding="lg"
+            className={`flex flex-col ${!isForgotPassword && !signUpSuccess ? 'md:min-h-[850px] md:justify-center xl:min-h-[900px]' : ''}`}
+            style={{ boxShadow: 'var(--shadow-card-hover)' }}
+          >
 
           {signUpSuccess ? (
             <div className="text-center">

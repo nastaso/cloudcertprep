@@ -44,15 +44,20 @@ import AppIsland from '../components/AppIsland.tsx'
           </div>
         </div>
 
-        {/* Right: auth card skeleton (matches Card padding="lg") */}
-        <div class="bg-bg-card rounded-2xl shadow-card border border-border-hairline p-8 md:p-10 animate-pulse" aria-hidden="true">
+        {/* Right: auth card skeleton. Mirrors the real card's min-height +
+            centered content (md+) and its element stack (heading, 2 fields,
+            Turnstile, submit, divider, 3 buttons) so the real form replaces it
+            with no size jump. */}
+        <div class="bg-bg-card rounded-2xl shadow-card border border-border-hairline p-8 md:p-10 md:min-h-[850px] md:flex md:flex-col md:justify-center xl:min-h-[900px] animate-pulse" aria-hidden="true">
           <div class="mx-auto h-7 w-28 rounded bg-text-muted/15 mb-6"></div>
           <div class="space-y-4">
             <div class="h-3.5 w-14 rounded bg-text-muted/15"></div>
             <div class="h-11 w-full rounded-lg bg-text-muted/10"></div>
             <div class="h-3.5 w-20 rounded bg-text-muted/15"></div>
             <div class="h-11 w-full rounded-lg bg-text-muted/10"></div>
-            <div class="h-11 w-full rounded-full bg-text-muted/20 mt-2"></div>
+            {/* Turnstile widget placeholder (~80px on the deployed origin) */}
+            <div class="h-[65px] w-full rounded-lg bg-text-muted/10 my-2"></div>
+            <div class="h-11 w-full rounded-full bg-text-muted/20"></div>
           </div>
           <div class="my-5 flex items-center gap-4">
             <div class="flex-1 h-px bg-border-hairline"></div>
