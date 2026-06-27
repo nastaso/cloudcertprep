@@ -11,7 +11,6 @@ const PENDING = (over: Record<string, unknown> = {}) => ({
   ],
   ...over,
 })
-const INFO = 'Your result is saved on this device for 24 hours'
 
 async function seed(page: import('@playwright/test').Page, pending: unknown, marker = 'clf-c02') {
   await page.addInitScript((args) => {
@@ -48,15 +47,18 @@ test('P0-3 edge: access_denied alone shows the banner', async ({ page }) => {
 test('P1-6 edge: cert mismatch does NOT rehydrate', async ({ page }) => {
   await seed(page, PENDING(), 'clf-c02')
   await page.goto('/aws/aif-c01/practice-exam') // marker cert != this cert
-  await page.waitForTimeout(2500)
-  await expect(page.getByText(INFO)).toHaveCount(0)
+  // No rehydrate: the START screen shows, never the results screen.
+  await expect(page.getByRole('button', { name: 'Start exam', exact: true })).toBeVisible({ timeout: 15000 })
+  await page.waitForTimeout(1500)
+  await expect(page.getByRole('button', { name: /Retake exam/i })).toHaveCount(0)
 })
 
 test('P1-6 edge: expired pending (>24h) does NOT rehydrate', async ({ page }) => {
   await seed(page, PENDING({ finishedAt: Date.now() - 25 * 3600 * 1000 }), 'clf-c02')
   await page.goto('/aws/clf-c02/practice-exam')
-  await page.waitForTimeout(2500)
-  await expect(page.getByText(INFO)).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Start exam', exact: true })).toBeVisible({ timeout: 15000 })
+  await page.waitForTimeout(1500)
+  await expect(page.getByRole('button', { name: /Retake exam/i })).toHaveCount(0)
 })
 
 test('P1-4 edge: the Practice menu is locked during an exam (like cert switching)', async ({ page }) => {
