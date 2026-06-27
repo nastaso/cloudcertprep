@@ -7,10 +7,14 @@ interface PasswordStrengthMeterProps {
 
 /**
  * Live password strength indicator shown below the password field on the
- * sign-up form.
+ * sign-up / reset forms.
  *
  * Renders a 4-segment bar (each segment fills as the score increases), a
- * label (Weak / Fair / Good / Strong), and a small criteria checklist.
+ * label (Weak / Fair / Good / Strong), and a small criteria checklist. It is
+ * ALWAYS rendered (even for an empty input, where it shows the requirements
+ * with everything unmet): this surfaces the rules up-front (better UX, fewer
+ * rejected submits) AND reserves its space, so typing fills it in without
+ * growing the card / shifting the layout (zero CLS).
  *
  * Pure render, no internal state. Recomputes on every render via
  * `scorePassword(password)`. No external dependency (intentionally avoids
@@ -18,10 +22,7 @@ interface PasswordStrengthMeterProps {
  */
 export function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps) {
   const { score, label, checks } = scorePassword(password)
-
-  // Don't render anything for an empty input. Keeps the form quiet until the
-  // user starts typing.
-  if (password.length === 0) return null
+  const empty = password.length === 0
 
   const barColour =
     score <= 1 ? 'bg-danger' : score === 2 ? 'bg-warning-fill' : 'bg-success'
@@ -42,15 +43,17 @@ export function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps) 
           <div
             key={i}
             className={`flex-1 h-1.5 rounded-full transition-colors ${
-              i < score ? barColour : 'bg-bg-dark'
+              !empty && i < score ? barColour : 'bg-bg-dark'
             }`}
           />
         ))}
       </div>
-      <p className={`text-xs mt-1.5 font-medium ${labelColour}`}>{label}</p>
+      <p className={`text-xs mt-1.5 font-medium ${empty ? 'text-text-muted' : labelColour}`}>
+        {empty ? 'Password must include:' : label}
+      </p>
       <ul className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1">
         {criteria.map(c => {
-          const ok = checks[c.key]
+          const ok = !empty && checks[c.key]
           return (
             <li key={c.key} className="flex items-center gap-1.5 text-xs">
               {ok ? (

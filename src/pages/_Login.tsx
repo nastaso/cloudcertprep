@@ -329,15 +329,17 @@ export function Login() {
   }
 
   return (
-      // items-center on both the wrapper and the grid keeps the marketing column
-      // vertically centered against the auth card. The card itself is given a
-      // consistent min-height (below) so switching sign-in <-> sign-up does not
-      // change the card size, and therefore does not shift the centered marketing
-      // column or the footer (bug 4 + the owner's sign-in/sign-up review).
-      <div className="flex-1 flex items-center justify-center px-4 py-10 md:py-16">
-        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 md:items-center gap-8 lg:gap-12">
-          {/* Left Column - Features/Benefits */}
-          <div className="hidden md:flex flex-col justify-center space-y-6 md:pr-6 lg:pr-8">
+      // The marketing column is centered against the SIGN-IN card height (its own
+      // md:min-h below) and the grid is top-aligned, so it stays put when the card
+      // grows downward for sign-up - no shift (bug 4). The cards keep their NATURAL
+      // sizes (compact sign-in, taller sign-up); login.astro reserves the sign-in
+      // height so the footer is stable on load. (owner: natural sizes, not forced-equal.)
+      <div className="flex-1 flex items-start justify-center px-4 py-10 md:py-16">
+        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 md:items-start gap-8 lg:gap-12">
+          {/* Left Column - Features/Benefits. min-h = the sign-in card height so
+              justify-center centers it against that, and it does not move when the
+              sign-up card grows past it. */}
+          <div className="hidden md:flex flex-col justify-center space-y-6 md:pr-6 lg:pr-8 md:min-h-[718px] xl:min-h-[758px]">
               <div>
                 <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-text-primary mb-3">
                   Free AWS certification practice exams
@@ -402,19 +404,11 @@ export function Login() {
               shadow is `none` and the hairline border alone barely separates
               it from the background (M3 [F]). Inline style beats the utility
               class reliably regardless of Tailwind's generated rule order. */}
-          {/* Consistent min-height for the sign-in / sign-up modes (md+ only, so
-              mobile stays natural) so toggling between them does NOT change the
-              card size - and therefore does not shift the centered marketing
-              column or footer. Sized to fit sign-up incl. the Turnstile widget
-              (~80px) that renders on the deployed origin but not on localhost.
-              Content is vertically centered so the shorter sign-in form reads as
-              balanced rather than top-heavy. The focused reset / success cards
-              keep their natural (smaller) height. */}
-          <Card
-            padding="lg"
-            className={`flex flex-col ${!isForgotPassword && !signUpSuccess ? 'md:min-h-[850px] md:justify-center xl:min-h-[900px]' : ''}`}
-            style={{ boxShadow: 'var(--shadow-card-hover)' }}
-          >
+          {/* Natural height: sign-in is compact, sign-up grows downward for its
+              extra fields. The marketing column (centered against the sign-in
+              height) and the footer (login.astro reserves the sign-in height) do
+              not shift on load; a click to sign-up expands the card. */}
+          <Card padding="lg" className="flex flex-col" style={{ boxShadow: 'var(--shadow-card-hover)' }}>
 
           {signUpSuccess ? (
             <div className="text-center">
