@@ -39,7 +39,11 @@ export function Modal({ isOpen, title, children, onClose }: ModalProps) {
   if (!render) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    // z-[110] sits ABOVE the mobile drawer (z-100/101) so a modal opened while
+    // the drawer is open (e.g. a leave-guard confirm from a drawer link) is
+    // never hidden behind it (bug 19). The drawer also auto-closes via the
+    // cc:close-drawer event the leave-guards dispatch.
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
       {/* Overlay */}
       <div
         className={`absolute inset-0 bg-black/60 backdrop-blur-sm ${closing ? 'animate-fade-out pointer-events-none' : 'animate-fade-in'}`}

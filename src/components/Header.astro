@@ -47,11 +47,14 @@ const checkPath = 'M20 6 9 17l-5-5'
 ---
 
 {/* Apple-style frosted chrome: translucent, heavy blur+saturate, slim bar.
-    Content scrolls underneath; the bar reads as glass, not a slab. */}
+    Content scrolls underneath; the bar reads as glass, not a slab. The
+    non-sticky case (exam shell) is z-40, not z-30, so the header's own stacking
+    context - and the account-menu dropdown inside it - layers ABOVE the in-exam
+    sticky toolbar (z-30) instead of being covered by it (bug 8). */}
 <header
   id="site-header"
   data-overlay={overlay || undefined}
-  class:list={[sticky ? "sticky top-0 z-40" : "relative z-30", "bg-header-bg/70 backdrop-blur-xl backdrop-saturate-150 border-b border-border-hairline/60 text-on-header"]}
+  class:list={[sticky ? "sticky top-0 z-40" : "relative z-40", "bg-header-bg/70 backdrop-blur-xl backdrop-saturate-150 border-b border-border-hairline/60 text-on-header"]}
 >
   <div class="max-w-7xl mx-auto px-4 md:px-6">
     <div class="flex items-center justify-between gap-4 h-12 md:h-14">

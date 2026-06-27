@@ -72,11 +72,11 @@ test('P1-6: guest result rehydrates after the login round-trip (marker set)', as
     sessionStorage.setItem('cc_resume_results', 'clf-c02')
   }, PENDING)
   await page.goto('/aws/clf-c02/practice-exam')
-  // The info alert renders only inside the results screen for a guest with a
-  // pending attempt, so it is a clean proof of rehydrate. Review is hidden.
-  await expect(page.getByText('Your result is saved on this device for 24 hours')).toBeVisible({ timeout: 15000 })
+  // The results screen (not the start screen) is the proof of rehydrate: it has
+  // a "Retake exam" button the start screen lacks. Review is hidden because a
+  // rehydrated snapshot carries no Question objects.
+  await expect(page.getByRole('button', { name: /Retake exam/i })).toBeVisible({ timeout: 15000 })
   await expect(page.getByRole('button', { name: 'Review questions' })).toHaveCount(0)
-  await expect(page.getByRole('button', { name: /Retake exam/i })).toBeVisible()
 })
 
 test('P1-6: fresh visit (no marker) shows START, not an old result', async ({ page }) => {
@@ -85,9 +85,11 @@ test('P1-6: fresh visit (no marker) shows START, not an old result', async ({ pa
     // deliberately NO cc_resume_results marker
   }, PENDING)
   await page.goto('/aws/clf-c02/practice-exam')
-  await page.waitForTimeout(2500)
-  // No rehydrate without the marker: the results-only info alert never appears.
-  await expect(page.getByText('Your result is saved on this device for 24 hours')).toHaveCount(0)
+  // Without the marker there is no rehydrate: the START screen shows (its "Start
+  // exam" button), never the results screen ("Retake exam").
+  await expect(page.getByRole('button', { name: 'Start exam', exact: true })).toBeVisible({ timeout: 15000 })
+  await page.waitForTimeout(1500)
+  await expect(page.getByRole('button', { name: /Retake exam/i })).toHaveCount(0)
 })
 
 test('P1-8: no British spelling in rendered funnel pages', async ({ page }) => {

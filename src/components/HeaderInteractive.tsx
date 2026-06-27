@@ -7,7 +7,6 @@ import { KOFI_URL, GITHUB_REPO_URL } from '../lib/constants'
 import { guardExamLeave, SIGN_OUT_SENTINEL } from '../lib/examGuard'
 import { Menu, X, Heart, Sun, Moon, Github, History, Info, BookOpen, Home, UserCircle } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
-import { useExamActive } from '../hooks/useExamActive'
 import { useTheme } from '../hooks/useTheme'
 import { Button } from './Button'
 import { CertSwitcher } from './CertSwitcher'
@@ -27,11 +26,6 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
   const { user, loading: authLoading } = useAuth()
   const signOut = useSignOut()
   const { theme, toggleTheme } = useTheme()
-  // Hide the mobile drawer ONLY while a timed exam is ACTIVE (no-distraction
-  // lockdown, matching pro exam UX). It stays available on the exam start/
-  // results screens and throughout domain practice, where the in-app leave
-  // guard warns before navigating away.
-  const examActive = useExamActive()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [drawerClosing, setDrawerClosing] = useState(false)
   const drawerRef = useRef<HTMLDivElement>(null)
@@ -52,6 +46,16 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
     onEscape: closeMobileMenu,
   })
 
+  // Close the drawer when a leave-guard (or any) modal opens, so the drawer
+  // never sits on top of the modal it triggered (bug 19). The exam/practice
+  // anchor-capture guards dispatch this when an in-drawer nav link is
+  // intercepted; the Modal also layers above the drawer (z-index) as a backstop.
+  useEffect(() => {
+    const onCloseDrawer = () => { if (mobileMenuOpen) closeMobileMenu() }
+    window.addEventListener('cc:close-drawer', onCloseDrawer)
+    return () => window.removeEventListener('cc:close-drawer', onCloseDrawer)
+  }, [mobileMenuOpen, closeMobileMenu])
+
   // Sync the pre-paint `cc-authed` class (set by the inline script in
   // BaseLayout from the localStorage token) to the real auth result once
   // getSession() resolves. Self-corrects a stale token.
@@ -62,21 +66,20 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
 
   return (
     <>
-      {/* Hamburger - mobile only. Hidden only while a timed exam is ACTIVE
-          (examActive), where the drawer would overlap the in-exam toolbar;
-          available everywhere else, including the exam start screen and
-          domain practice (which has its own leave guard). */}
-      {!examActive && (
-        <button
-          onClick={() => (mobileMenuOpen ? closeMobileMenu() : setMobileMenuOpen(true))}
-          className="md:hidden inline-flex items-center justify-center w-11 h-11 text-on-header hover:bg-on-header/10 rounded-full transition-colors active:scale-[0.92]"
-          aria-label="Toggle menu"
-          aria-expanded={mobileMenuOpen}
-          aria-controls={mobileMenuOpen ? 'mobile-menu' : undefined}
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
-        </button>
-      )}
+      {/* Hamburger - mobile only. Available on EVERY route, including during an
+          active timed exam, so a mobile user always has a menu affordance (bug
+          13). Any in-exam / in-practice nav routes through the leave-guard
+          confirm, and the drawer portals above the in-exam toolbar, so it never
+          overlaps or lets the user wander off unguarded. */}
+      <button
+        onClick={() => (mobileMenuOpen ? closeMobileMenu() : setMobileMenuOpen(true))}
+        className="md:hidden inline-flex items-center justify-center w-11 h-11 text-on-header hover:bg-on-header/10 rounded-full transition-colors active:scale-[0.92]"
+        aria-label="Toggle menu"
+        aria-expanded={mobileMenuOpen}
+        aria-controls={mobileMenuOpen ? 'mobile-menu' : undefined}
+      >
+        {mobileMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
+      </button>
 
       {/* Desktop cluster - hidden on mobile. Order: cert switcher, links,
           auth button. Auth-dependent pieces are always in the DOM and
@@ -134,14 +137,13 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
         )}
       </div>
 
-      {/* Mobile drawer. Also gated on !hideMobileMenu so it can never mount on
-          the exam shell even if state were somehow set. PORTALED to <body>:
-          the header has `backdrop-blur-xl` (a backdrop-filter), which makes it
-          the containing block for `fixed` descendants — so an in-header drawer
-          gets clipped to the 48px header bar on non-overlay pages (e.g. /login).
-          Rendering into <body> escapes that containing block so the overlay +
-          panel cover the full viewport everywhere. */}
-      {!examActive && mobileMenuOpen && typeof document !== 'undefined' && createPortal(
+      {/* Mobile drawer. PORTALED to <body>: the header has `backdrop-blur-xl`
+          (a backdrop-filter), which makes it the containing block for `fixed`
+          descendants — so an in-header drawer gets clipped to the 48px header bar
+          on non-overlay pages (e.g. /login). Rendering into <body> escapes that
+          containing block so the overlay + panel cover the full viewport, and
+          its z-100/101 sits above the in-exam toolbar (z-30). */}
+      {mobileMenuOpen && typeof document !== 'undefined' && createPortal(
         <>
           <button
             type="button"

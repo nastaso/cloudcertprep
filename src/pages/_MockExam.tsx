@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Flag, AlertCircle, LayoutGrid, Heart } from 'lucide-react'
+import { Flag, AlertCircle, LayoutGrid, Heart, ArrowLeft } from 'lucide-react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
@@ -152,9 +152,6 @@ export function MockExam() {
   // an active exam. Opens in a new tab so nothing is lost, but a confirm keeps
   // the user from wandering off while the timer burns (Alex, 2026-06-13).
   const [pendingExternalUrl, setPendingExternalUrl] = useState<string | null>(null)
-  // One-shot success notice: a guest attempt stored before sign-in was flushed
-  // to the account (see lib/pendingAttempt.ts), shown once on the start screen.
-  const [attemptSavedNotice, setAttemptSavedNotice] = useState(false)
   const [results, setResults] = useState<{
     scaledScore: number
     percentScore: number
@@ -183,18 +180,6 @@ export function MockExam() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [startTime, setStartTime] = useState<number>(0)
   const [reviewFilter, setReviewFilter] = useState<'all' | 'incorrect' | 'flagged'>('all')
-  // Whether a guest's just-finished attempt is held on this device (drives the
-  // results "saved on this device" notice). Read in an effect, NOT during
-  // render: peekPendingAttempt touches localStorage (and can removeItem an
-  // expired snapshot), which must not run as a side-effect of every render. The
-  // setState is deferred (setTimeout) for the same reason the rehydrate effect
-  // below is: synchronous setState in an effect cascades a render.
-  const [hasPendingResult, setHasPendingResult] = useState(false)
-  useEffect(() => {
-    if (screen !== 'results') return
-    const t = window.setTimeout(() => setHasPendingResult(!!peekPendingAttempt()), 0)
-    return () => window.clearTimeout(t)
-  }, [screen])
   const [reviewDomainFilter, setReviewDomainFilter] = useState<number | null>(null)
   const [reviewQuestionIndex, setReviewQuestionIndex] = useState(0)
   const [optionKeyMaps, setOptionKeyMaps] = useState<Map<string, OptionKeyMap>>(new Map())
@@ -293,6 +278,9 @@ export function MockExam() {
       const isExternal = anchor.target === '_blank' || url.origin !== window.location.origin
       e.preventDefault()
       e.stopPropagation()
+      // If the click came from the (now exam-available) mobile drawer, close it
+      // so the leave-confirm modal isn't hidden behind it (bug 19).
+      window.dispatchEvent(new Event('cc:close-drawer'))
       if (isExternal) {
         setPendingExternalUrl(url.href)
       } else {
@@ -303,17 +291,18 @@ export function MockExam() {
     return () => document.removeEventListener('click', onClickCapture, true)
   }, [screen])
 
-  // Surface the one-shot "attempt saved" notice: a guest finished an exam,
-  // clicked "Sign in to save this attempt", and the pending attempt was
-  // flushed to their account during sign-in (lib/pendingAttempt.ts). The
-  // flush races this island's remount, so check the flag now AND listen for
-  // the saved event in case the flush lands after mount.
+  // After a guest signs in to save their attempt, the pending attempt is flushed
+  // to their account during sign-in (lib/pendingAttempt.ts). Send them to their
+  // history to SEE the saved attempt, rather than dropping them back on a bare
+  // exam start screen with a toast that could re-appear on later visits (bugs
+  // 14 + 15). The flush races this island's remount, so check the one-shot flag
+  // now AND listen for the saved event in case the flush lands after mount; the
+  // flag is consumed exactly once, so this navigates a single time.
   useEffect(() => {
     const consume = () => {
-      if (consumePendingAttemptSavedNotice()) setAttemptSavedNotice(true)
+      if (consumePendingAttemptSavedNotice()) window.location.assign('/history')
     }
-    // Deferred (not called synchronously in the effect body) so the mount
-    // commit settles before any state update.
+    // Deferred so the mount commit settles before the navigation.
     const t = window.setTimeout(consume, 0)
     window.addEventListener(PENDING_ATTEMPT_SAVED_EVENT, consume)
     return () => {
@@ -623,17 +612,18 @@ export function MockExam() {
     return (
       <div className="p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
-          {attemptSavedNotice && (
-            <Alert tone="success" className="mb-4 p-4 animate-enter">
-              Your exam attempt was saved to your history.
-            </Alert>
-          )}
           <Card padding="lg">
             <h1 className="text-2xl md:text-3xl font-semibold text-text-primary mb-3 md:mb-4">{cert.shortName} Practice Exam</h1>
             <p className="text-sm md:text-base text-text-muted mb-6 md:mb-8">{cert.examQuestionCount} questions, {Math.round(cert.examTimeSeconds / 60)} minutes. No answer feedback during exam.</p>
 
             <div className="bg-bg-dark rounded-xl p-4 md:p-6 mb-6 md:mb-8">
-              <h2 className="text-lg md:text-xl font-semibold text-text-primary mb-3 md:mb-4">Domain breakdown</h2>
+              {/* Column legend labels the per-row "16 · 24%" so the two numbers
+                  read as (questions in this exam) and (that domain's share of the
+                  exam) instead of unexplained noise (bug 10). */}
+              <div className="flex items-baseline justify-between gap-4 mb-3 md:mb-4">
+                <h2 className="text-lg md:text-xl font-semibold text-text-primary">Domain breakdown</h2>
+                <span className="text-[11px] md:text-xs text-text-muted whitespace-nowrap">Questions · % of exam</span>
+              </div>
               <ul className="space-y-2 md:space-y-2.5 text-sm md:text-base">
                 {(() => {
                   const targets = getExamDomainTargets(cert)
@@ -716,8 +706,11 @@ export function MockExam() {
   }
 
     if (screen === 'results') return (
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="max-w-2xl w-full space-y-6 animate-enter">
+      // Top-aligned (was flex items-center, which vertically centered a tall card
+      // and left a large empty band above it). pt-6/8 starts the result near the
+      // top consistently; mx-auto keeps it horizontally centered (bug 16).
+      <div className="flex-1 px-4 pt-6 md:pt-8 pb-12">
+        <div className="max-w-2xl mx-auto w-full space-y-5 animate-enter">
           <h1 className="sr-only">{cert.shortName} Exam Results</h1>
 
           <PassFailBanner
@@ -749,7 +742,12 @@ export function MockExam() {
               </div>
             </div>
 
-            <h3 className="text-xl font-semibold text-text-primary mb-4">Domain Breakdown</h3>
+            {/* Column legend mirrors the start screen (bug 10): the left sub-line
+                is correct/total, the right value is the per-domain score. */}
+            <div className="flex items-baseline justify-between gap-4 mb-4">
+              <h3 className="text-xl font-semibold text-text-primary">Domain Breakdown</h3>
+              <span className="text-[11px] md:text-xs text-text-muted whitespace-nowrap">Correct · score</span>
+            </div>
             <div className="space-y-4">
               {cert.domains.map(domain => {
                 const score = results!.domainScores[String(domain.id)] ?? 0
@@ -792,12 +790,6 @@ export function MockExam() {
               }
               ctaLabel="Sign in to save this attempt"
             />
-          )}
-
-          {!user && hasPendingResult && (
-            <Alert tone="info" className="text-sm">
-              Your result is saved on this device for 24 hours. Sign in anytime to keep it.
-            </Alert>
           )}
 
           <div className="mt-6 space-y-3">
@@ -1044,6 +1036,7 @@ export function MockExam() {
                 disabled={currentIndex === 0}
                 variant="secondary"
                 className="flex-1"
+                leftIcon={<ArrowLeft className="w-5 h-5" aria-hidden="true" />}
               >
                 Previous
               </Button>
