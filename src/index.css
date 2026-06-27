@@ -195,7 +195,11 @@ html.cc-js [data-reveal].is-revealed {
    always in the DOM; these rules decide which paints. React syncs the class
    to the real auth result once getSession() resolves. */
 .cc-auth-in { display: none; }
-html.cc-authed .cc-auth-in { display: unset; }
+/* `display: block`, NOT `unset`: `unset` resolves `display` to its INITIAL value
+   `inline` (display is not inherited), which silently dropped vertical margins +
+   min-height on every cc-auth-in element (e.g. the domain-page progress strip
+   reservation collapsed to 0 gap). All cc-auth-in elements are block-level. */
+html.cc-authed .cc-auth-in { display: block; }
 html.cc-authed .cc-auth-out { display: none; }
 
 /* Chrome hidden DURING an active timed exam (the exam island sets

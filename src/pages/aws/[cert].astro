@@ -320,10 +320,11 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
             <section id="domains" data-reveal>
               <p class="kicker" aria-hidden="true">Practice by domain</p>
               <h2 class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-2">
-                {secondaryKeyword ? `Build your ${secondaryKeyword} by domain` : 'Practice by exam domain'}
+                Practice {cert.shortName} by exam domain
               </h2>
               <p class="text-lead mb-8">
-                Focused question sets for every exam domain, weighted like the real exam.
+                Focused question sets for every exam domain, with instant feedback on each answer.
+                The percentage is that domain's share of the real exam.
               </p>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {cert.domains.map(d => (

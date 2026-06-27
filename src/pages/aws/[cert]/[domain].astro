@@ -362,10 +362,10 @@ const levelAccentUi = LEVEL_ACCENT_UI_HEX[cert.level]
       {/* Reserve the strip's height for signed-in users (cc-auth-in =
           display:none for guests, so SEO/CLS is untouched for them) so the
           client:only island mounting does not push the content sheet down.
-          Heights match the rendered strip (mobile column ~125px / desktop row
-          ~93px); the margin lives here, not on the Shell, so the reservation is
-          exact. */}
-      <div class="cc-auth-in mb-10 md:mb-14 min-h-[125px] md:min-h-[93px]">
+          Measured: the stacked mobile column is ~261px and the desktop row is
+          ~161px (the previous 125/93 under-reserved and the content jumped). The
+          margin lives here, not on the Shell, so the gap to the content is exact. */}
+      <div class="cc-auth-in mb-10 md:mb-14 min-h-[264px] md:min-h-[164px]">
         <DomainProgressStrip
           certCode={cert.code}
           certShortName={cert.shortName}
