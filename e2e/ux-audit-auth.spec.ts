@@ -80,14 +80,13 @@ test('P0-1: signup shows Check-email card with resend + edit-email', async ({ pa
 
   if (await card.isVisible()) {
     // Full card verification (only reachable when a signup email actually sends).
-    const resend = page.getByRole('button', { name: /Resend verification email/i })
-    await expect(resend).toBeVisible()
+    // bug 2: the resend cooldown starts at signup (the first email just sent), so
+    // the button is in its countdown state immediately - not clickable yet, which
+    // is what stops an instant resend from hitting Supabase's rate limit. bug 1:
+    // no second Turnstile is rendered on the card upfront.
+    await expect(page.getByRole('button', { name: /Resend in \d+s/ })).toBeVisible()
     await expect(page.getByText('Wrong email? Edit it')).toBeVisible()
-    await resend.click()
-    await expect(
-      page.getByRole('button', { name: /Resend in \d+s/ }).or(page.getByRole('alert')),
-    ).toBeVisible({ timeout: 25000 })
-    await page.getByText('Wrong email? Edit it').click().catch(() => {})
+    await page.getByText('Wrong email? Edit it').click()
     await expect(page.locator('#email')).toBeVisible()
   } else {
     // Rate-limited path: assert the copy is the non-enumerating handled message.

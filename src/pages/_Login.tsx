@@ -17,6 +17,13 @@ import { getActiveTotalQuestions } from '../data/certifications'
 import { safeFrom } from '../lib/navigation'
 import { authErrorMessage } from '../lib/authErrors'
 
+// Client cooldown for resend / reset emails. Sized to Supabase's per-email
+// rate-limit window (the default minimum interval between auth emails to the
+// same address is 60s), so the button only re-enables once a send can actually
+// succeed (bug 2: an instant resend after signup otherwise hits "too many
+// attempts").
+const RESEND_COOLDOWN_SECONDS = 60
+
 export function Login() {
   const location = useLocation()
   const from = safeFrom((location.state as { from?: string })?.from)
@@ -27,6 +34,11 @@ export function Login() {
   // cooldown throttles repeat sends to match Supabase's resend rate limit.
   const [resendState, setResendState] = useState<'idle' | 'sending' | 'sent'>('idle')
   const [resendCooldown, setResendCooldown] = useState(0) // seconds remaining
+  // Whether the lazily-revealed resend captcha is showing. The "Check your
+  // email" card no longer renders a second Turnstile upfront (a jarring repeat
+  // bot-check right after signup); pressing Resend reveals it only when a fresh
+  // single-use token is needed, then sends as soon as it resolves (bug 1).
+  const [resendChallenge, setResendChallenge] = useState(false)
   // Cooldown after a password-reset email is sent, so a user who doesn't see it
   // immediately can't hammer the button (Supabase rate-limits server-side; this
   // is the visible feedback that a send is in flight). (M3 [H])
@@ -90,6 +102,19 @@ export function Login() {
     return () => window.clearInterval(id)
   }, [resetCooldown])
 
+  // Re-arm the captcha when the reset cooldown ends (transition to 0), so a
+  // follow-up "Send reset link" has a fresh single-use token. This keeps the
+  // challenge hidden DURING the wait (bug 3: no second Turnstile on the normal
+  // single send) while still allowing a working resend. Gated on the forgot
+  // mode so it never re-challenges the sign-in form.
+  const prevResetCooldownRef = useRef(0)
+  useEffect(() => {
+    if (prevResetCooldownRef.current > 0 && resetCooldown === 0 && isForgotPassword) {
+      resetCaptcha()
+    }
+    prevResetCooldownRef.current = resetCooldown
+  }, [resetCooldown, isForgotPassword])
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -134,9 +159,13 @@ export function Login() {
         trackEvent('sign_up', { method: 'email' })
         setPassword('')
         setConfirmPassword('')
-        // The signup token is now consumed; clear it so the success card's
-        // Turnstile re-arms with a fresh token for a possible resend (P0-1).
+        // The signup token is now consumed; clear it so a later resend reveals a
+        // fresh challenge rather than reusing a dead token (P0-1, bug 1).
         resetCaptcha()
+        // Start the resend cooldown immediately: signup just sent the first
+        // email, so Supabase's per-email rate limit is already counting. Without
+        // this, an instant Resend hits "too many attempts" (bug 2).
+        setResendCooldown(RESEND_COOLDOWN_SECONDS)
         setSignUpSuccess(true)
         return
       } else {
@@ -220,22 +249,22 @@ export function Login() {
 
       if (error) throw error
       setSuccess('Check your email for a reset link')
-      setResetCooldown(45) // matches Supabase's default reset-email interval
+      setResetCooldown(RESEND_COOLDOWN_SECONDS)
+      // Do NOT re-arm the captcha here. The token is now consumed, but the
+      // button is on its cooldown so no token is needed until it ends -
+      // re-challenging now is the visible "Turnstile twice" bug (bug 3). A fresh
+      // token is re-armed when the cooldown expires (effect below).
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred')
+      resetCaptcha() // re-arm so the user can retry after a failed send
     } finally {
-      resetCaptcha()
       setLoading(false)
     }
   }
 
-  // Resend the sign-up confirmation email (P0-1). Mirrors handleEmailAuth's
-  // captcha handling: tokens are single-use, so re-arm Turnstile after the call.
-  const handleResend = async () => {
-    if (hasCaptcha && !captchaToken) {
-      setError('Please complete the verification challenge below.')
-      return
-    }
+  // Actually send the resend (token already solved). Separated so both the
+  // direct path and the lazy-challenge completion below reuse it (P0-1).
+  const sendResend = async () => {
     setError('')
     setResendState('sending')
     try {
@@ -247,7 +276,8 @@ export function Login() {
       })
       if (error) throw error
       setResendState('sent')
-      setResendCooldown(45) // matches Supabase's default resend interval
+      setResendChallenge(false)
+      setResendCooldown(RESEND_COOLDOWN_SECONDS)
     } catch (err: unknown) {
       setError(authErrorMessage(err, 'sign-up'))
       setResendState('idle')
@@ -256,14 +286,39 @@ export function Login() {
     }
   }
 
+  // Resend the sign-up confirmation email (P0-1, bug 1). The captcha is shown
+  // lazily: pressing Resend reveals the Turnstile only when a fresh token is
+  // needed, instead of rendering a second widget on the success card upfront.
+  const handleResend = () => {
+    if (resendCooldown > 0 || resendState === 'sending') return
+    if (hasCaptcha && !captchaToken) { setResendChallenge(true); return }
+    void sendResend()
+  }
+
+  // Lazy-resend completion: once the revealed challenge yields a token, send.
+  // Deferred (setTimeout) so the state updates land outside the effect body, and
+  // fired only on the challenge/token edge (sendResend is recreated each render,
+  // so it is intentionally not a dependency).
+  useEffect(() => {
+    if (!resendChallenge || !captchaToken) return
+    const t = window.setTimeout(() => { void sendResend() }, 0)
+    return () => window.clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resendChallenge, captchaToken])
+
   return (
       // Top-anchored (items-start) so switching sign-in <-> sign-up <-> reset
       // grows the card DOWNWARD from a stable top instead of re-centering and
       // visibly jumping the whole card (the taller sign-up form adds confirm
-      // password + terms + strength meter). The grid still centers the marketing
-      // column against the card on md+.
+      // password + terms + strength meter). The grid is also top-aligned (see
+      // below), so the marketing column stays put as the card grows.
       <div className="flex-1 flex items-start justify-center px-4 py-10 md:py-16">
-        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 md:items-center gap-8 lg:gap-12">
+        {/* md:items-start (was items-center): the marketing column is top-pinned
+            and fixed-height, so switching sign-in <-> sign-up grows the auth card
+            DOWNWARD without re-centering the marketing column against it (bug 4).
+            Combined with the wrapper's items-start, neither the left column nor
+            the footer visibly reflow on a mode toggle. */}
+        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 md:items-start gap-8 lg:gap-12">
           {/* Left Column - Features/Benefits */}
           <div className="hidden md:flex flex-col justify-center space-y-6 md:pr-6 lg:pr-8">
               <div>
@@ -351,10 +406,14 @@ export function Login() {
                 </Alert>
               )}
 
-              {/* Single-use Turnstile token for the resend call; renders nothing
-                  when no site key is configured. Shares turnstileRef because only
-                  one of the two card branches is ever mounted at a time. */}
-              <Turnstile ref={turnstileRef} onToken={setCaptchaToken} theme={theme} />
+              {/* Lazily-revealed captcha for the resend call (bug 1): shown only
+                  after the user presses Resend, when a fresh single-use token is
+                  needed - never a second widget upfront. Renders nothing when no
+                  site key is configured. Shares turnstileRef because only one of
+                  the two card branches is ever mounted at a time. */}
+              {resendChallenge && (
+                <Turnstile ref={turnstileRef} onToken={setCaptchaToken} theme={theme} />
+              )}
 
               <Button
                 onClick={handleResend}
@@ -362,7 +421,7 @@ export function Login() {
                 fullWidth
                 loading={resendState === 'sending'}
                 loadingText="Sending..."
-                disabled={resendCooldown > 0 || (hasCaptcha && !captchaToken)}
+                disabled={resendCooldown > 0}
                 className="mt-4 mb-3"
               >
                 {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend verification email'}
@@ -370,14 +429,14 @@ export function Login() {
 
               <button
                 type="button"
-                onClick={() => { setSignUpSuccess(false); setIsSignUp(true); setError(''); setResendState('idle'); setResendCooldown(0) }}
+                onClick={() => { setSignUpSuccess(false); setIsSignUp(true); setError(''); setResendState('idle'); setResendCooldown(0); setResendChallenge(false) }}
                 className="block w-full text-sm text-text-muted hover:text-text-primary transition-colors mb-4"
               >
                 Wrong email? Edit it
               </button>
 
               <Button
-                onClick={() => { setSignUpSuccess(false); setIsSignUp(false); setError(''); setResendState('idle'); setResendCooldown(0) }}
+                onClick={() => { setSignUpSuccess(false); setIsSignUp(false); setError(''); setResendState('idle'); setResendCooldown(0); setResendChallenge(false) }}
                 variant="ghost"
                 fullWidth
               >
