@@ -298,9 +298,13 @@ export function MockExam() {
   // 14 + 15). The flush races this island's remount, so check the one-shot flag
   // now AND listen for the saved event in case the flush lands after mount; the
   // flag is consumed exactly once, so this navigates a single time.
+  // While the just-signed-in flush is in flight, show a "Saving..." state on the
+  // start screen instead of flashing the bare exam intro before the redirect.
+  const [savingToHistory, setSavingToHistory] = useState(false)
   useEffect(() => {
     const consume = () => {
-      if (consumePendingAttemptSavedNotice()) window.location.assign('/history')
+      // ?saved=1 -> /history shows a "saved to your history" confirmation banner.
+      if (consumePendingAttemptSavedNotice()) window.location.assign('/history?saved=1')
     }
     // Deferred so the mount commit settles before the navigation.
     const t = window.setTimeout(consume, 0)
@@ -310,6 +314,22 @@ export function MockExam() {
       window.removeEventListener(PENDING_ATTEMPT_SAVED_EVENT, consume)
     }
   }, [])
+
+  // A signed-in user who lands on the start screen with a pending guest attempt
+  // is about to have it flushed + be redirected to /history (above). Show a
+  // loader instead of the start screen so they don't see the intro flash.
+  useEffect(() => {
+    if (!user || screen !== 'start') return
+    const t = window.setTimeout(() => { if (peekPendingAttempt()) setSavingToHistory(true) }, 0)
+    return () => window.clearTimeout(t)
+  }, [user, screen])
+  // Fallback: if the flush never completes (e.g. it failed), drop the loader
+  // after a few seconds so the user is never stuck on it.
+  useEffect(() => {
+    if (!savingToHistory) return
+    const t = window.setTimeout(() => setSavingToHistory(false), 8000)
+    return () => window.clearTimeout(t)
+  }, [savingToHistory])
 
   // Rehydrate a guest's just-finished attempt after a /login round-trip (P1-6).
   // "Continue as guest" reloads the exam route, remounting this island at the
@@ -609,6 +629,13 @@ export function MockExam() {
   const flaggedCount = Array.from(answers.values()).filter(s => s.flagged).length
 
   if (screen === 'start') {
+    if (savingToHistory) {
+      return (
+        <div className="flex-1 flex items-center justify-center p-8">
+          <LoadingSpinner text="Saving your attempt..." />
+        </div>
+      )
+    }
     return (
       <div className="p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
@@ -628,11 +655,13 @@ export function MockExam() {
                         clarifying caption instead. */}
                     <div className="md:hidden">
                       <p className="mb-2 text-right text-[11px] uppercase tracking-wide text-text-muted">Questions · % of exam</p>
-                      <ul className="space-y-2 text-sm">
+                      {/* text-[13px] so the longer AIF domain names ("Security,
+                          Compliance, and Governance") fit on one line on a phone. */}
+                      <ul className="space-y-2 text-[13px]">
                         {cert.domains.map(d => (
                           <li key={d.id} className="flex items-baseline justify-between gap-3">
-                            <span className="text-text-muted">{d.name}</span>
-                            <span className="font-mono tabular-nums whitespace-nowrap font-medium text-text-primary">
+                            <span className="min-w-0 text-text-muted">{d.name}</span>
+                            <span className="shrink-0 font-mono tabular-nums whitespace-nowrap font-medium text-text-primary">
                               {targets[d.id]}<span className="ml-1.5 font-normal text-text-muted">· {Math.round(d.examProportion * 100)}%</span>
                             </span>
                           </li>

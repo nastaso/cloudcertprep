@@ -188,18 +188,35 @@ const softwareAppJsonLd = serializeJsonLd({
           if (!(window.__ccHasSession && window.__ccHasSession())) return
           var hdr = document.getElementById('site-header')
           if (hdr) hdr.removeAttribute('data-overlay')
-          // First signed-in home visit on this device: greet as new, not
-          // "Welcome back" (bug 6). Device-local flag; the text is swapped in
-          // place before paint so the common returning case never flashes.
+          // First home view for a FRESHLY-created account: greet as new, not
+          // "Welcome back" (bug 6). Read the stored session user and key the
+          // "greeted" flag on the account id + its age, so a brand-new account
+          // gets the welcome even on a browser where a DIFFERENT account was used
+          // before (the old device-only flag failed that case), and an existing
+          // account is never greeted as new. Text is swapped in place pre-paint
+          // so the common returning case never flashes.
           try {
-            if (!localStorage.getItem('cc_home_greeted')) {
-              localStorage.setItem('cc_home_greeted', '1')
-              var k = document.getElementById('cc-hero-kicker')
-              var s = document.getElementById('cc-hero-subline')
-              if (k) k.textContent = 'Welcome to CloudCertPrep'
-              if (s) s.textContent = 'Your account is ready. Head to your dashboard, or jump straight into practice.'
+            var u = null
+            for (var i = 0; i < localStorage.length; i++) {
+              var key = localStorage.key(i)
+              if (key && key.indexOf('sb-') === 0 && key.indexOf('-auth-token') === key.length - 11) {
+                try { u = (JSON.parse(localStorage.getItem(key)) || {}).user } catch (e) {}
+                break
+              }
             }
-          } catch (e) { /* private mode: fall back to the default greeting */ }
+            if (u && u.id && u.created_at) {
+              var ageMs = Date.now() - Date.parse(u.created_at)
+              var greeted = (localStorage.getItem('cc_home_greeted') || '').split(',').filter(Boolean)
+              if (ageMs >= 0 && ageMs < 86400000 && greeted.indexOf(u.id) === -1) {
+                greeted.push(u.id)
+                localStorage.setItem('cc_home_greeted', greeted.join(','))
+                var k = document.getElementById('cc-hero-kicker')
+                var s = document.getElementById('cc-hero-subline')
+                if (k) k.textContent = 'Welcome to CloudCertPrep'
+                if (s) s.textContent = 'Your account is ready. Head to your dashboard, or jump straight into practice.'
+              }
+            }
+          } catch (e) { /* private mode / parse error: fall back to the default greeting */ }
         }
         apply()
         window.addEventListener('pageshow', apply)

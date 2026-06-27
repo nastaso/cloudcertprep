@@ -182,6 +182,18 @@ export function History() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState(false)
   const [attempts, setAttempts] = useState<ExamAttempt[]>([])
+  // One-shot "your attempt was saved" banner: the guest-attempt save flow
+  // redirects here with ?saved=1 after flushing the attempt to the account.
+  // Read + strip the param once on mount so a refresh is clean.
+  const [savedFromExam] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const p = new URLSearchParams(window.location.search)
+    if (p.get('saved') !== '1') return false
+    p.delete('saved')
+    const qs = p.toString()
+    window.history.replaceState(null, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash)
+    return true
+  })
 
   // Multi-cert: no single "active" cert. Title and meta are platform-level.
   useSEO({
@@ -462,6 +474,12 @@ export function History() {
               </Button>
             )}
           </div>
+
+          {savedFromExam && (
+            <Alert tone="success" className="mb-4">
+              Your exam attempt was saved to your history.
+            </Alert>
+          )}
 
           {resetSuccess && (
             <Alert tone="success" className="mb-4">
