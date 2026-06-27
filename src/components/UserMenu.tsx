@@ -49,7 +49,15 @@ export function UserMenu() {
     <div
       ref={wrapRef}
       className="relative cc-auth-in"
-      onBlur={(e) => { if (!wrapRef.current?.contains(e.relatedTarget as Node)) setOpen(false) }}
+      onBlur={(e) => {
+        // Only close on a real focus move to an element OUTSIDE the menu
+        // (keyboard tab-out). A null relatedTarget means focus went nowhere -
+        // e.g. a pointer press on the non-interactive email row inside the menu
+        // - which must NOT dismiss it; genuine outside clicks are handled by the
+        // mousedown listener. (bug 7)
+        const next = e.relatedTarget as Node | null
+        if (next && !wrapRef.current?.contains(next)) setOpen(false)
+      }}
     >
       <button
         ref={triggerRef}

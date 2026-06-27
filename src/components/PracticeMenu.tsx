@@ -91,7 +91,14 @@ export function PracticeMenu({ variant, isAuthed = false, onNavigate, currentPat
       <div
         ref={wrapRef}
         className="relative"
-        onBlur={(e) => { if (!wrapRef.current?.contains(e.relatedTarget as Node)) setOpen(false) }}
+        onBlur={(e) => {
+          // Close only on a real focus move OUTSIDE the panel (keyboard tab-out).
+          // A null relatedTarget means focus went nowhere - e.g. a press on a
+          // non-interactive cert-name label inside the panel - and must not
+          // dismiss it; outside clicks are handled by the mousedown listener. (bug 7)
+          const next = e.relatedTarget as Node | null
+          if (next && !wrapRef.current?.contains(next)) setOpen(false)
+        }}
       >
         <button
           ref={triggerRef}
