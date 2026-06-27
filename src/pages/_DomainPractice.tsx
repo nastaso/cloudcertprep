@@ -41,23 +41,6 @@ import { ArrowRight, Check, X } from 'lucide-react'
 
 type Screen = 'selection' | 'config' | 'practice' | 'results'
 
-/**
- * "Don't show again" flag for the practice leave-guard modal. Practice is
- * lower-stakes than the timed mock exam (whose guard intentionally has NO
- * opt-out), so users may permanently dismiss this one. Stored on confirm-leave
- * with the checkbox ticked; when set, both the in-app modal and the native
- * beforeunload warning are skipped.
- */
-const PRACTICE_LEAVE_GUARD_KEY = 'cloudcertprep_practice_leave_guard'
-
-function isLeaveGuardDismissed(): boolean {
-  try {
-    return localStorage.getItem(PRACTICE_LEAVE_GUARD_KEY) === 'dismissed'
-  } catch {
-    return false
-  }
-}
-
 interface QuestionResult {
   question: Question
   userAnswer: string | string[]
@@ -103,7 +86,6 @@ export function DomainPractice() {
   const [loading, setLoading] = useState(false)
   const [answering, setAnswering] = useState(false)
   const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null)
-  const [dontShowLeaveGuard, setDontShowLeaveGuard] = useState(false)
   // "End session early" confirm. Distinct from the leave guard: ending the
   // session SAVES the answered questions and shows results, rather than
   // discarding them like a navigate-away. (M3 [B])
@@ -177,11 +159,10 @@ export function DomainPractice() {
   // finishPractice(), so leaving mid-session silently discards them. The
   // native beforeunload dialog is the last-resort net for browser-level exits
   // (tab close, refresh); confirmed in-app leaves set isIntentionalLeave() so
-  // the net stays silent for them. Skipped entirely once the user has ticked
-  // "don't show again".
+  // the net stays silent for them.
   useEffect(() => {
     function handleBeforeUnload(e: BeforeUnloadEvent) {
-      if (effectiveScreen === 'practice' && questions.length > 0 && !isIntentionalLeave() && !isLeaveGuardDismissed()) {
+      if (effectiveScreen === 'practice' && questions.length > 0 && !isIntentionalLeave()) {
         e.preventDefault()
         e.returnValue = ''
       }
@@ -199,7 +180,6 @@ export function DomainPractice() {
   useEffect(() => {
     if (effectiveScreen !== 'practice' || questions.length === 0) return
     function onClickCapture(e: MouseEvent) {
-      if (isLeaveGuardDismissed()) return
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
       const anchor = (e.target as HTMLElement)?.closest('a')
       if (!anchor) return
@@ -209,6 +189,9 @@ export function DomainPractice() {
       if (url.origin !== window.location.origin) return
       e.preventDefault()
       e.stopPropagation()
+      // Close the mobile drawer (if a drawer link triggered this) so the
+      // leave-confirm modal isn't hidden behind it (bug 19).
+      window.dispatchEvent(new Event('cc:close-drawer'))
       setPendingLeaveUrl(url.pathname + url.search)
     }
     document.addEventListener('click', onClickCapture, true)
@@ -217,13 +200,6 @@ export function DomainPractice() {
 
   function confirmPracticeLeave() {
     if (!pendingLeaveUrl) return
-    if (dontShowLeaveGuard) {
-      try {
-        localStorage.setItem(PRACTICE_LEAVE_GUARD_KEY, 'dismissed')
-      } catch {
-        // localStorage unavailable: the choice just doesn't persist
-      }
-    }
     confirmExamLeave(pendingLeaveUrl)
   }
 
@@ -907,10 +883,9 @@ export function DomainPractice() {
             </Button>
           )}
 
-          {/* Custom leave-confirm modal for intercepted in-app navigation.
-              Unlike the mock-exam guard this one offers "don't show again":
-              practice is low-stakes (a session, not a 65-question timed
-              attempt), so a permanent opt-out is acceptable here. */}
+          {/* Custom leave-confirm modal for intercepted in-app navigation. No
+              "don't ask again" opt-out: there was no way to re-enable it, so a
+              mis-tap permanently disabled a safety prompt (bug 20). */}
           <Modal
             isOpen={pendingLeaveUrl !== null}
             title="Leave practice?"
@@ -921,15 +896,6 @@ export function DomainPractice() {
                 Your practice session is still in progress. If you leave this
                 page now, the answers from this session will not be saved.
               </p>
-              <label className="flex items-center gap-2.5 text-sm text-text-muted cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={dontShowLeaveGuard}
-                  onChange={e => setDontShowLeaveGuard(e.target.checked)}
-                  className="w-4 h-4 rounded border-border-hairline accent-brand"
-                />
-                Don't ask me again
-              </label>
               <div className="flex gap-4 mt-6">
                 <Button onClick={() => setPendingLeaveUrl(null)} variant="secondary" className="flex-1">
                   Keep practicing
