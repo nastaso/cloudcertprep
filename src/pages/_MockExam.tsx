@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef, Fragment } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Flag, AlertCircle, LayoutGrid, Heart, ArrowLeft } from 'lucide-react'
 import { Button } from '../components/Button'
@@ -617,26 +617,27 @@ export function MockExam() {
             <p className="text-sm md:text-base text-text-muted mb-6 md:mb-8">{cert.examQuestionCount} questions, {Math.round(cert.examTimeSeconds / 60)} minutes. No answer feedback during exam.</p>
 
             <div className="bg-bg-dark rounded-xl p-4 md:p-6 mb-6 md:mb-8">
-              {/* Column legend labels the per-row "16 · 24%" so the two numbers
-                  read as (questions in this exam) and (that domain's share of the
-                  exam) instead of unexplained noise (bug 10). */}
-              <div className="flex items-baseline justify-between gap-4 mb-3 md:mb-4">
-                <h2 className="text-lg md:text-xl font-semibold text-text-primary">Domain breakdown</h2>
-                <span className="text-[11px] md:text-xs text-text-muted whitespace-nowrap">Questions · % of exam</span>
-              </div>
-              <ul className="space-y-2 md:space-y-2.5 text-sm md:text-base">
-                {(() => {
-                  const targets = getExamDomainTargets(cert)
-                  return cert.domains.map(d => (
-                    <li key={d.id} className="flex items-baseline justify-between gap-4">
-                      <span className="text-text-muted">{d.name}</span>
-                      <span className="font-mono tabular-nums whitespace-nowrap text-text-primary font-medium">
-                        {targets[d.id]}<span className="ml-1.5 font-normal text-text-muted">· {Math.round(d.examProportion * 100)}%</span>
-                      </span>
-                    </li>
-                  ))
-                })()}
-              </ul>
+              <h2 className="text-lg md:text-xl font-semibold text-text-primary mb-3 md:mb-4">Domain breakdown</h2>
+              {/* A single grid so the "Questions" / "% of exam" headers line up
+                  directly above their number columns - the legend used to be one
+                  right-aligned label that did not align with the data (bug 10). */}
+              {(() => {
+                const targets = getExamDomainTargets(cert)
+                return (
+                  <div className="grid grid-cols-[1fr_auto_auto] items-baseline gap-x-5 md:gap-x-8 text-sm md:text-base">
+                    <span aria-hidden="true" />
+                    <span className="justify-self-end pb-1.5 text-[11px] font-medium uppercase tracking-wide text-text-muted">Questions</span>
+                    <span className="justify-self-end pb-1.5 text-[11px] font-medium uppercase tracking-wide text-text-muted">% of exam</span>
+                    {cert.domains.map(d => (
+                      <Fragment key={d.id}>
+                        <span className="py-1 text-text-muted">{d.name}</span>
+                        <span className="py-1 justify-self-end font-mono tabular-nums font-medium text-text-primary">{targets[d.id]}</span>
+                        <span className="py-1 justify-self-end font-mono tabular-nums text-text-muted">{Math.round(d.examProportion * 100)}%</span>
+                      </Fragment>
+                    ))}
+                  </div>
+                )
+              })()}
             </div>
 
             <Alert tone="warning" className="mb-6 md:mb-8">
@@ -742,12 +743,7 @@ export function MockExam() {
               </div>
             </div>
 
-            {/* Column legend mirrors the start screen (bug 10): the left sub-line
-                is correct/total, the right value is the per-domain score. */}
-            <div className="flex items-baseline justify-between gap-4 mb-4">
-              <h3 className="text-xl font-semibold text-text-primary">Domain Breakdown</h3>
-              <span className="text-[11px] md:text-xs text-text-muted whitespace-nowrap">Correct · score</span>
-            </div>
+            <h3 className="text-xl font-semibold text-text-primary mb-4">Domain Breakdown</h3>
             <div className="space-y-4">
               {cert.domains.map(domain => {
                 const score = results!.domainScores[String(domain.id)] ?? 0
