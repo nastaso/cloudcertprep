@@ -20,7 +20,10 @@ import AppIsland from '../components/AppIsland.tsx'
       same #cc-island-fallback contract the practice shells use; AppIsland
       removes it on mount). Mirrors _Login's two-column shape: marketing rail
       (desktop) + auth card. Token-based colors so it reads in dark and light. */}
-  <div class="relative flex-1 flex flex-col min-h-[70vh]">
+  {/* Reserve the REAL form height (card + py: ~778 mobile / ~978 md / ~1036 xl)
+      so the absolutely-positioned skeleton occupies the same box the hydrated
+      form will, and the footer does not jump down when the island mounts. */}
+  <div class="relative flex-1 flex flex-col min-h-[780px] md:min-h-[980px] xl:min-h-[1040px]">
     <div
       id="cc-island-fallback"
       class="absolute inset-0 flex items-center justify-center px-4 py-10 md:py-16"
