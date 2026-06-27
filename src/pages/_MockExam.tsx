@@ -618,24 +618,41 @@ export function MockExam() {
 
             <div className="bg-bg-dark rounded-xl p-4 md:p-6 mb-6 md:mb-8">
               <h2 className="text-lg md:text-xl font-semibold text-text-primary mb-3 md:mb-4">Domain breakdown</h2>
-              {/* A single grid so the "Questions" / "% of exam" headers line up
-                  directly above their number columns - the legend used to be one
-                  right-aligned label that did not align with the data (bug 10). */}
               {(() => {
                 const targets = getExamDomainTargets(cert)
                 return (
-                  <div className="grid grid-cols-[1fr_auto_auto] items-baseline gap-x-5 md:gap-x-8 text-sm md:text-base">
-                    <span aria-hidden="true" />
-                    <span className="justify-self-end pb-1.5 text-[11px] font-medium uppercase tracking-wide text-text-muted">Questions</span>
-                    <span className="justify-self-end pb-1.5 text-[11px] font-medium uppercase tracking-wide text-text-muted">% of exam</span>
-                    {cert.domains.map(d => (
-                      <Fragment key={d.id}>
-                        <span className="py-1 text-text-muted">{d.name}</span>
-                        <span className="py-1 justify-self-end font-mono tabular-nums font-medium text-text-primary">{targets[d.id]}</span>
-                        <span className="py-1 justify-self-end font-mono tabular-nums text-text-muted">{Math.round(d.examProportion * 100)}%</span>
-                      </Fragment>
-                    ))}
-                  </div>
+                  <>
+                    {/* Mobile: the aligned 3-column headers ("QUESTIONS"/"% OF EXAM")
+                        are too wide for a phone - they squeezed the domain names into
+                        3-line wraps. Use a compact "16 · 24%" row with a single
+                        clarifying caption instead. */}
+                    <div className="md:hidden">
+                      <p className="mb-2 text-right text-[11px] uppercase tracking-wide text-text-muted">Questions · % of exam</p>
+                      <ul className="space-y-2 text-sm">
+                        {cert.domains.map(d => (
+                          <li key={d.id} className="flex items-baseline justify-between gap-3">
+                            <span className="text-text-muted">{d.name}</span>
+                            <span className="font-mono tabular-nums whitespace-nowrap font-medium text-text-primary">
+                              {targets[d.id]}<span className="ml-1.5 font-normal text-text-muted">· {Math.round(d.examProportion * 100)}%</span>
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    {/* Desktop: aligned columns under their headers (bug 10). */}
+                    <div className="hidden md:grid grid-cols-[1fr_auto_auto] items-baseline gap-x-8 text-base">
+                      <span aria-hidden="true" />
+                      <span className="justify-self-end pb-1.5 text-[11px] font-medium uppercase tracking-wide text-text-muted">Questions</span>
+                      <span className="justify-self-end pb-1.5 text-[11px] font-medium uppercase tracking-wide text-text-muted">% of exam</span>
+                      {cert.domains.map(d => (
+                        <Fragment key={d.id}>
+                          <span className="py-1 text-text-muted">{d.name}</span>
+                          <span className="py-1 justify-self-end font-mono tabular-nums font-medium text-text-primary">{targets[d.id]}</span>
+                          <span className="py-1 justify-self-end font-mono tabular-nums text-text-muted">{Math.round(d.examProportion * 100)}%</span>
+                        </Fragment>
+                      ))}
+                    </div>
+                  </>
                 )
               })()}
             </div>
