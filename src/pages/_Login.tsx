@@ -407,8 +407,13 @@ export function Login() {
           {/* Natural height: sign-in is compact, sign-up grows downward for its
               extra fields. The marketing column (centered against the sign-in
               height) and the footer (login.astro reserves the sign-in height) do
-              not shift on load; a click to sign-up expands the card. */}
-          <Card padding="lg" className="flex flex-col" style={{ boxShadow: 'var(--shadow-card-hover)' }}>
+              not shift on load; a click to sign-up expands the card.
+              The short terminal states (forgot-password, check-your-email) are
+              much shorter than the marketing column, so top-pinning them leaves
+              them floating high; `md:self-center` centers ONLY those against the
+              marketing height. Sign-in / sign-up stay top-aligned so toggling
+              between them does not move the card (bug 4). */}
+          <Card padding="lg" className={`flex flex-col${isForgotPassword || signUpSuccess ? ' md:self-center' : ''}`} style={{ boxShadow: 'var(--shadow-card-hover)' }}>
 
           {signUpSuccess ? (
             <div className="text-center">
