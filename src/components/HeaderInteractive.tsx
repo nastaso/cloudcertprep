@@ -29,7 +29,7 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [drawerClosing, setDrawerClosing] = useState(false)
   const drawerRef = useRef<HTMLDivElement>(null)
-  const drawerCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const drawerCloseTimerRef = useRef<number | null>(null)
 
   // Pre-paint auth hint: BaseLayout sets `cc-authed` before first paint from
   // the localStorage token. Mirror DomainProgressStrip's pattern to show
