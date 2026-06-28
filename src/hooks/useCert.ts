@@ -1,6 +1,7 @@
 import { useEffect, useSyncExternalStore } from 'react'
 import { CERTIFICATIONS, DEFAULT_CERT_ID, getCertByPath } from '../data/certifications'
 import { subscribeLocationChange } from '../lib/locationChange'
+import { storageGet, storageSet } from '../lib/storage'
 import type { Certification } from '../data/certifications'
 
 /**
@@ -17,6 +18,11 @@ const STORAGE_KEY = 'activeCert'
 
 const pathListeners = new Set<() => void>()
 const storeListeners = new Set<() => void>()
+
+// In-memory fallback for storage-blocked browsers (private mode / cookies
+// disabled). Keeps cert navigation functional for the current session even
+// when localStorage is inaccessible.
+let inMemoryCert: string | null = null
 
 let pathInitialised = false
 function initPath() {
@@ -46,8 +52,7 @@ function subscribeStore(cb: () => void) {
   return () => storeListeners.delete(cb)
 }
 function getStored(): string {
-  if (typeof localStorage === 'undefined') return DEFAULT_CERT_ID
-  return localStorage.getItem(STORAGE_KEY) ?? DEFAULT_CERT_ID
+  return storageGet(STORAGE_KEY, inMemoryCert ?? DEFAULT_CERT_ID)
 }
 function getServerStored(): string { return DEFAULT_CERT_ID }
 
@@ -81,8 +86,9 @@ export function useCert(): Certification {
 
 export function setActiveCert(certCode: string): boolean {
   if (!CERTIFICATIONS[certCode]) return false
-  if (typeof localStorage === 'undefined') return false
-  localStorage.setItem(STORAGE_KEY, certCode)
+  // Always update in-memory first so storage-blocked browsers still navigate correctly.
+  inMemoryCert = certCode
+  storageSet(STORAGE_KEY, certCode)
   storeListeners.forEach(cb => cb())
   return true
 }
