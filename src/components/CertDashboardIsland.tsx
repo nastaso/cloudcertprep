@@ -185,9 +185,20 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
     }
   }, [authLoading, user, cert.code, reloadKey])
 
-  // Logged-out (or still resolving): render nothing. The static guest view
-  // stays visible.
-  if (authLoading || !user) return null
+  // Genuinely logged out: render nothing and leave the static guest view
+  // (#cert-guest-view) visible. A real guest reaches this synchronously -
+  // useAuth resolves loading=false on the first render when there is no token
+  // AND no `?code=` callback, so `authLoading` here always means a token or an
+  // OAuth/magic-link exchange is in flight (a real/pending session).
+  if (!authLoading && !user) return null
+
+  // Still resolving auth (persisted token, or a `?code=` exchange that can run
+  // >1s): render the dashboard with its data skeletons, NOT nothing. The static
+  // guest view is hidden pre-paint (cc-auth-out + the optimistic `cc-authed` on
+  // a `?code=` URL - F1), so returning null while `authLoading` would blank the
+  // above-the-fold for the whole exchange. `dataLoading` stays true while
+  // `authLoading` (the fetch is gated on it), so every data section shows its
+  // skeleton; the render below never dereferences `user`.
 
   // Level accent ties the signed-in dashboard to the cert's identity (same
   // hue as the guest hero's blueprint panel and the OG tile art).

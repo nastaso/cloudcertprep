@@ -220,22 +220,20 @@ const softwareAppJsonLd = serializeJsonLd({
         }
         apply()
         window.addEventListener('pageshow', apply)
-        // Email-confirmation / async sign-in lands here with NO session in
-        // storage yet (Supabase exchanges the URL token AFTER load), so the
-        // first apply() bails: the header keeps its white-on-transparent
-        // overlay while the hero CSS-swaps to the LIGHT signed-in view ->
-        // invisible logo/nav. HeaderInteractive toggles html.cc-authed once
-        // auth resolves; re-run apply() then (idempotent) so the overlay drops
-        // to the readable frosted header AND the first-login greeting swaps in.
-        try {
-          var root = document.documentElement
-          if (!root.classList.contains('cc-authed')) {
-            var mo = new MutationObserver(function () {
-              if (root.classList.contains('cc-authed')) { mo.disconnect(); apply() }
-            })
-            mo.observe(root, { attributes: true, attributeFilter: ['class'] })
-          }
-        } catch (e) { /* no MutationObserver: pageshow re-apply still covers bfcache */ }
+        // Email-confirmation / OAuth / magic-link sign-in lands here with NO
+        // session in storage yet (Supabase exchanges the URL `?code=` token
+        // AFTER load), so the first apply() above bails (no token) and the
+        // first-login greeting can't be chosen. `cc-authed` is now set
+        // optimistically PRE-paint on a `?code=` URL (BaseLayout), so we can NOT
+        // watch for a `cc-authed`-add to learn when the token lands - that
+        // transition already happened before the token. Instead HeaderInteractive
+        // dispatches `cc:session-resolved` once useAuth resolves (token persisted,
+        // user known); re-run apply() then. It is idempotent and reads
+        // user.created_at from the now-present token, so a brand-new account gets
+        // the first-login greeting and a returning one keeps "Welcome back". The
+        // header-overlay half is already covered by CSS (index.css
+        // html.cc-authed header[data-overlay]); apply() also drops [data-overlay].
+        window.addEventListener('cc:session-resolved', apply)
       })()
     </script>
   )}

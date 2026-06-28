@@ -229,12 +229,24 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
     <!-- Auth pre-paint: define a shared hasSession() helper on window, then
          apply the `cc-authed` class to <html> before paint. Logged-in
          visitors see History + Sign out immediately (no flash, no shift).
-         The HeaderInteractive island re-syncs this class to the real auth
-         result; the per-page cert landing pre-hide script (cert.astro)
-         reuses the same window.__ccHasSession() helper. Runs on bfcache
+         The class is ALSO set optimistically on an OAuth / magic-link return
+         (`?code=` in the URL): the session token is not written yet (Supabase
+         exchanges the code AFTER load - the same `hasAuthCallback` test as
+         useAuth.ts), so without this the home/cert page paints the GUEST hero
+         then hard-cuts to the signed-in view ~1s later when the PKCE exchange
+         resolves (flash F1, plus a dark->light tone change in light theme).
+         The guest markup only CSS-hides (it is never removed), and crawlers
+         never see a `?code=` URL, so the build-time HTML keeps the locked H1 as
+         the first <h1> (citation guard). A failed exchange flips back to guest
+         when HeaderInteractive re-syncs to the real auth result (rarer than
+         today's every-success flash; failures navigate away anyway). Header
+         readability + hero swap on the optimistic class are pure CSS
+         (index.css `html.cc-authed header[data-overlay]` + `.cc-auth-*`).
+         __ccHasSession() itself stays a PURE token check - cert.astro + the
+         index.astro greeting read it for the real stored user. Runs on bfcache
          restore (pageshow) too. DO NOT REMOVE. -->
     <script is:inline>
-      (function(){function h(){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sb-')===0&&k.indexOf('-auth-token')===k.length-11)return true}}catch(e){}return false}window.__ccHasSession=h;function apply(){document.documentElement.classList.toggle('cc-authed',h())}apply();window.addEventListener('pageshow',apply)})();
+      (function(){function h(){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sb-')===0&&k.indexOf('-auth-token')===k.length-11)return true}}catch(e){}return false}window.__ccHasSession=h;function apply(){document.documentElement.classList.toggle('cc-authed',h()||/[?&]code=/.test(location.search))}apply();window.addEventListener('pageshow',apply)})();
     </script>
 
     <!-- Stale-chunk recovery: after a new deploy, a still-open old tab can
