@@ -2,6 +2,12 @@ import { test, expect, type Page } from '@playwright/test'
 import { createClient } from '@supabase/supabase-js'
 import { readFileSync } from 'node:fs'
 
+// This spec creates and deletes REAL users via the service-role admin client, so
+// it must run serially: playwright.config sets fullyParallel:true, and the
+// afterAll cleanup below could otherwise race a sibling test that is still using
+// its user. (TEST-BACKLOG 1E)
+test.describe.configure({ mode: 'serial' })
+
 // Auth/funnel e2e against the cloudcertprep-test Supabase project (Turnstile test
 // key 1x...AA auto-passes on localhost). Reads creds from gitignored .env.local.
 let env: Record<string, string> = {}
@@ -18,21 +24,39 @@ const admin = HAS_CREDS
   ? createClient(env.VITE_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
   : (null as unknown as ReturnType<typeof createClient>)
 const PW = 'Sup3rStr0ng-Pass-2026'
-const mk = (t: string) => `cc-e2e-${t}-${Date.now()}@example.com`
+
+// Track every email this file mints so afterAll deletes ONLY our users, never a
+// sibling/concurrent run's still-in-use `cc-e2e-` accounts. (TEST-BACKLOG 1E)
+const createdEmails: string[] = []
+const mk = (t: string) => {
+  const email = `cc-e2e-${t}-${Date.now()}@example.com`
+  createdEmails.push(email)
+  return email
+}
 
 test.afterAll(async () => {
   if (!HAS_CREDS) return
+  const mine = new Set(createdEmails.map(e => e.toLowerCase()))
+  // listUsers default page is 50; this file mints a handful per run, so one page
+  // covers our set. (If that ever grows, page through `data.users`.)
   const { data } = await admin.auth.admin.listUsers()
   for (const u of data.users) {
-    if (u.email?.startsWith('cc-e2e-')) await admin.auth.admin.deleteUser(u.id)
+    if (u.email && mine.has(u.email.toLowerCase())) await admin.auth.admin.deleteUser(u.id)
   }
 })
 
 async function submitForm(page: Page) {
-  // Target the form submit specifically; "Sign in" also matches the header button.
-  const btn = page.locator('form button[type="submit"]')
-  await expect(btn).toBeEnabled({ timeout: 25000 }) // wait for Turnstile token
-  await btn.click()
+  // The submit button is intentionally NOT gated on the Turnstile token (it stays
+  // enabled so the CTA never looks broken on load - _Login.tsx:598), so an
+  // "enabled" wait returns instantly and clicks BEFORE the token lands, tripping
+  // the `if (hasCaptcha && !captchaToken)` guard. Instead wait for Cloudflare's
+  // hidden input to carry a token, then a short settle: that input fills a beat
+  // before React's onToken -> setCaptchaToken runs, and the submit handler reads
+  // the React state, not the input. Then click the form submit once ("Sign in"
+  // alone also matches the header button). (TEST-BACKLOG 1B)
+  await expect(page.locator('input[name="cf-turnstile-response"]')).toHaveValue(/.+/, { timeout: 25000 })
+  await page.waitForTimeout(750)
+  await page.locator('form button[type="submit"]').click()
 }
 
 test('sign in (confirmed user) lands authenticated + dashboard renders (P1-10 root)', async ({ page }) => {
@@ -53,7 +77,14 @@ test('sign in (confirmed user) lands authenticated + dashboard renders (P1-10 ro
   await expect(page.getByRole('button', { name: 'Account menu' }).first()).toBeVisible({ timeout: 15000 })
 
   await page.goto('/aws/clf-c02')
-  await expect(page.getByText('Your dashboard')).toBeVisible({ timeout: 20000 })
+  // Match the authed dashboard kicker by its "<level> . Your dashboard" tail (e.g.
+  // "Foundational . Your dashboard") rather than a bare "Your dashboard": the latter
+  // also matches the transient sr-only "Loading your dashboard" status, which
+  // appears/disappears as the data fetch runs, so it races into a strict-mode
+  // violation. The kicker + the two practice CTAs render regardless of the data, so
+  // this verifies the signed-in dashboard WITHOUT needing the test project's progress
+  // rows seeded (the structural assertions are not data-dependent).
+  await expect(page.getByText(/·\s*Your dashboard/)).toBeVisible({ timeout: 20000 })
   // P1-10: dashboard entrance root + halo on exactly the two practice cards.
   // Scope to :visible because the prerendered guest view (hidden via display:none)
   // also carries .stagger / .halo CTAs.
@@ -110,15 +141,9 @@ test('P0-2: confirming the signup link redirects to /?verified=1 welcome card', 
   await expect(page.getByText('Your email is confirmed')).toBeVisible({ timeout: 20000 })
 })
 
-test('P1-11: Turnstile pending helper is wired under the submit button', async ({ page }) => {
-  await page.goto('/login')
-  // With the always-pass test key the token arrives fast, so assert the helper
-  // exists in the rendered form (id + copy) rather than racing its visibility.
-  const helper = page.locator('#captcha-pending')
-  // It is present until the token resolves; tolerate either still-pending or resolved.
-  const count = await helper.count()
-  expect(count === 0 || (await helper.textContent())?.includes('Verifying')).toBeTruthy()
-})
+// (Removed dead "P1-11: Turnstile pending helper" test: it asserted #captcha-pending,
+// which is rendered nowhere in src, so it passed trivially via a count===0 escape
+// hatch and counted as coverage it never provided. (TEST-BACKLOG 1H))
 
 test('P1-7: in-exam Sign out routes through the leave modal, then completes', async ({ page }) => {
   const email = mk('signout')

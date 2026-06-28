@@ -1,10 +1,15 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 import { createClient } from '@supabase/supabase-js'
 import { readFileSync, mkdirSync } from 'node:fs'
 
 // Dark+light screenshots of the UX-audit surfaces for owner visual review.
 // Saved under .kiro/ (gitignored). Run after a build against the test backend.
 test.use({ reducedMotion: 'reduce' })
+
+// Serial: the signed-in shots create real users and sign in on the one shared
+// test project; concurrent sign-ins flake under load (same reason as the auth
+// spec). (TEST-BACKLOG 1E)
+test.describe.configure({ mode: 'serial' })
 
 const DIR = '.kiro/ux/audit-2026-06-24/qa-shots'
 mkdirSync(DIR, { recursive: true })
@@ -24,11 +29,35 @@ const admin = HAS_CREDS
   : (null as unknown as ReturnType<typeof createClient>)
 const PW = 'Sup3rStr0ng-Pass-2026'
 
+// Track + delete only the users this file mints, never a sibling run's still-in-use
+// cc-e2e- accounts. (TEST-BACKLOG 1E)
+const createdEmails: string[] = []
+async function makeUser(tag: string): Promise<string> {
+  const email = `cc-e2e-shot-${tag}-${Date.now()}@example.com`
+  createdEmails.push(email)
+  await admin.auth.admin.createUser({ email, password: PW, email_confirm: true })
+  return email
+}
+
 test.afterAll(async () => {
   if (!HAS_CREDS) return
+  const mine = new Set(createdEmails.map(e => e.toLowerCase()))
   const { data } = await admin.auth.admin.listUsers()
-  for (const u of data.users) if (u.email?.startsWith('cc-e2e-')) await admin.auth.admin.deleteUser(u.id)
+  for (const u of data.users) if (u.email && mine.has(u.email.toLowerCase())) await admin.auth.admin.deleteUser(u.id)
 })
+
+// Sign in via the form, waiting for the Turnstile token (the submit button is NOT
+// token-gated, so "enabled" is not a readiness proxy - it would click before the
+// token lands). Mirrors ux-audit-auth.spec.ts submitForm. (TEST-BACKLOG 1B)
+async function signIn(page: Page, email: string): Promise<void> {
+  await page.goto('/login')
+  await page.locator('#email').fill(email)
+  await page.locator('#password').fill(PW)
+  await expect(page.locator('input[name="cf-turnstile-response"]')).toHaveValue(/.+/, { timeout: 25000 })
+  await page.waitForTimeout(750)
+  await page.locator('form button[type="submit"]').click()
+  await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
+}
 
 for (const theme of ['light', 'dark'] as const) {
   test(`shots/${theme}: public surfaces`, async ({ page }) => {
@@ -45,17 +74,12 @@ for (const theme of ['light', 'dark'] as const) {
 
   test(`shots/${theme}: signed-in dashboard`, async ({ page }) => {
     await page.addInitScript((t) => localStorage.setItem('cloudcertprep_theme', t), theme)
-    const email = `cc-e2e-shot-${theme}-${Date.now()}@example.com`
-    await admin.auth.admin.createUser({ email, password: PW, email_confirm: true })
-    await page.goto('/login')
-    await page.locator('#email').fill(email)
-    await page.locator('#password').fill(PW)
-    const btn = page.locator('form button[type="submit"]')
-    await expect(btn).toBeEnabled({ timeout: 25000 })
-    await btn.click()
-    await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
+    await signIn(page, await makeUser(theme))
     await page.goto('/aws/clf-c02')
-    await expect(page.getByText('Your dashboard')).toBeVisible({ timeout: 20000 })
+    // Match the "<level> . Your dashboard" kicker, not a bare "Your dashboard"
+    // (which also matches the transient sr-only "Loading your dashboard" status and
+    // races into a strict-mode violation). See ux-audit-auth.spec.ts.
+    await expect(page.getByText(/·\s*Your dashboard/)).toBeVisible({ timeout: 20000 })
     await page.waitForTimeout(900)
     await page.screenshot({ path: `${DIR}/dashboard-${theme}.png`, fullPage: true })
   })
@@ -63,15 +87,7 @@ for (const theme of ['light', 'dark'] as const) {
   test(`shots/${theme}: signed-in practice menu (with Dashboard)`, async ({ page }) => {
     await page.addInitScript((t) => localStorage.setItem('cloudcertprep_theme', t), theme)
     await page.setViewportSize({ width: 1280, height: 820 })
-    const email = `cc-e2e-shot-menu-${theme}-${Date.now()}@example.com`
-    await admin.auth.admin.createUser({ email, password: PW, email_confirm: true })
-    await page.goto('/login')
-    await page.locator('#email').fill(email)
-    await page.locator('#password').fill(PW)
-    const btn = page.locator('form button[type="submit"]')
-    await expect(btn).toBeEnabled({ timeout: 25000 })
-    await btn.click()
-    await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
+    await signIn(page, await makeUser(`menu-${theme}`))
     const trigger = page.getByRole('button', { name: 'Practice', exact: true })
     await expect(async () => {
       if ((await trigger.getAttribute('aria-expanded')) !== 'true') await trigger.click()
