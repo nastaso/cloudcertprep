@@ -27,9 +27,16 @@ interface Props {
    * (Apple pattern). A tiny inline script toggles .hdr-scrolled.
    */
   overlay?: boolean
+  /**
+   * When true, suppress the html.cc-authed frost rule so signed-in users
+   * still see the transparent overlay (not the frosted bar). Use on pages
+   * whose dark hero is always visible regardless of auth state, e.g.
+   * coming-soon cert landings.
+   */
+  noAuthedFrost?: boolean
 }
 
-const { showNav = true, sticky = true, overlay = false } = Astro.props
+const { showNav = true, sticky = true, overlay = false, noAuthedFrost = false } = Astro.props
 
 // Current request path, resolved at build time for each prerendered page.
 // Passed into the island so the CertSwitcher renders the correct state in the
@@ -54,6 +61,7 @@ const checkPath = 'M20 6 9 17l-5-5'
 <header
   id="site-header"
   data-overlay={overlay || undefined}
+  data-no-authed-frost={noAuthedFrost || undefined}
   class:list={[sticky ? "sticky top-0 z-40" : "relative z-40", "bg-header-bg/70 backdrop-blur-xl backdrop-saturate-150 border-b border-border-hairline/60 text-on-header"]}
 >
   <div class="max-w-7xl mx-auto px-4 md:px-6">

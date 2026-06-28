@@ -30,6 +30,12 @@ interface Props {
   /** Billboard overlay header (transparent → frosted on scroll). Hero pages only. */
   headerOverlay?: boolean
   /**
+   * Suppress the cc-authed frost rule so the transparent overlay is preserved
+   * for signed-in users. Pass true for pages whose dark hero is always visible
+   * regardless of auth state (e.g. coming-soon cert landings).
+   */
+  headerNoAuthedFrost?: boolean
+  /**
    * Whether the Header sticks to the top of the viewport on scroll. Default
    * true. Disabled on the mock-exam shell, whose in-page exam toolbar already
    * owns `sticky top-0`; two sticky bars at top-0 would overlap.
@@ -57,6 +63,7 @@ const {
   showChrome = true,
   headerShowNav = true,
   headerOverlay = false,
+  headerNoAuthedFrost = false,
   headerSticky = true,
   noscriptDirectory = false,
 } = Astro.props
@@ -247,7 +254,7 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
         Skip to main content
       </a>
 
-      {showChrome && <Header showNav={headerShowNav} sticky={headerSticky} overlay={headerOverlay} />}
+      {showChrome && <Header showNav={headerShowNav} sticky={headerSticky} overlay={headerOverlay} noAuthedFrost={headerNoAuthedFrost} />}
 
       <main id="main" class="flex-1 flex flex-col">
         <slot />

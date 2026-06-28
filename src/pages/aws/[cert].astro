@@ -230,6 +230,7 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
   robots={robots}
   jsonLd={[courseJsonLd]}
   headerOverlay={true}
+  headerNoAuthedFrost={isComingSoon}
 >
   {/* BreadcrumbList JSON-LD only (visuallyHidden); the visible mono trail
       renders inside the stage hero. */}
@@ -431,4 +432,5 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
       })()
     </script>
   )}
+
 </BaseLayout>
