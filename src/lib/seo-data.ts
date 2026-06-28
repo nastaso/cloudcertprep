@@ -240,7 +240,7 @@ export const FAQ_ENTRIES: FAQEntry[] = [
   {
     question: 'How much does the AWS Cloud Practitioner exam cost?',
     answer:
-      'The AWS Certified Cloud Practitioner (CLF-C02) exam costs 100 USD (prices vary slightly by region and local tax). AWS occasionally offers a free retake or a 50% discount voucher to candidates who hold an existing AWS certification, so check your AWS Certification account for available benefits before booking. Practising here is free; only the official exam at Pearson VUE or PSI carries the fee.',
+      'The AWS Certified Cloud Practitioner (CLF-C02) exam costs 100 USD (prices vary slightly by region and local tax). AWS occasionally offers a free retake or a 50% discount voucher to candidates who hold an existing AWS certification, so check your AWS Certification account for available benefits before booking. Practicing here is free; only the official exam at Pearson VUE or PSI carries the fee.',
     category: 'format',
     certCode: 'clf-c02',
   },
@@ -350,7 +350,7 @@ export const FAQ_ENTRIES: FAQEntry[] = [
   {
     question: 'How much does the AWS AI Practitioner exam cost?',
     answer:
-      'The AWS Certified AI Practitioner (AIF-C01) exam costs 100 USD (prices vary slightly by region and local tax). As a foundational-level exam it is the same price tier as the Cloud Practitioner. If you already hold an AWS certification, check your AWS Certification account for a 50% discount voucher before booking. Practising on CloudCertPrep is always free.',
+      'The AWS Certified AI Practitioner (AIF-C01) exam costs 100 USD (prices vary slightly by region and local tax). As a foundational-level exam it is the same price tier as the Cloud Practitioner. If you already hold an AWS certification, check your AWS Certification account for a 50% discount voucher before booking. Practicing on CloudCertPrep is always free.',
     category: 'format',
     certCode: 'aif-c01',
   },

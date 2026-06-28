@@ -29,17 +29,26 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [drawerClosing, setDrawerClosing] = useState(false)
   const drawerRef = useRef<HTMLDivElement>(null)
+  const drawerCloseTimerRef = useRef<number | null>(null)
 
-  // Animate the drawer out before unmounting (§8 item 5). Plays the exit
-  // animation, then removes the drawer from the DOM. Reduced-motion users (or
-  // browsers without the animationend event) fall back to an immediate close
-  // via the timeout, so the menu always closes.
+  // Pre-paint auth hint: BaseLayout sets `cc-authed` before first paint from
+  // the localStorage token. Mirror DomainProgressStrip's pattern to show
+  // auth-gated nav items (Dashboard link, History, Account) immediately,
+  // without waiting for useAuth()'s async getSession() to resolve (C1).
+  const [authedHint] = useState(() =>
+    typeof document !== 'undefined' && document.documentElement.classList.contains('cc-authed'))
+  const isAuthed = authedHint || Boolean(user)
+
+  // Animate the drawer out before unmounting. Plays the 180ms (--dur-fast)
+  // exit animation, then removes the drawer from the DOM.
   const closeMobileMenu = useCallback(() => {
     setDrawerClosing(true)
-    window.setTimeout(() => {
+    if (drawerCloseTimerRef.current !== null) clearTimeout(drawerCloseTimerRef.current)
+    drawerCloseTimerRef.current = window.setTimeout(() => {
       setMobileMenuOpen(false)
       setDrawerClosing(false)
-    }, 240)
+      drawerCloseTimerRef.current = null
+    }, 180)
   }, [])
   useFocusTrap(drawerRef, mobileMenuOpen && !drawerClosing, {
     lockBodyScroll: true,
@@ -94,7 +103,7 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
           {/* Persistent primary action (P1-4): a Practice menu (every active
               cert x its practice modes), always visible in both auth states and
               on every route. Link+Disclosure widget; see PracticeMenu. */}
-          <PracticeMenu variant="desktop" isAuthed={Boolean(user)} />
+          <PracticeMenu variant="desktop" isAuthed={isAuthed} />
           <a
             href="/about"
             className="hdr-link hidden lg:inline-block text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
@@ -179,7 +188,7 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
             />
 
             <nav className="flex flex-col p-4 gap-1">
-              <PracticeMenu variant="mobile" onNavigate={closeMobileMenu} isAuthed={Boolean(user)} currentPath={initialPathname} />
+              <PracticeMenu variant="mobile" onNavigate={closeMobileMenu} isAuthed={isAuthed} currentPath={initialPathname} />
               <a
                 href="/"
                 onClick={closeMobileMenu}
@@ -204,7 +213,7 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
                 <BookOpen className="w-5 h-5 text-text-muted" aria-hidden="true" />
                 Blog
               </a>
-              {user && (
+              {isAuthed && (
                 <a
                   href="/history"
                   onClick={closeMobileMenu}
@@ -214,7 +223,7 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
                   Exam history
                 </a>
               )}
-              {user && (
+              {isAuthed && (
                 <a
                   href="/account"
                   onClick={closeMobileMenu}

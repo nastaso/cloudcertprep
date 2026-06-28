@@ -352,7 +352,7 @@ export function Login() {
                     <BookOpen className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-text-primary font-semibold mb-1">{getActiveTotalQuestions().toLocaleString()}+ Practice Questions</h3>
+                    <h3 className="text-text-primary font-semibold mb-1">{getActiveTotalQuestions().toLocaleString('en-US')}+ Practice Questions</h3>
                     <p className="text-text-muted text-sm">Up to date with the latest exam guides, across multiple AWS certifications</p>
                   </div>
                 </div>

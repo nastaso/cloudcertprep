@@ -9,9 +9,9 @@ interface ModalProps {
   onClose: () => void
 }
 
-// Matches the exit animation duration (--dur-fast) so the dialog + backdrop
-// finish animating out before they unmount.
-const EXIT_MS = 200
+// Matches --dur-fast (180ms) so the dialog + backdrop finish animating out
+// before they unmount.
+const EXIT_MS = 180
 
 export function Modal({ isOpen, title, children, onClose }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null)

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import { CheckCircle, AlertTriangle, X } from 'lucide-react'
 import { buttonClass } from '../lib/buttonStyles'
 import { useAuth } from '../hooks/useAuth'
@@ -40,14 +40,14 @@ const ACK_KEY = 'cloudcertprep_verified_welcome_ack'
 type Notice = { kind: 'verified' } | { kind: 'expired' } | { kind: 'error' } | { kind: 'deleted' } | null
 
 /**
- * Read the auth redirect markers from the URL exactly once on mount, then strip
- * them so a refresh is clean and the notice cannot replay from the URL. Two
- * cases land on home (the Supabase Site URL):
+ * Read the auth redirect markers from the URL exactly once on mount. Pure read -
+ * no side effects (URL stripping and localStorage writes happen in a useEffect
+ * so they do not run during render, which is StrictMode-safe). Two cases land
+ * on home (the Supabase Site URL):
  *   - ?verified=1                              -> post-confirm welcome (P0-2)
  *   - ?error=...&error_code=otp_expired (or access_denied) -> dead link (P0-3)
  * `email_unverified` is the OAuth refusal handled on /login, so it is ignored
- * here. Bails before touching history/localStorage for the ~99.9% of visits
- * with no auth param, so normal traffic pays effectively nothing.
+ * here. Bails early for the ~99.9% of visits with no auth param.
  */
 function readNoticeOnce(): Notice {
   if (typeof window === 'undefined') return null
@@ -65,17 +65,11 @@ function readNoticeOnce(): Notice {
 
   if (!verified && !deleted && !isExpired && !isOtherError) return null
 
-  // Strip every auth param so a refresh is clean (mirror _Login.tsx read-once).
-  ;['verified', 'account_deleted', 'error', 'error_code', 'error_description'].forEach(k => params.delete(k))
-  const qs = params.toString()
-  window.history.replaceState(null, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash)
-
   if (isExpired) return { kind: 'expired' } // the actionable failure wins
   if (isOtherError) return { kind: 'error' } // transient/unknown failure, still actionable
   if (deleted) return { kind: 'deleted' } // post-deletion acknowledgement
   try {
     if (localStorage.getItem(ACK_KEY)) return null
-    localStorage.setItem(ACK_KEY, new Date().toISOString())
   } catch { /* private mode: still show once for this view */ }
   return { kind: 'verified' }
 }
@@ -86,6 +80,21 @@ function readNoticeOnce(): Notice {
  */
 export default function AuthLinkNotice() {
   const [notice, setNotice] = useState<Notice>(readNoticeOnce)
+
+  // Strip auth params from the URL and write the ack after mount so these
+  // side effects don't run during render (safe if StrictMode is ever added).
+  useEffect(() => {
+    if (!notice) return
+    const params = new URLSearchParams(window.location.search)
+    ;['verified', 'account_deleted', 'error', 'error_code', 'error_description'].forEach(k => params.delete(k))
+    const qs = params.toString()
+    window.history.replaceState(null, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash)
+    if (notice.kind === 'verified') {
+      try { localStorage.setItem(ACK_KEY, new Date().toISOString()) } catch { /* private mode */ }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Reflect the REAL session, not the URL marker: a confirm link can land here
   // without an established session (confirmed on another device, cookie not
   // persisted), in which case asserting "You are signed in" is a lie that sends
@@ -132,10 +141,10 @@ export default function AuthLinkNotice() {
   }
 
   // Verified case. A just-verified user who IS signed in already gets the
-  // returning-user welcome hero on the home page (HomeWelcome), so a toast on
-  // top of it is redundant and, on small screens, overlaps that hero's heading.
-  // So only show the verified toast when the session did NOT establish - the
-  // one case where there is no welcome hero and the user must still sign in.
+  // returning-user welcome hero on the home page, so a toast on top of it is
+  // redundant and, on small screens, overlaps that hero's heading. So only show
+  // the verified toast when the session did NOT establish - the one case where
+  // there is no welcome hero and the user must still sign in.
   // Wait for auth to resolve before deciding (avoids a flash either way).
   if (authLoading) return null
   if (user) return null

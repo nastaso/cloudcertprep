@@ -112,10 +112,9 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
   }
 
   useEffect(() => {
-    // Async setState (inside loadStats) is allowed by the rule's intent;
-    // disabling the synchronous heuristic explicitly.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadStats()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // First-load phase: the prerendered snapshot is still standing in (it is
@@ -235,7 +234,7 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
                     <TrendingUp className="w-5 h-5 text-text-muted flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div>
                       <p className="text-text-primary text-sm md:text-base mb-1">
-                        {getCertTotalQuestions(cert.code).toLocaleString()} practice questions available
+                        {getCertTotalQuestions(cert.code).toLocaleString('en-US')} practice questions available
                       </p>
                       <p className="text-text-muted text-xs md:text-sm">
                         Community stats will appear here once users start taking exams.
@@ -285,11 +284,11 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
                 {/* Key Metrics */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6">
                   <div>
-                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_attempts.toLocaleString()}</p>
+                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_attempts.toLocaleString('en-US')}</p>
                     <p className="text-text-muted text-xs md:text-sm mt-1">Total attempts</p>
                   </div>
                   <div>
-                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_passes.toLocaleString()}</p>
+                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_passes.toLocaleString('en-US')}</p>
                     <p className="text-text-muted text-xs md:text-sm mt-1">Total passes</p>
                   </div>
                   <div>
@@ -387,7 +386,7 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
           {stats && (
             <div className="border-t border-text-muted/10 pt-6">
               <p className="text-text-muted text-xs md:text-sm text-center">
-                {stats.total_users.toLocaleString()} users · {stats.total_questions_answered.toLocaleString()} questions answered across all certifications
+                {stats.total_users.toLocaleString('en-US')} users · {stats.total_questions_answered.toLocaleString('en-US')} questions answered across all certifications
               </p>
             </div>
           )}

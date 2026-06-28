@@ -15,7 +15,7 @@ import { loadAllQuestions } from '../data/questions'
 import { CERTIFICATIONS, getCertDomains } from '../data/certifications'
 import { Modal } from '../components/Modal'
 import { QuestionReviewCard } from '../components/QuestionReviewCard'
-import { TrendingUp, Check, X, Trash2, AlertTriangle, ChevronDown, ChevronRight } from 'lucide-react'
+import { TrendingUp, Check, X, Trash2, AlertTriangle, ChevronDown, ChevronRight, RotateCw } from 'lucide-react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
@@ -589,17 +589,21 @@ export function History() {
               )}
 
               {loadError ? (
-                <Card padding="lg" className="text-center !py-12">
-                  <p className="text-text-primary font-medium">We could not load your exam history.</p>
-                  <p className="mt-1 text-sm text-text-muted">Check your connection and try again.</p>
-                  <Button
+                <Alert
+                  tone="danger"
+                  role="alert"
+                  className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <span>We could not load your exam history. Check your connection and try again.</span>
+                  <button
+                    type="button"
                     onClick={() => { setLoading(true); void loadHistory() }}
-                    variant="secondary"
-                    className="mt-6"
+                    className="inline-flex min-h-[44px] flex-shrink-0 items-center justify-center gap-2 rounded-full border border-danger/40 px-5 text-sm font-medium text-danger transition-colors duration-200 hover:bg-danger/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40"
                   >
+                    <RotateCw className="h-4 w-4" aria-hidden="true" />
                     Try again
-                  </Button>
-                </Card>
+                  </button>
+                </Alert>
               ) : filteredAttempts.length === 0 ? (
                 <Card padding="lg" className="text-center !py-12">
                   <p className="text-text-muted text-lg">

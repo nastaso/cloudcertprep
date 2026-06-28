@@ -1205,16 +1205,18 @@ export function MockExam() {
         {/* Custom leave-confirm modal — replaces the native beforeunload dialog
             for intercepted in-app navigation. Leaving discards the in-progress
             attempt (exam state lives in this island's memory), so this is a real
-            confirm, not just a heads-up. */}
+            confirm, not just a heads-up. The sign-out case brands itself as such
+            (mirrors the practice leave-modal, which has always done this). */}
         <Modal
           isOpen={pendingLeaveUrl !== null}
-          title="Leave the exam?"
+          title={pendingLeaveUrl === SIGN_OUT_SENTINEL ? 'Sign out?' : 'Leave the exam?'}
           onClose={() => setPendingLeaveUrl(null)}
         >
           <div className="space-y-4">
             <p className="text-text-primary">
-              Your exam is still in progress. If you leave this page now, your
-              current answers and timer will be lost and this attempt will not be saved.
+              {pendingLeaveUrl === SIGN_OUT_SENTINEL
+                ? 'Your exam is still in progress. If you sign out now, your current answers and timer will be lost and this attempt will not be saved.'
+                : 'Your exam is still in progress. If you leave this page now, your current answers and timer will be lost and this attempt will not be saved.'}
             </p>
             <div className="flex gap-4 mt-6">
               <Button onClick={() => setPendingLeaveUrl(null)} variant="secondary" className="flex-1">
@@ -1235,7 +1237,7 @@ export function MockExam() {
                 variant="danger"
                 className="flex-1"
               >
-                Leave exam
+                {pendingLeaveUrl === SIGN_OUT_SENTINEL ? 'Sign out' : 'Leave exam'}
               </Button>
             </div>
           </div>
