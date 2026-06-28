@@ -139,7 +139,7 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
 
       {/* Mobile drawer. PORTALED to <body>: the header has `backdrop-blur-xl`
           (a backdrop-filter), which makes it the containing block for `fixed`
-          descendants — so an in-header drawer gets clipped to the 48px header bar
+          descendants, so an in-header drawer gets clipped to the 48px header bar
           on non-overlay pages (e.g. /login). Rendering into <body> escapes that
           containing block so the overlay + panel cover the full viewport, and
           its z-100/101 sits above the in-exam toolbar (z-30). */}
