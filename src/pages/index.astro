@@ -220,6 +220,22 @@ const softwareAppJsonLd = serializeJsonLd({
         }
         apply()
         window.addEventListener('pageshow', apply)
+        // Email-confirmation / async sign-in lands here with NO session in
+        // storage yet (Supabase exchanges the URL token AFTER load), so the
+        // first apply() bails: the header keeps its white-on-transparent
+        // overlay while the hero CSS-swaps to the LIGHT signed-in view ->
+        // invisible logo/nav. HeaderInteractive toggles html.cc-authed once
+        // auth resolves; re-run apply() then (idempotent) so the overlay drops
+        // to the readable frosted header AND the first-login greeting swaps in.
+        try {
+          var root = document.documentElement
+          if (!root.classList.contains('cc-authed')) {
+            var mo = new MutationObserver(function () {
+              if (root.classList.contains('cc-authed')) { mo.disconnect(); apply() }
+            })
+            mo.observe(root, { attributes: true, attributeFilter: ['class'] })
+          }
+        } catch (e) { /* no MutationObserver: pageshow re-apply still covers bfcache */ }
       })()
     </script>
   )}
