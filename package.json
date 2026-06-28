@@ -28,7 +28,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "e2e:auth": "playwright test ux-audit-auth ux-audit-shots"
   },
   "overrides": {
     "esbuild": "^0.28.1"
