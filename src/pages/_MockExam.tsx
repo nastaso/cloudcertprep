@@ -31,7 +31,7 @@ import { KOFI_URL } from '../lib/constants'
 import { MIN_VALID_EXAM_SECONDS, MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
 import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave, SIGN_OUT_SENTINEL, markIntentionalLeave } from '../lib/examGuard'
 import { useSignOut } from '../hooks/useSignOut'
-import { storePendingAttempt, consumePendingAttemptSavedNotice, PENDING_ATTEMPT_SAVED_EVENT, peekPendingAttempt, type PendingAttempt } from '../lib/pendingAttempt'
+import { storePendingAttempt, consumePendingAttemptSavedNotice, markPendingAttemptSaveIntent, PENDING_ATTEMPT_SAVED_EVENT, peekPendingAttempt, type PendingAttempt } from '../lib/pendingAttempt'
 import { getProviderLabel } from '../data/certifications'
 
 type ExamScreen = 'start' | 'exam' | 'results' | 'review'
@@ -818,6 +818,10 @@ export function MockExam() {
           {!user && (
             <UnlockCTA
               onSignIn={() => {
+                // Bind the stored snapshot to THIS save action: flushPendingAttempt
+                // only writes it to the account that completes this sign-in, so a
+                // passive/unrelated sign-in on a shared device never adopts it.
+                markPendingAttemptSaveIntent(cert.code)
                 // Remember to re-show this result if the guest returns via
                 // "Continue as guest" instead of signing in (P1-6).
                 try { sessionStorage.setItem(RESUME_RESULTS_KEY, cert.code) } catch { /* ignore */ }
