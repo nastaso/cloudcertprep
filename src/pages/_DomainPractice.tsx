@@ -85,6 +85,10 @@ export function DomainPractice() {
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0)
   const [optionKeyMaps, setOptionKeyMaps] = useState<Map<string, OptionKeyMap>>(new Map())
   const [loading, setLoading] = useState(false)
+  // Surfaced on the config screen when the question-chunk fetch fails, so a
+  // failed start is a visible, retryable error instead of a dead Start button
+  // (mirrors the mock exam's loadError). (item 7)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [answering, setAnswering] = useState(false)
   const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null)
   // "End session early" confirm. Distinct from the leave guard: ending the
@@ -218,6 +222,35 @@ export function DomainPractice() {
     return () => { delete document.body.dataset.practiceActive; cleanup() }
   }, [effectiveScreen, questions.length])
 
+  // Guard browser/device Back during an active practice session. The session
+  // lives only in this island's memory (persisted at finishPractice), and Back
+  // drops the ?domain= param, so effectiveScreen would silently fall to
+  // 'selection' and discard the answers. The anchor-capture + beforeunload
+  // guards don't see a same-document history pop, and re-pinning via react-router
+  // loses to its own popstate handling, so instead push a DUPLICATE history entry
+  // on top of the practice URL: a Back pops onto this identical URL, react-router's
+  // location is unchanged, the session stays mounted, and we route the Back through
+  // the same "Leave practice?" confirm as every other leave. The selection screen
+  // (domainPracticePath, no ?domain) is the target the confirm honors.
+  useEffect(() => {
+    if (effectiveScreen !== 'practice' || questions.length === 0) return
+    const practiceUrl = location.pathname + location.search
+    window.history.pushState(null, '', practiceUrl)
+    function onPopState() {
+      window.history.pushState(null, '', practiceUrl) // re-arm for the next Back
+      window.dispatchEvent(new Event('cc:close-drawer'))
+      setPendingLeaveUrl(domainPracticePath)
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => {
+      window.removeEventListener('popstate', onPopState)
+      // Pop the guard entry we added so a normal finish -> results -> Back needs no
+      // extra "dead" Back press. The guard shares the practice URL, so this pop
+      // changes no route (react-router reads the same location).
+      window.history.back()
+    }
+  }, [effectiveScreen, questions.length, location.pathname, location.search, domainPracticePath])
+
   function confirmPracticeLeave() {
     if (!pendingLeaveUrl) return
     if (pendingLeaveUrl === SIGN_OUT_SENTINEL) {
@@ -254,6 +287,7 @@ export function DomainPractice() {
 
   async function startPractice() {
     setLoading(true)
+    setLoadError(null)
     try {
       // Re-fetch mastery data so back-to-back sessions use fresh weights
       await refreshMastery()
@@ -280,6 +314,13 @@ export function DomainPractice() {
       // Keep the visitor "online" in Umami during the practice session by
       // emitting a virtual page view (see MockExam, task 13.10). (R15.5)
       trackPageView(`/${cert.provider}/${cert.code}/domain-practice/active`)
+    } catch (err: unknown) {
+      // A failed chunk fetch (offline / network) used to dead-end the Start
+      // button silently because there was no catch. Surface a retryable error
+      // instead, matching the mock exam's startExam. (item 7)
+      const msg = err instanceof Error ? err.message : 'Failed to load questions'
+      setLoadError(`Could not start practice. ${msg}. Please check your connection and try again.`)
+      logError('DomainPractice.startPractice', err)
     } finally {
       setLoading(false)
     }
@@ -539,6 +580,12 @@ export function DomainPractice() {
                 </p>
               )}
             </div>
+
+            {loadError && (
+              <Alert tone="danger" role="alert" className="mb-4 md:mb-6 text-sm">
+                {loadError}
+              </Alert>
+            )}
 
             <div className="flex gap-4">
               <Button
