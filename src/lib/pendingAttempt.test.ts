@@ -4,6 +4,8 @@ import {
   flushPendingAttempt,
   markPendingAttemptSaveIntent,
   hasPendingAttempt,
+  hasPendingAttemptSaveIntent,
+  consumePendingAttemptSavedNotice,
   type PendingAttempt,
 } from './pendingAttempt'
 
@@ -183,5 +185,54 @@ describe('flushPendingAttempt: save-intent gating', () => {
 
     expect(saved).toBe(false)
     expect(mocks.examInsert).not.toHaveBeenCalled()
+  })
+})
+
+const SAVED_NOTICE_KEY = 'cloudcertprep_pending_attempt_saved'
+
+describe('hasPendingAttemptSaveIntent', () => {
+  it('is false when no intent is set', () => {
+    expect(hasPendingAttemptSaveIntent()).toBe(false)
+  })
+
+  it('is true after the save CTA marks an intent, and does NOT consume it', () => {
+    markPendingAttemptSaveIntent('clf-c02')
+    // Peek-only: reading it must not disarm the real flush, so a second read
+    // still sees it.
+    expect(hasPendingAttemptSaveIntent()).toBe(true)
+    expect(hasPendingAttemptSaveIntent()).toBe(true)
+  })
+})
+
+describe('consumePendingAttemptSavedNotice: freshness window', () => {
+  it('returns the cert code for a fresh notice, then clears it (one-shot)', () => {
+    sessionStorage.setItem(SAVED_NOTICE_KEY, `clf-c02|${Date.now()}`)
+
+    expect(consumePendingAttemptSavedNotice()).toBe('clf-c02')
+    // One-shot: a second read finds nothing.
+    expect(consumePendingAttemptSavedNotice()).toBeNull()
+  })
+
+  it('ignores (and clears) a stale notice set while no exam island was mounted', () => {
+    // > SAVED_NOTICE_TTL_MS (60s) old: the header-sign-in / failed-flush-retry leak.
+    sessionStorage.setItem(SAVED_NOTICE_KEY, `clf-c02|${Date.now() - 5 * 60 * 1000}`)
+
+    expect(consumePendingAttemptSavedNotice()).toBeNull()
+    // Cleared on read so it can't accumulate or misfire later.
+    expect(sessionStorage.getItem(SAVED_NOTICE_KEY)).toBeNull()
+  })
+
+  it('ignores a legacy notice that carries no timestamp', () => {
+    sessionStorage.setItem(SAVED_NOTICE_KEY, 'clf-c02')
+
+    expect(consumePendingAttemptSavedNotice()).toBeNull()
+  })
+
+  it('a successful flush writes a fresh, honored notice', async () => {
+    storePendingAttempt(makePending('clf-c02'))
+    markPendingAttemptSaveIntent('clf-c02')
+
+    expect(await flushPendingAttempt('intended-user-A')).toBe(true)
+    expect(consumePendingAttemptSavedNotice()).toBe('clf-c02')
   })
 })

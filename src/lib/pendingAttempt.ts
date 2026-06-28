@@ -37,6 +37,14 @@ const SAVED_NOTICE_KEY = 'cloudcertprep_pending_attempt_saved'
 // the same tab, exactly like RESUME_RESULTS_KEY / SAVED_NOTICE_KEY.
 const SAVE_INTENT_KEY = 'cloudcertprep_pending_attempt_intent'
 const PENDING_TTL_MS = 24 * 60 * 60 * 1000
+// Freshness window for the "attempt saved" notice. A successful flush lands a
+// second or two before the exam island remounts (the post-login redirect), so
+// the notice only needs to survive that brief gap. Bounding it stops a notice
+// set while NO exam island was mounted (a header sign-in that lands on home, or
+// a failed-flush retry on a marketing page) from lingering in the tab's
+// sessionStorage and later hijacking a deliberate mock-exam start with a bounce
+// to /history. (EDGE-CASE stale-pending-saved-notice-bounces-to-history)
+const SAVED_NOTICE_TTL_MS = 60 * 1000
 
 /**
  * Fired after a successful flush. The exam island listens for it IN ADDITION
@@ -121,12 +129,25 @@ export function peekPendingAttempt(): PendingAttempt | null {
  * the user is still on /login (the SIGNED_IN event), before the exam island
  * remounts, so a window event would be missed; a sessionStorage flag survives
  * the route change. Returns the cert code once, then clears.
+ *
+ * The notice is stored as `${certCode}|${flushEpochMs}` and only honored within
+ * SAVED_NOTICE_TTL_MS: a notice set while no exam island was mounted (header
+ * sign-in -> home, or a failed-flush retry on a non-exam page) is read-and-
+ * cleared but treated as expired, so it cannot bounce a deliberate later
+ * exam-start to /history. A legacy notice with no timestamp is likewise ignored
+ * (and cleared).
  */
 export function consumePendingAttemptSavedNotice(): string | null {
   try {
     const v = sessionStorage.getItem(SAVED_NOTICE_KEY)
-    if (v) sessionStorage.removeItem(SAVED_NOTICE_KEY)
-    return v
+    if (!v) return null
+    // Always clear on read - the notice is one-shot regardless of freshness.
+    sessionStorage.removeItem(SAVED_NOTICE_KEY)
+    const sep = v.lastIndexOf('|')
+    if (sep === -1) return null
+    const ts = Number(v.slice(sep + 1))
+    if (!Number.isFinite(ts) || Date.now() - ts > SAVED_NOTICE_TTL_MS) return null
+    return v.slice(0, sep)
   } catch {
     return null
   }
@@ -144,6 +165,21 @@ export function markPendingAttemptSaveIntent(certCode: string): void {
     sessionStorage.setItem(SAVE_INTENT_KEY, certCode)
   } catch {
     // sessionStorage unavailable: the attempt just won't auto-save on sign-in.
+  }
+}
+
+/**
+ * True when a save intent is currently set, WITHOUT consuming it. The exam
+ * island reads this to decide whether to show its "Saving your attempt..."
+ * loader: PR-3 gated the actual flush on the intent, so a stale, no-intent
+ * pending attempt no longer saves and must not show a spurious spinner either.
+ * Peek-only so this read never disarms the real flush. (item 4b)
+ */
+export function hasPendingAttemptSaveIntent(): boolean {
+  try {
+    return sessionStorage.getItem(SAVE_INTENT_KEY) !== null
+  } catch {
+    return false
   }
 }
 
@@ -225,7 +261,9 @@ export async function flushPendingAttempt(userId: string): Promise<boolean> {
     }
 
     localStorage.removeItem(PENDING_KEY)
-    try { sessionStorage.setItem(SAVED_NOTICE_KEY, pending.certCode) } catch { /* ignore */ }
+    // Stamp the notice with the flush time so a stale one (set on a non-exam
+    // page) cannot bounce a deliberate later exam start to /history. (item 4)
+    try { sessionStorage.setItem(SAVED_NOTICE_KEY, `${pending.certCode}|${Date.now()}`) } catch { /* ignore */ }
     window.dispatchEvent(new Event(PENDING_ATTEMPT_SAVED_EVENT))
     return true
   } catch (error: unknown) {
