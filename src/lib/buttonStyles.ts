@@ -130,7 +130,7 @@ export function inputClass(opts?: { hasError?: boolean; className?: string; surf
     'border transition-[border-color,box-shadow] duration-200 focus:outline-none',
     hasError
       ? 'border-danger focus:border-danger focus-visible:ring-2 focus-visible:ring-danger/40'
-      : 'border-text-muted/25 hover:border-text-muted/50 focus:border-brand focus-visible:ring-2 focus-visible:ring-brand/30',
+      : 'border-text-muted/40 hover:border-text-muted/60 focus:border-brand focus-visible:ring-2 focus-visible:ring-brand/30',
     className,
   ]
     .filter(Boolean)
