@@ -14,7 +14,10 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 import Breadcrumb from '../components/Breadcrumb.astro'
 import HeroMini from '../components/landing/HeroMini.astro'
 import LastUpdatedStamp from '../components/LastUpdatedStamp.astro'
+import Card from '../components/Card.astro'
+import Button from '../components/Button.astro'
 import { GITHUB_REPO_URL, KOFI_URL } from '../lib/constants'
+import { CERTIFICATIONS, DEFAULT_CERT_ID } from '../data/certifications'
 import { SITE_URL } from '../lib/seo-data'
 import { serializeJsonLd } from '../lib/jsonld'
 
@@ -22,6 +25,9 @@ const canonical = `${SITE_URL}/about`
 const contributorsUrl = `${GITHUB_REPO_URL}/graphs/contributors`
 const contributingUrl = `${GITHUB_REPO_URL}/blob/main/CONTRIBUTING.md`
 const issuesUrl = `${GITHUB_REPO_URL}/issues`
+// Closing-CTA target (P2-12): the flagship practice route, single-sourced.
+const defaultCert = CERTIFICATIONS[DEFAULT_CERT_ID]
+const practiceHref = defaultCert ? `/${defaultCert.provider}/${defaultCert.code}/practice-exam` : '/'
 
 const breadcrumbItems = [
   { label: 'Home', to: '/' },
@@ -82,8 +88,9 @@ const howToJsonLd = serializeJsonLd({
 
 // HowTo JSON-LD describing the question-and-explanation methodology: the
 // editorial process every question goes through before it ships. Distinct
-// from the study-methodology HowTo above (different @id). Mirrors the visible
-// "Question and Explanation Methodology" section. (R23.6 / E-E-A-T)
+// from the study-methodology HowTo above (different @id). Mirrors the three
+// subsections (write / explain / review) of the visible "How the question
+// banks are built" section. (R23.6 / E-E-A-T)
 const methodologyHowToJsonLd = serializeJsonLd({
   '@context': 'https://schema.org',
   '@type': 'HowTo',
@@ -129,11 +136,11 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
   <HeroMini
     kicker="The project"
     title="About CloudCertPrep"
-    lede="Free, open-source, ad-free AWS certification practice exams. No paywalls, no premium tiers, no signup required to practise."
+    lede="Free, open-source, ad-free AWS certification practice exams. No paywalls, no premium tiers, no signup required to practice."
     crumbs={[{ label: 'Home', href: '/' }, { label: 'About' }]}
     maxWidth="max-w-3xl"
   >
-    <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 52 211 153;">
+    <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 74 222 128;">
       <LastUpdatedStamp />
     </div>
   </HeroMini>
@@ -141,17 +148,14 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
   <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
     <div class="max-w-3xl mx-auto px-4 md:px-8">
       <div class="space-y-10 max-w-[68ch] mx-auto">
-        {/* Maintainer + source (E-E-A-T anchor) */}
-        <section class="space-y-3">
-          <p class={bodyText}>
-            CloudCertPrep is built and maintained by{' '}
-            <a href="https://santonastaso.me" target="_blank" rel="noopener noreferrer" class={link}>Alex Santonastaso</a>, and the entire codebase and question bank are public on{' '}
-            <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class={link}>GitHub</a>.
-          </p>
-        </section>
+        {/* Mission standfirst (distinct from the maintainer detail below, which
+            used to be restated here almost verbatim). */}
+        <p class="text-lg md:text-xl leading-relaxed text-text-primary [text-wrap:balance]">
+          A free, open, and fully auditable way to prepare for AWS certifications: no ads, no paywalls, no signup to start, and no "exam dumps".
+        </p>
 
         {/* Who maintains it */}
-        <section class="space-y-3">
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>Who maintains it</h2>
           <p class={bodyText}>
             CloudCertPrep is created and maintained by{' '}
@@ -159,32 +163,24 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
           </p>
         </section>
 
-        {/* Methodology */}
-        <section class="space-y-3">
+        {/* How the question banks are built - one section: the editorial
+            standard (lede) followed by the three-part methodology (write /
+            explain / review). Was two adjacent, overlapping H2 sections; the
+            methodologyHowToJsonLd above mirrors the three subsections. */}
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>How the question banks are built</h2>
           <p class={bodyText}>
-            Every question is aligned to the official AWS exam guide and its task statements, so the topic coverage and difficulty mirror what you will actually face on exam day. Each question ships with a detailed explanation of why the correct answer is right and why each distractor is wrong. The explanations are where the real learning happens.
+            Every question is aligned to the official AWS exam guide and its task statements, so topic coverage and difficulty mirror what you will face on exam day, and each ships with a detailed explanation of why the correct answer is right and why every distractor is wrong. The whole bank is validated by an automated schema checker and is publicly auditable on GitHub. This is the editorial standard every question is held to before it ships.
           </p>
-          <p class={bodyText}>
-            Questions are validated by an automated schema checker before they are merged, and the whole bank is publicly auditable on GitHub. Anyone can read a question, cross-reference it against the AWS documentation, report an error, or open a pull request with a correction. Community contributions are reviewed against the validator and the exam guide before they go live.
-          </p>
-        </section>
-
-        {/* Question and explanation methodology */}
-        <section class="space-y-3">
-          <h2 class={sectionHeading}>Question and Explanation Methodology</h2>
-          <p class={bodyText}>
-            Building on how the banks are assembled above, this is the editorial standard every question is held to before it ships.
-          </p>
-          <h3 class="text-base md:text-lg font-semibold text-text-primary">How questions are written</h3>
+          <h3 class="text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary pt-2">How questions are written</h3>
           <p class={bodyText}>
             Each question is authored against a specific task statement in the official AWS exam guide, so coverage and difficulty track the scored exam rather than drifting into trivia. New questions arrive as community contributions through a GitHub pull request, where anyone can propose, discuss, and refine them in the open. Questions are never sourced from braindumps or exam dumps. Reproducing real exam content breaches the AWS certification agreement and teaches recall instead of understanding, so we write original questions from the published exam guide and documentation.
           </p>
-          <h3 class="text-base md:text-lg font-semibold text-text-primary">How explanations are structured</h3>
+          <h3 class="text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary pt-2">How explanations are structured</h3>
           <p class={bodyText}>
             Every explanation has two parts: a rationale for the correct answer that explains why it is right, and a per-distractor rationale that explains why each incorrect option is wrong. Reading why the wrong answers are wrong is what turns a practice question into genuine understanding you can carry into the exam.
           </p>
-          <h3 class="text-base md:text-lg font-semibold text-text-primary">How the banks are reviewed</h3>
+          <h3 class="text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary pt-2">How the banks are reviewed</h3>
           <p class={bodyText}>
             Changes are reviewed through GitHub pull requests before merging, so every edit has a visible author and review trail. The entire bank is publicly auditable: each question links to its source file by{' '}
             <a href={GITHUB_REPO_URL} target="_blank" rel="noopener noreferrer" class={link}>permalink on GitHub</a>, so you can verify any claim against the AWS documentation yourself. Everything is{' '}
@@ -193,7 +189,7 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
         </section>
 
         {/* Free + open-source rationale */}
-        <section class="space-y-3">
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>Why it is free and open source</h2>
           <p class={bodyText}>
             CloudCertPrep is MIT licensed with no ads, no paywalls, and no premium tier. Good exam prep should not be locked behind a subscription. The project is sustained by optional{' '}
@@ -202,7 +198,7 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
         </section>
 
         {/* Contributor credits */}
-        <section class="space-y-3">
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>Contributors</h2>
           <p class={bodyText}>
             CloudCertPrep is built in the open and welcomes contributions. See the{' '}
@@ -215,7 +211,7 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
         </section>
 
         {/* Privacy */}
-        <section class="space-y-3">
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>Privacy</h2>
           <p class={bodyText}>
             CloudCertPrep is GDPR-compliant. Guest users generate no server-side personal data. Authenticated user data is stored in the EU (Supabase, Ireland) and is never sold or shared. For analytics, cookieless, privacy-friendly{' '}
@@ -225,7 +221,7 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
         </section>
 
         {/* Contact */}
-        <section class="space-y-3">
+        <section class="space-y-3 border-t border-border-hairline pt-8 md:pt-10">
           <h2 class={sectionHeading}>Contact</h2>
           <p class={bodyText}>
             Questions, corrections, or ideas? Email{' '}
@@ -234,6 +230,21 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
             <a href="https://github.com/nastaso" target="_blank" rel="noopener noreferrer" class={link}>github.com/nastaso</a>.
           </p>
         </section>
+
+        {/* Closing funnel CTA (P2-12): a convinced reader gets a path into the
+            product instead of dead-ending on a trust page. */}
+        <Card as="section" padding="md" class="text-center">
+          <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-2">Ready to start?</h2>
+          <p class="text-text-muted mb-5">Pick a certification and take a full practice exam, free and with no signup.</p>
+          <div class="flex flex-wrap justify-center gap-3">
+            <Button href={practiceHref} variant="brand" size="lg" arrow>
+              Start practicing free
+            </Button>
+            <Button href="/#certifications" variant="secondary" size="lg">
+              Browse certifications
+            </Button>
+          </div>
+        </Card>
       </div>
     </div>
   </div>

@@ -16,9 +16,26 @@
 let leaveHandler: ((url: string) => void) | null = null
 let intentionalLeave = false
 
+/**
+ * Reserved leave target meaning "sign the user out" rather than navigate to a
+ * URL. Passed through the same guardExamLeave / leaveHandler string channel so
+ * this module stays framework-agnostic; the exam island branches on it (P1-7).
+ */
+export const SIGN_OUT_SENTINEL = '__signout__'
+
 /** True while a timed exam is running (mirrors the body dataset flag the exam island sets). */
 export function isExamActive(): boolean {
   return typeof document !== 'undefined' && document.body.dataset.examActive === 'true'
+}
+
+/**
+ * True while a domain-practice session is in progress (mirrors the body dataset
+ * flag the practice island sets). Practice deliberately does NOT set
+ * `examActive` (that flag also hides the mobile hamburger, which practice
+ * keeps), so it carries its own flag; the leave broker treats both the same.
+ */
+export function isPracticeActive(): boolean {
+  return typeof document !== 'undefined' && document.body.dataset.practiceActive === 'true'
 }
 
 /**
@@ -33,13 +50,14 @@ export function registerExamLeaveHandler(fn: (url: string) => void): () => void 
 }
 
 /**
- * Ask to leave to `url`. If an exam is active and a handler is registered, the
- * confirm modal is shown and this returns true (caller must NOT navigate). If
- * no exam is active, returns false (caller navigates normally). Used by the
- * header's non-anchor navigations (e.g. the Sign in button).
+ * Ask to leave to `url`. If an exam OR a practice session is active and a
+ * handler is registered, the confirm modal is shown and this returns true
+ * (caller must NOT navigate / sign out). Otherwise returns false (caller
+ * proceeds normally). Used by the header's non-anchor actions (the Sign in /
+ * Sign out buttons), which the islands' anchor-capture listeners can't catch.
  */
 export function guardExamLeave(url: string): boolean {
-  if (isExamActive() && leaveHandler) {
+  if ((isExamActive() || isPracticeActive()) && leaveHandler) {
     leaveHandler(url)
     return true
   }
@@ -58,4 +76,13 @@ export function confirmExamLeave(url: string): void {
 /** True when the current unload was triggered by a confirmed in-app leave. */
 export function isIntentionalLeave(): boolean {
   return intentionalLeave
+}
+
+/**
+ * Mark the next unload intentional WITHOUT navigating. Used when the confirmed
+ * action performs its own redirect (e.g. sign-out calls window.location.assign),
+ * so the beforeunload net stays silent for that navigation (P1-7).
+ */
+export function markIntentionalLeave(): void {
+  intentionalLeave = true
 }

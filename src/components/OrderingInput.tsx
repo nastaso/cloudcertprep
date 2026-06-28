@@ -23,7 +23,7 @@ function defaultOrder(options: Record<string, string>): string[] {
 }
 
 const rowBase =
-  'flex items-center gap-2 md:gap-3 w-full border rounded-xl text-left transition-[border-color,background-color] duration-200'
+  'flex items-center gap-2 md:gap-3 w-full border rounded-xl text-left transition-[border-color,background-color] duration-base ease-out'
 
 /**
  * Keyboard-accessible ordering control: a vertical list reordered with native
@@ -46,9 +46,10 @@ export function OrderingInput({ options, value, correctOrder, mode, onChange, co
     `flex-shrink-0 grid place-items-center font-mono font-semibold rounded-lg border ${compact ? 'w-6 h-6 text-[11px]' : 'w-7 h-7 text-xs md:text-sm'} ${tint}`
   // Reorder controls read as real buttons (resting hairline well) instead of
   // floating icons. Hover = border-brighten + surface tier (Astro pattern) and
-  // the sanctioned arrow slide (§6); press = 80ms scale. 44px touch target.
+  // the sanctioned arrow slide (§6); press settles at gentle, down at press.
+  // 44px touch target.
   const reorderBtn =
-    'group w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-lg border border-border-hairline bg-bg-dark/40 text-text-muted hover:text-text-primary hover:border-text-muted/60 hover:bg-bg-card-hover transition-[color,border-color,background-color,transform] duration-200 ease-press active:scale-95 active:duration-[80ms] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-bg-dark/40 disabled:hover:border-border-hairline disabled:hover:text-text-muted disabled:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand'
+    'group w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-lg border border-border-hairline bg-bg-dark/40 text-text-muted hover:text-text-primary hover:border-text-muted/60 hover:bg-bg-card-hover transition-[color,border-color,background-color,transform] duration-gentle ease-press active:scale-[0.97] active:duration-press disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-bg-dark/40 disabled:hover:border-border-hairline disabled:hover:text-text-muted disabled:active:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand'
 
   if (mode === 'result') {
     const userOrder = value ?? []
@@ -127,7 +128,7 @@ export function OrderingInput({ options, value, correctOrder, mode, onChange, co
                 aria-label={`Move "${options[key]}" up`}
                 className={reorderBtn}
               >
-                <ArrowUp className="w-4 h-4 md:w-[18px] md:h-[18px] transition-transform duration-200 ease-press group-hover:-translate-y-0.5" aria-hidden="true" />
+                <ArrowUp className="w-4 h-4 md:w-[18px] md:h-[18px] transition-transform duration-gentle ease-press group-hover:-translate-y-0.5" aria-hidden="true" />
               </button>
               <button
                 type="button"
@@ -136,7 +137,7 @@ export function OrderingInput({ options, value, correctOrder, mode, onChange, co
                 aria-label={`Move "${options[key]}" down`}
                 className={reorderBtn}
               >
-                <ArrowDown className="w-4 h-4 md:w-[18px] md:h-[18px] transition-transform duration-200 ease-press group-hover:translate-y-0.5" aria-hidden="true" />
+                <ArrowDown className="w-4 h-4 md:w-[18px] md:h-[18px] transition-transform duration-gentle ease-press group-hover:translate-y-0.5" aria-hidden="true" />
               </button>
             </span>
           </li>

@@ -26,6 +26,7 @@ import SampleQuestionCard from '../../../components/SampleQuestionCard.astro'
 import GitHubPermalinkCallout from '../../../components/GitHubPermalinkCallout.astro'
 import Faq from '../../../components/Faq.astro'
 import PostCard from '../../../components/PostCard.astro'
+import DomainProgressStrip from '../../../components/DomainProgressStrip.tsx'
 import {
   CERTIFICATIONS,
   getCertDomainSlug,
@@ -43,7 +44,7 @@ import {
 import { getFeaturedSampleIds } from '../../../data/featured-samples'
 import { SITE_URL } from '../../../lib/seo-data'
 import { GITHUB_REPO_URL } from '../../../lib/constants'
-import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB } from '../../../lib/levelAccent'
+import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB, LEVEL_ACCENT_UI_HEX } from '../../../lib/levelAccent'
 
 // Static imports of every active cert's question banks. Keyed lookup:
 // QUESTION_BANKS[certCode][domainId] -> question array.
@@ -255,8 +256,8 @@ const faqEntries = [
     answer: `There are ${totalDomainQuestions} free practice questions for the ${domain.name} domain of the ${cert.name} (${cert.shortName}) exam. They are part of a pool of ${totalCertQuestions.toLocaleString('en-US')}+ questions across the whole bank. Every question comes with a full explanation.`,
   },
   {
-    question: `How do I practise ${cert.shortName} ${domain.name} questions?`,
-    answer: `Start a free domain practice session for ${domain.name} on CloudCertPrep. No account is needed to practise as a guest. If you sign in, spaced repetition shows you the questions you got wrong, or have not seen yet, more often.`,
+    question: `How do I practice ${cert.shortName} ${domain.name} questions?`,
+    answer: `Start a free domain practice session for ${domain.name} on CloudCertPrep. No account is needed to practice as a guest. If you sign in, spaced repetition shows you the questions you got wrong, or have not seen yet, more often.`,
   },
   {
     question: `How hard is the ${domain.name} domain on the ${cert.shortName} exam?`,
@@ -277,6 +278,9 @@ const faqEntries = [
 const levelAccent = LEVEL_ACCENT_HEX[cert.level]
 const levelGlow = LEVEL_ACCENT_RGB[cert.level]
 const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
+// Light-surface UI accent (not the pale badge color) for the signed-in
+// progress strip's bar fill, matching the cert dashboard's domain cards.
+const levelAccentUi = LEVEL_ACCENT_UI_HEX[cert.level]
 ---
 
 <BaseLayout
@@ -314,22 +318,22 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
         </h1>
 
         <p class="mt-5 text-lg md:text-xl leading-relaxed text-[#9AA6B2]">
-          {totalDomainQuestions}+ free practice questions for the {domain.name} domain of the {cert.name} ({cert.shortName}) exam, each with a detailed explanation. Practise right in your browser.
+          {totalDomainQuestions}+ free practice questions for the {domain.name} domain of the {cert.name} ({cert.shortName}) exam, each with a detailed explanation. Practice right in your browser.
         </p>
 
         <div class="mt-8 flex flex-wrap items-center gap-4">
           <a
             href={domainPracticeHref}
-            class="halo chev-link inline-flex min-h-[48px] items-center justify-center rounded-full bg-[#FF9900] px-7 py-3 text-base font-semibold text-[#16191F] transition-[background-color,transform] duration-200 ease-press hover:bg-[#FFAD33] active:scale-[0.97] active:duration-[80ms] focus:outline-none"
+            class="halo chev-link inline-flex min-h-[48px] items-center justify-center rounded-full bg-[#FF9900] px-7 py-3 text-base font-semibold text-[#16191F] transition-[background-color,transform] duration-gentle ease-press hover:bg-[#EC7211] active:scale-[0.97] active:duration-press focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1116]"
             data-cc-event="cta_start_domain_practice"
             data-cc-param-location="domain_landing_hero"
             data-cc-param-cert={cert.code}
           >
-            Start practising<span class="chev" aria-hidden="true">›</span>
+            Start practicing<span class="chev" aria-hidden="true">→</span>
           </a>
           <a
             href={practiceExamHref}
-            class="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-medium text-[#F4F6F8] transition-[border-color,background-color,transform] duration-200 ease-press hover:border-white/40 hover:bg-white/5 active:scale-[0.97] active:duration-[80ms] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+            class="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-medium text-[#F4F6F8] transition-[border-color,background-color,transform] duration-gentle ease-press hover:border-white/40 hover:bg-white/5 active:scale-[0.97] active:duration-press focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1116]"
           >
             Take a full mock exam
           </a>
@@ -341,7 +345,7 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
           ))}
         </ul>
 
-        <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 52 211 153;">
+        <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 74 222 128;">
           <LastUpdatedStamp examGuideVersion={cert.examGuideVersion} examGuideUrl={cert.examGuideUrl} />
         </div>
       </header>
@@ -351,6 +355,29 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
   {/* Content sheet slides over the stage (one system with home/cert/blog). */}
   <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
     <div class="max-w-4xl mx-auto px-4 md:px-8">
+      {/* Signed-in personalization: this domain's mastery + practice CTA + a
+          route back to the dashboard. Renders nothing for guests (the SEO page
+          below is untouched). Mounted OUTSIDE the space-y stack so the empty
+          guest island leaves no phantom gap. */}
+      {/* Reserve the strip's height for signed-in users (cc-auth-in =
+          display:none for guests, so SEO/CLS is untouched for them) so the
+          client:only island mounting does not push the content sheet down.
+          Measured: the stacked mobile column is ~261px and the desktop row is
+          ~161px (the previous 125/93 under-reserved and the content jumped). The
+          margin lives here, not on the Shell, so the gap to the content is exact. */}
+      <div class="cc-auth-in mb-10 md:mb-14 min-h-[264px] md:min-h-[164px]">
+        <DomainProgressStrip
+          certCode={cert.code}
+          certShortName={cert.shortName}
+          domainId={domain.id}
+          domainName={domain.name}
+          questionCount={totalDomainQuestions}
+          domainPracticeHref={domainPracticeHref}
+          certPath={certPath}
+          accentHex={levelAccentUi}
+          client:only="react"
+        />
+      </div>
       <div class="space-y-10 md:space-y-14">
         {/* 4. Intro — unique per domain (blurb + exam-guide facts). Primary
             keyword in the first paragraph and an H2 (R6.5); 200-400 words. */}
@@ -359,13 +386,13 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
             The <strong class="text-text-primary">{domain.name}</strong> domain of the {cert.name} ({cert.shortName}) exam covers {domain.blurb ?? `the ${domain.name.toLowerCase()} area of the exam`}.{domain.weight && domain.taskRange ? ` It makes up ${domain.weight}% of your exam score (task statements ${domain.taskRange} in the official AWS exam guide).` : ''} These {primaryInSentence} match the real exam: the same scenario style and the same difficulty. Every question comes with a full explanation of why the right answer is right and why each wrong option is wrong.
           </p>
           <p>
-            Practise free, with no signup. Every question is original and open source, so you can check it against the official AWS exam guide and documentation. You never have to trust a hidden answer key. There are {totalDomainQuestions}+ questions in this domain alone, and {totalCertQuestions.toLocaleString('en-US')}+ across the whole {cert.shortName} bank.{secondaryList ? ` If you searched for ${secondaryList}, these questions cover the same ground.` : ''} Create a free account to unlock spaced repetition: questions you get wrong come back more often, so your weakest topics get the most practice.
+            Practice free, with no signup. Every question is original and open source, so you can check it against the official AWS exam guide and documentation. You never have to trust a hidden answer key. There are {totalDomainQuestions}+ questions in this domain alone, and {totalCertQuestions.toLocaleString('en-US')}+ across the whole {cert.shortName} bank.{secondaryList ? ` If you searched for ${secondaryList}, these questions cover the same ground.` : ''} <span class="cc-auth-out">Create a free account to unlock spaced repetition: questions you get wrong come back more often, so your weakest topics get the most practice.</span>
           </p>
           <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary pt-2">
             How to use these {primaryInSentence}
           </h2>
           <p>
-            Work through the sample questions below and read each explanation in full, even when you answer correctly. The explanations are where the real learning happens. When this domain feels easy, take a full-length timed mock exam to build pacing and stamina. Your domain mastery score will show this area climb as you practise.
+            Work through the sample questions below and read each explanation in full, even when you answer correctly. The explanations are where the real learning happens. When this domain feels easy, take a full-length timed mock exam to build pacing and stamina. Your domain mastery score will show this area climb as you practice.
           </p>
         </section>
 
@@ -403,6 +430,9 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
             <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary">
               Sample {domain.name} questions
             </h2>
+            <p class="text-sm md:text-base text-text-muted">
+              Answer a question to reveal the full explanation, just like the real practice mode.
+            </p>
             <div class="space-y-4">
               {sampleQuestions.map((q, i) => (
                 <SampleQuestionCard
@@ -421,32 +451,28 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
                 />
               ))}
             </div>
-            <div class="flex flex-wrap gap-3 pt-2">
-              <Button href={domainPracticeHref} variant="brand" arrow>
-                Practise {domain.name}
-              </Button>
-              <Button href={practiceExamHref} variant="secondary">
-                Take a full mock exam
-              </Button>
-            </div>
           </section>
         )}
 
-        {/* 7b. Repeat primary CTA below the fold so there is a conversion path
-            above and below the sample questions. */}
+        {/* Single closing CTA below the samples (was two back-to-back rows: an
+            inline button pair + this card). Both practice paths live in the one
+            prominent card so the conversion point isn't duplicated. */}
         <Card as="section" padding="md" class="text-center">
           <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-4">
-            Ready to practise {domain.name}?
+            Ready to practice {domain.name}?
           </h2>
-          <div class="flex justify-center">
+          <div class="flex flex-col sm:flex-row justify-center gap-3">
             <Button href={domainPracticeHref} variant="brand" size="lg" arrow>
-              Start practising
+              Start practicing
+            </Button>
+            <Button href={practiceExamHref} variant="secondary" size="lg">
+              Take a full mock exam
             </Button>
           </div>
         </Card>
 
         {/* FAQ block (visible + FAQPage JSON-LD via Faq.astro) */}
-        <Faq entries={faqEntries} headingId="domain-faq-heading" />
+        <Faq entries={faqEntries} headingId="domain-faq-heading" headingClass="text-xl md:text-2xl font-semibold tracking-[-0.01em]" />
 
         {/* 10. Latest blog posts tagged for this domain (8.7). Rendered only
             when at least one matching non-draft post exists. */}
@@ -469,7 +495,8 @@ const levelLabel = cert.level.charAt(0).toUpperCase() + cert.level.slice(1)
             <h2 class="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-4">
               Other {cert.shortName} domains
             </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* 3 sisters -> a single row of 3 (no lone card); otherwise 2-up. */}
+            <div class:list={['grid grid-cols-1 gap-3', sisterDomains.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2']}>
               {sisterDomains.map(sister => (
                 <a
                   href={sister.href}

@@ -4,12 +4,14 @@ import { useFocusTrap } from '../hooks/useFocusTrap'
 import { useSignOut } from '../hooks/useSignOut'
 import { trackEvent } from '../lib/analytics'
 import { KOFI_URL, GITHUB_REPO_URL } from '../lib/constants'
-import { guardExamLeave } from '../lib/examGuard'
-import { Menu, X, Heart, Sun, Moon, Github, History, Info, BookOpen, Home } from 'lucide-react'
+import { guardExamLeave, SIGN_OUT_SENTINEL } from '../lib/examGuard'
+import { Menu, X, Heart, Sun, Moon, Github, History, Info, BookOpen, Home, UserCircle } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
 import { Button } from './Button'
 import { CertSwitcher } from './CertSwitcher'
+import { PracticeMenu } from './PracticeMenu'
+import { UserMenu } from './UserMenu'
 
 /**
  * HeaderInteractive — auth/cert/theme/mobile-drawer parts of the header.
@@ -20,7 +22,7 @@ import { CertSwitcher } from './CertSwitcher'
  * other islands on the same page without instantiating duplicate context
  * trees. See src/hooks/useAuth.ts and src/hooks/useTheme.ts.
  */
-export default function HeaderInteractive({ initialPathname, hideMobileMenu = false }: { initialPathname?: string; hideMobileMenu?: boolean }) {
+export default function HeaderInteractive({ initialPathname }: { initialPathname?: string }) {
   const { user, loading: authLoading } = useAuth()
   const signOut = useSignOut()
   const { theme, toggleTheme } = useTheme()
@@ -44,6 +46,16 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
     onEscape: closeMobileMenu,
   })
 
+  // Close the drawer when a leave-guard (or any) modal opens, so the drawer
+  // never sits on top of the modal it triggered (bug 19). The exam/practice
+  // anchor-capture guards dispatch this when an in-drawer nav link is
+  // intercepted; the Modal also layers above the drawer (z-index) as a backstop.
+  useEffect(() => {
+    const onCloseDrawer = () => { if (mobileMenuOpen) closeMobileMenu() }
+    window.addEventListener('cc:close-drawer', onCloseDrawer)
+    return () => window.removeEventListener('cc:close-drawer', onCloseDrawer)
+  }, [mobileMenuOpen, closeMobileMenu])
+
   // Sync the pre-paint `cc-authed` class (set by the inline script in
   // BaseLayout from the localStorage token) to the real auth result once
   // getSession() resolves. Self-corrects a stale token.
@@ -54,27 +66,35 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
 
   return (
     <>
-      {/* Hamburger - mobile only. Suppressed on the exam shell
-          (hideMobileMenu) where the drawer overlaps/breaks the in-exam
-          toolbar UI on mobile. */}
-      {!hideMobileMenu && (
-        <button
-          onClick={() => (mobileMenuOpen ? closeMobileMenu() : setMobileMenuOpen(true))}
-          className="md:hidden inline-flex items-center justify-center w-11 h-11 text-on-header hover:bg-on-header/10 rounded-full transition-colors active:scale-[0.92]"
-          aria-label="Toggle menu"
-          aria-expanded={mobileMenuOpen}
-          aria-controls={mobileMenuOpen ? 'mobile-menu' : undefined}
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
-        </button>
-      )}
+      {/* Hamburger - mobile only. Available on EVERY route, including during an
+          active timed exam, so a mobile user always has a menu affordance (bug
+          13). Any in-exam / in-practice nav routes through the leave-guard
+          confirm, and the drawer portals above the in-exam toolbar, so it never
+          overlaps or lets the user wander off unguarded. */}
+      <button
+        onClick={() => (mobileMenuOpen ? closeMobileMenu() : setMobileMenuOpen(true))}
+        className="md:hidden inline-flex items-center justify-center w-11 h-11 text-on-header hover:bg-on-header/10 rounded-full transition-colors active:scale-[0.92]"
+        aria-label="Toggle menu"
+        aria-expanded={mobileMenuOpen}
+        aria-controls={mobileMenuOpen ? 'mobile-menu' : undefined}
+      >
+        {mobileMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
+      </button>
 
       {/* Desktop cluster - hidden on mobile. Order: cert switcher, links,
           auth button. Auth-dependent pieces are always in the DOM and
           toggled by the `cc-authed` class via CSS. */}
       <div className="hidden md:flex items-center gap-5 lg:gap-7">
-        <CertSwitcher variant="desktop" initialPathname={initialPathname} />
+        {/* Desktop cert-switcher pill removed: redundant with the Practice menu
+            (which lists every cert + Dashboard from any page) and not SEO-bearing
+            (client island; every cert URL is already linked from the home grid,
+            footer, and BaseLayout SEO list). The mobile drawer keeps its switcher
+            (the only one there). */}
         <nav className="flex items-center gap-5 lg:gap-7">
+          {/* Persistent primary action (P1-4): a Practice menu (every active
+              cert x its practice modes), always visible in both auth states and
+              on every route. Link+Disclosure widget; see PracticeMenu. */}
+          <PracticeMenu variant="desktop" isAuthed={Boolean(user)} />
           <a
             href="/about"
             className="hdr-link hidden lg:inline-block text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
@@ -88,12 +108,6 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
             Blog
           </a>
           <a
-            href="/history"
-            className="hdr-link cc-auth-in text-on-header font-medium transition-colors text-sm rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-on-header focus-visible:ring-offset-2 focus-visible:ring-offset-header-bg"
-          >
-            History
-          </a>
-          <a
             href={GITHUB_REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -105,35 +119,31 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
           </a>
         </nav>
 
-        {/* Both auth buttons always rendered, CSS-toggled by `cc-authed`.
-            Use the shared <Button> component so the system focus-visible ring
-            and transition apply (a11y findings 3 + 4). */}
-        <Button
-          onClick={signOut}
-          variant="secondary"
-          size="sm"
-          className="cc-auth-in whitespace-nowrap"
-        >
-          Sign out
-        </Button>
-        <Button
-          onClick={() => { if (!guardExamLeave('/login')) window.location.assign('/login') }}
-          variant="primary"
-          size="sm"
-          className="cc-auth-out whitespace-nowrap"
-        >
-          Sign in
-        </Button>
+        {/* Account/user menu (signed in) + Sign in (signed out), CSS-toggled by
+            `cc-authed`. History/Account/theme/Sign out now live inside the user
+            menu instead of as flat top-level links. */}
+        <UserMenu />
+        {/* Hide the header 'Sign in' on the login page itself (it would point to
+            the page the user is already on). */}
+        {initialPathname !== '/login' && (
+          <Button
+            onClick={() => { if (!guardExamLeave('/login')) window.location.assign('/login') }}
+            variant="primary"
+            size="sm"
+            className="cc-auth-out whitespace-nowrap"
+          >
+            Sign in
+          </Button>
+        )}
       </div>
 
-      {/* Mobile drawer. Also gated on !hideMobileMenu so it can never mount on
-          the exam shell even if state were somehow set. PORTALED to <body>:
-          the header has `backdrop-blur-xl` (a backdrop-filter), which makes it
-          the containing block for `fixed` descendants — so an in-header drawer
-          gets clipped to the 48px header bar on non-overlay pages (e.g. /login).
-          Rendering into <body> escapes that containing block so the overlay +
-          panel cover the full viewport everywhere. */}
-      {!hideMobileMenu && mobileMenuOpen && typeof document !== 'undefined' && createPortal(
+      {/* Mobile drawer. PORTALED to <body>: the header has `backdrop-blur-xl`
+          (a backdrop-filter), which makes it the containing block for `fixed`
+          descendants, so an in-header drawer gets clipped to the 48px header bar
+          on non-overlay pages (e.g. /login). Rendering into <body> escapes that
+          containing block so the overlay + panel cover the full viewport, and
+          its z-100/101 sits above the in-exam toolbar (z-30). */}
+      {mobileMenuOpen && typeof document !== 'undefined' && createPortal(
         <>
           <button
             type="button"
@@ -169,6 +179,7 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
             />
 
             <nav className="flex flex-col p-4 gap-1">
+              <PracticeMenu variant="mobile" onNavigate={closeMobileMenu} isAuthed={Boolean(user)} currentPath={initialPathname} />
               <a
                 href="/"
                 onClick={closeMobileMenu}
@@ -200,7 +211,17 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
                   className="px-4 py-3 text-text-primary hover:bg-bg-dark rounded-xl transition-colors active:scale-[0.98] font-medium flex items-center gap-3"
                 >
                   <History className="w-5 h-5 text-text-muted" aria-hidden="true" />
-                  History
+                  Exam history
+                </a>
+              )}
+              {user && (
+                <a
+                  href="/account"
+                  onClick={closeMobileMenu}
+                  className="px-4 py-3 text-text-primary hover:bg-bg-dark rounded-xl transition-colors active:scale-[0.98] font-medium flex items-center gap-3"
+                >
+                  <UserCircle className="w-5 h-5 text-text-muted" aria-hidden="true" />
+                  Account
                 </a>
               )}
               <a
@@ -230,9 +251,9 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
             <div className="p-4 border-t border-text-muted/20">
               {user ? (
                 <Button
-                  onClick={async () => {
+                  onClick={() => {
                     closeMobileMenu()
-                    await signOut()
+                    if (!guardExamLeave(SIGN_OUT_SENTINEL)) void signOut()
                   }}
                   variant="secondary"
                   fullWidth
@@ -264,7 +285,7 @@ export default function HeaderInteractive({ initialPathname, hideMobileMenu = fa
                 className="flex items-center justify-center gap-2 text-text-muted hover:text-text-primary transition-colors text-sm"
               >
                 <Heart className="w-4 h-4 text-danger" aria-hidden="true" />
-                Support the developer
+                Support this project
               </a>
             </div>
           </div>

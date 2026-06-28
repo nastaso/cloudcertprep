@@ -37,7 +37,7 @@ import { SITE_URL } from '../../lib/seo-data'
 import { serializeJsonLd } from '../../lib/jsonld'
 import snapshot from '../../lib/generated/stats-snapshot.json'
 import CertSpecPanel from '../../components/landing/CertSpecPanel.astro'
-import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB } from '../../lib/levelAccent'
+import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB, LEVEL_ACCENT_UI_HEX } from '../../lib/levelAccent'
 import { getCollection, type CollectionEntry } from 'astro:content'
 import PostCard from '../../components/PostCard.astro'
 
@@ -66,7 +66,7 @@ const examMinutes = Math.round(cert.examTimeSeconds / 60)
 const providerLabel = getProviderLabel(cert.provider)
 const certPath = `/${cert.provider}/${cert.code}`
 const totalQuestions = getCertTotalQuestions(cert.code)
-const totalQuestionsLabel = totalQuestions.toLocaleString('en-GB')
+const totalQuestionsLabel = totalQuestions.toLocaleString('en-US')
 const levelLabel = getLevelLabel(cert.level)
 
 // Per-cert SEO. Active certs get SERP-friendly specifics (question count,
@@ -160,6 +160,7 @@ const certForIsland = {
     id: d.id,
     name: d.name,
     questionCount: d.questionCount,
+    slug: getCertDomainSlug(cert, d.id),
   })),
 }
 
@@ -181,8 +182,8 @@ const secondaryKeyword = isActive ? CERT_SECONDARY_KEYWORD[cert.code] : undefine
 // Domain_Landing's "Looking for {primaryKeyword}?" opener); otherwise keep the
 // generic platform line.
 const heroLede = secondaryKeyword
-  ? `Looking for a free ${secondaryKeyword}? Practise realistic ${providerLabel} exam questions with adaptive domain mastery, randomised exams, and unlimited free attempts.`
-  : `Practise realistic ${providerLabel} exam questions with adaptive domain mastery, randomised exams, and unlimited free attempts.`
+  ? `Looking for a free ${secondaryKeyword}? Practice realistic ${providerLabel} exam questions with adaptive domain mastery, randomized exams, and unlimited free attempts.`
+  : `Practice realistic ${providerLabel} exam questions with adaptive domain mastery, randomized exams, and unlimited free attempts.`
 
 // DSv6 wayfinding: the exam-UI mockup is the HOME page's exclusive hero
 // signature. Cert hubs show the exam blueprint (CertSpecPanel: domain weights
@@ -190,6 +191,10 @@ const heroLede = secondaryKeyword
 // a glance.
 const levelAccent = LEVEL_ACCENT_HEX[cert.level]
 const levelGlow = LEVEL_ACCENT_RGB[cert.level]
+// UI-accent variant for fills on the LIGHT card surface (the #domains weight
+// bars): the pale badge color (Foundational #A8B9C9) is invisible on white, so
+// the bars use the darker slate UI accent, same as the signed-in dashboard.
+const levelAccentUi = LEVEL_ACCENT_UI_HEX[cert.level]
 
 // Per-domain landing links. These keyword-rich pages are the indexable SEO
 // surface for each exam domain; linking them here creates the
@@ -260,24 +265,27 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
               <div class="mt-8 flex flex-wrap items-center gap-4">
                 <a
                   href={`${certPath}/practice-exam`}
-                  class="halo chev-link inline-flex min-h-[48px] items-center justify-center rounded-full bg-[#FF9900] px-7 py-3 text-base font-semibold text-[#16191F] transition-[background-color,transform] duration-200 ease-press hover:bg-[#FFAD33] active:scale-[0.97] active:duration-[80ms] focus:outline-none"
+                  class="halo chev-link inline-flex min-h-[48px] items-center justify-center rounded-full bg-[#FF9900] px-7 py-3 text-base font-semibold text-[#16191F] transition-[background-color,transform] duration-gentle ease-press hover:bg-[#EC7211] active:scale-[0.97] active:duration-press focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1116]"
                   data-cc-event="cta_start_practice_exam"
                   data-cc-param-location="cert_landing_hero"
                   data-cc-param-cert={cert.code}
                 >
-                  Start practice exam<span class="chev" aria-hidden="true">›</span>
+                  Start practice exam<span class="chev" aria-hidden="true">→</span>
                 </a>
                 <a
                   href="#domains"
-                  class="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-medium text-[#F4F6F8] transition-[border-color,background-color,transform] duration-200 ease-press hover:border-white/40 hover:bg-white/5 active:scale-[0.97] active:duration-[80ms] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                  class="inline-flex min-h-[48px] items-center gap-2 rounded-full border border-white/20 px-6 py-3 text-base font-medium text-[#F4F6F8] transition-[border-color,background-color,transform] duration-gentle ease-press hover:border-white/40 hover:bg-white/5 active:scale-[0.97] active:duration-press focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0E1116]"
                 >
                   Practice by domain
                 </a>
               </div>
             )}
 
+            {/* Exam facts - MOBILE ONLY. On sm+ the CertSpecPanel blueprint
+                (right column) shows the same four facts in its footer, so the
+                facts rendered twice side by side; hide this strip there. */}
             {!isComingSoon && (
-              <ul class="mt-10 grid grid-cols-2 gap-x-6 gap-y-2 sm:flex sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-1.5 list-none font-mono text-[13px] tracking-wide text-[#8B95A3] sm:[&>li+li]:before:content-['·'] sm:[&>li+li]:before:mr-3 sm:[&>li+li]:before:text-white/25">
+              <ul class="mt-10 grid grid-cols-2 gap-x-6 gap-y-2 sm:hidden list-none font-mono text-[13px] tracking-wide text-[#8B95A3]">
                 <li class="whitespace-nowrap">{cert.examQuestionCount} questions</li>
                 <li class="whitespace-nowrap">{examMinutes} minutes</li>
                 <li class="whitespace-nowrap">pass {cert.passingScore}/1000</li>
@@ -286,7 +294,7 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
             )}
 
             {isActive && (
-              <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 52 211 153;">
+              <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 74 222 128;">
                 <LastUpdatedStamp examGuideVersion={cert.examGuideVersion} examGuideUrl={cert.examGuideUrl} />
               </div>
             )}
@@ -312,16 +320,17 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
             <section id="domains" data-reveal>
               <p class="kicker" aria-hidden="true">Practice by domain</p>
               <h2 class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-2">
-                {secondaryKeyword ? `Build your ${secondaryKeyword} by domain` : 'Practice by exam domain'}
+                Practice {cert.shortName} by exam domain
               </h2>
               <p class="text-lead mb-8">
-                Focused question sets for every exam domain, weighted like the real exam.
+                Focused question sets for every exam domain, with instant feedback on each answer.
+                The percentage is that domain's share of the real exam.
               </p>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {cert.domains.map(d => (
                   <a
                     href={`/${cert.provider}/${cert.code}/${getCertDomainSlug(cert, d.id)}`}
-                    class="halo group flex flex-col gap-2 rounded-2xl border border-border-hairline bg-bg-card p-5 md:p-6 shadow-card transition-[background-color,border-color] duration-200 ease-out hover:bg-bg-card-hover focus:outline-none"
+                    class="halo group flex flex-col gap-2 rounded-2xl border border-border-hairline bg-bg-card p-5 md:p-6 shadow-card transition-[background-color,border-color] duration-200 ease-out hover:bg-bg-card-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card"
                     style={`--halo-color: ${levelGlow}`}
                   >
                     <span class="flex items-baseline justify-between gap-4">
@@ -329,11 +338,11 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
                       <span class="font-mono text-[12px] text-text-muted whitespace-nowrap">{Math.round(d.examProportion * 100)}%</span>
                     </span>
                     <span class="h-1 w-full overflow-hidden rounded-full bg-border-hairline/60">
-                      <span class="block h-full rounded-full" style={`width: ${Math.round(d.examProportion * 100)}%; background-color: ${levelAccent}`}></span>
+                      <span class="block h-full rounded-full" style={`width: ${Math.round(d.examProportion * 100)}%; background-color: ${levelAccentUi}`}></span>
                     </span>
                     <span class="flex items-center justify-between text-sm text-text-muted">
                       <span>{d.questionCount}+ practice questions</span>
-                      <span class="feature-arrow text-link" aria-hidden="true">→</span>
+                      <span class="feature-arrow text-text-primary group-hover:translate-x-1 group-focus-visible:translate-x-1" aria-hidden="true">→</span>
                     </span>
                   </a>
                 ))}
@@ -359,7 +368,7 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
                 ))}
               </div>
               <p class="mt-6">
-                <a href="/blog" class="chev-link text-sm md:text-base font-medium text-link hover:underline underline-offset-4">Read all articles<span class="chev" aria-hidden="true">›</span></a>
+                <a href="/blog" class="chev-link text-sm md:text-base font-medium text-text-primary underline underline-offset-4 hover:text-text-primary/70">Read all articles<span class="chev" aria-hidden="true">›</span></a>
               </p>
             </section>
           )}

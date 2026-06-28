@@ -47,13 +47,15 @@ export function ResetPassword() {
   // the brief redirect window. The success branch below owns that interval.
   if (!user && !success) {
     return (
-      <div className="flex-1 flex items-center justify-center px-4">
-        <Card padding="lg" className="max-w-md w-full">
-          <h1 className="text-xl font-semibold text-text-primary mb-2">Reset link invalid or expired</h1>
-          <p className="text-text-muted mb-8">
-            Password reset links are single-use and expire after a short time.
-            Request a new one from the sign-in page.
-          </p>
+      <div className="flex-1 flex items-center justify-center px-4 py-10 md:py-16">
+        <Card padding="lg" className="max-w-md w-full" style={{ boxShadow: 'var(--shadow-card-hover)' }}>
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-2">Reset link invalid or expired</h1>
+            <p className="text-text-muted text-sm leading-relaxed">
+              Password reset links are single-use and expire after a short time.
+              Request a new one from the sign-in page.
+            </p>
+          </div>
           <Button onClick={() => navigate('/login')} fullWidth>
             Back to sign in
           </Button>
@@ -107,10 +109,12 @@ export function ResetPassword() {
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center px-4">
-      <Card padding="lg" className="max-w-md w-full">
-        <h1 className="text-xl font-semibold text-text-primary mb-2">Reset your password</h1>
-        <p className="text-text-muted mb-8">Choose a new password</p>
+    <div className="flex-1 flex items-center justify-center px-4 py-10 md:py-16">
+      <Card padding="lg" className="max-w-md w-full" style={{ boxShadow: 'var(--shadow-card-hover)' }}>
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-semibold tracking-[-0.01em] text-text-primary mb-2">Reset your password</h1>
+          <p className="text-text-muted text-sm">Choose a new password</p>
+        </div>
 
         <form onSubmit={handleResetPassword} className="space-y-4">
           <div>
@@ -123,6 +127,7 @@ export function ResetPassword() {
               onChange={setPassword}
               required
               autoComplete="new-password"
+              placeholder="Enter a new password"
             />
             <PasswordStrengthMeter password={password} />
           </div>
@@ -137,11 +142,12 @@ export function ResetPassword() {
               onChange={setConfirmPassword}
               required
               autoComplete="new-password"
+              placeholder="Re-enter your password"
             />
           </div>
 
           {success && (
-            <Alert tone="success">
+            <Alert tone="success" role="status">
               Password updated successfully! Redirecting to sign in...
             </Alert>
           )}

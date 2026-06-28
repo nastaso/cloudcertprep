@@ -4,7 +4,6 @@ import {
   isPassed,
   getDomainScore,
   formatTime,
-  formatDuration,
   formatTotalTime,
   isAnswerCorrect,
   correctAnswerFor,
@@ -117,24 +116,6 @@ describe('formatTime', () => {
     // The mock exam tops out at 90:00; formatter just keeps counting minutes.
     expect(formatTime(3600)).toBe('60:00')
     expect(formatTime(5400)).toBe('90:00')
-  })
-})
-
-describe('formatDuration', () => {
-  it('handles zero', () => {
-    expect(formatDuration(0)).toBe('0 seconds')
-  })
-
-  it('uses singular for 1 minute / 1 second', () => {
-    expect(formatDuration(1)).toBe('1 second')
-    expect(formatDuration(60)).toBe('1 minute')
-    expect(formatDuration(61)).toBe('1 minute 1 second')
-  })
-
-  it('uses plural otherwise', () => {
-    expect(formatDuration(45)).toBe('45 seconds')
-    expect(formatDuration(120)).toBe('2 minutes')
-    expect(formatDuration(125)).toBe('2 minutes 5 seconds')
   })
 })
 

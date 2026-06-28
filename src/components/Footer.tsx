@@ -1,5 +1,7 @@
 import { useTheme } from '../hooks/useTheme'
 import { Sun, Moon } from 'lucide-react'
+import { KOFI_URL } from '../lib/constants'
+import { trackEvent } from '../lib/analytics'
 
 // Inline links inside muted prose stay underlined (WCAG 1.4.1 / Lighthouse
 // link-in-text-block). Nav-column links are distinguishable as a list, so
@@ -17,7 +19,7 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border-hairline mt-auto">
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-16">
         {/* 2x2 on mobile (brand + 3 nav columns = 4 even cells, no orphan),
             1x4 on desktop. The previous 2-col grid with a full-width brand
             stranded "Legal" next to an empty cell on phones. */}
@@ -46,7 +48,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li><a href="/aws/clf-c02" className={navLink}>Cloud Practitioner</a></li>
               <li><a href="/aws/aif-c01" className={navLink}>AI Practitioner</a></li>
-              <li><a href="/history" className={navLink}>Exam History</a></li>
+              <li><a href="/history" className={navLink}>Exam history</a></li>
             </ul>
           </nav>
 
@@ -56,6 +58,17 @@ export function Footer() {
               <li><a href="/about" className={navLink}>About</a></li>
               <li><a href="/blog" className={navLink}>Blog</a></li>
               <li><a href="/contribute" className={navLink}>Contribute</a></li>
+              <li>
+                <a
+                  href={KOFI_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackEvent('donate_click', { location: 'footer' })}
+                  className={navLink}
+                >
+                  Support this project
+                </a>
+              </li>
             </ul>
           </nav>
 

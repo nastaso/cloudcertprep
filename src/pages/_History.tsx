@@ -7,8 +7,9 @@ import { useSEO } from '../hooks/useSEO'
 import { getSupabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { Skeleton } from '../components/Skeleton'
 import type { Question, ExamAttempt } from '../types'
-import { formatDuration } from '../lib/scoring'
+import { formatTime } from '../lib/scoring'
 import { formatRelativeDate } from '../lib/formatting'
 import { loadAllQuestions } from '../data/questions'
 import { CERTIFICATIONS, getCertDomains } from '../data/certifications'
@@ -179,7 +180,20 @@ export function History() {
   const { user, loading: authLoading } = useAuth()
   const { goCertExam } = useCertNavigate()
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [attempts, setAttempts] = useState<ExamAttempt[]>([])
+  // One-shot "your attempt was saved" banner: the guest-attempt save flow
+  // redirects here with ?saved=1 after flushing the attempt to the account.
+  // Read + strip the param once on mount so a refresh is clean.
+  const [savedFromExam] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const p = new URLSearchParams(window.location.search)
+    if (p.get('saved') !== '1') return false
+    p.delete('saved')
+    const qs = p.toString()
+    window.history.replaceState(null, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash)
+    return true
+  })
 
   // Multi-cert: no single "active" cert. Title and meta are platform-level.
   useSEO({
@@ -215,6 +229,7 @@ export function History() {
 
   async function loadHistory() {
     try {
+      setLoadError(false)
       if (!user?.id) {
         setAttempts([])
         setLoading(false)
@@ -232,6 +247,9 @@ export function History() {
       setAttempts(data || [])
     } catch (error: unknown) {
       logError('History.loadHistory', error)
+      // Surface the failure instead of falling through to the 'no attempts yet'
+      // empty state, which would tell a returning user their history is gone.
+      setLoadError(true)
     } finally {
       setLoading(false)
     }
@@ -381,9 +399,32 @@ export function History() {
   }, [attempts, filter, certFilter])
 
   if (loading) {
+    // Skeleton shaped like the history list (matches the real wrapper, so the
+    // page does not jump when data resolves). Reduced-motion-safe via Skeleton.
     return (
-      <div className="flex-1 flex items-center justify-center p-8">
-        <LoadingSpinner text="Loading history..." />
+      <div className="p-4 md:p-8">
+        <div className="max-w-7xl mx-auto" aria-busy="true">
+          <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-text-primary mb-4 md:mb-6">Exam history</h1>
+          <p className="sr-only" role="status">Loading your exam history</p>
+          <div className="flex flex-wrap gap-2 mb-4" aria-hidden="true">
+            <Skeleton className="h-9 w-28 rounded-xl" />
+            <Skeleton className="h-9 w-24 rounded-xl" />
+          </div>
+          <div className="space-y-3" aria-hidden="true">
+            {[0, 1, 2, 3, 4].map(i => (
+              <div key={i} className="bg-bg-card border border-border-hairline rounded-2xl p-4 md:p-5 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4 min-w-0">
+                  <Skeleton className="h-6 w-14 rounded-full" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-3 w-32" />
+                  </div>
+                </div>
+                <Skeleton className="h-7 w-12" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
@@ -416,7 +457,7 @@ export function History() {
     <div className="p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4 md:mb-6">
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-[-0.02em] text-text-primary">Exam History</h1>
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-text-primary">Exam history</h1>
             {user && attempts.length > 0 && (
               <Button
                 onClick={() => setShowResetModal(true)}
@@ -426,10 +467,19 @@ export function History() {
                 className="min-h-[44px]"
                 aria-label="Reset progress"
               >
+                {/* A lone trash icon on mobile reads as 'delete one'; keep a
+                    short text label so the destructive scope is clear. */}
+                <span className="md:hidden">Reset</span>
                 <span className="hidden md:inline">Reset progress</span>
               </Button>
             )}
           </div>
+
+          {savedFromExam && (
+            <Alert tone="success" className="mb-4">
+              Your exam attempt was saved to your history.
+            </Alert>
+          )}
 
           {resetSuccess && (
             <Alert tone="success" className="mb-4">
@@ -501,7 +551,7 @@ export function History() {
                 <select
                   value={itemsPerPage}
                   onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                  className={inputClass({ className: 'w-auto px-3 py-2 text-sm' })}
+                  className={inputClass({ surface: 'page', className: 'w-auto px-3 py-2 text-sm' })}
                 >
                   <option value={3}>3 per page</option>
                   <option value={5}>5 per page</option>
@@ -516,7 +566,7 @@ export function History() {
           {/* Guest User: a calm neutral sign-in funnel (no warning styling —
               nothing is wrong, it's just gated). The CTA carries the action. */}
           {!user ? (
-            <div className="bg-bg-card border border-border-hairline rounded-2xl p-6 md:p-8">
+            <div className="max-w-2xl bg-bg-card border border-border-hairline rounded-2xl p-6 md:p-8">
               <div className="flex items-center gap-2.5 mb-2">
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-bg-dark border border-border-hairline">
                   <TrendingUp className="w-4 h-4 text-text-primary" aria-hidden="true" />
@@ -524,7 +574,7 @@ export function History() {
                 <p className="text-text-primary font-semibold tracking-[-0.01em]">Track your progress</p>
               </div>
               <p className="text-text-muted text-sm mb-5 max-w-md">
-                Sign in to track your practice exam history and see your domain mastery improve over time. Practising as a guest works without an account.
+                Sign in to track your practice exam history and see your domain mastery improve over time. Practicing as a guest works without an account.
               </p>
               <Button onClick={() => goToLogin(navigate, location)} variant="primary" size="md">
                 Sign in
@@ -538,7 +588,19 @@ export function History() {
                 </div>
               )}
 
-              {filteredAttempts.length === 0 ? (
+              {loadError ? (
+                <Card padding="lg" className="text-center !py-12">
+                  <p className="text-text-primary font-medium">We could not load your exam history.</p>
+                  <p className="mt-1 text-sm text-text-muted">Check your connection and try again.</p>
+                  <Button
+                    onClick={() => { setLoading(true); void loadHistory() }}
+                    variant="secondary"
+                    className="mt-6"
+                  >
+                    Try again
+                  </Button>
+                </Card>
+              ) : filteredAttempts.length === 0 ? (
                 <Card padding="lg" className="text-center !py-12">
                   <p className="text-text-muted text-lg">
                     {filter === 'all' && certFilter === CERT_FILTER_ALL
@@ -565,7 +627,7 @@ export function History() {
                       <Card key={attempt.id} padding="md">
                         <div className="flex items-start justify-between mb-3 gap-3">
                           <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${attempt.passed ? 'bg-success/20' : 'bg-danger/20'}`}>
+                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${attempt.passed ? 'bg-success/15' : 'bg-danger/15'}`}>
                               {attempt.passed ? (
                                 <Check className="w-5 h-5 md:w-6 md:h-6 text-success" />
                               ) : (
@@ -587,7 +649,7 @@ export function History() {
                                 )}
                               </div>
                               <p className="mt-1 font-mono text-[12px] text-text-muted">
-                                {formatRelativeDate(attempt.attempted_at)} · {formatDuration(attempt.time_taken_seconds)}
+                                {formatRelativeDate(attempt.attempted_at)} · {formatTime(attempt.time_taken_seconds)}
                               </p>
                               <p className="text-text-muted text-xs md:text-sm mt-0.5">
                                 {attempt.correct_answers}/{attempt.total_questions} correct ({Math.round(attempt.score_percent)}%)
@@ -601,7 +663,7 @@ export function History() {
                         </div>
 
                         <div>
-                          <p className="text-xs md:text-sm font-semibold text-text-primary mb-2">Domain Breakdown</p>
+                          <p className="text-xs md:text-sm font-semibold text-text-primary mb-2">Domain breakdown</p>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             {Object.entries(attemptDomains).map(([id, name]) => {
                               const domainId = Number(id)
@@ -623,7 +685,7 @@ export function History() {
                             onClick={() => handleExpandAttempt(attempt.id, attempt.cert_code)}
                             aria-expanded={expandedAttempt === attempt.id}
                             aria-controls={`attempt-details-${attempt.id}`}
-                            className="w-full px-4 py-2 bg-bg-dark hover:bg-bg-dark/70 text-text-primary font-medium rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+                            className="w-full px-4 py-2 bg-bg-dark hover:bg-bg-dark/70 text-text-primary font-medium rounded-lg transition-colors flex items-center justify-center gap-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card"
                           >
                             {expandedAttempt === attempt.id
                               ? <ChevronDown className="w-4 h-4" aria-hidden="true" />
@@ -689,7 +751,7 @@ export function History() {
                           onClick={() => setCurrentPage(pageNum)}
                           aria-label={`Go to page ${pageNum}`}
                           aria-current={safeCurrentPage === pageNum ? 'page' : undefined}
-                          className={`w-11 h-11 rounded-full font-medium transition-[background-color,border-color,color] duration-200 active:scale-[0.97] text-sm border ${
+                          className={`w-11 h-11 rounded-full font-medium transition-[background-color,border-color,color] duration-200 active:scale-[0.97] text-sm border focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card ${
                             safeCurrentPage === pageNum
                               ? 'bg-header-bg text-on-header border-header-bg'
                               : 'bg-bg-card hover:bg-bg-card-hover text-text-primary border-border-hairline'

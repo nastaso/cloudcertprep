@@ -16,12 +16,14 @@ import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { Modal } from '../components/Modal'
-import { confirmExamLeave, isIntentionalLeave } from '../lib/examGuard'
+import { confirmExamLeave, isIntentionalLeave, registerExamLeaveHandler, markIntentionalLeave, SIGN_OUT_SENTINEL } from '../lib/examGuard'
+import { useSignOut } from '../hooks/useSignOut'
 import { UnlockCTA } from '../components/landing/UnlockCTA'
 import { updateDomainProgress } from '../lib/supabaseUtils'
 import { reviewCellClass } from '../lib/buttonStyles'
 import { goToLogin } from '../lib/navigation'
-import type { Question, OptionKey } from '../types'
+import { calculateDomainMastery } from '../lib/domainStats'
+import type { Question, OptionKey, DomainProgress } from '../types'
 import { loadDomainQuestions } from '../data/questions'
 import { isAnswerCorrect, correctAnswerFor } from '../lib/scoring'
 import { trackEvent, trackPageView } from '../lib/analytics'
@@ -36,26 +38,9 @@ import {
   PRACTICE_QUESTION_STEP,
   buildGitHubIssueUrl,
 } from '../lib/constants'
-import { Check, X } from 'lucide-react'
+import { ArrowRight, Check, X } from 'lucide-react'
 
 type Screen = 'selection' | 'config' | 'practice' | 'results'
-
-/**
- * "Don't show again" flag for the practice leave-guard modal. Practice is
- * lower-stakes than the timed mock exam (whose guard intentionally has NO
- * opt-out), so users may permanently dismiss this one. Stored on confirm-leave
- * with the checkbox ticked; when set, both the in-app modal and the native
- * beforeunload warning are skipped.
- */
-const PRACTICE_LEAVE_GUARD_KEY = 'cloudcertprep_practice_leave_guard'
-
-function isLeaveGuardDismissed(): boolean {
-  try {
-    return localStorage.getItem(PRACTICE_LEAVE_GUARD_KEY) === 'dismissed'
-  } catch {
-    return false
-  }
-}
 
 interface QuestionResult {
   question: Question
@@ -91,6 +76,10 @@ export function DomainPractice() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [userAnswer, setUserAnswer] = useState<string | string[] | null>(null)
   const [showFeedback, setShowFeedback] = useState(false)
+  // Shown when the user tries to submit a multi-answer question without picking
+  // the required number (e.g. selected 1 of 2). Cleared on any selection change
+  // and on moving to the next question.
+  const [multiAnswerWarning, setMultiAnswerWarning] = useState(false)
   const [results, setResults] = useState<boolean[]>([])
   const [questionResults, setQuestionResults] = useState<QuestionResult[]>([])
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0)
@@ -98,13 +87,43 @@ export function DomainPractice() {
   const [loading, setLoading] = useState(false)
   const [answering, setAnswering] = useState(false)
   const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null)
-  const [dontShowLeaveGuard, setDontShowLeaveGuard] = useState(false)
+  // "End session early" confirm. Distinct from the leave guard: ending the
+  // session SAVES the answered questions and shows results, rather than
+  // discarding them like a navigate-away. (M3 [B])
+  const [showEndConfirm, setShowEndConfirm] = useState(false)
   // Synchronous re-entrancy guard for finishPractice (mirrors _MockExam's
   // submittingRef). React state is async, so a rapid double-click on "Finish
   // session" would otherwise run the attempt_questions insert twice before the
   // screen swaps to results, inflating per-domain mastery.
   const finishingRef = useRef(false)
+  const signOut = useSignOut()
   const { selectQuestions, refreshMastery } = useSpacedRepetition(user?.id ?? null, selectedDomain, cert.code)
+
+  // Per-domain mastery for the SELECTION screen tiles, so a returning signed-in
+  // user sees where they stand before picking a domain (same source + math as
+  // the cert dashboard). Logged-out users get nothing here. (M3 [A])
+  const [domainMastery, setDomainMastery] = useState<DomainProgress[]>([])
+  useEffect(() => {
+    if (authLoading || !user || effectiveScreen !== 'selection') return
+    let cancelled = false
+    void (async () => {
+      try {
+        const supabase = await getSupabase()
+        if (cancelled) return
+        const { data, error } = await supabase
+          .from('domain_progress')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('cert_code', cert.code)
+        if (cancelled) return
+        if (error) { logError('DomainPractice.loadMastery', error); return }
+        if (data) setDomainMastery(data as DomainProgress[])
+      } catch (err) {
+        if (!cancelled) logError('DomainPractice.loadMastery', err)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [authLoading, user, effectiveScreen, cert.code])
 
   const domains = Object.fromEntries(cert.domains.map(d => [d.id, d.name]))
 
@@ -142,11 +161,10 @@ export function DomainPractice() {
   // finishPractice(), so leaving mid-session silently discards them. The
   // native beforeunload dialog is the last-resort net for browser-level exits
   // (tab close, refresh); confirmed in-app leaves set isIntentionalLeave() so
-  // the net stays silent for them. Skipped entirely once the user has ticked
-  // "don't show again".
+  // the net stays silent for them.
   useEffect(() => {
     function handleBeforeUnload(e: BeforeUnloadEvent) {
-      if (effectiveScreen === 'practice' && questions.length > 0 && !isIntentionalLeave() && !isLeaveGuardDismissed()) {
+      if (effectiveScreen === 'practice' && questions.length > 0 && !isIntentionalLeave()) {
         e.preventDefault()
         e.returnValue = ''
       }
@@ -164,7 +182,6 @@ export function DomainPractice() {
   useEffect(() => {
     if (effectiveScreen !== 'practice' || questions.length === 0) return
     function onClickCapture(e: MouseEvent) {
-      if (isLeaveGuardDismissed()) return
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
       const anchor = (e.target as HTMLElement)?.closest('a')
       if (!anchor) return
@@ -174,22 +191,43 @@ export function DomainPractice() {
       if (url.origin !== window.location.origin) return
       e.preventDefault()
       e.stopPropagation()
+      // Close the mobile drawer (if a drawer link triggered this) so the
+      // leave-confirm modal isn't hidden behind it (bug 19).
+      window.dispatchEvent(new Event('cc:close-drawer'))
       setPendingLeaveUrl(url.pathname + url.search)
     }
     document.addEventListener('click', onClickCapture, true)
     return () => document.removeEventListener('click', onClickCapture, true)
   }, [effectiveScreen, questions.length])
 
+  // Broker non-anchor leaves (the header Sign out button) through the same
+  // "Leave practice?" modal. The click-capture above only catches <a> clicks,
+  // and guardExamLeave only fires when a session is flagged active - so during
+  // an active session set `practiceActive` and register a leave handler. Without
+  // this, Sign out runs immediately (clearing the session) and the redirect
+  // trips the native beforeunload dialog; cancelling it left the user logged out
+  // on the page. NB: practiceActive, NOT examActive (which would hide the mobile
+  // hamburger that practice keeps).
+  useEffect(() => {
+    if (effectiveScreen !== 'practice' || questions.length === 0) return
+    document.body.dataset.practiceActive = 'true'
+    const cleanup = registerExamLeaveHandler((url: string) => {
+      window.dispatchEvent(new Event('cc:close-drawer'))
+      setPendingLeaveUrl(url)
+    })
+    return () => { delete document.body.dataset.practiceActive; cleanup() }
+  }, [effectiveScreen, questions.length])
+
   function confirmPracticeLeave() {
     if (!pendingLeaveUrl) return
-    if (dontShowLeaveGuard) {
-      try {
-        localStorage.setItem(PRACTICE_LEAVE_GUARD_KEY, 'dismissed')
-      } catch {
-        // localStorage unavailable: the choice just doesn't persist
-      }
+    if (pendingLeaveUrl === SIGN_OUT_SENTINEL) {
+      // Confirmed sign-out: silence the beforeunload net for the redirect
+      // useSignOut performs, then sign out (mirrors the exam path).
+      markIntentionalLeave()
+      void signOut()
+    } else {
+      confirmExamLeave(pendingLeaveUrl)
     }
-    confirmExamLeave(pendingLeaveUrl)
   }
 
   function selectDomain(domainId: number) {
@@ -232,6 +270,7 @@ export function DomainPractice() {
       setCurrentIndex(0)
       setUserAnswer(null)
       setShowFeedback(false)
+      setMultiAnswerWarning(false)
       setResults([])
       setQuestionResults([])
       finishingRef.current = false // re-arm the dup-write guard for this fresh session
@@ -254,6 +293,7 @@ export function DomainPractice() {
       const currentAnswers = Array.isArray(userAnswer) ? userAnswer : []
       const newAnswers = toggleMultiAnswer(currentAnswers, answer, MAX_MULTI_ANSWER)
       setUserAnswer(newAnswers)
+      setMultiAnswerWarning(false)
     } else {
       setAnswering(true)
       setUserAnswer(answer)
@@ -292,6 +332,7 @@ export function DomainPractice() {
       setCurrentIndex(currentIndex + 1)
       setUserAnswer(null)
       setShowFeedback(false)
+      setMultiAnswerWarning(false)
     } else {
       finishPractice()
     }
@@ -300,23 +341,28 @@ export function DomainPractice() {
   async function finishPractice() {
     if (finishingRef.current) return
     finishingRef.current = true
-    // Only save to database if user is logged in
-    if (user) {
+    // Persist ONLY the questions actually answered this session (driven by
+    // questionResults, which gets one push per graded question). Mapping over
+    // all `questions` would fabricate "answered incorrectly" rows for questions
+    // never seen when a session is ended early - that would pollute the
+    // spaced-repetition weights and inflate the mastery denominator with false
+    // misses. For a full run-through questionResults already covers every
+    // question, so this is identical to the previous behaviour there. Only save
+    // for a logged-in user with at least one answered question. (M3 [B])
+    if (user && questionResults.length > 0) {
       try {
         const supabase = await getSupabase()
-        // Save each question result to attempt_questions table (without attempt_id for practice mode)
-        const questionRecords = questions.map((q, idx) => {
+        const questionRecords = questionResults.map((qr) => {
+          const q = qr.question
           const keyMap = optionKeyMaps.get(q.id) || {}
           const type = getQuestionType(q)
-          const ua = questionResults[idx]?.userAnswer ?? (type === 'single' ? '' : [])
-
           return {
             attempt_id: null, // Practice mode doesn't have an exam attempt
             user_id: user.id,
             question_id: q.id,
-            user_answer: encodeAnswerForDb(ua, keyMap, type),
+            user_answer: encodeAnswerForDb(qr.userAnswer, keyMap, type),
             correct_answer: encodeAnswerForDb(correctAnswerFor(q), keyMap, type),
-            is_correct: results[idx] || false,
+            is_correct: qr.isCorrect,
             was_flagged: false,
             domain_id: selectedDomain,
             cert_code: cert.code,
@@ -336,7 +382,7 @@ export function DomainPractice() {
       }
     }
 
-    trackEvent('practice_completed', { domain_id: selectedDomain, correct: results.filter(r => r).length, total: questions.length })
+    trackEvent('practice_completed', { domain_id: selectedDomain, correct: results.filter(r => r).length, total: questionResults.length })
     setScreen('results')
     window.scrollTo(0, 0)
   }
@@ -360,32 +406,68 @@ export function DomainPractice() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
               {cert.domains.map(domain => {
+                // Per-domain mastery for signed-in users who've practiced this
+                // domain. Same bank-capped derivation as the dashboard so the two
+                // surfaces never disagree. (M3 [A])
+                const progress = domainMastery.find(d => d.domain_id === domain.id)
+                const attempted = Math.min(progress?.questions_attempted || 0, domain.questionCount)
+                const correct = Math.min(progress?.questions_correct || 0, attempted)
+                const mastery = calculateDomainMastery(correct, domain.id, cert.code)
+                const showMastery = !!user && attempted > 0
                 return (
                   <button
                     key={domain.id}
                     onClick={() => selectDomain(domain.id)}
-                    aria-label={`Practice ${domain.name}: ${domain.questionCount} questions`}
-                    className="bg-bg-dark hover:bg-bg-card-hover p-4 md:p-6 rounded-xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-200 text-left"
+                    aria-label={showMastery
+                      ? `Practice ${domain.name}: ${domain.questionCount} questions, ${mastery}% mastery`
+                      : `Practice ${domain.name}: ${domain.questionCount} questions`}
+                    className="group bg-bg-dark hover:bg-bg-card-hover p-4 md:p-6 rounded-xl border border-border-hairline hover:border-text-muted/50 transition-[background-color,border-color] duration-gentle ease-out text-left flex flex-col gap-3"
                   >
-                    <div className="flex items-center gap-3 md:gap-4">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center font-mono text-lg md:text-xl font-semibold flex-shrink-0 bg-brand/10 text-brand">
-                        {domain.id}
+                    <div className="flex items-center justify-between gap-3 w-full">
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Brand-tinted index chip; the digit is theme-aware text
+                            (orange-on-peach read low-contrast in light mode). */}
+                        <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex items-center justify-center font-mono text-base md:text-lg font-semibold flex-shrink-0 bg-brand/15 text-text-primary">
+                          {domain.id}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm md:text-base font-semibold text-text-primary [text-wrap:balance]">
+                            {domain.name}
+                          </h3>
+                          <p className="text-xs md:text-sm text-text-muted">{domain.questionCount} questions</p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-sm md:text-base lg:text-lg font-semibold text-text-primary">
-                          {domain.name}
-                        </h3>
-                        <p className="text-xs md:text-sm text-text-muted">{domain.questionCount} questions</p>
-                      </div>
+                      <ArrowRight
+                        className="flex-shrink-0 w-4 h-4 md:w-5 md:h-5 text-text-muted/40 transition-[transform,color] duration-gentle group-hover:translate-x-0.5 group-hover:text-text-primary"
+                        aria-hidden="true"
+                      />
                     </div>
+                    {showMastery && (
+                      <div className="w-full animate-fade-in">
+                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                          <span className="text-[11px] uppercase tracking-wide text-text-muted">Mastery</span>
+                          <span className="font-mono text-xs font-semibold tabular-nums text-text-primary">{mastery}%</span>
+                        </div>
+                        <div className="h-1 w-full overflow-hidden rounded-full bg-text-muted/15" role="presentation">
+                          <div
+                            className="h-full w-full origin-left bg-brand transition-transform duration-settle ease-out"
+                            style={{ transform: `scaleX(${mastery / 100})` }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </button>
                 )
               })}
             </div>
 
-            <Button onClick={goHome} variant="secondary" fullWidth>
-              Back to home
-            </Button>
+            {/* Lowest-priority action: a quiet centered ghost, not a full-width
+                button competing with the domain grid above it. */}
+            <div className="flex justify-center pt-1">
+              <Button onClick={goHome} variant="ghost" size="sm">
+                Back to home
+              </Button>
+            </div>
           </Card>
 
           {/* Guest-only sign-in nudge — rendered as a sibling card BELOW the
@@ -397,8 +479,8 @@ export function DomainPractice() {
               <UnlockCTA
                 onSignIn={() => goToLogin(navigate, location)}
                 location="domain_practice_wall"
-                title="Sign in to save your progress"
-                body="Practise free as a guest, no account needed. Sign in to save per-domain mastery and unlock spaced repetition, which repeats the questions you get wrong."
+                title="Unlock spaced repetition and saved mastery"
+                body="Practice free as a guest, no account needed. Sign in to save per-domain mastery and unlock spaced repetition, which repeats the questions you get wrong."
                 ctaLabel="Sign in to save progress"
                 noTopMargin
               />
@@ -428,7 +510,7 @@ export function DomainPractice() {
                   onClick={() => setQuestionCount(Math.max(MIN_PRACTICE_QUESTIONS, questionCount - PRACTICE_QUESTION_STEP))}
                   disabled={questionCount <= MIN_PRACTICE_QUESTIONS}
                   aria-label="Decrease question count"
-                  className="w-11 h-11 md:w-12 md:h-12 flex items-center justify-center bg-bg-dark hover:bg-bg-card-hover text-text-primary text-xl md:text-2xl font-bold rounded-full transition-all duration-150 active:scale-[0.97] disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100"
+                  className="w-11 h-11 md:w-12 md:h-12 flex items-center justify-center bg-bg-dark hover:bg-bg-card-hover text-text-primary text-xl md:text-2xl font-bold rounded-full transition-[background-color,transform] duration-gentle ease-press active:scale-[0.97] active:duration-press disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100"
                 >
                   −
                 </button>
@@ -439,7 +521,7 @@ export function DomainPractice() {
                   onClick={() => setQuestionCount(Math.min(MAX_PRACTICE_QUESTIONS, questionCount + PRACTICE_QUESTION_STEP))}
                   disabled={questionCount >= MAX_PRACTICE_QUESTIONS}
                   aria-label="Increase question count"
-                  className="w-11 h-11 md:w-12 md:h-12 flex items-center justify-center bg-bg-dark hover:bg-bg-card-hover text-text-primary text-xl md:text-2xl font-bold rounded-full transition-all duration-150 active:scale-[0.97] disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100"
+                  className="w-11 h-11 md:w-12 md:h-12 flex items-center justify-center bg-bg-dark hover:bg-bg-card-hover text-text-primary text-xl md:text-2xl font-bold rounded-full transition-[background-color,transform] duration-gentle ease-press active:scale-[0.97] active:duration-press disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100"
                 >
                   +
                 </button>
@@ -544,7 +626,7 @@ export function DomainPractice() {
               <UnlockCTA
                 onSignIn={() => goToLogin(navigate, location)}
                 location="practice_results"
-                title="Sign in to save your practice progress"
+                title="Don't lose this progress"
                 body="This session's results were not saved. Create a free account to track per-domain mastery and get spaced repetition focused on what you got wrong."
                 ctaLabel="Sign in to save progress"
               />
@@ -568,11 +650,25 @@ export function DomainPractice() {
     return (
       <div className="p-4 md:p-8">
           <div className="max-w-3xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-center mb-6">
-            <h2 className="text-base md:text-lg lg:text-xl font-semibold text-text-primary">
+          {/* Header. Centered title until the first answer; once there's
+              progress to save, it becomes title-left / "End session"-right so
+              the escape hatch never overlaps or cramps the title (it stays
+              clear down to 320px, unlike a centered title with a side button).
+              The button is gated on >=1 answered: before that there's nothing
+              to save, so Back is the exit. (M3 [B]) */}
+          <div className={`flex items-center gap-3 mb-6 min-h-[2rem] ${questionResults.length > 0 ? 'justify-between' : 'justify-center'}`}>
+            <h2 className="text-base md:text-lg lg:text-xl font-semibold text-text-primary [text-wrap:balance] min-w-0">
               {domains[selectedDomain!]}
             </h2>
+            {questionResults.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowEndConfirm(true)}
+                className="shrink-0 text-sm text-text-muted hover:text-text-primary transition-colors whitespace-nowrap"
+              >
+                End session
+              </button>
+            )}
           </div>
 
           {/* Progress */}
@@ -582,7 +678,10 @@ export function DomainPractice() {
                 Question {currentIndex + 1} of {questions.length}
               </span>
             </div>
-            <ProgressBar percent={(currentIndex / questions.length) * 100} showLabel={false} />
+            {/* Advance when the current question is answered (showFeedback), so
+                the bar reaches 100% on the final graded question instead of
+                capping at (n-1)/n. Display-only; scoring is untouched. */}
+            <ProgressBar percent={((currentIndex + (showFeedback ? 1 : 0)) / questions.length) * 100} showLabel={false} />
           </div>
 
           {/* Question */}
@@ -607,7 +706,7 @@ export function DomainPractice() {
                   options={currentQuestion.options}
                   value={Array.isArray(userAnswer) ? userAnswer : null}
                   correctOrder={currentQuestion.correctOrder}
-                  onChange={order => setUserAnswer(order)}
+                  onChange={order => { setUserAnswer(order); setMultiAnswerWarning(false) }}
                 />
               ) : currentType === 'matching' ? (
                 <MatchingInput
@@ -616,7 +715,7 @@ export function DomainPractice() {
                   targets={currentQuestion.targets ?? {}}
                   value={Array.isArray(userAnswer) ? userAnswer : null}
                   correctMatches={currentQuestion.correctMatches}
-                  onChange={tokens => setUserAnswer(tokens)}
+                  onChange={tokens => { setUserAnswer(tokens); setMultiAnswerWarning(false) }}
                 />
               ) : (
                 Object.entries(currentQuestion.options).map(([key, value]) => {
@@ -679,14 +778,26 @@ export function DomainPractice() {
               const requiredCount = Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER
               const selectedCount = Array.isArray(userAnswer) ? userAnswer.length : 0
               return (
-                <Button
-                  onClick={() => checkAnswer()}
-                  disabled={selectedCount !== requiredCount}
-                  variant="primary"
-                  fullWidth
-                >
-                  Submit answer
-                </Button>
+                <>
+                  {multiAnswerWarning && selectedCount < requiredCount && (
+                    <Alert tone="warning" role="alert" className="mb-3 text-sm">
+                      Select {requiredCount} answers to continue. You have {selectedCount} of {requiredCount} selected.
+                    </Alert>
+                  )}
+                  {/* Enabled even when incomplete: a silently-disabled button left
+                      users stuck with no idea why. Clicking under-selected shows
+                      the warning above instead of grading a half-answer. */}
+                  <Button
+                    onClick={() => {
+                      if (selectedCount < requiredCount) { setMultiAnswerWarning(true); return }
+                      checkAnswer()
+                    }}
+                    variant="primary"
+                    fullWidth
+                  >
+                    Submit answer
+                  </Button>
+                </>
               )
             })()}
 
@@ -714,7 +825,24 @@ export function DomainPractice() {
                   ) : !touched && (
                     <div className="mb-3 text-xs md:text-sm text-text-muted">Reorder the steps to set your answer.</div>
                   )}
-                  <Button onClick={() => checkAnswer()} disabled={!complete} variant="primary" fullWidth>
+                  {multiAnswerWarning && !complete && (
+                    <Alert tone="warning" role="alert" className="mb-3 text-sm">
+                      {currentType === 'matching'
+                        ? `Match all ${leftCount} items to continue. You have ${selectedCount} of ${leftCount} matched.`
+                        : 'Reorder the steps to set your answer before submitting.'}
+                    </Alert>
+                  )}
+                  {/* Enabled even when incomplete (see the multi-answer note above):
+                      clicking without finishing shows the warning instead of a
+                      silently dead button. */}
+                  <Button
+                    onClick={() => {
+                      if (!complete) { setMultiAnswerWarning(true); return }
+                      checkAnswer()
+                    }}
+                    variant="primary"
+                    fullWidth
+                  >
                     Submit answer
                   </Button>
                 </>
@@ -722,7 +850,7 @@ export function DomainPractice() {
             })()}
 
             {showFeedback && (
-              <Alert tone={isCorrect ? 'success' : 'danger'} className="mt-4 p-4 animate-enter">
+              <Alert tone={isCorrect ? 'success' : 'danger'} role="status" className="mt-4 p-4 animate-enter">
                 <div className={`font-semibold mb-2 flex items-center gap-2 text-sm md:text-base ${isCorrect ? 'text-success' : 'text-danger'}`}>
                   {isCorrect ? <Check className="w-4 h-4 md:w-5 md:h-5" /> : <X className="w-4 h-4 md:w-5 md:h-5" />}
                   <p>{isCorrect ? 'Correct!' : 'Incorrect'}</p>
@@ -768,7 +896,7 @@ export function DomainPractice() {
                   href={buildGitHubIssueUrl(currentQuestion.id)}
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-text-primary hover:text-text-primary/70 hover:underline"
+                  className="text-text-primary underline underline-offset-2 hover:text-text-primary/70"
                 >
                   Report on GitHub
                 </a>
@@ -782,35 +910,55 @@ export function DomainPractice() {
             </Button>
           )}
 
-          {/* Custom leave-confirm modal for intercepted in-app navigation.
-              Unlike the mock-exam guard this one offers "don't show again":
-              practice is low-stakes (a session, not a 65-question timed
-              attempt), so a permanent opt-out is acceptable here. */}
+          {/* Custom leave-confirm modal for intercepted in-app navigation. No
+              "don't ask again" opt-out: there was no way to re-enable it, so a
+              mis-tap permanently disabled a safety prompt (bug 20). */}
           <Modal
             isOpen={pendingLeaveUrl !== null}
-            title="Leave practice?"
+            title={pendingLeaveUrl === SIGN_OUT_SENTINEL ? 'Sign out?' : 'Leave practice?'}
             onClose={() => setPendingLeaveUrl(null)}
           >
             <div className="space-y-4">
               <p className="text-text-primary">
-                Your practice session is still in progress. If you leave this
-                page now, the answers from this session will not be saved.
+                Your practice session is still in progress. If you{' '}
+                {pendingLeaveUrl === SIGN_OUT_SENTINEL ? 'sign out' : 'leave this page'}{' '}
+                now, the answers from this session will not be saved.
               </p>
-              <label className="flex items-center gap-2.5 text-sm text-text-muted cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={dontShowLeaveGuard}
-                  onChange={e => setDontShowLeaveGuard(e.target.checked)}
-                  className="w-4 h-4 rounded border-border-hairline accent-brand"
-                />
-                Don't ask me again
-              </label>
               <div className="flex gap-4 mt-6">
                 <Button onClick={() => setPendingLeaveUrl(null)} variant="secondary" className="flex-1">
-                  Keep practising
+                  Keep practicing
                 </Button>
                 <Button onClick={confirmPracticeLeave} variant="danger" className="flex-1">
-                  Leave practice
+                  {pendingLeaveUrl === SIGN_OUT_SENTINEL ? 'Sign out' : 'Leave practice'}
+                </Button>
+              </div>
+            </div>
+          </Modal>
+
+          {/* End-session-early confirm. Unlike "Leave practice", this SAVES the
+              answered questions and goes to results. (M3 [B]) */}
+          <Modal
+            isOpen={showEndConfirm}
+            title="End this session?"
+            onClose={() => setShowEndConfirm(false)}
+          >
+            <div className="space-y-4">
+              <p className="text-text-primary">
+                You've answered {questionResults.length} of {questions.length} questions.
+                {user
+                  ? ' They will be saved and your results shown.'
+                  : ' Your results will be shown (sign in to save progress).'}
+              </p>
+              <div className="flex gap-4 mt-6">
+                <Button onClick={() => setShowEndConfirm(false)} variant="secondary" className="flex-1">
+                  Keep practicing
+                </Button>
+                <Button
+                  onClick={() => { setShowEndConfirm(false); void finishPractice() }}
+                  variant="primary"
+                  className="flex-1"
+                >
+                  End &amp; see results
                 </Button>
               </div>
             </div>
