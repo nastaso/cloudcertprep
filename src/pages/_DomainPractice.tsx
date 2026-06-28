@@ -16,7 +16,8 @@ import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { Modal } from '../components/Modal'
-import { confirmExamLeave, isIntentionalLeave } from '../lib/examGuard'
+import { confirmExamLeave, isIntentionalLeave, registerExamLeaveHandler, markIntentionalLeave, SIGN_OUT_SENTINEL } from '../lib/examGuard'
+import { useSignOut } from '../hooks/useSignOut'
 import { UnlockCTA } from '../components/landing/UnlockCTA'
 import { updateDomainProgress } from '../lib/supabaseUtils'
 import { reviewCellClass } from '../lib/buttonStyles'
@@ -95,6 +96,7 @@ export function DomainPractice() {
   // session" would otherwise run the attempt_questions insert twice before the
   // screen swaps to results, inflating per-domain mastery.
   const finishingRef = useRef(false)
+  const signOut = useSignOut()
   const { selectQuestions, refreshMastery } = useSpacedRepetition(user?.id ?? null, selectedDomain, cert.code)
 
   // Per-domain mastery for the SELECTION screen tiles, so a returning signed-in
@@ -198,9 +200,34 @@ export function DomainPractice() {
     return () => document.removeEventListener('click', onClickCapture, true)
   }, [effectiveScreen, questions.length])
 
+  // Broker non-anchor leaves (the header Sign out button) through the same
+  // "Leave practice?" modal. The click-capture above only catches <a> clicks,
+  // and guardExamLeave only fires when a session is flagged active - so during
+  // an active session set `practiceActive` and register a leave handler. Without
+  // this, Sign out runs immediately (clearing the session) and the redirect
+  // trips the native beforeunload dialog; cancelling it left the user logged out
+  // on the page. NB: practiceActive, NOT examActive (which would hide the mobile
+  // hamburger that practice keeps).
+  useEffect(() => {
+    if (effectiveScreen !== 'practice' || questions.length === 0) return
+    document.body.dataset.practiceActive = 'true'
+    const cleanup = registerExamLeaveHandler((url: string) => {
+      window.dispatchEvent(new Event('cc:close-drawer'))
+      setPendingLeaveUrl(url)
+    })
+    return () => { delete document.body.dataset.practiceActive; cleanup() }
+  }, [effectiveScreen, questions.length])
+
   function confirmPracticeLeave() {
     if (!pendingLeaveUrl) return
-    confirmExamLeave(pendingLeaveUrl)
+    if (pendingLeaveUrl === SIGN_OUT_SENTINEL) {
+      // Confirmed sign-out: silence the beforeunload net for the redirect
+      // useSignOut performs, then sign out (mirrors the exam path).
+      markIntentionalLeave()
+      void signOut()
+    } else {
+      confirmExamLeave(pendingLeaveUrl)
+    }
   }
 
   function selectDomain(domainId: number) {
@@ -888,20 +915,21 @@ export function DomainPractice() {
               mis-tap permanently disabled a safety prompt (bug 20). */}
           <Modal
             isOpen={pendingLeaveUrl !== null}
-            title="Leave practice?"
+            title={pendingLeaveUrl === SIGN_OUT_SENTINEL ? 'Sign out?' : 'Leave practice?'}
             onClose={() => setPendingLeaveUrl(null)}
           >
             <div className="space-y-4">
               <p className="text-text-primary">
-                Your practice session is still in progress. If you leave this
-                page now, the answers from this session will not be saved.
+                Your practice session is still in progress. If you{' '}
+                {pendingLeaveUrl === SIGN_OUT_SENTINEL ? 'sign out' : 'leave this page'}{' '}
+                now, the answers from this session will not be saved.
               </p>
               <div className="flex gap-4 mt-6">
                 <Button onClick={() => setPendingLeaveUrl(null)} variant="secondary" className="flex-1">
                   Keep practicing
                 </Button>
                 <Button onClick={confirmPracticeLeave} variant="danger" className="flex-1">
-                  Leave practice
+                  {pendingLeaveUrl === SIGN_OUT_SENTINEL ? 'Sign out' : 'Leave practice'}
                 </Button>
               </div>
             </div>

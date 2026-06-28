@@ -29,6 +29,16 @@ export function isExamActive(): boolean {
 }
 
 /**
+ * True while a domain-practice session is in progress (mirrors the body dataset
+ * flag the practice island sets). Practice deliberately does NOT set
+ * `examActive` (that flag also hides the mobile hamburger, which practice
+ * keeps), so it carries its own flag; the leave broker treats both the same.
+ */
+export function isPracticeActive(): boolean {
+  return typeof document !== 'undefined' && document.body.dataset.practiceActive === 'true'
+}
+
+/**
  * The exam island registers how to confirm a leave (open its modal). Returns a
  * cleanup that clears the handler so a stale closure can't fire after unmount.
  */
@@ -40,13 +50,14 @@ export function registerExamLeaveHandler(fn: (url: string) => void): () => void 
 }
 
 /**
- * Ask to leave to `url`. If an exam is active and a handler is registered, the
- * confirm modal is shown and this returns true (caller must NOT navigate). If
- * no exam is active, returns false (caller navigates normally). Used by the
- * header's non-anchor navigations (e.g. the Sign in button).
+ * Ask to leave to `url`. If an exam OR a practice session is active and a
+ * handler is registered, the confirm modal is shown and this returns true
+ * (caller must NOT navigate / sign out). Otherwise returns false (caller
+ * proceeds normally). Used by the header's non-anchor actions (the Sign in /
+ * Sign out buttons), which the islands' anchor-capture listeners can't catch.
  */
 export function guardExamLeave(url: string): boolean {
-  if (isExamActive() && leaveHandler) {
+  if ((isExamActive() || isPracticeActive()) && leaveHandler) {
     leaveHandler(url)
     return true
   }
