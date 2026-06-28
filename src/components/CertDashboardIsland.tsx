@@ -163,7 +163,13 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
           if (typeof attemptsRes.count === 'number') setExamCount(attemptsRes.count)
           // Surface an error only when BOTH queries failed; a partial failure
           // still has useful data to show. Either way the skeleton resolves.
-          if (progressRes.error && attemptsRes.error) setDataError(true)
+          if (progressRes.error && attemptsRes.error) {
+            setDataError(true)
+          } else {
+            // Clear any prior error (e.g. from a TOKEN_REFRESHED re-fetch after
+            // a transient failure) so the dashboard is not stuck on the error alert.
+            setDataError(false)
+          }
           setDataLoading(false)
         })
         .catch((error: unknown) => {
