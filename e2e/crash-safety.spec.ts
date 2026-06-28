@@ -58,6 +58,38 @@ test('useTheme: theme toggles without crashing when localStorage is blocked', as
 })
 
 // ---------------------------------------------------------------------------
+// useCert: exam page renders when localStorage.getItem is blocked (surface 7)
+// ---------------------------------------------------------------------------
+
+test('useCert: practice-exam renders without crashing when localStorage.getItem is blocked', async ({ page }) => {
+  // Block localStorage.getItem to simulate a storage-disabled / sandboxed browser.
+  // This is the exact condition that made getStored() throw during render, causing
+  // the AppIsland ErrorBoundary to catch it and show "Something went wrong."
+  await page.addInitScript(() => {
+    const orig = window.localStorage
+    const proxy = new Proxy(orig, {
+      get(target, prop) {
+        if (prop === 'getItem') {
+          return () => { throw new DOMException('SecurityError', 'SecurityError') }
+        }
+        const val = target[prop as keyof Storage]
+        return typeof val === 'function' ? (val as (...args: unknown[]) => unknown).bind(target) : val
+      },
+    })
+    Object.defineProperty(window, 'localStorage', { get: () => proxy, configurable: true })
+  })
+
+  await page.goto('/aws/clf-c02/practice-exam')
+
+  // The ErrorBoundary must NOT fire.
+  await expect(page.getByText(/something went wrong/i)).toHaveCount(0)
+
+  // The exam start screen must render (useCert fell back to DEFAULT_CERT_ID,
+  // not an uncaught SecurityError that crashes the island).
+  await expect(page.getByRole('button', { name: 'Start exam' })).toBeVisible({ timeout: 15000 })
+})
+
+// ---------------------------------------------------------------------------
 // Dashboard: error clears on successful re-fetch (surface 7)
 // ---------------------------------------------------------------------------
 
