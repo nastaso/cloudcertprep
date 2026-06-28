@@ -260,10 +260,10 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
               </>
             ) : (
               <>
-                <StatTile label="Questions practiced" value={questionsPracticed.toLocaleString()} suffix={`/ ${bankTotal.toLocaleString()}`} />
+                <StatTile label="Questions practiced" value={questionsPracticed.toLocaleString('en-US')} suffix={`/ ${bankTotal.toLocaleString('en-US')}`} />
                 <StatTile label="Accuracy" value={String(accuracy)} suffix="%" hint="correct / answered" />
                 <StatTile label="Mock exams" value={String(examCount)} />
-                <StatTile label="Best score" value={bestScore > 0 ? bestScore.toLocaleString() : '0'} suffix={bestScore > 0 ? `/ ${(1000).toLocaleString()}` : undefined} />
+                <StatTile label="Best score" value={bestScore > 0 ? bestScore.toLocaleString('en-US') : '0'} suffix={bestScore > 0 ? `/ ${(1000).toLocaleString('en-US')}` : undefined} />
               </>
             )}
           </div>

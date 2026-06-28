@@ -60,8 +60,8 @@ export function AnswerButton({ label, text, state, onClick, disabled, compact }:
           className={`flex-shrink-0 ${compact ? 'pt-0.5' : 'pt-0.5 md:pt-1'} ${state === 'correct' ? 'text-success' : 'text-danger'}`}
         >
           {state === 'correct'
-            ? <Check className={compact ? 'w-4 h-4' : 'w-4 h-4 md:w-5 md:h-5'} aria-label="Correct answer" />
-            : <X className={compact ? 'w-4 h-4' : 'w-4 h-4 md:w-5 md:h-5'} aria-label="Your answer (incorrect)" />}
+            ? <Check role="img" aria-label="Correct answer" className={compact ? 'w-4 h-4' : 'w-4 h-4 md:w-5 md:h-5'} />
+            : <X role="img" aria-label="Your answer (incorrect)" className={compact ? 'w-4 h-4' : 'w-4 h-4 md:w-5 md:h-5'} />}
         </span>
       )}
     </button>

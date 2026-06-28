@@ -31,8 +31,7 @@ export function isExamActive(): boolean {
 /**
  * True while a domain-practice session is in progress (mirrors the body dataset
  * flag the practice island sets). Practice deliberately does NOT set
- * `examActive` (that flag also hides the mobile hamburger, which practice
- * keeps), so it carries its own flag; the leave broker treats both the same.
+ * `examActive`, so it carries its own flag; the leave broker treats both the same.
  */
 export function isPracticeActive(): boolean {
   return typeof document !== 'undefined' && document.body.dataset.practiceActive === 'true'

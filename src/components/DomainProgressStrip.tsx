@@ -50,7 +50,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   )
 }
 
-function Skeleton() {
+function StripSkeleton() {
   return (
     <Shell>
       <p className="sr-only" role="status">Loading your progress</p>
@@ -113,9 +113,9 @@ function Strip(props: DomainProgressStripProps) {
   }, [loaded])
 
   // Resolving auth: a returning user gets the skeleton; a guest gets nothing.
-  if (authLoading) return authedHint ? <Skeleton /> : null
+  if (authLoading) return authedHint ? <StripSkeleton /> : null
   if (!user) return null
-  if (!loaded) return <Skeleton />
+  if (!loaded) return <StripSkeleton />
   // On a transient network/RLS error, hide the personalization rather than
   // asserting a false "Not started yet" to a user who has practiced. The
   // prerendered SEO content below is untouched (this island renders nothing).
