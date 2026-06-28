@@ -64,6 +64,59 @@ jobs:
       - name: Indexing diagnostic (informational)
         run: node scripts/diagnose-indexing.mjs --base https://www.cloudcertprep.io || echo "indexing diagnostic reported issues (informational)"
 
+  e2e:
+    name: Playwright e2e (logged-out + seeded)
+    runs-on: ubuntu-latest
+    # No secrets, no real backend, no Turnstile. This covers the logged-OUT funnel
+    # specs AND the seeded-session logged-IN specs (e2e/seededSession.ts seeds a
+    # fake localStorage token client-side; REST reads are stubbed). The two
+    # real-creds specs (ux-audit-auth, ux-audit-shots) auto-skip here because no
+    # .env.local exists (their own test.skip(!HAS_CREDS) guard) - those run in the
+    # separate, owner-gated e2e-auth.yml workflow.
+    env:
+      # Build AND e2e must share one VITE_SUPABASE_URL: the seeded fixture derives
+      # its `sb-<ref>-auth-token` key from it and supabase-js derives the same key
+      # from the value frozen into the build; a mismatch means the token is never
+      # read. Setting it at job level keeps both steps in lockstep. Fork PRs get
+      # the placeholder fallback (same as the build/lighthouse jobs); the seeded
+      # token is a fake unsigned value and every REST read is stubbed, so no real
+      # Supabase call is ever made even when the secret URL is present.
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || 'placeholder-anon-key-build-only' }}
+      VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY || '1x00000000000000000000AA' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # MUST precede e2e: playwright.config webServer is `npm run preview`, which
+      # serves dist/ WITHOUT building. A missing/stale build serves empty output.
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run e2e (logged-out + seeded)
+        run: npm run e2e
+
+      - name: Upload Playwright traces on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
   lighthouse:
     name: Lighthouse CI
     runs-on: ubuntu-latest

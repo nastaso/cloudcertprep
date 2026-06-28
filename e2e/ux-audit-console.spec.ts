@@ -10,7 +10,14 @@ const ROUTES = [
   '/history', '/stats',
   '/?verified=1', '/?error=access_denied&error_code=otp_expired',
 ]
-const NOISE = /umami|analytics|supabase|turnstile|challenges\.cloudflare|cloudflareinsights|favicon|net::ERR|Failed to load resource|ERR_BLOCKED|the server responded with a status|font-size:0|color:transparent/i
+// `Stats\.loadStats` filters StatsIsland's OWN catch-block diagnostic. /stats
+// fetches public stats unconditionally (even as a guest), so when the Supabase
+// backend is unavailable in test - the CI placeholder URL, or a test project
+// missing platform_stats / get_public_exam_stats - _Stats logs
+// `[Stats.loadStats...]` and shows the snapshot fallback. That is backend noise,
+// not a JS/React fault (a real render crash surfaces as a pageerror or a React
+// console error, neither of which carries this tag), so it is filtered too.
+const NOISE = /umami|analytics|supabase|Stats\.loadStats|turnstile|challenges\.cloudflare|cloudflareinsights|favicon|net::ERR|Failed to load resource|ERR_BLOCKED|the server responded with a status|font-size:0|color:transparent/i
 
 for (const route of ROUTES) {
   test(`no console errors on ${route}`, async ({ page }) => {

@@ -1,0 +1,98 @@
+name: E2E auth (real-creds, test project)
+
+# Layer 3 of the e2e plan (TEST-BACKLOG-2026-06-28.md Section 3): the ONLY layer
+# that exercises the genuine Supabase auth handshake (signup -> confirm -> resend
+# -> reset -> sign-in -> in-exam sign-out) and the GDPR-export RLS isolation. It
+# creates and deletes REAL users via a service-role key, so it is deliberately
+# kept off the per-PR path and out of fork PRs.
+#
+# STATUS: INERT until the owner finishes setup. It runs ONLY on manual dispatch
+# (no schedule yet). Before this gate is meaningful the owner must:
+#   1. Configure the four TEST_* repo secrets below, all pointing at the
+#      cloudcertprep-test project (NEVER prod) - see the security note at bottom.
+#   2. On the test project's Supabase dashboard, set the CAPTCHA secret to the
+#      always-passes dummy `1x0000000000000000000000000000000AA`.
+#   3. Seed the test-project schema/data (platform_stats, domain_progress) so the
+#      signed-in dashboard/stats assertions can render (TEST-BACKLOG 1F). Until
+#      then those specific assertions stay red - that is expected and owner-gated;
+#      the auth-handshake assertions pass without it.
+# Once 1-3 are done, uncomment the nightly `schedule` trigger to make it a gate.
+#
+# If the TEST_* secrets are absent, the materialized .env.local is empty, so the
+# auth/shots specs self-skip (test.skip(!HAS_CREDS)) and this job passes as a
+# harmless no-op.
+
+on:
+  workflow_dispatch:
+  # Owner: uncomment to run nightly once the test project is seeded (step 3 above).
+  # schedule:
+  #   - cron: '0 7 * * *'
+
+# Least-privilege: this job only reads the repo and talks to the test Supabase
+# project via the secret; it never writes back to GitHub.
+permissions:
+  contents: read
+
+jobs:
+  e2e-auth:
+    name: Auth handshake e2e (cloudcertprep-test)
+    runs-on: ubuntu-latest
+    # Never hand the service-role secret to a fork PR. Mirrors the fork guard in
+    # ci.yml's lighthouse job; harmless for workflow_dispatch/schedule (both pass).
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Setup Node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ux-audit-auth.spec.ts hand-parses .env.local for HAS_CREDS (it reads the
+      # FILE, not env vars), so the file must be materialized from secrets. ALL
+      # FOUR must point at the SAME cloudcertprep-test project (a prod anon key
+      # against a test URL is rejected by the browser) - TEST-BACKLOG 1A.
+      - name: Write .env.local from secrets (TEST project ONLY)
+        run: |
+          {
+            echo "VITE_SUPABASE_URL=${{ secrets.TEST_SUPABASE_URL }}"
+            echo "VITE_SUPABASE_ANON_KEY=${{ secrets.TEST_SUPABASE_ANON_KEY }}"
+            echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.TEST_SUPABASE_SERVICE_ROLE_KEY }}"
+            echo "VITE_TURNSTILE_SITE_KEY=${{ secrets.TEST_TURNSTILE_SITE_KEY }}"
+          } > .env.local
+
+      # Vite freezes import.meta.env at build time and preview serves dist/ only,
+      # so build AFTER writing .env.local.
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      # ux-audit-auth runs serial (mode:'serial' in the spec). ux-audit-shots is
+      # capture-only; harmless to include.
+      - name: Run real-creds auth e2e
+        run: npm run e2e -- ux-audit-auth ux-audit-shots
+
+      - name: Upload Playwright traces on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-auth-traces
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+# Security tradeoffs of a service-role key in CI (TEST-BACKLOG Section 3):
+#  - SUPABASE_SERVICE_ROLE_KEY is god-mode (it creates/deletes real users). It
+#    MUST point only at cloudcertprep-test, never prod.
+#  - It lives as a GitHub Actions secret, never committed.
+#  - Fork PRs never receive it (the `if:` guard above + GitHub withholds secrets
+#    from fork PRs by default).
+#  - It runs on manual dispatch / (later) cron, not on every PR, to minimize
+#    exposure. The test project should hold only disposable data.
