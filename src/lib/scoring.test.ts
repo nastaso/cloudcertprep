@@ -8,7 +8,9 @@ import {
   isAnswerCorrect,
   correctAnswerFor,
   getExamDomainTargets,
+  computeExamTiming,
 } from './scoring'
+import { MIN_VALID_EXAM_SECONDS } from './constants'
 import type { Certification } from '../data/certifications'
 import type { Question } from '../types'
 
@@ -223,5 +225,53 @@ describe('correctAnswerFor', () => {
   it('returns sorted K:T tokens for matching questions', () => {
     expect(correctAnswerFor({ ...base, type: 'matching', correctMatches: { B: '2', A: '3', C: '1' } }))
       .toEqual(['A:3', 'B:2', 'C:1'])
+  })
+})
+
+describe('computeExamTiming', () => {
+  // 90-minute exam, like CLF-C02.
+  const EXAM_SECONDS = 90 * 60
+
+  it('reports the real elapsed time for a normal full-length attempt', () => {
+    const start = 1_000_000
+    const now = start + 45 * 60 * 1000 // 45 minutes later
+    expect(computeExamTiming(start, now, EXAM_SECONDS)).toEqual({
+      timeTaken: 45 * 60,
+      isTooShort: false,
+    })
+  })
+
+  it('flags a genuine sub-minute attempt as too short', () => {
+    const start = 1_000_000
+    const now = start + 30 * 1000 // 30 seconds
+    const { timeTaken, isTooShort } = computeExamTiming(start, now, EXAM_SECONDS)
+    expect(timeTaken).toBe(30)
+    expect(timeTaken).toBeLessThan(MIN_VALID_EXAM_SECONDS)
+    expect(isTooShort).toBe(true)
+  })
+
+  it('treats exactly MIN_VALID_EXAM_SECONDS as long enough (boundary)', () => {
+    const start = 1_000_000
+    const now = start + MIN_VALID_EXAM_SECONDS * 1000
+    expect(computeExamTiming(start, now, EXAM_SECONDS).isTooShort).toBe(false)
+  })
+
+  it('clamps a forward clock jump / device sleep to the exam length (no inflated time)', () => {
+    // Laptop slept for ~3.5h mid-exam, then woke past the deadline.
+    const start = 1_000_000
+    const now = start + 3.5 * 60 * 60 * 1000
+    const { timeTaken, isTooShort } = computeExamTiming(start, now, EXAM_SECONDS)
+    expect(timeTaken).toBe(EXAM_SECONDS) // capped, not 3h30m
+    expect(isTooShort).toBe(false)
+  })
+
+  it('does NOT discard a completed attempt when the clock jumps backward (negative elapsed)', () => {
+    // NTP / manual correction moved the wall clock back during the exam.
+    const start = 1_000_000
+    const now = start - 5 * 60 * 1000 // "now" is before start
+    const { timeTaken, isTooShort } = computeExamTiming(start, now, EXAM_SECONDS)
+    expect(timeTaken).toBe(0) // floored, never negative
+    // The completed attempt must NOT be classified as a sub-minute throwaway.
+    expect(isTooShort).toBe(false)
   })
 })

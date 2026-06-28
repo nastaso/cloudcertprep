@@ -18,7 +18,7 @@ import { PassFailBanner } from '../components/PassFailBanner'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { QuestionReviewCard } from '../components/QuestionReviewCard'
 import { UnlockCTA } from '../components/landing/UnlockCTA'
-import { selectExamQuestions, calculateScaledScore, isPassed, getDomainScore, formatTime, formatTotalTime, isAnswerCorrect, correctAnswerFor, getExamDomainTargets } from '../lib/scoring'
+import { selectExamQuestions, calculateScaledScore, isPassed, getDomainScore, formatTime, formatTotalTime, isAnswerCorrect, correctAnswerFor, getExamDomainTargets, computeExamTiming } from '../lib/scoring'
 import { getSupabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { updateDomainProgress } from '../lib/supabaseUtils'
@@ -28,10 +28,10 @@ import { loadAllQuestions } from '../data/questions'
 import { shuffleAndMapQuestions, toggleMultiAnswer, getQuestionType, encodeAnswerForDb, type OptionKeyMap } from '../lib/utils'
 import { trackEvent, trackPageView } from '../lib/analytics'
 import { KOFI_URL } from '../lib/constants'
-import { MIN_VALID_EXAM_SECONDS, MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
+import { MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
 import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave, SIGN_OUT_SENTINEL, markIntentionalLeave } from '../lib/examGuard'
 import { useSignOut } from '../hooks/useSignOut'
-import { storePendingAttempt, consumePendingAttemptSavedNotice, markPendingAttemptSaveIntent, PENDING_ATTEMPT_SAVED_EVENT, peekPendingAttempt, type PendingAttempt } from '../lib/pendingAttempt'
+import { storePendingAttempt, consumePendingAttemptSavedNotice, markPendingAttemptSaveIntent, PENDING_ATTEMPT_SAVED_EVENT, peekPendingAttempt, hasPendingAttemptSaveIntent, type PendingAttempt } from '../lib/pendingAttempt'
 import { getProviderLabel } from '../data/certifications'
 
 type ExamScreen = 'start' | 'exam' | 'results' | 'review'
@@ -177,6 +177,10 @@ export function MockExam() {
   // flips synchronously, so the save body runs at most once per attempt.
   const submittingRef = useRef(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  // Set when a SIGNED-IN submit is skipped as too short (or a backward clock jump
+  // makes a completed attempt look sub-minute): the results screen renders a full
+  // score, so without this the not-saved state would be silent. (item 2)
+  const [tooShortNotSaved, setTooShortNotSaved] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [startTime, setStartTime] = useState<number>(0)
   const [reviewFilter, setReviewFilter] = useState<'all' | 'incorrect' | 'flagged'>('all')
@@ -320,7 +324,13 @@ export function MockExam() {
   // loader instead of the start screen so they don't see the intro flash.
   useEffect(() => {
     if (!user || screen !== 'start') return
-    const t = window.setTimeout(() => { if (peekPendingAttempt()) setSavingToHistory(true) }, 0)
+    // Only show the loader when a flush is genuinely coming: a pending snapshot
+    // AND a live save intent. PR-3 gated the flush itself on the intent, so a
+    // signed-in user with a stale, no-intent pending attempt would otherwise see
+    // the spinner for up to 8s while nothing actually saves. (item 4b)
+    const t = window.setTimeout(() => {
+      if (peekPendingAttempt() && hasPendingAttemptSaveIntent()) setSavingToHistory(true)
+    }, 0)
     return () => window.clearTimeout(t)
   }, [user, screen])
   // Fallback: if the flush never completes (e.g. it failed), drop the loader
@@ -378,6 +388,16 @@ export function MockExam() {
       setOptionKeyMaps(keyMaps)
       setAnswers(new Map())
       setCurrentIndex(0)
+      // Reset transient modal / notice flags so a retake starts clean. A manual
+      // submit leaves showEndModal=true; without this the "Ready to submit?"
+      // modal re-opens over question 1 of the retake (and a reflex "Submit for
+      // grading" instantly grades the fresh exam 0/total). (item 1)
+      setShowEndModal(false)
+      setShowQuestionNav(false)
+      setPendingLeaveUrl(null)
+      setPendingExternalUrl(null)
+      setSubmitError(null)
+      setTooShortNotSaved(false)
       submittingRef.current = false // re-arm the dup-submit guard for this fresh attempt
       setScreen('exam')
       setStartTime(Date.now())
@@ -474,12 +494,15 @@ export function MockExam() {
     // Clear any stale submit error from a previous attempt so a later
     // successful save doesn't keep showing "could not be saved". (M0b)
     setSubmitError(null)
+    setTooShortNotSaved(false)
     timer.pause()
 
-    const timeTaken = Math.floor((Date.now() - startTime) / 1000)
+    // Clamp the duration and the too-short test against a non-monotonic clock
+    // (device sleep, NTP / manual jumps), so a forward jump can't inflate the
+    // saved time and a backward jump can't discard a completed attempt. (item 3)
+    const { timeTaken, isTooShort } = computeExamTiming(startTime, Date.now(), cert.examTimeSeconds)
     const isGuest = !user
-    const isTooShort = timeTaken < MIN_VALID_EXAM_SECONDS
-    
+
     const results = questions.map((q, idx) => {
       const state = answers.get(idx)
       const type = getQuestionType(q)
@@ -597,6 +620,12 @@ export function MockExam() {
             domain_id: r.domainId,
           })),
         })
+      } else if (!isGuest && isTooShort) {
+        // Signed in, but the run was too short to count as a real attempt, so
+        // nothing is persisted. The results screen still renders a full score, so
+        // surface an explicit "not saved" notice rather than dropping it silently
+        // (the guest path at least has its own sign-in CTA). (item 2)
+        setTooShortNotSaved(true)
       }
     } catch (error: unknown) {
       logError('MockExam.submitExam', error)
@@ -768,6 +797,11 @@ export function MockExam() {
           {submitError && (
             <Alert tone="warning">
               {submitError}
+            </Alert>
+          )}
+          {tooShortNotSaved && (
+            <Alert tone="warning">
+              This attempt was too short to be saved to your history.
             </Alert>
           )}
 

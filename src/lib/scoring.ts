@@ -1,6 +1,7 @@
 import type { Question, QuestionType } from '../types'
 import type { Certification } from '../data/certifications'
 import { fisherYatesShuffle, getQuestionType, matchesToTokens } from './utils'
+import { MIN_VALID_EXAM_SECONDS } from './constants'
 
 /**
  * Calculate AWS scaled score (100-1000 range)
@@ -157,4 +158,30 @@ export function formatTotalTime(minutes: number): string {
   const hours = Math.floor(minutes / 60)
   const mins = minutes % 60
   return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`
+}
+
+/**
+ * Derive the persisted/displayed exam duration and the "too short to save" flag
+ * from wall-clock timestamps, defended against a non-monotonic `Date.now()`
+ * (device sleep/suspend, NTP or manual clock jumps) corrupting the result.
+ *
+ * - `timeTaken` is clamped to `[0, examTimeSeconds]`, so a FORWARD jump (waking a
+ *   suspended laptop) can no longer inflate the saved/shown time past the exam
+ *   length, and a BACKWARD jump can no longer go negative.
+ * - `isTooShort` is true only for a genuine sub-minute run (raw elapsed in
+ *   `[0, MIN_VALID_EXAM_SECONDS)`). A NEGATIVE raw elapsed signals the clock
+ *   moved backward on an otherwise-complete attempt, so it is NOT classified as
+ *   too short - the attempt is still saved rather than silently discarded.
+ *
+ * See EDGE-CASE-FINDINGS-2026-06-28: exam-timer-wallclock-sleep-clockjump.
+ */
+export function computeExamTiming(
+  startTimeMs: number,
+  nowMs: number,
+  examTimeSeconds: number,
+): { timeTaken: number; isTooShort: boolean } {
+  const rawElapsed = Math.floor((nowMs - startTimeMs) / 1000)
+  const timeTaken = Math.min(Math.max(0, rawElapsed), examTimeSeconds)
+  const isTooShort = rawElapsed >= 0 && rawElapsed < MIN_VALID_EXAM_SECONDS
+  return { timeTaken, isTooShort }
 }
