@@ -136,7 +136,7 @@ export function MockExam() {
   const navigate = useNavigate()
   const location = useLocation()
   const { goHome } = useCertNavigate()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const signOut = useSignOut()
   const cert = useCert()
   const [screen, setScreen] = useState<ExamScreen>('start')
@@ -319,20 +319,26 @@ export function MockExam() {
     }
   }, [])
 
-  // A signed-in user who lands on the start screen with a pending guest attempt
-  // is about to have it flushed + be redirected to /history (above). Show a
-  // loader instead of the start screen so they don't see the intro flash.
+  // A user who lands here with a pending guest attempt + a live save intent is
+  // about to have it flushed + be redirected to /history (above). Show a loader
+  // instead of the bare intro/results screen so they don't see it flash. Two arms:
+  //  - a resolved `user` (email/password return: the session is present on landing), OR
+  //  - auth still RESOLVING (`authLoading`): the OAuth / magic-link return lands on
+  //    this exam route as `?code=...` with NO session yet, and useAuth holds
+  //    loading=true for the whole PKCE exchange (~1s+ on a mid-range phone). Without
+  //    this arm `user` is null for the exchange window and the bare results screen
+  //    shows (the guest rehydrate below swaps to results while user is null). The arm
+  //    is deliberately screen-agnostic for that reason; only mid-exam/review are
+  //    excluded. The 8s fallback drops the loader if no flush ultimately lands (e.g.
+  //    a failed exchange). The flush itself is intent-gated (PR-3), so a stale
+  //    no-intent pending attempt never shows the spinner. (item 4b)
   useEffect(() => {
-    if (!user || screen !== 'start') return
-    // Only show the loader when a flush is genuinely coming: a pending snapshot
-    // AND a live save intent. PR-3 gated the flush itself on the intent, so a
-    // signed-in user with a stale, no-intent pending attempt would otherwise see
-    // the spinner for up to 8s while nothing actually saves. (item 4b)
+    if ((!user && !authLoading) || (screen !== 'start' && screen !== 'results')) return
     const t = window.setTimeout(() => {
       if (peekPendingAttempt() && hasPendingAttemptSaveIntent()) setSavingToHistory(true)
     }, 0)
     return () => window.clearTimeout(t)
-  }, [user, screen])
+  }, [user, authLoading, screen])
   // Fallback: if the flush never completes (e.g. it failed), drop the loader
   // after a few seconds so the user is never stuck on it.
   useEffect(() => {

@@ -78,6 +78,20 @@ export function Login() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Restoring from the bfcache after an OAuth redirect must reset `loading`. The
+  // Google / GitHub handlers set `loading` true then hand off to
+  // `signInWithOAuth`, which navigates away WITHOUT clearing it (only the catch
+  // does). Pressing Back restores this page from the bfcache with `loading`
+  // frozen true, leaving the submit + OAuth buttons stuck on the spinner.
+  // `pageshow` with `persisted` is the bfcache-restore signal; clear the flag so
+  // the form is usable again. (A fresh reload re-mounts with loading=false, so
+  // the persisted guard keeps this to the restore case.)
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => { if (e.persisted) setLoading(false) }
+    window.addEventListener('pageshow', onPageShow)
+    return () => window.removeEventListener('pageshow', onPageShow)
+  }, [])
+
   // Cloudflare Turnstile token. Passed to Supabase as options.captchaToken on
   // every auth call; Supabase validates it server-side. Tokens are single-use,
   // so the widget is reset after each attempt. When no site key is configured
