@@ -89,11 +89,11 @@ function init() {
         const initialUser = session?.user ?? null
         prevUser = initialUser
         setState({ user: initialUser, loading: false })
-        // A guest exam attempt stored before this session resolved (e.g. the
-        // flush failed offline last visit) is retried on any signed-in load.
-        if (initialUser && hasPendingAttempt()) {
-          void flushPendingAttempt(initialUser.id)
-        }
+        // No pending-attempt flush here: a persisted session resolving on load
+        // is a PASSIVE transition (it may be a different person on a shared
+        // device), so it must not adopt a stored guest attempt. The flush is
+        // wired into onAuthStateChange below and gated on an explicit save
+        // intent; INITIAL_SESSION delivers the same session through that path.
       })
       .catch((err: unknown) => {
         logError('useAuth.getSession', err)
@@ -152,10 +152,17 @@ function init() {
 
       // Flush a pending guest exam attempt to the now-signed-in account (the
       // results-screen "Sign in to save this attempt" path). Deferred out of
-      // the auth callback per the supabase-js deadlock caution; the flush
-      // self-guards against re-entry and missing payloads, so firing on any
-      // signed-in transition (incl. INITIAL_SESSION / TOKEN_REFRESHED) is safe.
-      if (newUser && hasPendingAttempt()) {
+      // the auth callback per the supabase-js deadlock caution. flushPendingAttempt
+      // is the real guard: it writes ONLY when the guest set a matching save
+      // intent, so a passive or unrelated sign-in adopts nothing. We additionally
+      // skip bare TOKEN_REFRESHED / USER_UPDATED here so they never even attempt
+      // it; SIGNED_IN is the genuine save flow and INITIAL_SESSION carries the
+      // same intent-gated session for the in-tab return from /login. (P2 data-bleed)
+      if (
+        (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')
+        && newUser
+        && hasPendingAttempt()
+      ) {
         const userId = newUser.id
         setTimeout(() => { void flushPendingAttempt(userId) }, 0)
       }
