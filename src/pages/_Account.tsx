@@ -108,7 +108,7 @@ export function Account() {
 
   if (authLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="p-4 md:p-8 min-h-[320px]">
         <LoadingSpinner text="Loading your account..." />
       </div>
     )
