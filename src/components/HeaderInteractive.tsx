@@ -71,6 +71,14 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
   useEffect(() => {
     if (authLoading) return
     document.documentElement.classList.toggle('cc-authed', Boolean(user))
+    // Tell same-page pre-paint scripts the real session has resolved (token now
+    // persisted, `user` known). The home first-login greeting (index.astro) used
+    // to re-run on a `cc-authed`-add MutationObserver, but `cc-authed` is now set
+    // optimistically PRE-paint on an OAuth `?code=` return (BaseLayout), before
+    // the token exists, so that add-transition no longer fires when the token
+    // lands. This event is the reliable "session resolved" signal instead. Fires
+    // on every resolution (incl. guest); listeners are idempotent and self-gate.
+    window.dispatchEvent(new Event('cc:session-resolved'))
   }, [authLoading, user])
 
   return (
