@@ -4,11 +4,13 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "prepare": "git config core.hooksPath .githooks || true",
     "dev": "astro dev",
     "prebuild": "node scripts/validate-questions.mjs && npx tsx scripts/generate-seo-assets.mjs && node scripts/generate-stats-snapshot.mjs && node scripts/generate-og-images.mjs && node scripts/validate-blog-frontmatter.mjs && node scripts/validate-internal-links.mjs",
     "build": "astro build",
     "postbuild": "npm run check:citation && npm run check:graph && npm run check:person-graph && npm run csp:hash && npm run cf:headers",
     "lint": "eslint .",
+    "check": "astro check && eslint . && vitest run",
     "check:astro": "astro check",
     "preview": "astro preview",
     "validate": "node scripts/validate-questions.mjs",

@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "pre-push: running npm run check (astro check + lint + test)..."
+npm run check || { echo "pre-push BLOCKED: fix the above before pushing."; exit 1; }
