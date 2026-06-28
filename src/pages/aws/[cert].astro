@@ -230,6 +230,7 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
   robots={robots}
   jsonLd={[courseJsonLd]}
   headerOverlay={true}
+  headerNoAuthedFrost={isComingSoon}
 >
   {/* BreadcrumbList JSON-LD only (visuallyHidden); the visible mono trail
       renders inside the stage hero. */}
@@ -432,26 +433,4 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
     </script>
   )}
 
-  {/*
-    Coming-soon certs keep the guest view visible for signed-in visitors (no
-    dashboard to replace it), so the dark stage hero is always present and the
-    overlay header is appropriate for logged-out visitors. But the css rule
-    `html.cc-authed header[data-overlay]` (added as a flash-cover for active
-    certs) permanently frosts the header for signed-in users unless we remove
-    the attribute. Remove data-overlay only for signed-in users so the logged-
-    out overlay look is preserved and the logged-in header is correctly themed.
-  */}
-  {isComingSoon && (
-    <script is:inline>
-      (function () {
-        function apply() {
-          if (!(window.__ccHasSession && window.__ccHasSession())) return
-          var hdr = document.getElementById('site-header')
-          if (hdr) hdr.removeAttribute('data-overlay')
-        }
-        apply()
-        window.addEventListener('pageshow', apply)
-      })()
-    </script>
-  )}
 </BaseLayout>
