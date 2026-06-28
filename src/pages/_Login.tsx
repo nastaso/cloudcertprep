@@ -572,12 +572,6 @@ export function Login() {
             </>
           )}
 
-          {error && (
-            <Alert tone="danger" role="alert" className="text-danger">
-              <span id="auth-error">{error}</span>
-            </Alert>
-          )}
-
           {success && (
             <Alert tone="success" role="status">
               {success}
@@ -601,7 +595,7 @@ export function Login() {
               // primary CTA here only made it look broken on load. The submit
               // handlers validate the captcha and show an inline message if the
               // challenge isn't solved. (Sign-up form requirements still gate,
-              // since those have visible inline feedback.)
+              // since those have visible invalid feedback.)
               (isSignUp && !acceptedTerms) ||
               (isSignUp && !isPasswordStrongEnough(password)) ||
               (isSignUp && password !== confirmPassword) ||
@@ -612,6 +606,14 @@ export function Login() {
               ? (resetCooldown > 0 ? `Resend in ${resetCooldown}s` : 'Send reset link')
               : isSignUp ? 'Sign up' : 'Sign in'}
           </Button>
+
+          {/* Error rendered below the submit button so it never shoves the
+              Turnstile + CTA down when it appears (P4 CLS fix). */}
+          {error && (
+            <Alert tone="danger" role="alert" className="text-danger">
+              <span id="auth-error">{error}</span>
+            </Alert>
+          )}
         </form>
 
         <div className="mt-6 text-center">

@@ -413,6 +413,22 @@ header[data-overlay]:not(.hdr-scrolled) {
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
 }
+/* For authenticated users (cc-authed class on <html>), restore the frosted
+   header state immediately on paint so there is no white-text-on-light-bg
+   flash before the end-of-body script removes [data-overlay]. The JS script
+   still runs and removes the attribute; this CSS merely covers the ~50ms gap.
+   Two rules: light and dark need separate --color-on-header values (the generic
+   overlay rule always sets white, which is invisible on the light frosted bar). */
+html.cc-authed header[data-overlay]:not(.hdr-scrolled) {
+  --color-on-header: 22 25 31;
+  background-color: rgb(var(--color-header-bg) / 0.7) !important;
+  border-color: rgb(var(--color-border) / 0.6) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(150%) !important;
+  backdrop-filter: blur(24px) saturate(150%) !important;
+}
+html.dark.cc-authed header[data-overlay]:not(.hdr-scrolled) {
+  --color-on-header: 244 246 248;
+}
 
 /* Stage grain: subtle film noise so the gradient reads printed, not
    vector-flat. Pure CSS data-URI — zero JS. */

@@ -236,8 +236,11 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
   <Breadcrumb items={breadcrumbItems} visuallyHidden />
 
   {/* Static GUEST view (stage hero + content sheet) — visible to crawlers and
-      logged-out users. CertDashboardIsland hides this for authenticated users. */}
-  <div id="cert-guest-view">
+      logged-out users. For active certs, cc-auth-out hides this pre-paint the
+      instant BaseLayout adds cc-authed to <html>, before CertDashboardIsland
+      hydrates (mirrors how #home-guest-hero works). Coming-soon certs omit the
+      class: a signed-in visitor still sees the coming-soon page. */}
+  <div id="cert-guest-view" class:list={[isActive && 'cc-auth-out']}>
     {/* ---- Stage hero, glow in the cert's official LEVEL color ---- */}
     <section class="stage relative overflow-hidden -mt-[calc(3rem+1px)] md:-mt-[calc(3.5rem+1px)]" style={`--stage-glow: ${levelGlow}`}>
       <div class="relative max-w-6xl mx-auto px-4 md:px-8 pt-28 md:pt-36 pb-16 md:pb-24">
@@ -384,8 +387,14 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
       no question bank, so a logged-in visitor must keep seeing the coming-soon
       guest view (Watch on GitHub) rather than a practice dashboard whose CTAs
       lead to non-existent exam routes. */}
+  {/* cc-auth-in: guests see display:none (no visual gap, Lighthouse-neutral).
+      min-h reserves the above-fold dashboard height so the footer never rises
+      into view while the island resolves, matching the domain page pattern at
+      [domain].astro:368. Sized to push the footer below the fold on every
+      device: viewport height minus the sticky header (3rem mobile / 3.5rem
+      desktop per h-12 md:h-14 in Header.astro). */}
   {isActive && (
-    <div class="px-4 md:px-8">
+    <div class="cc-auth-in px-4 md:px-8 min-h-[calc(100vh-3rem)] md:min-h-[calc(100vh-3.5rem)]">
       <CertDashboardIsland cert={certForIsland} client:only="react" />
     </div>
   )}
