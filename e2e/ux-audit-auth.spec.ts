@@ -77,7 +77,14 @@ test('sign in (confirmed user) lands authenticated + dashboard renders (P1-10 ro
   await expect(page.getByRole('button', { name: 'Account menu' }).first()).toBeVisible({ timeout: 15000 })
 
   await page.goto('/aws/clf-c02')
-  await expect(page.getByText('Your dashboard')).toBeVisible({ timeout: 20000 })
+  // Match the authed dashboard kicker by its "<level> . Your dashboard" tail (e.g.
+  // "Foundational . Your dashboard") rather than a bare "Your dashboard": the latter
+  // also matches the transient sr-only "Loading your dashboard" status, which
+  // appears/disappears as the data fetch runs, so it races into a strict-mode
+  // violation. The kicker + the two practice CTAs render regardless of the data, so
+  // this verifies the signed-in dashboard WITHOUT needing the test project's progress
+  // rows seeded (the structural assertions are not data-dependent).
+  await expect(page.getByText(/·\s*Your dashboard/)).toBeVisible({ timeout: 20000 })
   // P1-10: dashboard entrance root + halo on exactly the two practice cards.
   // Scope to :visible because the prerendered guest view (hidden via display:none)
   // also carries .stagger / .halo CTAs.
