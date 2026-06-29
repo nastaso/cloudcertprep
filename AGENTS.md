@@ -38,6 +38,7 @@ opening PRs, see `CONTRIBUTING.md`; for a project overview, see `README.md`.
 | `npm run preview` | Serve the built `dist/`. |
 | `npm run lint` | ESLint over the repo. |
 | `npm run test` | Full Vitest unit suite. |
+| `npm run check` | Type-check (`astro check`) + lint + unit tests in one go. The pre-push hook runs this; run it before pushing to catch type errors CI would otherwise reject. |
 | `npm run e2e` | Playwright end-to-end tests. |
 | `npm run validate` | Question-bank validator (also runs in prebuild). |
 | `npm run icons` | Regenerate the favicon / app-icon / maskable set from one source. |
