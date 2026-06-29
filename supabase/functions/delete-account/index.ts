@@ -4,11 +4,23 @@
 // auth.users row itself - only the service_role / Admin API can. So account
 // deletion has to run server-side. This Edge Function:
 //   1. Identifies the caller from their JWT (the Authorization header that
-//      supabase.functions.invoke forwards automatically).
-//   2. Deletes the caller's data rows with the service_role client (explicit,
-//      so it works even if a table's FK lacks ON DELETE CASCADE - see the
-//      attempt_questions note in src/pages/_History.tsx).
-//   3. Deletes the auth.users row (cascades to anything still referencing it).
+//      supabase.functions.invoke forwards automatically). It deletes ONLY this
+//      authenticated caller's own auth.uid(); it never reads an id from the
+//      request body, so a user can never delete another account.
+//   2. Defence-in-depth: deletes the caller's data rows explicitly with the
+//      service_role client BEFORE deleting the auth user. Once
+//      supabase/sql/delete-account-cascade.sql is applied, deleting the
+//      auth.users row alone cascades these away - but the explicit deletes guard
+//      against a future cascade regression, matching the owner's "no orphaned
+//      data" posture. The list is exactly the user-keyed BASE TABLES:
+//        attempt_questions, exam_attempts, domain_progress
+//      `question_mastery` is deliberately ABSENT: it is a read-only VIEW over
+//      attempt_questions (see supabase/README.md), so it has no rows of its own
+//      and is not deletable - erasing attempt_questions empties it. If the live
+//      schema ever turns it into a real table, add it here AND to the cascade SQL.
+//      `platform_stats` is excluded too (a public aggregate, not personal data).
+//   3. Deletes the auth.users row (the cascade then removes anything still
+//      referencing it).
 //
 // Deploy (owner, one-time):
 //   supabase functions deploy delete-account --project-ref <ref>
