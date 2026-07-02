@@ -549,7 +549,7 @@ export function DomainPractice() {
 
             <div className="flex items-center justify-between mb-8">
               <span className="text-text-primary font-medium" id="question-count-label">
-                Number of Questions:
+                Number of questions:
               </span>
               <div className="flex items-center gap-3 md:gap-4" role="group" aria-labelledby="question-count-label">
                 <button

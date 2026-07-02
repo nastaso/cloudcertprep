@@ -856,16 +856,16 @@ export function MockExam() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <p className="text-text-muted text-sm mb-1">Pass Mark</p>
+                <p className="text-text-muted text-sm mb-1">Pass mark</p>
                 <p className="font-mono text-2xl font-semibold tabular-nums text-text-primary">{cert.passingScore}/1000</p>
               </div>
               <div>
-                <p className="text-text-muted text-sm mb-1">Time Taken</p>
-                <p className="font-mono text-2xl font-semibold tabular-nums text-text-primary">{formatTotalTime(Math.round(results!.timeTaken / 60))}</p>
+                <p className="text-text-muted text-sm mb-1">Time taken</p>
+                <p className="font-mono text-2xl font-semibold tabular-nums text-text-primary">{results!.timeTaken < 60 ? '<1m' : formatTotalTime(Math.round(results!.timeTaken / 60))}</p>
               </div>
             </div>
 
-            <h3 className="text-xl font-semibold text-text-primary mb-4">Domain Breakdown</h3>
+            <h3 className="text-xl font-semibold text-text-primary mb-4">Domain breakdown</h3>
             <div className="space-y-4">
               {cert.domains.map(domain => {
                 const score = results!.domainScores[String(domain.id)] ?? 0
@@ -1249,7 +1249,7 @@ export function MockExam() {
         <Modal isOpen={showEndModal} title="Ready to submit?" onClose={() => setShowEndModal(false)}>
           <div className="space-y-4">
             <p className="text-text-primary">You have answered <span className="font-bold">{answeredCount}</span> of {questions.length} questions.</p>
-            <p className="text-text-primary"><span className="font-bold">{flaggedCount}</span> questions are flagged for review.</p>
+            <p className="text-text-primary"><span className="font-bold">{flaggedCount}</span> {flaggedCount === 1 ? 'question is' : 'questions are'} flagged for review.</p>
             {answeredCount < questions.length && (
               <p className="text-warning text-sm" role="alert">
                 <span className="font-semibold">{questions.length - answeredCount} unanswered</span> {questions.length - answeredCount === 1 ? 'question is' : 'questions are'} marked incorrect on submit.
