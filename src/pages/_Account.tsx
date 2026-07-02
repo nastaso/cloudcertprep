@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { goToLogin } from '../lib/navigation'
 import { useAuth } from '../hooks/useAuth'
 import { useSEO } from '../hooks/useSEO'
 import { getSupabase } from '../lib/supabase'
+import { sweepAuthTokens, eraseLocalTraces } from '../lib/authCleanup'
 import { logError } from '../lib/logger'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
@@ -48,6 +49,21 @@ export function Account() {
   const [confirmText, setConfirmText] = useState('')
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  // Synchronous re-entrancy guard (note 1): setDeleting is async, so a
+  // state-only check lets rapid double-clicks both reach the invoke. Same
+  // idiom as _MockExam's submittingRef.
+  const deletingRef = useRef(false)
+
+  // If the session dies while the delete modal is open (cross-tab sign-out or
+  // deletion), the Delete button would silently no-op on `!user?.id` (note 4).
+  // Close the modal instead: the page behind it already swaps to the
+  // signed-out card. Never mid-delete (the local sign-out inside handleDelete
+  // must not close its own progress view before the redirect).
+  useEffect(() => {
+    if (!authLoading && !user && showDeleteModal && !deletingRef.current) {
+      setShowDeleteModal(false)
+    }
+  }, [authLoading, user, showDeleteModal])
 
   async function handleExport() {
     if (!user?.id) return
@@ -118,21 +134,49 @@ export function Account() {
 
   async function handleDelete() {
     if (!user?.id) return
+    if (deletingRef.current) return
+    deletingRef.current = true
+    const userId = user.id
     setDeleting(true)
     setDeleteError(null)
     try {
       const supabase = await getSupabase()
-      const { error } = await supabase.functions.invoke('delete-account', { method: 'POST' })
+      // 30s race (note 3): functions.invoke never times out on its own, and
+      // the modal is deliberately unclosable mid-delete - a hung request would
+      // lock the user on the spinner forever. The deletion itself is
+      // idempotent server-side, so timing out into the retry copy is safe.
+      const { error } = await Promise.race([
+        supabase.functions.invoke('delete-account', { method: 'POST' }),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('delete-account timed out after 30s')), 30000)),
+      ])
       if (error) throw error
       // The account (and session) no longer exist; clear the local token and
-      // leave the app. The home banner acknowledges the deletion.
+      // leave the app. The home banner acknowledges the deletion. signOut can
+      // itself reject at the storage layer, which used to land the user on
+      // /?account_deleted=1 with a live-looking token (signed-in hero under
+      // the "account deleted" toast) - the guaranteed sweep closes that (F6),
+      // and the traces erase keeps the deleted user's pending-attempt results
+      // from rehydrating for the next person in this tab (F7).
       await supabase.auth.signOut({ scope: 'local' }).catch(() => {})
+      sweepAuthTokens()
+      eraseLocalTraces(userId)
       window.location.assign('/?account_deleted=1')
     } catch (err: unknown) {
+      // FunctionsHttpError.message is a fixed string; log the response
+      // status/body too so a real failure is diagnosable (note 2).
       logError('Account.delete', err)
+      const ctx = (err as { context?: unknown }).context
+      if (ctx instanceof Response) {
+        const body = await ctx.clone().text().catch(() => '')
+        logError('Account.delete.context', { status: ctx.status, body: body.slice(0, 500) })
+      }
+      deletingRef.current = false
       setDeleting(false)
+      // Retry-first copy (note 5): the operation is idempotent, so "try
+      // again" is the accurate first suggestion; email stays the fallback.
       setDeleteError(
-        `We could not delete your account automatically. Please email ${SUPPORT_EMAIL} and we will erase it within 30 days.`,
+        `We could not delete your account. Please try again in a moment. If it keeps failing, email ${SUPPORT_EMAIL} and we will erase it within 30 days.`,
       )
     }
   }
