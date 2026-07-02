@@ -89,6 +89,10 @@ export function DomainPractice() {
   // failed start is a visible, retryable error instead of a dead Start button
   // (mirrors the mock exam's loadError). (item 7)
   const [loadError, setLoadError] = useState<string | null>(null)
+  // Save failure on finishPractice (hardening note 9): a swallowed error used
+  // to silently lose the session's progress (realistic since cross-tab
+  // account deletion mid-practice); the results screen shows this instead.
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [answering, setAnswering] = useState(false)
   const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null)
   // "End session early" confirm. Distinct from the leave guard: ending the
@@ -288,6 +292,7 @@ export function DomainPractice() {
   async function startPractice() {
     setLoading(true)
     setLoadError(null)
+    setSaveError(null)
     try {
       // Re-fetch mastery data so back-to-back sessions use fresh weights
       await refreshMastery()
@@ -420,6 +425,9 @@ export function DomainPractice() {
         await updateDomainProgress(user.id, selectedDomain!, cert.code)
       } catch (error: unknown) {
         logError('DomainPractice.finishPractice', error)
+        // Visible failure notice, mirroring _MockExam's save-failure copy: the
+        // user must know their progress was not recorded (note 9).
+        setSaveError('Your practice results could not be saved to your progress. You can still review your answers below.')
       }
     }
 
@@ -619,6 +627,11 @@ export function DomainPractice() {
     return (
       <div className="p-4 md:p-8">
           <div className="max-w-4xl mx-auto">
+            {saveError && (
+              <Alert tone="warning" role="alert" className="mb-4">
+                {saveError}
+              </Alert>
+            )}
             {/* Summary Header */}
             <Card padding="md" className="text-center mb-4 animate-enter">
               <h1 className="text-2xl md:text-3xl font-semibold text-text-primary mb-3">Practice session complete!</h1>

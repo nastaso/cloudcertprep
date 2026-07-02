@@ -273,3 +273,17 @@ export async function flushPendingAttempt(userId: string): Promise<boolean> {
     flushing = false
   }
 }
+
+/**
+ * Remove every pending-attempt artifact this module owns: the snapshot, the
+ * save intent, and the saved notice. Called on account deletion (hardening
+ * F7) so a deleted user's guest results can never rehydrate or flush for the
+ * next person in the same tab.
+ */
+export function clearPendingAttemptStorage(): void {
+  try { localStorage.removeItem(PENDING_KEY) } catch { /* ignore */ }
+  try {
+    sessionStorage.removeItem(SAVE_INTENT_KEY)
+    sessionStorage.removeItem(SAVED_NOTICE_KEY)
+  } catch { /* ignore */ }
+}
