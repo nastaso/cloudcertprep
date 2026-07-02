@@ -73,15 +73,11 @@ Primary key: `(user_id, cert_code, domain_id)`.
 
 **RLS:** enabled. `auth.uid() = user_id`.
 
-> **Known live-schema gotcha (found 2026-06-12):** production carries a CLF-era check constraint
-> `domain_progress_domain_id_check` that **rejects `domain_id = 5`** (23514), so AIF-C01 domain-5
-> progress upserts fail silently (the app only logs). `attempt_questions` is not affected. Fix
-> (pending owner run):
->
-> ```sql
-> ALTER TABLE public.domain_progress DROP CONSTRAINT domain_progress_domain_id_check;
-> ALTER TABLE public.domain_progress ADD CONSTRAINT domain_progress_domain_id_check CHECK (domain_id >= 1);
-> ```
+> **Resolved schema gotcha (found 2026-06-12, fixed by 2026-07-02):** production used to carry a
+> CLF-era check constraint `domain_progress_domain_id_check` that rejected `domain_id = 5`, so AIF-C01
+> domain-5 progress upserts failed silently. Confirmed fixed on prod (verified via
+> `pg_get_constraintdef`): the constraint now reads `CHECK (domain_id >= 1)`, which allows domain 5
+> (and any future domain). No further action needed.
 
 ---
 

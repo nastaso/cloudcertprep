@@ -778,8 +778,12 @@ export function MockExam() {
               just out of the primary action path. Copy is non-blocking:
               guest mode works fine, this is purely the upside of signing
               in. `safeFrom` in `goToLogin` returns the user to this exam
-              page after sign-in so friction is minimal. */}
-          {!user && (
+              page after sign-in so friction is minimal. The `!authLoading`
+              arm keeps it from flashing at a just-signed-in user during the
+              `?code=` exchange window, when `user` is still null (hardening
+              F5; CertDashboardIsland/_DomainPractice already do this). A real
+              guest resolves loading=false synchronously, so no pop for them. */}
+          {!user && !authLoading && (
             <div className="mt-4 md:mt-6">
               <UnlockCTA
                 onSignIn={() => goToLogin(navigate, location)}
@@ -863,8 +867,12 @@ export function MockExam() {
           {/* Guest signup CTA at the highest-intent moment — right after a
               completed exam (audit A1). Guests only; the message leads with the
               improvement angle on a fail and the save-your-win angle on a pass.
-              Reuses the permitted `unlock_cta_clicked` event via location. */}
-          {!user && (
+              Reuses the permitted `unlock_cta_clicked` event via location.
+              `!authLoading`: during the `?code=` exchange a just-signed-in
+              user is not a guest; without the arm this flashes "Sign in to
+              save" for the whole exchange window (hardening F5, part of F3's
+              flash). */}
+          {!user && !authLoading && (
             <UnlockCTA
               onSignIn={() => {
                 // Bind the stored snapshot to THIS save action: flushPendingAttempt
