@@ -69,7 +69,10 @@ One row per `(user_id, cert_code, domain_id)`. Materialised view of attempt_ques
 | `mastery_percent` | `numeric` NOT NULL | 0-100, `questions_correct / cert.domains[domain_id].questionCount * 100` |
 | `updated_at` | `timestamptz` NOT NULL | |
 
-Primary key: `(user_id, cert_code, domain_id)`.
+Primary key: `id` (uuid). The app's upsert conflict target is the separate UNIQUE constraint
+`(user_id, domain_id, cert_code)`. (Corrected 2026-07-02 against live prod via `pg_constraint`:
+this doc previously claimed the composite was the primary key - that layout exists on the TEST
+project, not on prod.)
 
 **RLS:** enabled. `auth.uid() = user_id`.
 
