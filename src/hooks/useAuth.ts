@@ -38,28 +38,47 @@ function setState(next: AuthState) {
   listeners.forEach(cb => cb())
 }
 
-function init() {
-  if (initialised || typeof window === 'undefined') return
-  initialised = true
-
-  // Best-effort sync check for a persisted Supabase session token. If none,
-  // resolve loading=false immediately so the logged-out chrome paints
-  // without a placeholder. A stale token only briefly keeps loading=true
-  // until getSession() confirms; never shows a logged-out user a flash.
-  //
-  // SYNC: same scan also lives at window.__ccHasSession (BaseLayout.astro
-  // inline pre-paint script). The two implementations must stay in lockstep.
-  // Inline scripts can't import TS modules, so this duplication is forced.
-  let hasToken = false
+// Best-effort sync check for a persisted Supabase session token.
+//
+// SYNC: same scan also lives at window.__ccHasSession (BaseLayout.astro
+// inline pre-paint script). The two implementations must stay in lockstep.
+// Inline scripts can't import TS modules, so this duplication is forced.
+function hasStoredToken(): boolean {
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i)
       if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) {
-        hasToken = true
-        break
+        return true
       }
     }
   } catch { /* localStorage unavailable */ }
+  return false
+}
+
+function init() {
+  if (initialised || typeof window === 'undefined') return
+  initialised = true
+
+  // If no token, resolve loading=false immediately so the logged-out chrome
+  // paints without a placeholder. A stale token only briefly keeps
+  // loading=true until getSession() confirms; never shows a logged-out user
+  // a flash.
+  const hasToken = hasStoredToken()
+
+  // bfcache restore: a restored page keeps its frozen React heap, so a user
+  // who signed out (or deleted their account) in another tab/page still
+  // renders as signed in here even though the class-level chrome heals
+  // (hardening F8). On restore, re-run the token scan and downgrade to guest
+  // when no token remains - the same shape as _Login's bfcache loading reset
+  // (#125). Upgrades are deliberately left to the next real navigation: a
+  // bare token proves nothing without a getSession round-trip.
+  window.addEventListener('pageshow', (e: PageTransitionEvent) => {
+    if (!e.persisted) return
+    if (!hasStoredToken() && state.user !== null) {
+      prevUser = null
+      setState({ user: null, loading: false })
+    }
+  })
 
   // An OAuth / magic-link / recovery callback returns as `?code=...` on whatever
   // page `redirectTo` pointed at. For OAuth that is wherever the user started
