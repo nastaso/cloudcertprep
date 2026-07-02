@@ -1,10 +1,10 @@
-﻿import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef, Fragment } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Flag, AlertCircle, LayoutGrid } from 'lucide-react'
+import { Flag, AlertCircle, LayoutGrid, Heart, ArrowLeft } from 'lucide-react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
-import { filterChipClass, reviewCellClass } from '../lib/buttonStyles'
+import { buttonClass, filterChipClass, reviewCellClass } from '../lib/buttonStyles'
 import { useTimer } from '../hooks/useTimer'
 import { useAuth } from '../hooks/useAuth'
 import { useSEO } from '../hooks/useSEO'
@@ -15,10 +15,12 @@ import { OrderingInput } from '../components/OrderingInput'
 import { MatchingInput } from '../components/MatchingInput'
 import { Modal } from '../components/Modal'
 import { PassFailBanner } from '../components/PassFailBanner'
+import { ShareResultButton } from '../components/ShareResultButton'
+import { buildPassShareText } from '../lib/shareResult'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { QuestionReviewCard } from '../components/QuestionReviewCard'
 import { UnlockCTA } from '../components/landing/UnlockCTA'
-import { selectExamQuestions, calculateScaledScore, isPassed, getDomainScore, formatTime, formatDuration, isAnswerCorrect, correctAnswerFor, getExamDomainTargets } from '../lib/scoring'
+import { selectExamQuestions, calculateScaledScore, isPassed, getDomainScore, formatTime, formatTotalTime, isAnswerCorrect, correctAnswerFor, getExamDomainTargets, computeExamTiming } from '../lib/scoring'
 import { getSupabase } from '../lib/supabase'
 import { logError } from '../lib/logger'
 import { updateDomainProgress } from '../lib/supabaseUtils'
@@ -27,12 +29,48 @@ import type { Question, OptionKey } from '../types'
 import { loadAllQuestions } from '../data/questions'
 import { shuffleAndMapQuestions, toggleMultiAnswer, getQuestionType, encodeAnswerForDb, type OptionKeyMap } from '../lib/utils'
 import { trackEvent, trackPageView } from '../lib/analytics'
-import { MIN_VALID_EXAM_SECONDS, MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
-import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave } from '../lib/examGuard'
-import { storePendingAttempt, consumePendingAttemptSavedNotice, PENDING_ATTEMPT_SAVED_EVENT } from '../lib/pendingAttempt'
+import { KOFI_URL } from '../lib/constants'
+import { MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
+import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave, SIGN_OUT_SENTINEL, markIntentionalLeave } from '../lib/examGuard'
+import { useSignOut } from '../hooks/useSignOut'
+import { storePendingAttempt, consumePendingAttemptSavedNotice, markPendingAttemptSaveIntent, PENDING_ATTEMPT_SAVED_EVENT, peekPendingAttempt, hasPendingAttemptSaveIntent, type PendingAttempt } from '../lib/pendingAttempt'
 import { getProviderLabel } from '../data/certifications'
+import { findNextDomainAction } from '../lib/domainStats'
 
 type ExamScreen = 'start' | 'exam' | 'results' | 'review'
+
+// Marker set when a guest leaves the RESULTS screen toward /login, so returning
+// via "Continue as guest" re-shows that result instead of a fresh start screen
+// (P1-6). sessionStorage survives the full reload that "Continue as guest" does.
+const RESUME_RESULTS_KEY = 'cc_resume_results'
+
+/**
+ * Map a stored guest PendingAttempt back into the results-screen state shape
+ * (P1-6). Read-only re-display: the summary + per-domain breakdown need only
+ * isCorrect / domainId. The full per-question REVIEW needs the loaded Question
+ * objects, which a fresh remount does not have, so the review button is hidden
+ * for a rehydrated attempt (the results screen gates review on questions.length).
+ */
+function rebuildResultsFromPending(pending: PendingAttempt) {
+  const a = pending.attempt
+  return {
+    scaledScore: a.scaled_score,
+    percentScore: a.score_percent,
+    passed: a.passed,
+    correctCount: a.correct_answers,
+    totalQuestions: a.total_questions,
+    timeTaken: a.time_taken_seconds,
+    domainScores: a.domain_scores,
+    questionResults: pending.questions.map(q => ({
+      questionId: q.question_id,
+      domainId: q.domain_id,
+      userAnswer: q.user_answer,
+      correctAnswer: q.correct_answer,
+      isCorrect: q.is_correct,
+      wasFlagged: q.was_flagged,
+    })),
+  }
+}
 
 interface QuestionState {
   userAnswer: string | string[] | null
@@ -57,8 +95,12 @@ function ExamQuestionGrid({
   onSelect: (idx: number) => void
   variant?: 'sidebar' | 'modal'
 }) {
+  // 'modal' fills the narrow mobile sheet with a 5-col grid; 'sidebar' is the
+  // slim in-exam navigator.
+  const containerClass = `grid grid-cols-5 gap-2${variant === 'modal' ? ' max-h-96 overflow-y-auto' : ''}`
+  const cellSize = variant === 'modal' ? 'w-full aspect-square' : 'w-10 h-10'
   return (
-    <div className={`grid grid-cols-5 gap-2${variant === 'modal' ? ' max-h-96 overflow-y-auto' : ''}`}>
+    <div className={containerClass}>
       {questions.map((_, idx) => {
         const state = answers.get(idx)
         const isAnswered = isQuestionAnswered(state)
@@ -76,13 +118,11 @@ function ExamQuestionGrid({
             onClick={() => onSelect(idx)}
             aria-label={ariaLabel}
             aria-current={isCurrent ? 'true' : undefined}
-            className={`relative ${variant === 'sidebar' ? 'w-10 h-10' : 'w-full aspect-square'} rounded text-sm font-medium transition-colors ${
-              isCurrent
-                ? 'bg-brand text-on-brand'
-                : isAnswered
+            className={`relative ${cellSize} rounded text-sm font-medium transition-colors focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand ${
+              isAnswered
                 ? 'bg-brand/30 text-text-primary hover:bg-brand/50'
                 : 'bg-bg-dark text-text-muted hover:bg-bg-card-hover'
-            }`}
+            }${isCurrent ? ' ring-2 ring-inset ring-brand' : ''}`}
           >
             {idx + 1}
             {isFlagged && (
@@ -99,7 +139,8 @@ export function MockExam() {
   const navigate = useNavigate()
   const location = useLocation()
   const { goHome } = useCertNavigate()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
+  const signOut = useSignOut()
   const cert = useCert()
   const [screen, setScreen] = useState<ExamScreen>('start')
   const [questions, setQuestions] = useState<Question[]>([])
@@ -114,9 +155,6 @@ export function MockExam() {
   // an active exam. Opens in a new tab so nothing is lost, but a confirm keeps
   // the user from wandering off while the timer burns (Alex, 2026-06-13).
   const [pendingExternalUrl, setPendingExternalUrl] = useState<string | null>(null)
-  // One-shot success notice: a guest attempt stored before sign-in was flushed
-  // to the account (see lib/pendingAttempt.ts), shown once on the start screen.
-  const [attemptSavedNotice, setAttemptSavedNotice] = useState(false)
   const [results, setResults] = useState<{
     scaledScore: number
     percentScore: number
@@ -142,6 +180,10 @@ export function MockExam() {
   // flips synchronously, so the save body runs at most once per attempt.
   const submittingRef = useRef(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  // Set when a SIGNED-IN submit is skipped as too short (or a backward clock jump
+  // makes a completed attempt look sub-minute): the results screen renders a full
+  // score, so without this the not-saved state would be silent. (item 2)
+  const [tooShortNotSaved, setTooShortNotSaved] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [startTime, setStartTime] = useState<number>(0)
   const [reviewFilter, setReviewFilter] = useState<'all' | 'incorrect' | 'flagged'>('all')
@@ -243,6 +285,9 @@ export function MockExam() {
       const isExternal = anchor.target === '_blank' || url.origin !== window.location.origin
       e.preventDefault()
       e.stopPropagation()
+      // If the click came from the (now exam-available) mobile drawer, close it
+      // so the leave-confirm modal isn't hidden behind it (bug 19).
+      window.dispatchEvent(new Event('cc:close-drawer'))
       if (isExternal) {
         setPendingExternalUrl(url.href)
       } else {
@@ -253,17 +298,22 @@ export function MockExam() {
     return () => document.removeEventListener('click', onClickCapture, true)
   }, [screen])
 
-  // Surface the one-shot "attempt saved" notice: a guest finished an exam,
-  // clicked "Sign in to save this attempt", and the pending attempt was
-  // flushed to their account during sign-in (lib/pendingAttempt.ts). The
-  // flush races this island's remount, so check the flag now AND listen for
-  // the saved event in case the flush lands after mount.
+  // After a guest signs in to save their attempt, the pending attempt is flushed
+  // to their account during sign-in (lib/pendingAttempt.ts). Send them to their
+  // history to SEE the saved attempt, rather than dropping them back on a bare
+  // exam start screen with a toast that could re-appear on later visits (bugs
+  // 14 + 15). The flush races this island's remount, so check the one-shot flag
+  // now AND listen for the saved event in case the flush lands after mount; the
+  // flag is consumed exactly once, so this navigates a single time.
+  // While the just-signed-in flush is in flight, show a "Saving..." state on the
+  // start screen instead of flashing the bare exam intro before the redirect.
+  const [savingToHistory, setSavingToHistory] = useState(false)
   useEffect(() => {
     const consume = () => {
-      if (consumePendingAttemptSavedNotice()) setAttemptSavedNotice(true)
+      // ?saved=1 -> /history shows a "saved to your history" confirmation banner.
+      if (consumePendingAttemptSavedNotice()) window.location.assign('/history?saved=1')
     }
-    // Deferred (not called synchronously in the effect body) so the mount
-    // commit settles before any state update.
+    // Deferred so the mount commit settles before the navigation.
     const t = window.setTimeout(consume, 0)
     window.addEventListener(PENDING_ATTEMPT_SAVED_EVENT, consume)
     return () => {
@@ -271,6 +321,61 @@ export function MockExam() {
       window.removeEventListener(PENDING_ATTEMPT_SAVED_EVENT, consume)
     }
   }, [])
+
+  // A user who lands here with a pending guest attempt + a live save intent is
+  // about to have it flushed + be redirected to /history (above). Show a loader
+  // instead of the bare intro/results screen so they don't see it flash. Two arms:
+  //  - a resolved `user` (email/password return: the session is present on landing), OR
+  //  - auth still RESOLVING (`authLoading`): the OAuth / magic-link return lands on
+  //    this exam route as `?code=...` with NO session yet, and useAuth holds
+  //    loading=true for the whole PKCE exchange (~1s+ on a mid-range phone). Without
+  //    this arm `user` is null for the exchange window and the bare results screen
+  //    shows (the guest rehydrate below swaps to results while user is null). The arm
+  //    is deliberately screen-agnostic for that reason; only mid-exam/review are
+  //    excluded. The 8s fallback drops the loader if no flush ultimately lands (e.g.
+  //    a failed exchange). The flush itself is intent-gated (PR-3), so a stale
+  //    no-intent pending attempt never shows the spinner. (item 4b)
+  useEffect(() => {
+    if ((!user && !authLoading) || (screen !== 'start' && screen !== 'results')) return
+    const t = window.setTimeout(() => {
+      if (peekPendingAttempt() && hasPendingAttemptSaveIntent()) setSavingToHistory(true)
+    }, 0)
+    return () => window.clearTimeout(t)
+  }, [user, authLoading, screen])
+  // Fallback: if the flush never completes (e.g. it failed), drop the loader
+  // after a few seconds so the user is never stuck on it.
+  useEffect(() => {
+    if (!savingToHistory) return
+    const t = window.setTimeout(() => setSavingToHistory(false), 8000)
+    return () => window.clearTimeout(t)
+  }, [savingToHistory])
+
+  // Rehydrate a guest's just-finished attempt after a /login round-trip (P1-6).
+  // "Continue as guest" reloads the exam route, remounting this island at the
+  // START screen with the in-memory results gone. Only when the guest explicitly
+  // left the RESULTS screen toward login (RESUME_RESULTS_KEY) AND a still-valid
+  // snapshot exists for THIS cert do we re-show the results summary, so a
+  // returning guest who just wants a fresh exam is never trapped on an old
+  // result. Read-only: peekPendingAttempt does not consume the snapshot.
+  useEffect(() => {
+    if (user || results || screen !== 'start') return
+    let marker: string | null = null
+    try { marker = sessionStorage.getItem(RESUME_RESULTS_KEY) } catch { /* ignore */ }
+    if (!marker) return
+    // Consume the marker regardless of outcome so it cannot replay later.
+    try { sessionStorage.removeItem(RESUME_RESULTS_KEY) } catch { /* ignore */ }
+    if (marker !== cert.code) return
+    const pending = peekPendingAttempt()
+    if (!pending || pending.certCode !== cert.code) return
+    // Deferred (not called synchronously in the effect body) so the mount commit
+    // settles before the screen swap, matching the saved-notice effect above.
+    const t = window.setTimeout(() => {
+      setResults(rebuildResultsFromPending(pending))
+      setScreen('results')
+    }, 0)
+    return () => window.clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, cert.code])
 
   function handleTimeUp() {
     const answeredCount = Array.from(answers.values()).filter(isQuestionAnswered).length
@@ -292,6 +397,16 @@ export function MockExam() {
       setOptionKeyMaps(keyMaps)
       setAnswers(new Map())
       setCurrentIndex(0)
+      // Reset transient modal / notice flags so a retake starts clean. A manual
+      // submit leaves showEndModal=true; without this the "Ready to submit?"
+      // modal re-opens over question 1 of the retake (and a reflex "Submit for
+      // grading" instantly grades the fresh exam 0/total). (item 1)
+      setShowEndModal(false)
+      setShowQuestionNav(false)
+      setPendingLeaveUrl(null)
+      setPendingExternalUrl(null)
+      setSubmitError(null)
+      setTooShortNotSaved(false)
       submittingRef.current = false // re-arm the dup-submit guard for this fresh attempt
       setScreen('exam')
       setStartTime(Date.now())
@@ -388,12 +503,15 @@ export function MockExam() {
     // Clear any stale submit error from a previous attempt so a later
     // successful save doesn't keep showing "could not be saved". (M0b)
     setSubmitError(null)
+    setTooShortNotSaved(false)
     timer.pause()
 
-    const timeTaken = Math.floor((Date.now() - startTime) / 1000)
+    // Clamp the duration and the too-short test against a non-monotonic clock
+    // (device sleep, NTP / manual jumps), so a forward jump can't inflate the
+    // saved time and a backward jump can't discard a completed attempt. (item 3)
+    const { timeTaken, isTooShort } = computeExamTiming(startTime, Date.now(), cert.examTimeSeconds)
     const isGuest = !user
-    const isTooShort = timeTaken < MIN_VALID_EXAM_SECONDS
-    
+
     const results = questions.map((q, idx) => {
       const state = answers.get(idx)
       const type = getQuestionType(q)
@@ -511,6 +629,12 @@ export function MockExam() {
             domain_id: r.domainId,
           })),
         })
+      } else if (!isGuest && isTooShort) {
+        // Signed in, but the run was too short to count as a real attempt, so
+        // nothing is persisted. The results screen still renders a full score, so
+        // surface an explicit "not saved" notice rather than dropping it silently
+        // (the guest path at least has its own sign-in CTA). (item 2)
+        setTooShortNotSaved(true)
       }
     } catch (error: unknown) {
       logError('MockExam.submitExam', error)
@@ -542,29 +666,71 @@ export function MockExam() {
   const answeredCount = Array.from(answers.values()).filter(isQuestionAnswered).length
   const flaggedCount = Array.from(answers.values()).filter(s => s.flagged).length
 
+  // Guest-save loader, hoisted ABOVE the screen switch (hardening F3). The
+  // arm effect is deliberately screen-agnostic (start OR results), but the
+  // sole render consumer used to live inside the 'start' branch only - which
+  // the OAuth return never shows: the rehydrate effect swaps to 'results'
+  // one task later, so the loader was unreachable on the exact path it was
+  // built for and the bare results screen + stale "Sign in to save" CTA
+  // flashed until the redirect (#125 fixed the email path only). Mirrors the
+  // arm effect's own screen exclusions: never over an active exam or review.
+  if (savingToHistory && (screen === 'start' || screen === 'results')) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-8">
+        <LoadingSpinner text="Saving your attempt..." />
+      </div>
+    )
+  }
+
   if (screen === 'start') {
     return (
       <div className="p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
-          {attemptSavedNotice && (
-            <Alert tone="success" className="mb-4 p-4 animate-enter">
-              Your exam attempt was saved to your history.
-            </Alert>
-          )}
           <Card padding="lg">
             <h1 className="text-2xl md:text-3xl font-semibold text-text-primary mb-3 md:mb-4">{cert.shortName} Practice Exam</h1>
             <p className="text-sm md:text-base text-text-muted mb-6 md:mb-8">{cert.examQuestionCount} questions, {Math.round(cert.examTimeSeconds / 60)} minutes. No answer feedback during exam.</p>
 
             <div className="bg-bg-dark rounded-xl p-4 md:p-6 mb-6 md:mb-8">
-              <h2 className="text-lg md:text-xl font-semibold text-text-primary mb-3 md:mb-4">Domain Breakdown</h2>
-              <div className="space-y-1.5 md:space-y-2 text-sm md:text-base text-text-muted">
-                {(() => {
-                  const targets = getExamDomainTargets(cert)
-                  return cert.domains.map(d => (
-                    <p key={d.id}>- {targets[d.id]} {d.name} ({Math.round(d.examProportion * 100)}%)</p>
-                  ))
-                })()}
-              </div>
+              <h2 className="text-lg md:text-xl font-semibold text-text-primary mb-3 md:mb-4">Domain breakdown</h2>
+              {(() => {
+                const targets = getExamDomainTargets(cert)
+                return (
+                  <>
+                    {/* Mobile: the aligned 3-column headers ("QUESTIONS"/"% OF EXAM")
+                        are too wide for a phone - they squeezed the domain names into
+                        3-line wraps. Use a compact "16 · 24%" row with a single
+                        clarifying caption instead. */}
+                    <div className="md:hidden">
+                      <p className="mb-2 text-right text-[11px] uppercase tracking-wide text-text-muted">Questions · % of exam</p>
+                      {/* text-[13px] so the longer AIF domain names ("Security,
+                          Compliance, and Governance") fit on one line on a phone. */}
+                      <ul className="space-y-2 text-[13px]">
+                        {cert.domains.map(d => (
+                          <li key={d.id} className="flex items-baseline justify-between gap-3">
+                            <span className="min-w-0 text-text-muted">{d.name}</span>
+                            <span className="shrink-0 font-mono tabular-nums whitespace-nowrap font-medium text-text-primary">
+                              {targets[d.id]}<span className="ml-1.5 font-normal text-text-muted">· {Math.round(d.examProportion * 100)}%</span>
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    {/* Desktop: aligned columns under their headers (bug 10). */}
+                    <div className="hidden md:grid grid-cols-[1fr_auto_auto] items-baseline gap-x-8 text-base">
+                      <span aria-hidden="true" />
+                      <span className="justify-self-end pb-1.5 text-[11px] font-medium uppercase tracking-wide text-text-muted">Questions</span>
+                      <span className="justify-self-end pb-1.5 text-[11px] font-medium uppercase tracking-wide text-text-muted">% of exam</span>
+                      {cert.domains.map(d => (
+                        <Fragment key={d.id}>
+                          <span className="py-1 text-text-muted">{d.name}</span>
+                          <span className="py-1 justify-self-end font-mono tabular-nums font-medium text-text-primary">{targets[d.id]}</span>
+                          <span className="py-1 justify-self-end font-mono tabular-nums text-text-muted">{Math.round(d.examProportion * 100)}%</span>
+                        </Fragment>
+                      ))}
+                    </div>
+                  </>
+                )
+              })()}
             </div>
 
             <Alert tone="warning" className="mb-6 md:mb-8">
@@ -581,7 +747,10 @@ export function MockExam() {
               </Alert>
             )}
 
-            <div className="flex flex-col md:flex-row gap-3 md:gap-4">
+            {/* flex-col-reverse on mobile so the PRIMARY 'Start exam' (last in
+                DOM, kept right on desktop) stacks on TOP when the row wraps -
+                the primary action should lead, not the 'Back to home' escape. */}
+            <div className="flex flex-col-reverse md:flex-row gap-3 md:gap-4">
               <Button
                 onClick={goHome}
                 disabled={loading}
@@ -612,13 +781,17 @@ export function MockExam() {
               just out of the primary action path. Copy is non-blocking:
               guest mode works fine, this is purely the upside of signing
               in. `safeFrom` in `goToLogin` returns the user to this exam
-              page after sign-in so friction is minimal. */}
-          {!user && (
+              page after sign-in so friction is minimal. The `!authLoading`
+              arm keeps it from flashing at a just-signed-in user during the
+              `?code=` exchange window, when `user` is still null (hardening
+              F5; CertDashboardIsland/_DomainPractice already do this). A real
+              guest resolves loading=false synchronously, so no pop for them. */}
+          {!user && !authLoading && (
             <div className="mt-4 md:mt-6">
               <UnlockCTA
                 onSignIn={() => goToLogin(navigate, location)}
                 location="mock_exam_start"
-                title="Sign in to save this attempt"
+                title="Save your score and progress"
                 body="Guest mode is fully functional, but your score, time, and per-domain breakdown will not be saved to your history."
                 ctaLabel="Sign in to save this attempt"
                 noTopMargin
@@ -630,18 +803,52 @@ export function MockExam() {
     )
   }
 
-  if (screen === 'results') return (
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="max-w-2xl w-full space-y-6 animate-enter">
+    if (screen === 'results') return (
+      // Top-aligned (was flex items-center, which vertically centered a tall card
+      // and left a large empty band above it). pt-6/8 starts the result near the
+      // top consistently; mx-auto keeps it horizontally centered (bug 16).
+      <div className="flex-1 px-4 pt-6 md:pt-8 pb-12">
+        <div className="max-w-2xl mx-auto w-full space-y-5 animate-enter">
+          <h1 className="sr-only">{cert.shortName} Exam Results</h1>
+
           <PassFailBanner
             passed={results!.passed}
             scaledScore={results!.scaledScore}
             percent={results!.percentScore}
           />
-
+          {/* Share affordance lives WITH the banner (the celebration moment),
+              not in the bottom action stack, which stays donate's territory.
+              Pass only, per owner decision: a fail screen stays focused on
+              its real actions (weakest-domain practice / sign-in CTA), so no
+              share/copy affordance is shown there. Guests get it too, since a
+              pre-signup share is pure top-of-funnel, but the quiet pill styling
+              keeps it secondary to UnlockCTA. Score data never rides in the
+              shared URL. (Growth Build 1, phase 1) */}
+          {results!.passed && (
+            <div className="flex justify-end">
+              <ShareResultButton
+                text={buildPassShareText({
+                  certShortName: cert.shortName,
+                  scaledScore: results!.scaledScore,
+                  correctCount: results!.correctCount,
+                  totalQuestions: results!.totalQuestions,
+                })}
+                label="Share my result"
+                analytics={{
+                  cert: cert.code,
+                  authed: Boolean(user),
+                }}
+              />
+            </div>
+          )}
           {submitError && (
             <Alert tone="warning">
               {submitError}
+            </Alert>
+          )}
+          {tooShortNotSaved && (
+            <Alert tone="warning">
+              This attempt was too short to be saved to your history.
             </Alert>
           )}
 
@@ -659,7 +866,7 @@ export function MockExam() {
               </div>
               <div>
                 <p className="text-text-muted text-sm mb-1">Time Taken</p>
-                <p className="font-mono text-2xl font-semibold tabular-nums text-text-primary">{formatDuration(results!.timeTaken)}</p>
+                <p className="font-mono text-2xl font-semibold tabular-nums text-text-primary">{formatTotalTime(Math.round(results!.timeTaken / 60))}</p>
               </div>
             </div>
 
@@ -688,10 +895,23 @@ export function MockExam() {
           {/* Guest signup CTA at the highest-intent moment — right after a
               completed exam (audit A1). Guests only; the message leads with the
               improvement angle on a fail and the save-your-win angle on a pass.
-              Reuses the permitted `unlock_cta_clicked` event via location. */}
-          {!user && (
+              Reuses the permitted `unlock_cta_clicked` event via location.
+              `!authLoading`: during the `?code=` exchange a just-signed-in
+              user is not a guest; without the arm this flashes "Sign in to
+              save" for the whole exchange window (hardening F5, part of F3's
+              flash). */}
+          {!user && !authLoading && (
             <UnlockCTA
-              onSignIn={() => goToLogin(navigate, location)}
+              onSignIn={() => {
+                // Bind the stored snapshot to THIS save action: flushPendingAttempt
+                // only writes it to the account that completes this sign-in, so a
+                // passive/unrelated sign-in on a shared device never adopts it.
+                markPendingAttemptSaveIntent(cert.code)
+                // Remember to re-show this result if the guest returns via
+                // "Continue as guest" instead of signing in (P1-6).
+                try { sessionStorage.setItem(RESUME_RESULTS_KEY, cert.code) } catch { /* ignore */ }
+                goToLogin(navigate, location)
+              }}
               location="exam_results"
               title={results!.passed ? 'Sign in to save this win' : 'Sign in to target your weak domains'}
               body={
@@ -704,19 +924,48 @@ export function MockExam() {
           )}
 
           <div className="mt-6 space-y-3">
-            <Button
-              onClick={() => {
-                setReviewFilter('all')
-                setReviewDomainFilter(null)
-                setReviewQuestionIndex(0)
-                window.scrollTo(0, 0)
-                setScreen('review')
-              }}
-              variant="primary"
-              fullWidth
-            >
-              Review questions
-            </Button>
+            {/* Signed-in FAIL: route the moment of highest motivation straight
+                into targeted domain practice (M5; guests get the adaptive
+                UnlockCTA above instead). Weakest here is THIS exam's per-domain
+                accuracy (results.domainScores), a legitimate "weakest" for the
+                moment. Real anchor, not a router push: domain-practice is a
+                separate Astro document with its own chrome (see useCertNavigate
+                M0c). Brand variant = the platform's "start practising" action. */}
+            {user && !results!.passed && (() => {
+              const weakest = findNextDomainAction(cert.domains.map(d => ({
+                domainId: d.id,
+                percent: results!.domainScores[String(d.id)] ?? 0,
+                practiced: true,
+              })))
+              const weakestDomain = weakest ? cert.domains.find(d => d.id === weakest.domainId) : undefined
+              return weakestDomain ? (
+                <a
+                  href={`/${cert.provider}/${cert.code}/domain-practice?domain=${weakestDomain.id}`}
+                  className={buttonClass({ variant: 'brand', fullWidth: true })}
+                >
+                  Practice your weakest domain: {weakestDomain.name}
+                </a>
+              ) : null
+            })()}
+            {/* Per-question review needs the loaded Question objects. A snapshot
+                rehydrate (P1-6) has none (questions stays empty on a fresh remount),
+                so gate on questions.length. Stateless, so it also stays correct
+                after a rehydrate -> Retake -> real exam, where a flag would go stale. */}
+            {questions.length > 0 && (
+              <Button
+                onClick={() => {
+                  setReviewFilter('all')
+                  setReviewDomainFilter(null)
+                  setReviewQuestionIndex(0)
+                  window.scrollTo(0, 0)
+                  setScreen('review')
+                }}
+                variant="primary"
+                fullWidth
+              >
+                Review questions
+              </Button>
+            )}
             <div className="flex gap-4">
               <Button onClick={goHome} variant="secondary" className="flex-1">
                 Back to home
@@ -732,6 +981,26 @@ export function MockExam() {
                 Retake exam
               </Button>
             </div>
+
+            {/* Quiet support ask at the highest-intent moment (just finished an
+                exam). Results screen only, never mid-exam, no orange (that is
+                for exam CTAs). One of three donate surfaces; distinct location. */}
+            <a
+              href={KOFI_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent('donate_click', { location: 'results' })}
+              className="block rounded-2xl border border-border-hairline bg-bg-card p-5 text-center transition-colors duration-200 hover:border-text-muted/40"
+            >
+              <p className="text-sm font-semibold text-text-primary">CloudCertPrep is free, and stays free.</p>
+              <p className="mt-1 text-sm text-text-muted">
+                It runs on Ko-fi tips, not ads. If this helped you study, you can buy me a coffee.
+              </p>
+              <span className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-text-primary">
+                <Heart className="w-4 h-4 text-danger" fill="currentColor" aria-hidden="true" />
+                Buy me a coffee
+              </span>
+            </a>
           </div>
         </div>
       </div>
@@ -739,7 +1008,12 @@ export function MockExam() {
 
   if (screen === 'exam' && currentQuestion) {
     return (
-      <div className="bg-bg-dark">
+      // Fade the exam screen in on entry. The intro card (max-w-2xl) and the
+      // in-exam layout (max-w-7xl, needs the width for the question navigator)
+      // are intentionally different widths; a cross-screen fade reads as
+      // "entered the exam" instead of the content jarringly reflowing wider.
+      // Opacity-only + reduced-motion-safe. (M3 [O])
+      <div className="bg-bg-dark animate-fade-in">
         {/* Visually-hidden page heading so the active exam's outline starts at
             h1 (the exam) -> h2 (the question) instead of opening on an orphan h2.
             Screen-reader only; no visual change. */}
@@ -748,7 +1022,7 @@ export function MockExam() {
             so it reads as a subordinate toolbar under the site header rather
             than a second heavy header bar. Sticks to the top while scrolling.
             Carries question position, a thin answered-progress bar, the timer,
-            and the End exam action. */}
+            and the Submit exam action. */}
         <div className="sticky top-0 z-30 bg-bg-card/95 backdrop-blur-sm border-b border-text-muted/15 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
@@ -770,15 +1044,15 @@ export function MockExam() {
               </div>
               <TimerAnnouncer seconds={timer.seconds} />
               <Button onClick={() => setShowEndModal(true)} variant="secondary" size="sm">
-                End exam
+                Submit exam
               </Button>
             </div>
           </div>
           {/* Answered-progress indicator */}
           <div className="h-1 bg-bg-dark" role="presentation">
             <div
-              className="h-full bg-brand transition-all duration-300"
-              style={{ width: `${questions.length ? (answeredCount / questions.length) * 100 : 0}%` }}
+              className="h-full w-full origin-left bg-brand transition-transform duration-settle ease-out"
+              style={{ transform: `scaleX(${questions.length ? answeredCount / questions.length : 0})` }}
             />
           </div>
         </div>
@@ -806,11 +1080,13 @@ export function MockExam() {
             </Button>
 
             <Card className="mb-3">
-              <div className="hidden lg:flex items-center justify-end mb-2">
-                <span className="text-text-muted text-xs md:text-sm">Question {currentIndex + 1} of {questions.length}</span>
-              </div>
-
-              <h2 className="text-base md:text-lg text-text-primary mb-4 md:mb-5">
+              {/* (No in-card "Question X of Y": the sticky toolbar above already
+                  shows it persistently - it was rendered twice on desktop.) */}
+              {/* cc-question-stem overrides the global `h1,h2 { text-wrap: balance }`
+                  (index.css): balance equalizes line lengths, which on a 2-sentence
+                  question stem forces an early break with a big trailing gap (reads
+                  as "wrapped wrong"). Body-length text wants greedy wrapping. */}
+              <h2 className="cc-question-stem text-base md:text-lg text-text-primary mb-4 md:mb-5">
                 {currentQuestion.question}
                 {currentType === 'multi' && (
                   <span className="text-text-primary font-semibold ml-2">(Select {Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER})</span>
@@ -897,7 +1173,7 @@ export function MockExam() {
               <button
                 onClick={toggleFlag}
                 aria-pressed={!!currentState?.flagged}
-                className={`flex items-center gap-2 min-h-[44px] px-4 py-2 md:py-2.5 rounded-lg transition-colors text-sm ${
+                className={`flex items-center gap-2 min-h-[44px] px-4 py-2 md:py-2.5 rounded-lg transition-colors text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-card ${
                   currentState?.flagged
                     ? 'bg-warning/20 text-warning border border-warning'
                     : 'bg-bg-dark text-text-muted hover:text-text-primary'
@@ -914,15 +1190,16 @@ export function MockExam() {
                 disabled={currentIndex === 0}
                 variant="secondary"
                 className="flex-1"
+                leftIcon={<ArrowLeft className="w-5 h-5" aria-hidden="true" />}
               >
                 Previous
               </Button>
               {currentIndex === questions.length - 1 ? (
                 <Button onClick={() => setShowEndModal(true)} variant="primary" className="flex-1">
-                  End exam
+                  Submit exam
                 </Button>
               ) : (
-                <Button onClick={nextQuestion} variant="secondary" className="flex-1">
+                <Button onClick={nextQuestion} variant="secondary" className="flex-1" arrow>
                   Next
                 </Button>
               )}
@@ -939,6 +1216,13 @@ export function MockExam() {
                 currentIndex={currentIndex}
                 onSelect={goToQuestion}
               />
+              {/* Legend: the grid's colors were previously unexplained. */}
+              <ul className="mt-4 pt-3 border-t border-border-hairline/60 grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px] text-text-muted list-none p-0 m-0">
+                <li className="flex items-center gap-1.5"><span className="h-3 w-3 flex-shrink-0 rounded-sm bg-brand/30" aria-hidden="true" /> Answered</li>
+                <li className="flex items-center gap-1.5"><span className="h-3 w-3 flex-shrink-0 rounded-sm bg-bg-dark border border-border-hairline" aria-hidden="true" /> Unanswered</li>
+                <li className="flex items-center gap-1.5"><span className="h-3 w-3 flex-shrink-0 rounded-sm ring-2 ring-inset ring-brand" aria-hidden="true" /> Current</li>
+                <li className="flex items-center gap-1.5"><Flag className="h-3 w-3 flex-shrink-0 text-warning fill-warning" aria-hidden="true" /> Flagged</li>
+              </ul>
             </div>
             </div>
           </div>
@@ -961,8 +1245,12 @@ export function MockExam() {
           </div>
         </Modal>
 
-        {/* End Exam Modal */}
-        <Modal isOpen={showEndModal} title="End exam" onClose={() => setShowEndModal(false)}>
+        {/* Final submit confirm + summary - opened by both the toolbar and the
+            last-question "Submit exam" buttons. Shows answered/flagged/
+            unanswered counts + the unanswered warning before the irreversible
+            "Submit for grading". (Replaces the removed review screen, whose job
+            the question sidebar/modal navigator already covered.) */}
+        <Modal isOpen={showEndModal} title="Ready to submit?" onClose={() => setShowEndModal(false)}>
           <div className="space-y-4">
             <p className="text-text-primary">You have answered <span className="font-bold">{answeredCount}</span> of {questions.length} questions.</p>
             <p className="text-text-primary"><span className="font-bold">{flaggedCount}</span> questions are flagged for review.</p>
@@ -978,10 +1266,10 @@ export function MockExam() {
             ) : (
               <div className="flex gap-4 mt-6">
                 <Button onClick={() => setShowEndModal(false)} variant="secondary" className="flex-1">
-                  Go back
+                  Keep reviewing
                 </Button>
                 <Button onClick={handleSubmitExam} variant="primary" className="flex-1">
-                  Submit exam
+                  Submit for grading
                 </Button>
               </div>
             )}
@@ -991,27 +1279,39 @@ export function MockExam() {
         {/* Custom leave-confirm modal — replaces the native beforeunload dialog
             for intercepted in-app navigation. Leaving discards the in-progress
             attempt (exam state lives in this island's memory), so this is a real
-            confirm, not just a heads-up. */}
+            confirm, not just a heads-up. The sign-out case brands itself as such
+            (mirrors the practice leave-modal, which has always done this). */}
         <Modal
           isOpen={pendingLeaveUrl !== null}
-          title="Leave the exam?"
+          title={pendingLeaveUrl === SIGN_OUT_SENTINEL ? 'Sign out?' : 'Leave the exam?'}
           onClose={() => setPendingLeaveUrl(null)}
         >
           <div className="space-y-4">
             <p className="text-text-primary">
-              Your exam is still in progress. If you leave this page now, your
-              current answers and timer will be lost and this attempt will not be saved.
+              {pendingLeaveUrl === SIGN_OUT_SENTINEL
+                ? 'Your exam is still in progress. If you sign out now, your current answers and timer will be lost and this attempt will not be saved.'
+                : 'Your exam is still in progress. If you leave this page now, your current answers and timer will be lost and this attempt will not be saved.'}
             </p>
             <div className="flex gap-4 mt-6">
               <Button onClick={() => setPendingLeaveUrl(null)} variant="secondary" className="flex-1">
                 Stay in exam
               </Button>
               <Button
-                onClick={() => { if (pendingLeaveUrl) confirmExamLeave(pendingLeaveUrl) }}
+                onClick={() => {
+                  if (pendingLeaveUrl === SIGN_OUT_SENTINEL) {
+                    // P1-7 (Alex B4): confirming the leave COMPLETES the sign-out.
+                    // Mark the unload intentional so the native beforeunload net
+                    // stays silent, then let useSignOut do its own redirect.
+                    markIntentionalLeave()
+                    void signOut()
+                  } else if (pendingLeaveUrl) {
+                    confirmExamLeave(pendingLeaveUrl)
+                  }
+                }}
                 variant="danger"
                 className="flex-1"
               >
-                Leave exam
+                {pendingLeaveUrl === SIGN_OUT_SENTINEL ? 'Sign out' : 'Leave exam'}
               </Button>
             </div>
           </div>
@@ -1091,9 +1391,11 @@ export function MockExam() {
     const originalQuestion = questions.find(q => q.id === currentReviewQuestion.questionId)!
 
     return (
-      <div className="flex-1">
-        <div className="p-4 md:p-8">
-          <div className="max-w-4xl mx-auto">
+    <div className="flex-1">
+      <h1 className="sr-only">{cert.shortName} Exam Review</h1>
+
+      <div className="p-4 md:p-8">
+        <div className="max-w-4xl mx-auto">
             {/* Filter Controls */}
             <Card padding="sm" className="mb-4">
               <div className="space-y-3">

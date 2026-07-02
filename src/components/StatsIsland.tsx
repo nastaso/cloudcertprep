@@ -11,8 +11,8 @@
  * /stats does not need react-router because Stats does not navigate
  * router-internally — every link is a real anchor to another Astro document.
  */
-import { useEffect } from 'react'
 import { Stats } from '../pages/_Stats'
+import { ErrorBoundary } from './ErrorBoundary'
 
 const SNAPSHOT_SELECTOR = '[data-stats-snapshot]'
 
@@ -23,8 +23,17 @@ function hideSnapshot() {
 }
 
 export default function StatsIsland() {
-  useEffect(() => {
-    hideSnapshot()
-  }, [])
-  return <Stats />
+  // Do NOT hide the prerendered snapshot on mount: _Stats starts in `loading`,
+  // so hiding immediately would swap real snapshot numbers -> a pulsing skeleton
+  // -> live numbers (content going backwards). Instead the snapshot IS the
+  // loading state: _Stats suppresses its first-load skeleton, and we hide the
+  // snapshot the moment live numbers are ready (one forward swap, no flash).
+  // ErrorBoundary: AppIsland wraps only the app routes, so without one here a
+  // render throw would unmount the island into a blank page (the snapshot is
+  // already display:none by then).
+  return (
+    <ErrorBoundary>
+      <Stats hideInitialSkeleton onLoaded={hideSnapshot} />
+    </ErrorBoundary>
+  )
 }

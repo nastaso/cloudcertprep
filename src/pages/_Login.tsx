@@ -6,6 +6,8 @@ import { trackEvent } from '../lib/analytics'
 import { useSEO } from '../hooks/useSEO'
 import { BookOpen, FileText, Target, TrendingUp, CheckCircle, Mail, Github } from 'lucide-react'
 import { useTheme } from '../hooks/useTheme'
+import { useAuth } from '../hooks/useAuth'
+import { LoadingSpinner } from '../components/LoadingSpinner'
 import { PasswordInput } from '../components/PasswordInput'
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter'
 import { Button } from '../components/Button'
@@ -17,12 +19,40 @@ import { getActiveTotalQuestions } from '../data/certifications'
 import { safeFrom } from '../lib/navigation'
 import { authErrorMessage } from '../lib/authErrors'
 
+// Client cooldown for resend / reset emails. Sized to Supabase's per-email
+// rate-limit window (the default minimum interval between auth emails to the
+// same address is 60s), so the button only re-enables once a send can actually
+// succeed (bug 2: an instant resend after signup otherwise hits "too many
+// attempts").
+const RESEND_COOLDOWN_SECONDS = 60
+
 export function Login() {
   const location = useLocation()
   const from = safeFrom((location.state as { from?: string })?.from)
+  // A signed-in visitor has no reason to see the login form, so bounce them away
+  // (to `from`, which is "/" for a directly-typed /login). useAuth resolves the
+  // REAL session (not a stale token); for an in-page sign-in the form does its
+  // own navigation to the same `from`, so this never fights it. (owner request)
+  const { user: authedUser, loading: authLoading } = useAuth()
+  useEffect(() => {
+    if (!authLoading && authedUser) window.location.replace(from)
+  }, [authLoading, authedUser, from])
   const [isSignUp, setIsSignUp] = useState(false)
   const [isForgotPassword, setIsForgotPassword] = useState(false)
   const [signUpSuccess, setSignUpSuccess] = useState(false)
+  // Resend-confirmation state for the "Check your email" card (P0-1). The
+  // cooldown throttles repeat sends to match Supabase's resend rate limit.
+  const [resendState, setResendState] = useState<'idle' | 'sending' | 'sent'>('idle')
+  const [resendCooldown, setResendCooldown] = useState(0) // seconds remaining
+  // Whether the lazily-revealed resend captcha is showing. The "Check your
+  // email" card no longer renders a second Turnstile upfront (a jarring repeat
+  // bot-check right after signup); pressing Resend reveals it only when a fresh
+  // single-use token is needed, then sends as soon as it resolves (bug 1).
+  const [resendChallenge, setResendChallenge] = useState(false)
+  // Cooldown after a password-reset email is sent, so a user who doesn't see it
+  // immediately can't hammer the button (Supabase rate-limits server-side; this
+  // is the visible feedback that a send is in flight). (M3 [H])
+  const [resetCooldown, setResetCooldown] = useState(0)
 
   // Title varies by auth mode; canonical=null since auth pages are noindex.
   useSEO({
@@ -48,6 +78,20 @@ export function Login() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Restoring from the bfcache after an OAuth redirect must reset `loading`. The
+  // Google / GitHub handlers set `loading` true then hand off to
+  // `signInWithOAuth`, which navigates away WITHOUT clearing it (only the catch
+  // does). Pressing Back restores this page from the bfcache with `loading`
+  // frozen true, leaving the submit + OAuth buttons stuck on the spinner.
+  // `pageshow` with `persisted` is the bfcache-restore signal; clear the flag so
+  // the form is usable again. (A fresh reload re-mounts with loading=false, so
+  // the persisted guard keeps this to the restore case.)
+  useEffect(() => {
+    const onPageShow = (e: PageTransitionEvent) => { if (e.persisted) setLoading(false) }
+    window.addEventListener('pageshow', onPageShow)
+    return () => window.removeEventListener('pageshow', onPageShow)
+  }, [])
+
   // Cloudflare Turnstile token. Passed to Supabase as options.captchaToken on
   // every auth call; Supabase validates it server-side. Tokens are single-use,
   // so the widget is reset after each attempt. When no site key is configured
@@ -67,6 +111,33 @@ export function Login() {
   // skips Supabase for logged-out visitors with no `?code=` callback, so this
   // page is responsible for its own warm-up.)
   useEffect(() => { void getSupabase() }, [])
+
+  // Tick the resend cooldown down to zero, then re-enable the resend button.
+  useEffect(() => {
+    if (resendCooldown <= 0) return
+    const id = window.setInterval(() => setResendCooldown(s => Math.max(0, s - 1)), 1000)
+    return () => window.clearInterval(id)
+  }, [resendCooldown])
+
+  // Same, for the forgot-password "Send reset link" button.
+  useEffect(() => {
+    if (resetCooldown <= 0) return
+    const id = window.setInterval(() => setResetCooldown(s => Math.max(0, s - 1)), 1000)
+    return () => window.clearInterval(id)
+  }, [resetCooldown])
+
+  // Re-arm the captcha when the reset cooldown ends (transition to 0), so a
+  // follow-up "Send reset link" has a fresh single-use token. This keeps the
+  // challenge hidden DURING the wait (bug 3: no second Turnstile on the normal
+  // single send) while still allowing a working resend. Gated on the forgot
+  // mode so it never re-challenges the sign-in form.
+  const prevResetCooldownRef = useRef(0)
+  useEffect(() => {
+    if (prevResetCooldownRef.current > 0 && resetCooldown === 0 && isForgotPassword) {
+      resetCaptcha()
+    }
+    prevResetCooldownRef.current = resetCooldown
+  }, [resetCooldown, isForgotPassword])
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -100,7 +171,11 @@ export function Login() {
           password,
           options: {
             captchaToken: captchaToken ?? undefined,
-            data: { accepted_terms_at: new Date().toISOString() }
+            data: { accepted_terms_at: new Date().toISOString() },
+            // Land the confirmation link on home with a marker the AuthLinkNotice
+            // island reads to show the "you are in" welcome (P0-2). The actual
+            // redirect target is gated by the Supabase Site URL / Redirect allow-list.
+            emailRedirectTo: `${window.location.origin}/?verified=1`,
           }
         })
 
@@ -108,6 +183,13 @@ export function Login() {
         trackEvent('sign_up', { method: 'email' })
         setPassword('')
         setConfirmPassword('')
+        // The signup token is now consumed; clear it so a later resend reveals a
+        // fresh challenge rather than reusing a dead token (P0-1, bug 1).
+        resetCaptcha()
+        // Start the resend cooldown immediately: signup just sent the first
+        // email, so Supabase's per-email rate limit is already counting. Without
+        // this, an instant Resend hits "too many attempts" (bug 2).
+        setResendCooldown(RESEND_COOLDOWN_SECONDS)
         setSignUpSuccess(true)
         return
       } else {
@@ -191,22 +273,87 @@ export function Login() {
 
       if (error) throw error
       setSuccess('Check your email for a reset link')
+      setResetCooldown(RESEND_COOLDOWN_SECONDS)
+      // Do NOT re-arm the captcha here. The token is now consumed, but the
+      // button is on its cooldown so no token is needed until it ends -
+      // re-challenging now is the visible "Turnstile twice" bug (bug 3). A fresh
+      // token is re-armed when the cooldown expires (effect below).
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred')
+      resetCaptcha() // re-arm so the user can retry after a failed send
     } finally {
-      resetCaptcha()
       setLoading(false)
     }
   }
 
+  // Actually send the resend (token already solved). Separated so both the
+  // direct path and the lazy-challenge completion below reuse it (P0-1).
+  const sendResend = async () => {
+    setError('')
+    setResendState('sending')
+    try {
+      const supabase = await getSupabase()
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: { captchaToken: captchaToken ?? undefined },
+      })
+      if (error) throw error
+      setResendState('sent')
+      setResendChallenge(false)
+      setResendCooldown(RESEND_COOLDOWN_SECONDS)
+    } catch (err: unknown) {
+      setError(authErrorMessage(err, 'sign-up'))
+      setResendState('idle')
+    } finally {
+      resetCaptcha() // token is single-use; re-arm for the next attempt
+    }
+  }
+
+  // Resend the sign-up confirmation email (P0-1, bug 1). The captcha is shown
+  // lazily: pressing Resend reveals the Turnstile only when a fresh token is
+  // needed, instead of rendering a second widget on the success card upfront.
+  const handleResend = () => {
+    if (resendCooldown > 0 || resendState === 'sending') return
+    if (hasCaptcha && !captchaToken) { setResendChallenge(true); return }
+    void sendResend()
+  }
+
+  // Lazy-resend completion: once the revealed challenge yields a token, send.
+  // Deferred (setTimeout) so the state updates land outside the effect body, and
+  // fired only on the challenge/token edge (sendResend is recreated each render,
+  // so it is intentionally not a dependency).
+  useEffect(() => {
+    if (!resendChallenge || !captchaToken) return
+    const t = window.setTimeout(() => { void sendResend() }, 0)
+    return () => window.clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resendChallenge, captchaToken])
+
+  // A signed-in (or still-resolving) visitor is being redirected away by the
+  // effect above; show a spinner instead of flashing the form. A logged-out
+  // guest resolves synchronously (useAuth skips Supabase with no token), so the
+  // form still paints immediately for the conversion path.
+  if (authLoading || authedUser) {
+    return (
+      <div className="flex-1 flex items-center justify-center px-4">
+        <LoadingSpinner />
+      </div>
+    )
+  }
+
   return (
-      // Top-anchored (items-start) so switching between sign-in / sign-up /
-      // reset / check-email grows the card DOWNWARD from a stable top instead
-      // of re-centering the whole card (which made it visibly jump).
+      // The marketing column is centered against the SIGN-IN card height (its own
+      // md:min-h below) and the grid is top-aligned, so it stays put when the card
+      // grows downward for sign-up - no shift (bug 4). The cards keep their NATURAL
+      // sizes (compact sign-in, taller sign-up); login.astro reserves the sign-in
+      // height so the footer is stable on load. (owner: natural sizes, not forced-equal.)
       <div className="flex-1 flex items-start justify-center px-4 py-10 md:py-16">
-        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-          {/* Left Column - Features/Benefits */}
-          <div className="hidden md:flex flex-col justify-start space-y-6 md:pr-6 lg:pr-8 md:pt-2">
+        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 md:items-start gap-8 lg:gap-12">
+          {/* Left Column - Features/Benefits. min-h = the sign-in card height so
+              justify-center centers it against that, and it does not move when the
+              sign-up card grows past it. */}
+          <div className="hidden md:flex flex-col justify-center space-y-6 md:pr-6 lg:pr-8 md:min-h-[718px] xl:min-h-[758px]">
               <div>
                 <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-text-primary mb-3">
                   Free AWS certification practice exams
@@ -216,17 +363,17 @@ export function Login() {
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
-                    <BookOpen className="w-5 h-5 text-text-muted" aria-hidden="true" />
+                    <BookOpen className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-text-primary font-semibold mb-1">{getActiveTotalQuestions().toLocaleString()}+ Practice Questions</h3>
-                    <p className="text-text-muted text-sm">Up to date with the latest exam guides, across multiple cloud certifications</p>
+                    <h3 className="text-text-primary font-semibold mb-1">{getActiveTotalQuestions().toLocaleString('en-US')}+ Practice Questions</h3>
+                    <p className="text-text-muted text-sm">Up to date with the latest exam guides, across multiple AWS certifications</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
-                    <FileText className="w-5 h-5 text-text-muted" aria-hidden="true" />
+                    <FileText className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-text-primary font-semibold mb-1">Full-Length Practice Exams</h3>
@@ -236,7 +383,7 @@ export function Login() {
 
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
-                    <Target className="w-5 h-5 text-text-muted" aria-hidden="true" />
+                    <Target className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-text-primary font-semibold mb-1">Domain Practice</h3>
@@ -246,7 +393,7 @@ export function Login() {
 
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="w-5 h-5 text-text-muted" aria-hidden="true" />
+                    <TrendingUp className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-text-primary font-semibold mb-1">Progress Tracking</h3>
@@ -256,7 +403,7 @@ export function Login() {
 
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />
+                    <CheckCircle className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="text-text-primary font-semibold mb-1">100% Free</h3>
@@ -266,8 +413,21 @@ export function Login() {
               </div>
             </div>
 
-          {/* Right Column - Auth Form */}
-          <Card padding="lg" className="flex flex-col">
+          {/* Right Column - Auth Form. Force the elevated shadow tier so the
+              card lifts off the page even in dark mode, where the base card
+              shadow is `none` and the hairline border alone barely separates
+              it from the background (M3 [F]). Inline style beats the utility
+              class reliably regardless of Tailwind's generated rule order. */}
+          {/* Natural height: sign-in is compact, sign-up grows downward for its
+              extra fields. The marketing column (centered against the sign-in
+              height) and the footer (login.astro reserves the sign-in height) do
+              not shift on load; a click to sign-up expands the card.
+              The short terminal states (forgot-password, check-your-email) are
+              much shorter than the marketing column, so top-pinning them leaves
+              them floating high; `md:self-center` centers ONLY those against the
+              marketing height. Sign-in / sign-up stay top-aligned so toggling
+              between them does not move the card (bug 4). */}
+          <Card padding="lg" className={`flex flex-col${isForgotPassword || signUpSuccess ? ' md:self-center' : ''}`} style={{ boxShadow: 'var(--shadow-card-hover)' }}>
 
           {signUpSuccess ? (
             <div className="text-center">
@@ -276,9 +436,50 @@ export function Login() {
               <p className="text-text-muted text-sm leading-relaxed mb-6">
                 We sent a verification link to <span className="text-text-primary font-medium">{email}</span>. Check your spam folder if you don't see it.
               </p>
+
+              {resendState === 'sent' && (
+                <Alert tone="success" role="status" className="mb-4 text-left">
+                  Sent again. The new link is on its way. Check spam if you still don't see it.
+                </Alert>
+              )}
+              {error && (
+                <Alert tone="danger" role="alert" className="mb-4 text-left text-danger">
+                  <span id="auth-error">{error}</span>
+                </Alert>
+              )}
+
+              {/* Lazily-revealed captcha for the resend call (bug 1): shown only
+                  after the user presses Resend, when a fresh single-use token is
+                  needed - never a second widget upfront. Renders nothing when no
+                  site key is configured. Shares turnstileRef because only one of
+                  the two card branches is ever mounted at a time. */}
+              {resendChallenge && (
+                <Turnstile ref={turnstileRef} onToken={setCaptchaToken} theme={theme} />
+              )}
+
               <Button
-                onClick={() => { setSignUpSuccess(false); setIsSignUp(false) }}
+                onClick={handleResend}
                 variant="secondary"
+                fullWidth
+                loading={resendState === 'sending'}
+                loadingText="Sending..."
+                disabled={resendCooldown > 0}
+                className="mt-4 mb-3"
+              >
+                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend verification email'}
+              </Button>
+
+              <button
+                type="button"
+                onClick={() => { setSignUpSuccess(false); setIsSignUp(true); setError(''); setResendState('idle'); setResendCooldown(0); setResendChallenge(false) }}
+                className="block w-full text-sm text-text-muted hover:text-text-primary transition-colors mb-4"
+              >
+                Wrong email? Edit it
+              </button>
+
+              <Button
+                onClick={() => { setSignUpSuccess(false); setIsSignUp(false); setError(''); setResendState('idle'); setResendCooldown(0); setResendChallenge(false) }}
+                variant="ghost"
                 fullWidth
               >
                 Back to sign in
@@ -322,9 +523,23 @@ export function Login() {
           {!isForgotPassword && (
             <>
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-2">
-                  Password
-                </label>
+                <div className="flex items-baseline justify-between mb-2 gap-3">
+                  <label htmlFor="password" className="block text-sm font-medium text-text-primary">
+                    Password
+                  </label>
+                  {/* Forgot-password lives next to the field it relates to (the
+                      conventional spot), not orphaned below the submit button
+                      (M3 [D]). Sign-in mode only. */}
+                  {!isSignUp && (
+                    <button
+                      type="button"
+                      onClick={() => { setIsForgotPassword(true); setError(''); setSuccess('') }}
+                      className="text-sm text-text-muted hover:text-text-primary transition-colors"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
                 <PasswordInput
                   id="password"
                   value={password}
@@ -347,6 +562,7 @@ export function Login() {
                     onChange={setConfirmPassword}
                     required
                     autoComplete="new-password"
+                    placeholder="Re-enter your password"
                   />
                 </div>
 
@@ -370,14 +586,8 @@ export function Login() {
             </>
           )}
 
-          {error && (
-            <Alert tone="danger" role="alert" className="text-danger">
-              <span id="auth-error">{error}</span>
-            </Alert>
-          )}
-
           {success && (
-            <Alert tone="success">
+            <Alert tone="success" role="status">
               {success}
             </Alert>
           )}
@@ -394,30 +604,31 @@ export function Login() {
             loading={loading}
             loadingText="Loading..."
             disabled={
-              (hasCaptcha && !captchaToken) ||
+              // NOT gated on the Turnstile token: the security boundary is
+              // Supabase verifying the token server-side, so disabling the
+              // primary CTA here only made it look broken on load. The submit
+              // handlers validate the captcha and show an inline message if the
+              // challenge isn't solved. (Sign-up form requirements still gate,
+              // since those have visible invalid feedback.)
               (isSignUp && !acceptedTerms) ||
               (isSignUp && !isPasswordStrongEnough(password)) ||
-              (isSignUp && password !== confirmPassword)
+              (isSignUp && password !== confirmPassword) ||
+              (isForgotPassword && resetCooldown > 0)
             }
           >
-            {isForgotPassword ? 'Send reset link' : isSignUp ? 'Sign up' : 'Sign in'}
+            {isForgotPassword
+              ? (resetCooldown > 0 ? `Resend in ${resetCooldown}s` : 'Send reset link')
+              : isSignUp ? 'Sign up' : 'Sign in'}
           </Button>
-        </form>
 
-        {!isSignUp && !isForgotPassword && (
-          <div className="mt-4 text-right">
-            <button
-              onClick={() => {
-                setIsForgotPassword(true)
-                setError('')
-                setSuccess('')
-              }}
-              className="text-sm text-text-muted hover:text-text-primary transition-colors"
-            >
-              Forgot password?
-            </button>
-          </div>
-        )}
+          {/* Error rendered below the submit button so it never shoves the
+              Turnstile + CTA down when it appears (P4 CLS fix). */}
+          {error && (
+            <Alert tone="danger" role="alert" className="text-danger">
+              <span id="auth-error">{error}</span>
+            </Alert>
+          )}
+        </form>
 
         <div className="mt-6 text-center">
           <button
@@ -480,10 +691,14 @@ export function Login() {
                 Continue with GitHub
               </Button>
 
+              {/* Quieter than the bordered OAuth buttons: on the login page the
+                  goal is account creation, so the guest escape hatch shouldn't
+                  carry equal weight. Still a full-width tap target + clearly
+                  visible (the product's 'free, no signup' promise depends on it). */}
               <Button
                 type="button"
                 onClick={() => window.location.assign(from)}
-                variant="secondary"
+                variant="ghost"
                 fullWidth
               >
                 Continue as guest

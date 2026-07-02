@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { formatRelativeDate } from './formatting'
 
-// `formatRelativeDate` hard-codes the 'en-GB' locale and reads `new Date()` for
+// `formatRelativeDate` hard-codes the 'en-US' locale and reads `new Date()` for
 // "now", so tests freeze the clock with fake timers (restored after each test)
-// and assert against en-GB wording. System-time strings use local-time ISO
+// and assert against en-US wording. System-time strings use local-time ISO
 // (no trailing 'Z') so the local-midnight calendar-day math is independent of
 // the runner's timezone.
 
-const LOCALE = 'en-GB'
+const LOCALE = 'en-US'
 // Built with the same Intl config as the production fallback so the expected
 // absolute string stays correct under any timezone, rather than hard-coded.
 const absoluteFmt = new Intl.DateTimeFormat(LOCALE, {

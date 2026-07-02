@@ -51,7 +51,7 @@ export function UnlockCTA({
 
   return (
     <div
-      className={`${noTopMargin ? '' : 'mt-6 '}p-3 md:p-4 bg-brand/10 border border-brand rounded-lg`}
+      className={`${noTopMargin ? '' : 'mt-6 '}p-5 md:p-6 bg-brand/10 border border-brand/30 rounded-2xl`}
     >
       <div className="flex items-center gap-2 mb-2">
         <Lock className="w-4 h-4 md:w-5 md:h-5 text-brand" />

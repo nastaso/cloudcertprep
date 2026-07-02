@@ -10,16 +10,29 @@ export default {
         'overlay': 'var(--shadow-overlay)',
       },
       transitionTimingFunction: {
-        // Shared premium curves (mirror --ease-* in index.css, DSv4 §1.5).
-        // entrances/settles
-        'out': 'cubic-bezier(0.16, 1, 0.3, 1)',
-        // indicator slides (tab underline)
-        'inout': 'cubic-bezier(0.45, 0, 0.15, 1)',
-        // button presses
-        'press': 'cubic-bezier(0.2, 0, 0, 1)',
+        // Shared premium curves - single source of truth is --ease-* in
+        // index.css (:root motion block); these reference the vars so the two
+        // systems can never drift. DEFAULT re-points every bare `transition` /
+        // `transition-colors` utility onto the signature curve (was Tailwind's
+        // generic Material cubic-bezier(0.4,0,0.2,1)) - the highest-leverage
+        // single edit for site-wide motion consistency.
+        DEFAULT: 'var(--ease-out)',
+        'out': 'var(--ease-out)',     // entrances/settles/lifts
+        'inout': 'var(--ease-inout)', // indicator slides (tab underline)
+        'press': 'var(--ease-press)', // button presses
+        'exit': 'var(--ease-exit)',   // dismissals: accelerate away
       },
       transitionDuration: {
+        // Named scale mirrors --dur-* in index.css. DEFAULT stays 200ms so bare
+        // `transition` utilities are unchanged.
         DEFAULT: '200ms',
+        'press': '90ms',
+        'fast': '180ms',
+        'base': '200ms',
+        'gentle': '250ms',
+        'slow': '350ms',
+        'reveal': '520ms',
+        'settle': '600ms',
       },
       fontFamily: {
         // DSv6: headings share the system stack (no display webfont). The
@@ -42,7 +55,9 @@ export default {
         'bg-card-hover': 'rgb(var(--color-bg-card-hover) / <alpha-value>)',
         'success': 'rgb(var(--color-success) / <alpha-value>)',
         'danger': 'rgb(var(--color-danger) / <alpha-value>)',
+        'on-danger': 'rgb(var(--color-on-danger) / <alpha-value>)',
         'warning': 'rgb(var(--color-warning) / <alpha-value>)',
+        'warning-fill': 'rgb(var(--color-warning-fill) / <alpha-value>)',
         'text-primary': 'rgb(var(--color-text-primary) / <alpha-value>)',
         'text-muted': 'rgb(var(--color-text-muted) / <alpha-value>)',
       },

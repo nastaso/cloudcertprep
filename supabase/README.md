@@ -39,8 +39,8 @@ One row per question shown in an attempt. Used for History review and `domain_pr
 | Column | Type | Notes |
 |---|---|---|
 | `id` | `uuid` PK | |
-| `attempt_id` | `uuid` FK | References `exam_attempts(id)`, cascade on delete |
-| `user_id` | `uuid` FK | Denormalised for RLS efficiency |
+| `attempt_id` | `uuid` FK | References `exam_attempts(id)`, cascade on delete. NULL for Domain Practice rows (no parent exam). |
+| `user_id` | `uuid` FK | References `auth.users(id)`, cascade on delete. Denormalised for RLS efficiency. The user_id cascade is load-bearing: Domain Practice rows have `attempt_id = NULL`, so the attempt_id cascade never reaches them. |
 | `cert_code` | `text` NOT NULL | |
 | `question_id` | `text` NOT NULL | e.g. `'CLF-D3-0142'` |
 | `domain_id` | `integer` NOT NULL | 1-N (any positive integer) |
@@ -61,7 +61,7 @@ One row per `(user_id, cert_code, domain_id)`. Materialised view of attempt_ques
 
 | Column | Type | Notes |
 |---|---|---|
-| `user_id` | `uuid` FK | |
+| `user_id` | `uuid` FK | References `auth.users(id)`, cascade on delete |
 | `cert_code` | `text` NOT NULL | |
 | `domain_id` | `integer` NOT NULL | |
 | `questions_attempted` | `integer` NOT NULL | Unique question count |
@@ -69,19 +69,18 @@ One row per `(user_id, cert_code, domain_id)`. Materialised view of attempt_ques
 | `mastery_percent` | `numeric` NOT NULL | 0-100, `questions_correct / cert.domains[domain_id].questionCount * 100` |
 | `updated_at` | `timestamptz` NOT NULL | |
 
-Primary key: `(user_id, cert_code, domain_id)`.
+Primary key: `id` (uuid). The app's upsert conflict target is the separate UNIQUE constraint
+`(user_id, domain_id, cert_code)`. (Corrected 2026-07-02 against live prod via `pg_constraint`:
+this doc previously claimed the composite was the primary key - that layout exists on the TEST
+project, not on prod.)
 
 **RLS:** enabled. `auth.uid() = user_id`.
 
-> **Known live-schema gotcha (found 2026-06-12):** production carries a CLF-era check constraint
-> `domain_progress_domain_id_check` that **rejects `domain_id = 5`** (23514), so AIF-C01 domain-5
-> progress upserts fail silently (the app only logs). `attempt_questions` is not affected. Fix
-> (pending owner run):
->
-> ```sql
-> ALTER TABLE public.domain_progress DROP CONSTRAINT domain_progress_domain_id_check;
-> ALTER TABLE public.domain_progress ADD CONSTRAINT domain_progress_domain_id_check CHECK (domain_id >= 1);
-> ```
+> **Resolved schema gotcha (found 2026-06-12, fixed by 2026-07-02):** production used to carry a
+> CLF-era check constraint `domain_progress_domain_id_check` that rejected `domain_id = 5`, so AIF-C01
+> domain-5 progress upserts failed silently. Confirmed fixed on prod (verified via
+> `pg_get_constraintdef`): the constraint now reads `CHECK (domain_id >= 1)`, which allows domain 5
+> (and any future domain). No further action needed.
 
 ---
 
@@ -135,6 +134,39 @@ Full source: see `src/pages/_Stats.tsx` for the call site. If you change the fun
 - After `INSERT` on `exam_attempts`: increment `platform_stats.total_exams_attempted` and `total_exams_passed` (if passed).
 - After `INSERT` on `attempt_questions`: increment `platform_stats.total_questions_answered`.
 - After `INSERT` on `auth.users`: increment `platform_stats.total_users`.
+
+---
+
+## Edge Functions
+
+### `delete-account` (`supabase/functions/delete-account/index.ts`)
+
+Self-service GDPR "right to erasure" backing the **Delete account** button on `/account`.
+RLS lets a user delete their own data rows but cannot remove the `auth.users` row itself
+(only the service_role can), so deletion runs server-side. The function authenticates the
+caller from their forwarded JWT (it deletes ONLY that caller's own `auth.uid()`, never an id
+from the request body), deletes their `attempt_questions`, `exam_attempts`, and
+`domain_progress` rows, then deletes the `auth.users` row.
+
+The data tables now carry `ON DELETE CASCADE` FKs to `auth.users(id)` (see
+`supabase/sql/delete-account-cascade.sql`), so deleting the auth row alone erases the data;
+the explicit per-table deletes in the function are kept as defence-in-depth. `question_mastery`
+is deliberately NOT in the delete list - it is a read-only VIEW over `attempt_questions`
+(below), so erasing `attempt_questions` empties it. `platform_stats` is excluded too (a public
+aggregate, not personal data). Apply the cascade SQL to a project before relying on it for
+deletion; verify with `node scripts/verify-delete-cascade.mjs`.
+
+**Deploy (owner, one-time):**
+
+```
+supabase functions deploy delete-account --project-ref <project-ref>
+```
+
+Supabase injects `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` into
+the function runtime automatically - no extra secrets to set. Until it is deployed, the
+`/account` Delete button surfaces an error that falls back to the email-based erasure path
+(still GDPR-compliant), so the UI degrades gracefully. The data **export** button on
+`/account` needs no function (it reads the user's own RLS-scoped rows directly).
 
 ---
 

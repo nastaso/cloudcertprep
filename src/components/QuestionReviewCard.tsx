@@ -36,7 +36,7 @@ export function QuestionReviewCard({
   const correctAnswerArray = Array.isArray(question.answer) ? question.answer : [question.answer]
 
   return (
-    <div className="bg-bg-card rounded-xl p-4 md:p-5 shadow-card">
+    <div className="bg-bg-card rounded-2xl p-4 md:p-5 shadow-card border border-border-hairline">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -133,7 +133,7 @@ export function QuestionReviewCard({
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackEvent('report_question_clicked', { question_id: question.id })}
-            className="text-text-primary hover:text-text-primary/70 hover:underline"
+            className="text-text-primary underline underline-offset-2 hover:text-text-primary/70"
           >
             Report on GitHub
           </a>

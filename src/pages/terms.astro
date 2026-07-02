@@ -23,6 +23,7 @@ const breadcrumbItems = [
   description="CloudCertPrep terms of service: a free study tool provided as-is with no warranty, open source under the MIT license. Read the full usage terms here."
   canonical="https://www.cloudcertprep.io/terms"
   headerOverlay={true}
+  headerNoAuthedFrost={true}
 >
   {/* BreadcrumbList JSON-LD only; the visible trail is the HeroMini crumbs. */}
   <Breadcrumb items={breadcrumbItems} visuallyHidden />
@@ -37,7 +38,7 @@ const breadcrumbItems = [
 
   <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
     <div class="max-w-3xl mx-auto px-4 md:px-8">
-      <p class="font-mono text-[12px] tracking-wide text-text-muted mb-8">Last updated: May 2026</p>
+      <p class="font-mono text-[12px] tracking-wide text-text-muted mb-8 max-w-[68ch] mx-auto">Last updated: May 2026</p>
 
       <div class="space-y-8 max-w-[68ch] mx-auto">
         <section>
@@ -82,19 +83,19 @@ const breadcrumbItems = [
           </p>
           <ul class="space-y-2 text-text-muted text-base">
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span>Attempt to scrape, reverse engineer, or systematically extract question content</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span>Use the service in a way that places unreasonable load on our infrastructure</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span>Create multiple accounts to circumvent any limitations</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span>Use the service for any unlawful purpose</span>
             </li>
           </ul>

@@ -4,9 +4,9 @@
  * (prerendered pages). Keeping the recipe here means the two systems can never
  * drift again (they previously disagreed on radius, shadow, and font weight).
  *
- * Design language (DSv4, AWS marketing): rounded-lg rectangles (NOT pills —
- * aws.amazon.com buttons are 8px-radius), `font-medium`, asymmetric press
- * (80ms down via .press-style active, 200ms eased release), orange primary
+ * Design language (DSv6): pill buttons (`rounded-full`), `font-medium`,
+ * asymmetric press (90ms compress via `active:duration-press` = --dur-press,
+ * 250ms eased release via `duration-gentle` = --dur-gentle), orange primary
  * that darkens to the AWS hover orange `brand-hover` (#EC7211) instead of
  * fading via opacity. All colours use project tokens so light/dark themes
  * switch automatically.
@@ -17,8 +17,8 @@ export type ButtonSize = 'sm' | 'md' | 'lg'
 /** Shape, motion, focus ring, and disabled handling shared by every variant. */
 export const BUTTON_BASE =
   'font-medium rounded-full inline-flex items-center justify-center gap-2 ' +
-  'transition-[transform,box-shadow,background-color,border-color,color] duration-200 ease-press ' +
-  'active:scale-[0.97] active:duration-[80ms] ' +
+  'transition-[transform,box-shadow,background-color,border-color,color] duration-gentle ease-press ' +
+  'active:scale-[0.97] active:duration-press ' +
   'disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 ' +
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-bg-dark'
 
@@ -38,13 +38,13 @@ export const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   // practising"), matching the dark-stage hero CTAs so the funnel reads as one
   // action across home, cert hubs, and domain pages.
   brand:
-    'bg-brand hover:bg-brand-hover text-on-brand shadow-sm hover:shadow-card-hover ' +
-    'disabled:hover:bg-brand disabled:shadow-sm',
+    'bg-brand hover:bg-brand-hover text-on-brand shadow-sm hover:shadow-card-hover hover:-translate-y-px ' +
+    'disabled:hover:bg-brand disabled:hover:translate-y-0 disabled:shadow-sm',
   secondary:
     'bg-bg-card hover:bg-bg-card-hover text-text-primary border border-border-hairline ' +
     'hover:border-text-muted/60 hover:shadow-card disabled:hover:bg-bg-card disabled:hover:border-border-hairline',
   danger:
-    'bg-danger hover:bg-danger/90 text-white shadow-sm hover:shadow-card-hover disabled:hover:bg-danger disabled:shadow-sm',
+    'bg-danger hover:bg-danger/90 text-on-danger shadow-sm hover:shadow-card-hover disabled:hover:bg-danger disabled:shadow-sm',
   ghost:
     'bg-transparent hover:bg-bg-card-hover text-text-muted hover:text-text-primary',
   tinted:
@@ -103,8 +103,10 @@ export function filterChipClass(opts: {
   // themes: light pill/dark text on dark, dark pill/light text on light.)
   return [
     'min-h-[44px] px-4 py-2 rounded-xl font-medium border ' +
-      'transition-[transform,background-color,border-color,color] duration-200 ease-press ' +
-      'active:scale-[0.97] active:duration-[80ms]',
+      'transition-[transform,background-color,border-color,color] duration-gentle ease-press ' +
+      'active:scale-[0.97] active:duration-press ' +
+      'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ' +
+      (surface === 'dark' ? 'focus-visible:ring-offset-bg-dark' : 'focus-visible:ring-offset-bg-card'),
     size === 'sm' ? 'text-xs' : 'text-xs md:text-sm',
     active ? 'bg-text-primary text-bg-dark border-text-primary' : inactive,
   ].join(' ')
@@ -116,14 +118,19 @@ export function filterChipClass(opts: {
  * the cool page gray, hairline border, 44px height, orange focus ring.
  * Pass `hasError` to swap the border/ring to the danger token.
  */
-export function inputClass(opts?: { hasError?: boolean; className?: string }): string {
-  const { hasError = false, className = '' } = opts ?? {}
+export function inputClass(opts?: { hasError?: boolean; className?: string; surface?: 'card' | 'page' }): string {
+  const { hasError = false, className = '', surface = 'card' } = opts ?? {}
+  // Default (in a Card): recessed fill (bg-bg-dark, a step darker than the card)
+  // so the field reads as a distinct, fillable well. On a bare PAGE surface,
+  // bg-bg-dark equals the page background in dark mode and the field nearly
+  // disappears, so a flush-surface field raises to bg-bg-card instead.
+  const fill = surface === 'page' ? 'bg-bg-card' : 'bg-bg-dark'
   return [
-    'w-full px-4 py-2.5 min-h-[44px] rounded-lg bg-bg-card text-text-primary placeholder:text-text-muted/60',
+    `w-full px-4 py-2.5 min-h-[44px] rounded-lg ${fill} text-text-primary placeholder:text-text-muted/60`,
     'border transition-[border-color,box-shadow] duration-200 focus:outline-none',
     hasError
       ? 'border-danger focus:border-danger focus-visible:ring-2 focus-visible:ring-danger/40'
-      : 'border-border-hairline hover:border-text-muted/50 focus:border-brand focus-visible:ring-2 focus-visible:ring-brand/30',
+      : 'border-text-muted/40 hover:border-text-muted/60 focus:border-brand focus-visible:ring-2 focus-visible:ring-brand/30',
     className,
   ]
     .filter(Boolean)
@@ -205,13 +212,15 @@ export function reviewCellClass(opts: {
   const { correct, current = false, flagged = false, inSet = true } = opts
   return [
     'w-8 h-8 md:w-9 md:h-9 rounded-lg font-mono text-[10px] md:text-xs font-semibold tabular-nums',
-    'border transition-[transform,background-color,border-color] duration-150',
+    // Calm tint feedback only: a scale-pop on every cell across the grid reads
+    // twitchy (the opposite of calm). brightness is GPU-cheap, no layout.
+    'border transition-[background-color,border-color,filter] duration-base',
     correct
       ? 'bg-success/15 border-success/30 text-success'
       : 'bg-danger/10 border-danger/25 text-danger',
     flagged ? 'ring-2 ring-warning' : '',
     current ? 'ring-2 ring-brand ring-offset-1 ring-offset-bg-card' : '',
-    inSet ? 'hover:scale-105' : 'opacity-40 cursor-not-allowed',
+    inSet ? 'hover:brightness-110' : 'opacity-40 cursor-not-allowed',
   ]
     .filter(Boolean)
     .join(' ')

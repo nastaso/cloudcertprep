@@ -30,18 +30,17 @@ interface Props {
   /** Billboard overlay header (transparent → frosted on scroll). Hero pages only. */
   headerOverlay?: boolean
   /**
+   * Suppress the cc-authed frost rule so the transparent overlay is preserved
+   * for signed-in users. Pass true for pages whose dark hero is always visible
+   * regardless of auth state (e.g. coming-soon cert landings).
+   */
+  headerNoAuthedFrost?: boolean
+  /**
    * Whether the Header sticks to the top of the viewport on scroll. Default
    * true. Disabled on the mock-exam shell, whose in-page exam toolbar already
    * owns `sticky top-0`; two sticky bars at top-0 would overlap.
    */
   headerSticky?: boolean
-  /**
-   * Hide the mobile hamburger/drawer in the Header. Default false (drawer
-   * shown site-wide). The exam shells (practice-exam, domain-practice) pass
-   * true because the drawer overlaps the in-exam toolbar; everywhere else the
-   * drawer is the only mobile navigation, so it must stay visible.
-   */
-  headerHideMobileMenu?: boolean
   /**
    * Render the no-JS site-directory fallback block. Default false: prerendered
    * marketing/content pages are fully readable without JS, so the directory
@@ -64,8 +63,8 @@ const {
   showChrome = true,
   headerShowNav = true,
   headerOverlay = false,
+  headerNoAuthedFrost = false,
   headerSticky = true,
-  headerHideMobileMenu = false,
   noscriptDirectory = false,
 } = Astro.props
 
@@ -117,8 +116,8 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:alt" content={title} />
     <meta property="og:site_name" content="CloudCertPrep" />
-    <meta property="og:locale" content="en_GB" />
-    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="en_GB" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -217,17 +216,37 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
          theme toggle (stored only on explicit toggle, never auto-persisted;
          no OS prefers-color-scheme mirroring by design). */
       (function(){var t=localStorage.getItem('cloudcertprep_theme');if(t==='dark'){document.documentElement.classList.add('dark')}})();
+      /* Motion gate, set BEFORE first paint so the hero stagger + scroll-reveal
+         elements ([data-reveal]) are hidden from frame ONE (deterministic - no
+         paint-then-snap-to-0 flash, which was racy when cc-js was added at the
+         end of <body>). Only when motion is allowed AND IntersectionObserver
+         exists; otherwise content paints fully visible (no-JS / reduced-motion /
+         old-browser parity). The end-of-body bootstrap then reveals it.
+         DO NOT REMOVE. */
+      (function(){try{if(!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)&&'IntersectionObserver'in window){document.documentElement.classList.add('cc-js')}}catch(e){}})();
     </script>
 
     <!-- Auth pre-paint: define a shared hasSession() helper on window, then
          apply the `cc-authed` class to <html> before paint. Logged-in
          visitors see History + Sign out immediately (no flash, no shift).
-         The HeaderInteractive island re-syncs this class to the real auth
-         result; the per-page cert landing pre-hide script (cert.astro)
-         reuses the same window.__ccHasSession() helper. Runs on bfcache
+         The class is ALSO set optimistically on an OAuth / magic-link return
+         (`?code=` in the URL): the session token is not written yet (Supabase
+         exchanges the code AFTER load - the same `hasAuthCallback` test as
+         useAuth.ts), so without this the home/cert page paints the GUEST hero
+         then hard-cuts to the signed-in view ~1s later when the PKCE exchange
+         resolves (flash F1, plus a dark->light tone change in light theme).
+         The guest markup only CSS-hides (it is never removed), and crawlers
+         never see a `?code=` URL, so the build-time HTML keeps the locked H1 as
+         the first <h1> (citation guard). A failed exchange flips back to guest
+         when HeaderInteractive re-syncs to the real auth result (rarer than
+         today's every-success flash; failures navigate away anyway). Header
+         readability + hero swap on the optimistic class are pure CSS
+         (index.css `html.cc-authed header[data-overlay]` + `.cc-auth-*`).
+         __ccHasSession() itself stays a PURE token check - cert.astro + the
+         index.astro greeting read it for the real stored user. Runs on bfcache
          restore (pageshow) too. DO NOT REMOVE. -->
     <script is:inline>
-      (function(){function h(){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sb-')===0&&k.indexOf('-auth-token')===k.length-11)return true}}catch(e){}return false}window.__ccHasSession=h;function apply(){document.documentElement.classList.toggle('cc-authed',h())}apply();window.addEventListener('pageshow',apply)})();
+      (function(){function h(){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sb-')===0&&k.indexOf('-auth-token')===k.length-11)return true}}catch(e){}return false}window.__ccHasSession=h;function apply(){document.documentElement.classList.toggle('cc-authed',h()||/[?&]code=/.test(location.search))}apply();window.addEventListener('pageshow',apply)})();
     </script>
 
     <!-- Stale-chunk recovery: after a new deploy, a still-open old tab can
@@ -247,14 +266,14 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
         Skip to main content
       </a>
 
-      {showChrome && <Header showNav={headerShowNav} sticky={headerSticky} hideMobileMenu={headerHideMobileMenu} overlay={headerOverlay} />}
+      {showChrome && <Header showNav={headerShowNav} sticky={headerSticky} overlay={headerOverlay} noAuthedFrost={headerNoAuthedFrost} />}
 
       <main id="main" class="flex-1 flex flex-col">
         <slot />
       </main>
 
       {showChrome && <FooterIsland client:idle />}
-      {showChrome && <DonateButtonIsland client:idle />}
+      {showChrome && <DonateButtonIsland client:idle pathname={Astro.url.pathname} />}
     </div>
 
     <AccountLinkNoticeIsland client:idle />
@@ -273,21 +292,27 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
     <script is:inline>
       (function () {
         var root = document.documentElement
-        root.classList.add('cc-js')
-        var els = function () { return Array.prototype.slice.call(document.querySelectorAll('[data-reveal]')) }
-        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        if (reduce || !('IntersectionObserver' in window)) {
-          els().forEach(function (el) { el.classList.add('is-revealed') })
-          return
-        }
+        /* cc-js is set pre-paint in <head>, but ONLY when motion is allowed +
+           IntersectionObserver exists. If it is absent (reduced-motion / no-IO /
+           no-JS parity) the content is already fully visible - nothing to do. */
+        if (!root.classList.contains('cc-js')) return
+        var els = Array.prototype.slice.call(document.querySelectorAll('[data-reveal]'))
+        if (!els.length) return
         var io = new IntersectionObserver(function (entries) {
           entries.forEach(function (e) {
             if (e.isIntersecting) { e.target.classList.add('is-revealed'); io.unobserve(e.target) }
           })
         }, { rootMargin: '0px 0px -10% 0px' })
-        function start() { els().forEach(function (el) { io.observe(el) }) }
-        if (document.readyState !== 'loading') start()
-        else document.addEventListener('DOMContentLoaded', start)
+        /* This runs at end-of-body parse, before the first paint of these
+           elements in practice. Reveal anything already in/near the viewport
+           SYNCHRONOUSLY so above-the-fold reveals never sit blank; observe only
+           the genuinely below-fold ones (hidden off-screen => no visible flash
+           when they later reveal on scroll). */
+        var vh = window.innerHeight || root.clientHeight
+        els.forEach(function (el) {
+          if (el.getBoundingClientRect().top < vh) el.classList.add('is-revealed')
+          else io.observe(el)
+        })
       })()
     </script>
     {noscriptDirectory && <noscript>
@@ -344,7 +369,7 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
             <li><a href="https://www.cloudcertprep.io/aws/aif-c01">AWS AI Practitioner (AIF-C01)</a></li>
             <li><a href="https://www.cloudcertprep.io/blog">Blog</a></li>
             <li><a href="https://www.cloudcertprep.io/contribute">Contribute</a></li>
-            <li><a href="https://www.cloudcertprep.io/history">Exam History</a></li>
+            <li><a href="https://www.cloudcertprep.io/history">Exam history</a></li>
             <li><a href="https://www.cloudcertprep.io/privacy">Privacy Policy</a></li>
             <li><a href="https://www.cloudcertprep.io/terms">Terms of Service</a></li>
           </ul>

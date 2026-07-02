@@ -186,7 +186,7 @@ export const FAQ_ENTRIES: FAQEntry[] = [
   {
     question: 'What is the AWS Cloud Practitioner pass rate?',
     answer:
-      'AWS does not publish official pass rates for any certification, so any specific percentage you see online is an estimate, not an AWS figure. CLF-C02 is the entry-level exam and is widely regarded as the most approachable AWS certification: candidates who study the exam guide, practise consistently, and review explanations typically pass on their first attempt. Treat your scores on full-length practice exams here as the best available predictor: a steady 800+ signals you are ready.',
+      'AWS does not publish official pass rates for any certification, so any specific percentage you see online is an estimate, not an AWS figure. CLF-C02 is the entry-level exam and is widely regarded as the most approachable AWS certification: candidates who study the exam guide, practice consistently, and review explanations typically pass on their first attempt. Treat your scores on full-length practice exams here as the best available predictor: a steady 800+ signals you are ready.',
     category: 'format',
     certCode: 'clf-c02',
     excludeFromLlms: true,
@@ -209,7 +209,7 @@ export const FAQ_ENTRIES: FAQEntry[] = [
   {
     question: 'Does every question have a detailed explanation?',
     answer:
-      'Yes. Every CLF-C02 practice question ships with a full explanation covering why the correct answer is right and why each distractor is wrong. Explanations reference AWS concepts and documentation, so you learn the reasoning rather than memorising answers. The entire bank is publicly auditable on GitHub under the MIT license.',
+      'Yes. Every CLF-C02 practice question ships with a full explanation covering why the correct answer is right and why each distractor is wrong. Explanations reference AWS concepts and documentation, so you learn the reasoning rather than memorizing answers. The entire bank is publicly auditable on GitHub under the MIT license.',
     category: 'format',
     certCode: 'clf-c02',
   },
@@ -240,7 +240,7 @@ export const FAQ_ENTRIES: FAQEntry[] = [
   {
     question: 'How much does the AWS Cloud Practitioner exam cost?',
     answer:
-      'The AWS Certified Cloud Practitioner (CLF-C02) exam costs 100 USD (prices vary slightly by region and local tax). AWS occasionally offers a free retake or a 50% discount voucher to candidates who hold an existing AWS certification, so check your AWS Certification account for available benefits before booking. Practising here is free; only the official exam at Pearson VUE or PSI carries the fee.',
+      'The AWS Certified Cloud Practitioner (CLF-C02) exam costs 100 USD (prices vary slightly by region and local tax). AWS occasionally offers a free retake or a 50% discount voucher to candidates who hold an existing AWS certification, so check your AWS Certification account for available benefits before booking. Practicing here is free; only the official exam at Pearson VUE or PSI carries the fee.',
     category: 'format',
     certCode: 'clf-c02',
   },
@@ -282,7 +282,7 @@ export const FAQ_ENTRIES: FAQEntry[] = [
   {
     question: 'Does CloudCertPrep provide CLF-C02 exam dumps?',
     answer:
-      'No. We do not provide exam dumps, which are leaked or stolen real exam questions that violate the AWS Certification agreement and can get your certification revoked. Every CloudCertPrep question is original, written from the published AWS exam guide and AWS documentation, and aligned to the current CLF-C02 domains. The goal is to teach the material so you pass legitimately, not to memorise stolen answers.',
+      'No. We do not provide exam dumps, which are leaked or stolen real exam questions that violate the AWS Certification agreement and can get your certification revoked. Every CloudCertPrep question is original, written from the published AWS exam guide and AWS documentation, and aligned to the current CLF-C02 domains. The goal is to teach the material so you pass legitimately, not to memorize stolen answers.',
     category: 'general',
     certCode: 'clf-c02',
   },
@@ -349,7 +349,7 @@ export const FAQ_ENTRIES: FAQEntry[] = [
   {
     question: 'Does every question have a detailed explanation?',
     answer:
-      'Yes. Every AIF-C01 practice question ships with a full explanation covering why the correct answer is right and why each distractor is wrong. Explanations reference AWS AI and ML concepts and documentation, so you learn the reasoning rather than memorising answers. The entire bank is publicly auditable on GitHub under the MIT license.',
+      'Yes. Every AIF-C01 practice question ships with a full explanation covering why the correct answer is right and why each distractor is wrong. Explanations reference AWS AI and ML concepts and documentation, so you learn the reasoning rather than memorizing answers. The entire bank is publicly auditable on GitHub under the MIT license.',
     category: 'format',
     certCode: 'aif-c01',
   },
@@ -357,7 +357,7 @@ export const FAQ_ENTRIES: FAQEntry[] = [
   {
     question: 'How much does the AWS AI Practitioner exam cost?',
     answer:
-      'The AWS Certified AI Practitioner (AIF-C01) exam costs 100 USD (prices vary slightly by region and local tax). As a foundational-level exam it is the same price tier as the Cloud Practitioner. If you already hold an AWS certification, check your AWS Certification account for a 50% discount voucher before booking. Practising on CloudCertPrep is always free.',
+      'The AWS Certified AI Practitioner (AIF-C01) exam costs 100 USD (prices vary slightly by region and local tax). As a foundational-level exam it is the same price tier as the Cloud Practitioner. If you already hold an AWS certification, check your AWS Certification account for a 50% discount voucher before booking. Practicing on CloudCertPrep is always free.',
     category: 'format',
     certCode: 'aif-c01',
   },

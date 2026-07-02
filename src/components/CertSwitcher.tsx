@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react'
 import { Check } from 'lucide-react'
 import { setActiveCert } from '../hooks/useCert'
 import { useExamActive } from '../hooks/useExamActive'
+import { guardExamLeave } from '../lib/examGuard'
 import { subscribeLocationChange } from '../lib/locationChange'
 import { getSortedCerts, getProviderLabel, getCertByPath, CERTIFICATIONS, DEFAULT_CERT_ID } from '../data/certifications'
 import type { Certification } from '../data/certifications'
@@ -147,13 +148,26 @@ export function CertSwitcher({ variant, onSelect, initialPathname }: CertSwitche
       onSelect?.()
       return
     }
+    const url = certTargetPath(target, pathname)
+    // During an active exam OR practice session, route the cert switch through
+    // the leave-confirm broker (the session island owns the navigation on
+    // confirm) instead of silently discarding the in-progress session. This is
+    // what the mobile switcher buttons need: unlike the desktop anchors, a
+    // <button> is not caught by the islands' anchor-capture leave guard. Matches
+    // the header Sign in / Sign out buttons. When guarded we must NOT also
+    // navigate here, and the active cert is persisted by useCert on the target
+    // page after the confirmed reload, so skip setActiveCert too.
+    if (guardExamLeave(url)) {
+      onSelect?.()
+      return
+    }
     setActiveCert(target.code)
     onSelect?.()
     // Real document navigation: each cert page is a separate Astro document,
     // so we must trigger a full browser navigation rather than a client-side
     // react-router push (which would only change the URL without loading the
     // new prerendered Astro page).
-    window.location.assign(certTargetPath(target, pathname))
+    window.location.assign(url)
   }
 
   // Build the grouped menu list shared between desktop and mobile variants.

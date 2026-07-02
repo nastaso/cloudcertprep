@@ -34,8 +34,11 @@ const breadcrumbItems = [
 ]
 ---
 
-<BaseLayout title={title} description={description} canonical={canonical} robots="noindex" headerSticky={false} headerHideMobileMenu={true} noscriptDirectory={true}>
-  <div class="w-full max-w-4xl mx-auto px-4 md:px-8 pt-4 md:pt-6">
+<BaseLayout title={title} description={description} canonical={canonical} robots="noindex" headerSticky={false} noscriptDirectory={true}>
+  {/* Orientation breadcrumb on the start/results screens; hidden DURING an
+      active timed exam (the exam island sets body[data-exam-active]) since the
+      route is noindex and you should not navigate away mid-exam (bug 12). */}
+  <div class="cc-hide-in-exam w-full max-w-4xl mx-auto px-4 md:px-8 pt-4 md:pt-6">
     <Breadcrumb items={breadcrumbItems} />
   </div>
   {/* Static island shell: reserves the body height and shows a spinner in the

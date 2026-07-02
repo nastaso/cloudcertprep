@@ -38,6 +38,12 @@ export function useCertNavigate() {
   const goCertExam = useCallback(
     (cert?: Certification) => {
       const target = cert ?? activeCert
+      // Guard: coming-soon certs have no practice-exam page; redirect to the
+      // cert landing instead of hard-404ing. (#525)
+      if (target.status !== 'active') {
+        window.location.assign(`/${target.provider}/${target.code}`)
+        return
+      }
       // The practice-exam page is a SEPARATE Astro document with its own
       // chrome (headerSticky={false}, robots=noindex). A react-router push
       // would render MockExam under the CURRENT document's chrome (e.g. from

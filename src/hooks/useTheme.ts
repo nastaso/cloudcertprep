@@ -8,6 +8,7 @@
  */
 
 import { useCallback, useSyncExternalStore } from 'react'
+import { storageSet } from '../lib/storage'
 
 type Theme = 'light' | 'dark'
 
@@ -49,7 +50,9 @@ export function useTheme() {
     root.classList.add('no-transition')
     const next: Theme = t === 'dark' ? 'light' : 'dark'
     root.classList.toggle('dark', next === 'dark')
-    localStorage.setItem(THEME_KEY, next)
+    // storageSet catches SecurityError in private/cookies-disabled browsers;
+    // execution continues so theme and no-transition are always resolved.
+    storageSet(THEME_KEY, next)
     theme = next
     notify()
     requestAnimationFrame(() => {

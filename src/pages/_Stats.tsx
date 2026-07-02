@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react'
-import { LoadingSpinner } from '../components/LoadingSpinner'
+import { Skeleton } from '../components/Skeleton'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
 import { getSupabase } from '../lib/supabase'
 import { formatRelativeDate } from '../lib/formatting'
 import { formatTime } from '../lib/scoring'
 import { CERTIFICATION_LIST, getCertTotalQuestions, getCertDomains } from '../data/certifications'
-import { Trophy, TrendingUp, Clock, Check } from 'lucide-react'
+import { Trophy, TrendingUp, Clock, Check, RotateCw } from 'lucide-react'
 import { logError } from '../lib/logger'
 
-interface PlatformStats {
+interface PublicTotals {
   total_users: number
   total_questions_answered: number
-  total_exams_attempted: number
-  total_exams_passed: number
 }
 
 interface RecentWin {
@@ -39,31 +37,51 @@ interface DomainStat {
   avg_score: number
 }
 
-export function Stats() {
-  const [stats, setStats] = useState<PlatformStats | null>(null)
+interface StatsProps {
+  /** Suppress the first-load skeleton (the prerendered snapshot stands in). */
+  hideInitialSkeleton?: boolean
+  /** Fired once the first data load settles, so the host can swap the snapshot. */
+  onLoaded?: () => void
+}
+
+export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}) {
+  const [publicTotals, setPublicTotals] = useState<PublicTotals | null>(null)
   const [certStats, setCertStats] = useState<Record<string, CertStats>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  // True once a fetch has actually succeeded. The prerendered snapshot is hidden
+  // ONLY then (not on an errored settle), so a flaky first load keeps the real
+  // cached numbers instead of swapping them for an error over empty placeholders.
+  const [liveLoaded, setLiveLoaded] = useState(false)
 
   async function loadStats() {
+    let ok = false
     try {
       setLoading(true)
       setError(null)
+      // Reset the footer so a retry can never leave a stale totals line from a
+      // prior success next to freshly retried cert stats; it only re-renders
+      // from a fresh, validated RPC result below.
+      setPublicTotals(null)
 
       const supabase = await getSupabase()
-      // Load platform stats from singleton table
-      const { data: statsData, error: statsError } = await supabase
-        .from('platform_stats')
-        .select('*')
-        .eq('id', 'singleton')
-        .single()
+      // Load live totals via SECURITY DEFINER RPC (bypasses RLS on auth.users /
+      // attempt_questions). Falls back silently if the function is not yet
+      // deployed on this env - the footer just won't render rather than erroring.
+      const { data: totalsData, error: totalsError } = await supabase
+        .rpc('get_public_totals')
 
-      if (statsError && statsError.code !== 'PGRST116') {
-        logError('Stats.loadStats.platformStats', statsError)
-      }
-
-      if (statsData) {
-        setStats(statsData)
+      if (totalsError) {
+        logError('Stats.loadStats.publicTotals', totalsError)
+      } else if (
+        Number.isFinite(totalsData?.total_users) &&
+        Number.isFinite(totalsData?.total_questions_answered) &&
+        totalsData.total_users > 0
+      ) {
+        // Shape-validated before storing: a drifted return (missing/null field,
+        // RETURNS TABLE array wrapping) must hide the footer, not throw in
+        // render. Zero users hides it too instead of bragging about "0 users".
+        setPublicTotals(totalsData)
       }
 
       // Load aggregate exam stats via SECURITY DEFINER RPC
@@ -72,7 +90,12 @@ export function Stats() {
         .rpc('get_public_exam_stats')
 
       if (examStatsError) {
+        // postgrest-js resolves almost every failure (rate limit, restart,
+        // missing function) as {error} rather than throwing, so a resolved
+        // error must fail the load too - otherwise the snapshot is swapped
+        // for "Be the first" placeholders with no error UI and no retry.
         logError('Stats.loadStats.examStats', examStatsError)
+        setError('Failed to load statistics')
       }
 
       if (examStats?.cert_stats) {
@@ -82,26 +105,89 @@ export function Stats() {
         }
         setCertStats(certStatsMap)
       }
+      ok = !examStatsError
 
     } catch (err: unknown) {
       logError('Stats.loadStats', err)
       setError('Failed to load statistics')
     } finally {
       setLoading(false)
+      // Hide the prerendered snapshot ONLY on a successful load (a single
+      // forward swap to live numbers). On an errored first load we keep it, so
+      // the real cached numbers stay on screen behind a compact retry.
+      if (ok) {
+        setLiveLoaded(true)
+        onLoaded?.()
+      }
     }
   }
 
   useEffect(() => {
-    // Async setState (inside loadStats) is allowed by the rule's intent;
-    // disabling the synchronous heuristic explicitly.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadStats()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // First-load phase: the prerendered snapshot is still standing in (it is
+  // hidden only on a SUCCESSFUL load). Never replace it with a skeleton or the
+  // empty-placeholder grid. While fetching, render nothing (the snapshot is the
+  // loading state); on a flaky load, show a compact retry OVER the real cached
+  // numbers instead of an error banner above wrong "Be the first" placeholders.
+  if (hideInitialSkeleton && !liveLoaded) {
+    if (error) {
+      return (
+        <div className="p-4 md:p-8">
+          <div className="max-w-6xl mx-auto">
+            <Alert tone="danger" role="status" className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <span>Showing the latest saved figures. We could not refresh the live statistics.</span>
+              <button
+                type="button"
+                onClick={() => loadStats()}
+                className="inline-flex min-h-[44px] flex-shrink-0 items-center justify-center gap-2 rounded-full border border-danger/40 px-5 text-sm font-medium text-danger transition-colors duration-200 hover:bg-danger/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40"
+              >
+                <RotateCw className="h-4 w-4" aria-hidden="true" />
+                Try again
+              </button>
+            </Alert>
+          </div>
+        </div>
+      )
+    }
+    return null
+  }
+
   if (loading) {
+    // A re-fetch after live data is already present: show the real skeleton
+    // (the snapshot is gone), never null (which would blank the page).
+    // Skeleton shaped like the stats page (header + cert cards), matching the
+    // real wrapper so there is no jump when the live numbers resolve.
     return (
-      <div className="flex-1 flex items-center justify-center p-8">
-        <LoadingSpinner text="Loading stats..." />
+      <div className="p-4 md:p-8">
+        <div className="max-w-6xl mx-auto space-y-8" aria-busy="true">
+          <header className="space-y-2">
+            <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] text-text-primary">Community statistics</h1>
+            <p className="text-text-muted text-sm md:text-base">
+              Aggregated, anonymous results from the CloudCertPrep community. Your individual scores stay private to your account.
+            </p>
+          </header>
+          <p className="sr-only" role="status">Loading community statistics</p>
+          {[0, 1].map(i => (
+            <div key={i} className="bg-bg-card border border-border-hairline rounded-2xl p-4 md:p-6" aria-hidden="true">
+              <div className="flex items-center gap-2 mb-4">
+                <Skeleton className="h-5 w-16 rounded-full" />
+                <Skeleton className="h-5 w-24" />
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                {[0, 1, 2, 3, 4, 5].map(j => (
+                  <div key={j} className="space-y-2">
+                    <Skeleton className="h-8 w-16" />
+                    <Skeleton className="h-3 w-20" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -126,8 +212,16 @@ export function Stats() {
           </header>
 
           {error && (
-            <Alert tone="danger" role="alert" className="text-danger">
-              <p className="text-danger text-sm">{error}</p>
+            <Alert tone="danger" role="alert" className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <span>We could not load the community statistics. Check your connection and try again.</span>
+              <button
+                type="button"
+                onClick={() => loadStats()}
+                className="inline-flex min-h-[44px] flex-shrink-0 items-center justify-center gap-2 rounded-full border border-danger/40 px-5 text-sm font-medium text-danger transition-colors duration-200 hover:bg-danger/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger/40"
+              >
+                <RotateCw className="h-4 w-4" aria-hidden="true" />
+                Try again
+              </button>
             </Alert>
           )}
 
@@ -151,7 +245,7 @@ export function Stats() {
                     <TrendingUp className="w-5 h-5 text-text-muted flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div>
                       <p className="text-text-primary text-sm md:text-base mb-1">
-                        {getCertTotalQuestions(cert.code).toLocaleString()} practice questions available
+                        {getCertTotalQuestions(cert.code).toLocaleString('en-US')} practice questions available
                       </p>
                       <p className="text-text-muted text-xs md:text-sm">
                         Community stats will appear here once users start taking exams.
@@ -179,7 +273,7 @@ export function Stats() {
                   <p className="text-text-muted text-sm">
                     Not enough attempts yet. Be the first to set the community benchmark.{' '}
                     <a href={`/aws/${cert.code}/practice-exam`} className="text-text-primary hover:text-text-primary/70 underline">
-                      Start practising →
+                      Start practicing →
                     </a>
                   </p>
                 </Card>
@@ -191,7 +285,7 @@ export function Stats() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="px-2 py-1 rounded text-xs font-medium bg-success/20 text-success">ACTIVE</span>
+                      <span className="px-2 py-0.5 rounded-full font-mono text-[11px] font-semibold uppercase tracking-wide bg-success/15 text-success">Active</span>
                       <h2 className="text-lg md:text-xl font-semibold text-text-primary">{cert.shortName}</h2>
                     </div>
                     <p className="text-text-muted text-xs md:text-sm">{cert.name}</p>
@@ -201,39 +295,39 @@ export function Stats() {
                 {/* Key Metrics */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-6">
                   <div>
-                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_attempts.toLocaleString()}</p>
-                    <p className="text-text-muted text-xs md:text-sm mt-1">Total Attempts</p>
+                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_attempts.toLocaleString('en-US')}</p>
+                    <p className="text-text-muted text-xs md:text-sm mt-1">Total attempts</p>
                   </div>
                   <div>
-                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_passes.toLocaleString()}</p>
-                    <p className="text-text-muted text-xs md:text-sm mt-1">Total Passes</p>
+                    <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{cs.total_passes.toLocaleString('en-US')}</p>
+                    <p className="text-text-muted text-xs md:text-sm mt-1">Total passes</p>
                   </div>
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">
                       {cs.total_attempts > 0 ? Math.round((cs.total_passes / cs.total_attempts) * 100) : 0}%
                     </p>
-                    <p className="text-text-muted text-xs md:text-sm mt-1">Pass Rate</p>
+                    <p className="text-text-muted text-xs md:text-sm mt-1">Pass rate</p>
                   </div>
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{Math.round(cs.avg_score)}</p>
-                    <p className="text-text-muted text-xs md:text-sm mt-1">Avg Score (Passed)</p>
+                    <p className="text-text-muted text-xs md:text-sm mt-1">Avg score (passed)</p>
                   </div>
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">{Math.round(cs.avg_time_minutes)} min</p>
-                    <p className="text-text-muted text-xs md:text-sm mt-1">Avg Time (Passed)</p>
+                    <p className="text-text-muted text-xs md:text-sm mt-1">Avg time (passed)</p>
                   </div>
                   <div>
                     <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-text-primary">
                       {cs.fastest_pass_seconds ? formatTime(cs.fastest_pass_seconds) : 'N/A'}
                     </p>
-                    <p className="text-text-muted text-xs md:text-sm mt-1">Fastest Pass</p>
+                    <p className="text-text-muted text-xs md:text-sm mt-1">Fastest pass</p>
                   </div>
                 </div>
 
                 {/* Domain Difficulty Ranking */}
                 {cs.domain_stats && cs.domain_stats.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="text-sm md:text-base font-semibold text-text-primary mb-3">Domain Difficulty (Hardest First)</h3>
+                    <h3 className="text-sm md:text-base font-semibold text-text-primary mb-3">Domain difficulty (hardest first)</h3>
                     <div className="space-y-3">
                       {(() => {
                         const certDomainNames = getCertDomains(cs.cert_code)
@@ -248,10 +342,10 @@ export function Stats() {
                             </div>
                             <p className="font-mono text-xs md:text-sm text-text-muted tabular-nums">{Math.round(ds.avg_score)}% avg</p>
                           </div>
-                          <div className="h-1.5 bg-bg-dark rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-text-muted/15 rounded-full overflow-hidden">
                             <div
-                              className={`h-full transition-all ${ds.avg_score < 60 ? 'bg-danger' : ds.avg_score < 75 ? 'bg-warning' : 'bg-success'}`}
-                              style={{ width: `${Math.min(100, ds.avg_score)}%` }}
+                              className={`h-full w-full origin-left transition-transform duration-settle ease-out ${ds.avg_score < 60 ? 'bg-danger' : ds.avg_score < 75 ? 'bg-warning-fill' : 'bg-success'}`}
+                              style={{ transform: `scaleX(${Math.min(100, ds.avg_score) / 100})` }}
                             />
                           </div>
                         </div>
@@ -267,7 +361,7 @@ export function Stats() {
                   <div>
                     <h3 className="text-sm md:text-base font-semibold text-text-primary mb-3 flex items-center gap-2">
                       <Trophy className="w-4 h-4 text-success" />
-                      Recent Passes
+                      Recent passes
                     </h3>
                     <div className="space-y-2">
                       {cs.recent_passes.map((pass, i) => (
@@ -282,7 +376,7 @@ export function Stats() {
                                 <span>{formatRelativeDate(pass.passed_at)}</span>
                                 {pass.time_taken_seconds && (
                                   <>
-                                    <span>•</span>
+                                    <span>·</span>
                                     <Clock className="w-3 h-3 inline" />
                                     <span>{formatTime(pass.time_taken_seconds)}</span>
                                   </>
@@ -299,11 +393,11 @@ export function Stats() {
             )
           })}
 
-          {/* Platform Totals */}
-          {stats && (
+          {/* Platform Totals - live counts via get_public_totals() RPC */}
+          {publicTotals && (
             <div className="border-t border-text-muted/10 pt-6">
               <p className="text-text-muted text-xs md:text-sm text-center">
-                {stats.total_users.toLocaleString()} users • {stats.total_questions_answered.toLocaleString()} questions answered across all certifications
+                {publicTotals.total_users.toLocaleString('en-US')} users · {publicTotals.total_questions_answered.toLocaleString('en-US')} questions answered across all certifications
               </p>
             </div>
           )}

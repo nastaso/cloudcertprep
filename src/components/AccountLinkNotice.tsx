@@ -32,16 +32,16 @@ export function AccountLinkNotice() {
       <Alert
         tone="success"
         role="status"
-        className="relative w-full max-w-md pr-10 shadow-2xl pointer-events-auto animate-slide-up"
+        className="relative w-full max-w-md pr-12 shadow-2xl pointer-events-auto animate-slide-up"
       >
         {ACCOUNT_LINK_MESSAGE}
         <button
           type="button"
           onClick={() => setVisible(false)}
-          className="absolute top-1.5 right-1.5 w-9 h-9 inline-flex items-center justify-center text-success hover:text-success/70 transition-colors rounded-md"
+          className="absolute top-0.5 right-0.5 w-11 h-11 inline-flex items-center justify-center text-success hover:text-success/70 transition-colors rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           aria-label="Dismiss"
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4" aria-hidden="true" />
         </button>
       </Alert>
     </div>

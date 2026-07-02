@@ -52,7 +52,7 @@ const sourceUrl = `${GITHUB_REPO_URL}/blob/main/src/data/${cert.code}/domain1.js
   <section aria-labelledby="explanation-showcase-heading" class="mt-8 md:mt-12">
     <p class="kicker" aria-hidden="true">Explanations</p>
     <h2 id="explanation-showcase-heading" class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-2">
-      Every Question Includes a Detailed Explanation
+      Every question includes a detailed explanation
     </h2>
     <p class="text-lead mb-6 max-w-2xl">
       Every question ships with a full explanation: why the correct answer is right and why each distractor is wrong.
@@ -67,6 +67,7 @@ const sourceUrl = `${GITHUB_REPO_URL}/blob/main/src/data/${cert.code}/domain1.js
       certCode={cert.code}
       domainSlug={domainSlug}
       questionId={sample.id}
+      reveal
     />
 
     <p class="mt-3 text-sm text-text-muted">

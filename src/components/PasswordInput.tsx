@@ -23,7 +23,7 @@ export function PasswordInput({
   value,
   onChange,
   autoComplete,
-  placeholder = '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022',
+  placeholder = 'Enter your password',
   required = false,
 }: PasswordInputProps) {
   const [visible, setVisible] = useState(false)

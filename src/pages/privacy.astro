@@ -26,6 +26,7 @@ const breadcrumbItems = [
   description="CloudCertPrep privacy policy. GDPR-compliant, EU-hosted (Ireland), no data sold. Guest users generate no personal data."
   canonical="https://www.cloudcertprep.io/privacy"
   headerOverlay={true}
+  headerNoAuthedFrost={true}
 >
   {/* BreadcrumbList JSON-LD only; the visible trail is the HeroMini crumbs. */}
   <Breadcrumb items={breadcrumbItems} visuallyHidden />
@@ -40,7 +41,7 @@ const breadcrumbItems = [
 
   <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
     <div class="max-w-3xl mx-auto px-4 md:px-8">
-      <p class="font-mono text-[12px] tracking-wide text-text-muted mb-8">Last updated: June 2026</p>
+      <p class="font-mono text-[12px] tracking-wide text-text-muted mb-8 max-w-[68ch] mx-auto">Last updated: June 2026</p>
 
       <div class="space-y-8 max-w-[68ch] mx-auto">
         <section>
@@ -57,15 +58,15 @@ const breadcrumbItems = [
           </p>
           <ul class="space-y-2 text-text-muted text-base">
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span><strong class="text-text-primary">Email address</strong>: used to identify your account and send password reset emails.</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span><strong class="text-text-primary">Practice history</strong>: the questions you answered, whether you got them right, and when. Used to power spaced repetition and track your domain mastery.</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span><strong class="text-text-primary">Exam attempts</strong>: your scores, timing, and domain breakdowns from practice exams. Used to display your History page.</span>
             </li>
           </ul>
@@ -92,12 +93,12 @@ const breadcrumbItems = [
           </p>
           <ul class="space-y-2 text-text-muted text-base">
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span><strong class="text-text-primary">Contract performance</strong>: processing your account data and study progress is necessary to provide the service you signed up for.</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
-              <span><strong class="text-text-primary">Legitimate interests</strong>: we use anonymised, aggregated analytics (Umami) to understand how the app is used and improve it. This does not identify you personally.</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
+              <span><strong class="text-text-primary">Legitimate interests</strong>: we use anonymized, aggregated analytics (Umami) to understand how the app is used and improve it. This does not identify you personally.</span>
             </li>
           </ul>
         </section>
@@ -109,15 +110,15 @@ const breadcrumbItems = [
           </p>
           <ul class="space-y-2 text-text-muted text-base">
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span>Personalising which questions appear in Domain Practice sessions (spaced repetition)</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span>Showing your domain mastery progress on the certification landing page</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span>Displaying your exam attempt history</span>
             </li>
           </ul>
@@ -129,7 +130,7 @@ const breadcrumbItems = [
         <section>
           <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Data retention</h2>
           <p class="text-text-muted text-base leading-[1.7]">
-            We retain your account data for as long as your account is active. If you request deletion, we will remove all your personal data within 30 days. Anonymised, aggregated statistics (e.g., total exams passed) may be retained indefinitely as they cannot identify you.
+            We retain your account data for as long as your account is active. If you delete your account from your account settings, your personal data is erased immediately and permanently. If you instead email a deletion request, we will remove all your personal data within 30 days. Anonymized, aggregated statistics (e.g., total exams passed) may be retained indefinitely as they cannot identify you.
           </p>
         </section>
 
@@ -154,28 +155,28 @@ const breadcrumbItems = [
           </p>
           <ul class="space-y-2 text-text-muted text-base">
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span><strong class="text-text-primary">Right of access</strong>: request a copy of your personal data</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span><strong class="text-text-primary">Right to rectification</strong>: request correction of inaccurate data</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span><strong class="text-text-primary">Right to erasure</strong>: request deletion of your data ("right to be forgotten")</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span><strong class="text-text-primary">Right to data portability</strong>: receive your data in a structured, machine-readable format</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span><strong class="text-text-primary">Right to object</strong>: object to processing based on legitimate interests</span>
             </li>
           </ul>
           <p class="text-text-muted text-base leading-[1.7] mt-3">
-            To exercise any of these rights, email <a href="mailto:alex@cloudcertprep.io" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">alex@cloudcertprep.io</a>. We will respond within 30 days.
+            If you have an account, you can export your data or permanently delete your account at any time from your <a href="/account" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">account settings</a>. For any other request, email <a href="mailto:alex@cloudcertprep.io" class="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors">alex@cloudcertprep.io</a> and we will respond within 30 days.
           </p>
         </section>
 
@@ -193,11 +194,11 @@ const breadcrumbItems = [
           </p>
           <ul class="space-y-2 text-text-muted text-base">
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span>Keep your authentication session active</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span>Remember your theme preference (light or dark mode)</span>
             </li>
           </ul>
@@ -213,7 +214,7 @@ const breadcrumbItems = [
           </p>
           <ul class="space-y-2 text-text-muted text-base mb-3">
             <li class="flex items-start gap-2">
-              <span class="text-text-muted mt-0.5">-</span>
+              <span class="mt-[0.55em] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-text-muted/50" aria-hidden="true"></span>
               <span><strong class="text-text-primary">Umami (cookieless, no consent required)</strong>: an open-source, privacy-focused analytics tool. Umami sets no cookies, collects no personally identifiable information, and does not track users across sites. We use it under the GDPR "legitimate interests" basis to understand which pages are visited and which features are used. You cannot opt out of Umami because it does not identify you in the first place.</span>
             </li>
           </ul>

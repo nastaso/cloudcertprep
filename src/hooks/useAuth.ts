@@ -38,28 +38,47 @@ function setState(next: AuthState) {
   listeners.forEach(cb => cb())
 }
 
-function init() {
-  if (initialised || typeof window === 'undefined') return
-  initialised = true
-
-  // Best-effort sync check for a persisted Supabase session token. If none,
-  // resolve loading=false immediately so the logged-out chrome paints
-  // without a placeholder. A stale token only briefly keeps loading=true
-  // until getSession() confirms; never shows a logged-out user a flash.
-  //
-  // SYNC: same scan also lives at window.__ccHasSession (BaseLayout.astro
-  // inline pre-paint script). The two implementations must stay in lockstep.
-  // Inline scripts can't import TS modules, so this duplication is forced.
-  let hasToken = false
+// Best-effort sync check for a persisted Supabase session token.
+//
+// SYNC: same scan also lives at window.__ccHasSession (BaseLayout.astro
+// inline pre-paint script). The two implementations must stay in lockstep.
+// Inline scripts can't import TS modules, so this duplication is forced.
+function hasStoredToken(): boolean {
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i)
       if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) {
-        hasToken = true
-        break
+        return true
       }
     }
   } catch { /* localStorage unavailable */ }
+  return false
+}
+
+function init() {
+  if (initialised || typeof window === 'undefined') return
+  initialised = true
+
+  // If no token, resolve loading=false immediately so the logged-out chrome
+  // paints without a placeholder. A stale token only briefly keeps
+  // loading=true until getSession() confirms; never shows a logged-out user
+  // a flash.
+  const hasToken = hasStoredToken()
+
+  // bfcache restore: a restored page keeps its frozen React heap, so a user
+  // who signed out (or deleted their account) in another tab/page still
+  // renders as signed in here even though the class-level chrome heals
+  // (hardening F8). On restore, re-run the token scan and downgrade to guest
+  // when no token remains - the same shape as _Login's bfcache loading reset
+  // (#125). Upgrades are deliberately left to the next real navigation: a
+  // bare token proves nothing without a getSession round-trip.
+  window.addEventListener('pageshow', (e: PageTransitionEvent) => {
+    if (!e.persisted) return
+    if (!hasStoredToken() && state.user !== null) {
+      prevUser = null
+      setState({ user: null, loading: false })
+    }
+  })
 
   // An OAuth / magic-link / recovery callback returns as `?code=...` on whatever
   // page `redirectTo` pointed at. For OAuth that is wherever the user started
@@ -89,11 +108,11 @@ function init() {
         const initialUser = session?.user ?? null
         prevUser = initialUser
         setState({ user: initialUser, loading: false })
-        // A guest exam attempt stored before this session resolved (e.g. the
-        // flush failed offline last visit) is retried on any signed-in load.
-        if (initialUser && hasPendingAttempt()) {
-          void flushPendingAttempt(initialUser.id)
-        }
+        // No pending-attempt flush here: a persisted session resolving on load
+        // is a PASSIVE transition (it may be a different person on a shared
+        // device), so it must not adopt a stored guest attempt. The flush is
+        // wired into onAuthStateChange below and gated on an explicit save
+        // intent; INITIAL_SESSION delivers the same session through that path.
       })
       .catch((err: unknown) => {
         logError('useAuth.getSession', err)
@@ -152,10 +171,17 @@ function init() {
 
       // Flush a pending guest exam attempt to the now-signed-in account (the
       // results-screen "Sign in to save this attempt" path). Deferred out of
-      // the auth callback per the supabase-js deadlock caution; the flush
-      // self-guards against re-entry and missing payloads, so firing on any
-      // signed-in transition (incl. INITIAL_SESSION / TOKEN_REFRESHED) is safe.
-      if (newUser && hasPendingAttempt()) {
+      // the auth callback per the supabase-js deadlock caution. flushPendingAttempt
+      // is the real guard: it writes ONLY when the guest set a matching save
+      // intent, so a passive or unrelated sign-in adopts nothing. We additionally
+      // skip bare TOKEN_REFRESHED / USER_UPDATED here so they never even attempt
+      // it; SIGNED_IN is the genuine save flow and INITIAL_SESSION carries the
+      // same intent-gated session for the in-tab return from /login. (P2 data-bleed)
+      if (
+        (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')
+        && newUser
+        && hasPendingAttempt()
+      ) {
         const userId = newUser.id
         setTimeout(() => { void flushPendingAttempt(userId) }, 0)
       }
