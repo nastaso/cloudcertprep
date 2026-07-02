@@ -17,6 +17,9 @@ import HeroStage from '../components/landing/HeroStage.astro'
 import AuthLinkNotice from '../components/AuthLinkNotice.tsx'
 import { buttonClass } from '../lib/buttonStyles'
 import Faq from '../components/Faq.astro'
+import PostCard from '../components/PostCard.astro'
+import { getCollection, type CollectionEntry } from 'astro:content'
+import { includeDrafts } from '../lib/posts'
 import {
   CERTIFICATIONS,
   DEFAULT_CERT_ID,
@@ -53,6 +56,16 @@ const canonical = 'https://www.cloudcertprep.io/'
 // question-count regexes) so the Build_Time_Citation_Guard passes regardless
 // of the hero's visual treatment.
 const homeFirstParagraph = buildHomeFirstParagraph(clfCount, aifCount)
+
+// Latest blog posts. The home page is the highest-authority page on the site,
+// so body-linking /blog (not just via the Header island) opens a crawl path and
+// passes link equity into the content cluster. Mirrors the proven cert-landing
+// "Latest from the blog" block. Non-draft posts only (drafts also show when
+// PUBLIC_PREVIEW_DRAFTS is set, for branch previews), newest first.
+const latestPosts = (await getCollection('blog'))
+  .filter((post: CollectionEntry<'blog'>) => includeDrafts || !post.data.draft)
+  .sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 2)
 
 // ItemList JSON-LD listing both active Cert_Landing URLs
 const itemListJsonLd = serializeJsonLd({
@@ -276,6 +289,24 @@ const softwareAppJsonLd = serializeJsonLd({
 
         {/* About card */}
         <AboutCard />
+
+        {/* Latest from the blog: body-link into the content cluster (reuses the
+            cert-landing pattern). Opens a crawl path from the highest-authority
+            page to /blog. */}
+        {latestPosts.length > 0 && (
+          <section data-reveal>
+            <p class="kicker" aria-hidden="true">Guides</p>
+            <h2 class="font-display text-[1.75rem] md:text-[2.25rem] font-semibold tracking-[-0.02em] text-text-primary mb-8">Latest from the blog</h2>
+            <div class="grid grid-cols-1 gap-6">
+              {latestPosts.map((post: CollectionEntry<'blog'>) => (
+                <PostCard data={post.data} slug={post.data.slug} />
+              ))}
+            </div>
+            <p class="mt-6">
+              <a href="/blog" class="chev-link text-sm md:text-base font-medium text-link hover:underline underline-offset-4">Read all articles<span class="chev" aria-hidden="true">›</span></a>
+            </p>
+          </section>
+        )}
 
         {/* Generic FAQ */}
         <Faq genericOnly />
