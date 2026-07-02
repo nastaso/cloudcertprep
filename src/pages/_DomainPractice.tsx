@@ -477,9 +477,9 @@ export function DomainPractice() {
                           {domain.id}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-sm md:text-base font-semibold text-text-primary [text-wrap:balance]">
+                          <h2 className="text-sm md:text-base font-semibold text-text-primary [text-wrap:balance]">
                             {domain.name}
-                          </h3>
+                          </h2>
                           <p className="text-xs md:text-sm text-text-muted">{domain.questionCount} questions</p>
                         </div>
                       </div>
@@ -639,7 +639,7 @@ export function DomainPractice() {
 
             {/* Question Number Grid */}
             <Card padding="sm" className="mb-4">
-              <h3 className="text-xs md:text-sm font-semibold text-text-muted mb-2 text-center">Questions:</h3>
+              <h2 className="text-xs md:text-sm font-semibold text-text-muted mb-2 text-center">Questions:</h2>
               <div className="grid grid-cols-[repeat(auto-fit,minmax(32px,32px))] md:grid-cols-[repeat(auto-fit,minmax(36px,36px))] gap-0.5 md:gap-1 justify-center">
                 {questionResults.map((result, idx) => {
                   const stateLabel = result.isCorrect ? 'correct' : 'incorrect'
@@ -714,9 +714,9 @@ export function DomainPractice() {
               The button is gated on >=1 answered: before that there's nothing
               to save, so Back is the exit. (M3 [B]) */}
           <div className={`flex items-center gap-3 mb-6 min-h-[2rem] ${questionResults.length > 0 ? 'justify-between' : 'justify-center'}`}>
-            <h2 className="text-base md:text-lg lg:text-xl font-semibold text-text-primary [text-wrap:balance] min-w-0">
+            <h1 className="text-base md:text-lg lg:text-xl font-semibold text-text-primary [text-wrap:balance] min-w-0">
               {domains[selectedDomain!]}
-            </h2>
+            </h1>
             {questionResults.length > 0 && (
               <button
                 type="button"
@@ -743,7 +743,7 @@ export function DomainPractice() {
 
           {/* Question */}
           <Card className="mb-3">
-            <h3 className="text-base md:text-lg text-text-primary mb-4 md:mb-5">
+            <h2 className="cc-question-stem text-base md:text-lg text-text-primary mb-4 md:mb-5">
               {currentQuestion.question}
               {currentType === 'multi' && (
                 <span className="text-text-primary font-semibold ml-2">(Select {Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER})</span>
@@ -754,7 +754,7 @@ export function DomainPractice() {
               {currentType === 'matching' && (
                 <span className="text-text-primary font-semibold ml-2">(Match each item)</span>
               )}
-            </h3>
+            </h2>
 
             <div className="space-y-2.5 mb-4">
               {currentType === 'ordering' ? (

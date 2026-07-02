@@ -547,8 +547,9 @@ export function History() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-text-muted text-sm">Show:</span>
+                <label htmlFor="history-items-per-page" className="text-text-muted text-sm">Show:</label>
                 <select
+                  id="history-items-per-page"
                   value={itemsPerPage}
                   onChange={(e) => setItemsPerPage(Number(e.target.value))}
                   className={inputClass({ surface: 'page', className: 'w-auto px-3 py-2 text-sm' })}
