@@ -28,7 +28,7 @@ import { goToLogin } from '../lib/navigation'
 import type { Question, OptionKey } from '../types'
 import { loadAllQuestions } from '../data/questions'
 import { shuffleAndMapQuestions, toggleMultiAnswer, getQuestionType, encodeAnswerForDb, type OptionKeyMap } from '../lib/utils'
-import { trackEvent, trackPageView } from '../lib/analytics'
+import { trackEvent } from '../lib/analytics'
 import { KOFI_URL } from '../lib/constants'
 import { MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
 import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave, SIGN_OUT_SENTINEL, markIntentionalLeave } from '../lib/examGuard'
@@ -417,12 +417,7 @@ export function MockExam() {
       timer.reset()
       timer.start()
       document.body.dataset.examActive = 'true'
-      trackEvent('exam_started')
-      // Keep the visitor visible in Umami's active-visitor count during the
-      // long (up to 90-min) exam session by emitting a virtual page view; a
-      // timed exam otherwise fires no page views and drops off "online" after
-      // ~5 min. (R15.5, task 13.10)
-      trackPageView(`/${cert.provider}/${cert.code}/practice-exam/active`)
+      trackEvent('exam_started', { guest: !user })
       window.scrollTo(0, 0)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to load questions'
@@ -656,7 +651,7 @@ export function MockExam() {
     setScreen('results')
     delete document.body.dataset.examActive
     window.scrollTo(0, 0)
-    trackEvent('exam_completed', { passed, scaled_score: scaledScore, score_percent: Math.round(percentScore) })
+    trackEvent('exam_completed', { passed, scaled_score: scaledScore, score_percent: Math.round(percentScore), guest: isGuest })
     setLoading(false)
   }
 
@@ -941,6 +936,7 @@ export function MockExam() {
               return weakestDomain ? (
                 <a
                   href={`/${cert.provider}/${cert.code}/domain-practice?domain=${weakestDomain.id}`}
+                  onClick={() => trackEvent('weakest_domain_cta_clicked', { surface: 'exam_results', variant: weakest!.kind })}
                   className={buttonClass({ variant: 'brand', fullWidth: true })}
                 >
                   Practice your weakest domain: {weakestDomain.name}

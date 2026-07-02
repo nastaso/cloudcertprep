@@ -259,6 +259,13 @@ export const FAQ_ENTRIES: FAQEntry[] = [
     certCode: 'clf-c02',
   },
   {
+    question: 'How many questions are on the AWS Cloud Practitioner exam?',
+    answer:
+      'The AWS Certified Cloud Practitioner (CLF-C02) exam has 65 questions to answer in 90 minutes. Of these, 50 are scored and 15 are unscored pilot questions mixed in at random that do not count toward your result. All questions are multiple choice or multiple response.',
+    category: 'format',
+    certCode: 'clf-c02',
+  },
+  {
     question: 'Can I retake the AWS Cloud Practitioner exam if I fail?',
     answer:
       'Yes. If you do not pass, you can retake the CLF-C02 exam after a 14-day waiting period. There is no limit on the total number of attempts, but you must pay the exam fee each time and wait 14 days between attempts. Use the gap to review your weakest domains in domain practice here before rebooking.',
@@ -351,6 +358,42 @@ export const FAQ_ENTRIES: FAQEntry[] = [
     question: 'How much does the AWS AI Practitioner exam cost?',
     answer:
       'The AWS Certified AI Practitioner (AIF-C01) exam costs 100 USD (prices vary slightly by region and local tax). As a foundational-level exam it is the same price tier as the Cloud Practitioner. If you already hold an AWS certification, check your AWS Certification account for a 50% discount voucher before booking. Practicing on CloudCertPrep is always free.',
+    category: 'format',
+    certCode: 'aif-c01',
+  },
+  {
+    question: 'Is there an AWS AI Practitioner exam voucher or discount?',
+    answer:
+      'AWS issues a 50% discount voucher to candidates who already hold an AWS certification, redeemable on their next exam, and periodically runs free or discounted exam promotions. Vouchers appear in the benefits section of your AWS Certification account and are applied at checkout when you schedule the exam. CloudCertPrep practice is always free regardless of any voucher.',
+    category: 'format',
+    certCode: 'aif-c01',
+  },
+  {
+    question: 'What is the AWS AI Practitioner passing score?',
+    answer:
+      'The AWS Certified AI Practitioner (AIF-C01) passing score is 700 on a scaled range of 100 to 1000. The score is scaled, not a simple percentage, so you do not need exactly 70% of questions correct. Of the 65 questions, 50 are scored and 15 are unscored pilot questions that do not affect your result. Aim for 800+ on the practice exams here for a comfortable margin.',
+    category: 'format',
+    certCode: 'aif-c01',
+  },
+  {
+    question: 'Can I retake the AWS AI Practitioner exam if I fail?',
+    answer:
+      'Yes. If you do not pass, you can retake the AIF-C01 exam after a 14-day waiting period. There is no limit on the total number of attempts, but you pay the exam fee each time and must wait 14 days between attempts. Use the gap to review your weakest domains in domain practice here before rebooking.',
+    category: 'format',
+    certCode: 'aif-c01',
+  },
+  {
+    question: 'What is the AWS AI Practitioner pass rate?',
+    answer:
+      'AWS does not publish official pass rates for any certification, so any specific percentage you see online is an estimate, not an AWS figure. AIF-C01 is a foundational exam: candidates who study the exam guide, focus on the generative-AI and foundation-model domains (together over half the exam), and review explanations typically pass on their first attempt. Treat your scores on full-length practice exams here as the best available predictor: a steady 800+ signals you are ready.',
+    category: 'format',
+    certCode: 'aif-c01',
+    excludeFromLlms: true,
+  },
+  {
+    question: 'How many questions are on the AWS AI Practitioner exam?',
+    answer:
+      'The AWS Certified AI Practitioner (AIF-C01) exam has 65 questions to answer in 90 minutes. Of these, 50 are scored and 15 are unscored pilot questions mixed in at random that do not affect your result. Question formats include multiple choice, multiple response, ordering, and matching.',
     category: 'format',
     certCode: 'aif-c01',
   },

@@ -2,6 +2,7 @@ import { useState, useEffect, type ReactNode } from 'react'
 import { CheckCircle, AlertTriangle, X } from 'lucide-react'
 import { buttonClass } from '../lib/buttonStyles'
 import { useAuth } from '../hooks/useAuth'
+import { trackEvent } from '../lib/analytics'
 
 /**
  * Non-modal top notice: a dismissible toast pinned just below the header,
@@ -90,6 +91,11 @@ export default function AuthLinkNotice() {
     const qs = params.toString()
     window.history.replaceState(null, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash)
     if (notice.kind === 'verified') {
+      // Closes the funnel's verification-completion blind spot: fired once
+      // here, gated on the same one-shot ack written right below, so a
+      // refresh (URL already stripped by the replaceState above) never
+      // refires it.
+      trackEvent('email_verified')
       try { localStorage.setItem(ACK_KEY, new Date().toISOString()) } catch { /* private mode */ }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

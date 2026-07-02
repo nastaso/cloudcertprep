@@ -26,7 +26,7 @@ import { calculateDomainMastery } from '../lib/domainStats'
 import type { Question, OptionKey, DomainProgress } from '../types'
 import { loadDomainQuestions } from '../data/questions'
 import { isAnswerCorrect, correctAnswerFor } from '../lib/scoring'
-import { trackEvent, trackPageView } from '../lib/analytics'
+import { trackEvent } from '../lib/analytics'
 import { useSpacedRepetition } from '../hooks/useSpacedRepetition'
 import { shuffleAndMapQuestions, toggleMultiAnswer, getQuestionType, encodeAnswerForDb, type OptionKeyMap } from '../lib/utils'
 import {
@@ -315,10 +315,7 @@ export function DomainPractice() {
       finishingRef.current = false // re-arm the dup-write guard for this fresh session
       setScreen('practice')
       window.scrollTo(0, 0)
-      trackEvent('practice_started', { domain_id: selectedDomain, question_count: questionCount })
-      // Keep the visitor "online" in Umami during the practice session by
-      // emitting a virtual page view (see MockExam, task 13.10). (R15.5)
-      trackPageView(`/${cert.provider}/${cert.code}/domain-practice/active`)
+      trackEvent('practice_started', { domain_id: selectedDomain, question_count: questionCount, guest: !user })
     } catch (err: unknown) {
       // A failed chunk fetch (offline / network) used to dead-end the Start
       // button silently because there was no catch. Surface a retryable error
@@ -431,7 +428,7 @@ export function DomainPractice() {
       }
     }
 
-    trackEvent('practice_completed', { domain_id: selectedDomain, correct: results.filter(r => r).length, total: questionResults.length })
+    trackEvent('practice_completed', { domain_id: selectedDomain, correct: results.filter(r => r).length, total: questionResults.length, guest: !user })
     setScreen('results')
     window.scrollTo(0, 0)
   }
