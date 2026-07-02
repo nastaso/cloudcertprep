@@ -31,7 +31,7 @@ import { formatTime } from '../lib/scoring'
 import { logError } from '../lib/logger'
 import { CERTIFICATIONS } from '../data/certifications'
 import { LEVEL_ACCENT_UI_HEX, LEVEL_ACCENT_UI_RGB } from '../lib/levelAccent'
-import { calculateDomainMastery } from '../lib/domainStats'
+import { calculateDomainMastery, findNextDomainAction } from '../lib/domainStats'
 import type { DomainProgress } from '../types'
 
 /** Minimal domain shape needed by the dashboard sidebar. */
@@ -225,6 +225,22 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
   const accuracy = questionsPracticed > 0 ? Math.round((questionsCorrect / questionsPracticed) * 100) : 0
   const bestScore = recentAttempts.reduce((max, a) => Math.max(max, a.scaled_score), 0)
 
+  // NEXT UP: the one action the mastery data points at (Growth Build 2 / H2).
+  // Standings use the same bank-capped derivation as the grid cards below;
+  // "practiced" keys off attempted (not correct) so a domain with 0 correct
+  // out of real attempts is honestly "weakest", not "unstarted".
+  const nextAction = findNextDomainAction(cert.domains.map(d => {
+    const progress = domainProgress.find(p => p.domain_id === d.id)
+    const attempted = Math.min(progress?.questions_attempted || 0, d.questionCount)
+    const correct = Math.min(progress?.questions_correct || 0, attempted)
+    return {
+      domainId: d.id,
+      percent: calculateDomainMastery(correct, d.id, cert.code),
+      practiced: attempted > 0,
+    }
+  }))
+  const nextDomain = nextAction ? cert.domains.find(d => d.id === nextAction.domainId) : undefined
+
   return (
     <div className="max-w-6xl mx-auto pt-6 md:pt-10 pb-16 md:pb-24 space-y-8 md:space-y-10 stagger" aria-busy={dataLoading}>
         {dataLoading && <p className="sr-only" role="status">Loading your dashboard</p>}
@@ -274,7 +290,15 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                 <StatTile label="Questions practiced" value={questionsPracticed.toLocaleString('en-US')} suffix={`/ ${bankTotal.toLocaleString('en-US')}`} />
                 <StatTile label="Accuracy" value={String(accuracy)} suffix="%" hint="correct / answered" />
                 <StatTile label="Mock exams" value={String(examCount)} />
-                <StatTile label="Best score" value={bestScore > 0 ? bestScore.toLocaleString('en-US') : '0'} suffix={bestScore > 0 ? `/ ${(1000).toLocaleString('en-US')}` : undefined} />
+                {/* Empty state: scaled scores start at 100, so a literal 0 is
+                    misleading (HALO-CRITIQUE P1). Placeholder + the one next
+                    action instead. */}
+                <StatTile
+                  label="Best score"
+                  value={bestScore > 0 ? bestScore.toLocaleString('en-US') : 'N/A'}
+                  suffix={bestScore > 0 ? `/ ${(1000).toLocaleString('en-US')}` : undefined}
+                  hint={bestScore > 0 ? undefined : 'Take your first mock exam to set a baseline'}
+                />
               </>
             )}
           </div>
@@ -347,6 +371,38 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
           <p className="text-sm text-text-muted mb-4">
             The percentage is how much of each domain's full question bank you have answered correctly.
           </p>
+          {/* NEXT UP: one card, one action (Growth Build 2 / H2). Unstarted
+              domains outrank low-mastery ones and are phrased "not practiced
+              yet", never "weakest" (untouched domains score 0 by construction,
+              which is not a diagnosis). Copy stays action-framed: the moment
+              this says "you are N% ready" it has become the parked
+              pro-candidate H3. Skeleton while loading so the card does not
+              push the grid down when data resolves (PR-5 CLS). */}
+          {dataLoading ? (
+            <div className="mb-4 rounded-2xl border border-border-hairline bg-bg-card p-5 md:p-6 animate-pulse" aria-hidden="true">
+              <div className="h-3 w-16 rounded bg-text-muted/15" />
+              <div className="mt-3 h-4 w-2/3 rounded bg-text-muted/15" />
+            </div>
+          ) : nextAction && nextDomain && (
+            <div className="mb-4 bg-bg-card border border-border-hairline rounded-2xl shadow-card p-5 md:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted">Next up</p>
+                <p className="mt-1.5 text-text-primary font-medium">
+                  {nextAction.kind === 'unstarted' ? (
+                    <>You have not practiced <span className="font-semibold">{nextDomain.name}</span> yet</>
+                  ) : (
+                    <>Weakest domain: <span className="font-semibold">{nextDomain.name}</span> ({nextAction.percent}%)</>
+                  )}
+                </p>
+              </div>
+              <a
+                href={`${certPath}/domain-practice?domain=${nextDomain.id}`}
+                className="inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full bg-cta px-6 text-sm font-medium text-on-cta transition-colors duration-200 hover:bg-cta-hover"
+              >
+                Practice this domain
+              </a>
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
             {dataLoading
               ? cert.domains.map(domain => (
