@@ -98,7 +98,7 @@ test('zero-data dashboard: Best score N/A + baseline hint, NEXT UP points at the
   await seedSession(page) // default stub: every REST read returns []
   await page.goto(CERT_URL)
 
-  await expect(page.getByText('Take your first mock exam to set a baseline')).toBeVisible({ timeout: 15000 })
+  await expect(page.getByText('Take your first practice exam to set a baseline')).toBeVisible({ timeout: 15000 })
   await expect(page.getByText('N/A')).toBeVisible()
   await expect(page.getByText('You have not practiced')).toBeVisible()
   const cta = page.getByRole('link', { name: 'Practice this domain' })

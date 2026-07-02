@@ -33,6 +33,14 @@ let prevUser: User | null = null
 // is stale and must not clobber it. (M2)
 let authEventLanded = false
 
+// Tab-scoped de-dupe for the `sign_in` event below. sessionStorage (not a
+// module variable): this is an MPA that reinitializes the whole auth module
+// (module state, incl. `prevUser`, resets to null) on every full page
+// navigation, but sessionStorage survives across navigations within the same
+// tab. See the long comment at the trackEvent('sign_in', ...) call for why
+// this is needed.
+const SIGN_IN_TRACKED_KEY = 'cc_sign_in_tracked'
+
 function setState(next: AuthState) {
   state = next
   listeners.forEach(cb => cb())
@@ -150,20 +158,66 @@ function init() {
 
       // Detect the real "user just signed in" moment. Excludes
       // TOKEN_REFRESHED, USER_UPDATED, INITIAL_SESSION.
+      //
+      // INVESTIGATED (2026-07, section-5 rider): the pre-ship baseline showed
+      // ~3.6 `sign_in` events per Umami visit (2.31k events / 649 visits).
+      // `prevUser === null` alone does not stop this, because the over-fire is
+      // NOT tab focus or token refresh triggering this branch directly - it is
+      // supabase-js itself. GoTrueClient's `_recoverAndRefresh()` (called from
+      // `_initialize()` on every client construction, i.e. on every full page
+      // load here, since this is an MPA that reinitializes the whole auth
+      // module per navigation - see the CWV comment above) issues a genuine
+      // `SIGNED_IN` broadcast whenever it finds a still-valid persisted
+      // session, NOT the `INITIAL_SESSION` event the newer supabase-js API
+      // added specifically to distinguish "recovered an existing session" from
+      // "just signed in". Because `prevUser` resets to null on every fresh
+      // navigation along with the rest of this module's state, that recovery
+      // broadcast satisfies this gate on every page view for an
+      // already-signed-in visitor, not only on a real sign-in - explaining the
+      // ~3.6x. (The same function also reruns on tab-focus/visibility-change,
+      // but that repeat is already deduped within one page's lifetime by
+      // `prevUser` no longer being null by then.)
+      //
+      // Fix: a sessionStorage flag survives across full-page navigations
+      // within the same tab (module state does not), so it catches exactly
+      // the case module state cannot, without touching any other file.
+      let alreadyTrackedThisTab = false
+      try {
+        alreadyTrackedThisTab = sessionStorage.getItem(SIGN_IN_TRACKED_KEY) === '1'
+      } catch { /* private mode: fall back to the old (over-firing) behavior */ }
+
       if (
         event === 'SIGNED_IN'
         && prevUser === null
         && newUser !== null
+        && !alreadyTrackedThisTab
       ) {
+        // OAuth signup vs return (funnel step 5b): a brand-new account's
+        // created_at lands within moments of this very sign-in event; a
+        // returning user's created_at is far in the past. ~2 min is generous
+        // enough to absorb the OAuth redirect round-trip without false
+        // positives on a real return visit.
+        const createdAtMs = Date.parse(newUser.created_at)
+        const isNewUser = !Number.isNaN(createdAtMs) && Date.now() - createdAtMs < 2 * 60 * 1000
+
         trackEvent('sign_in', {
           method: newUser.app_metadata?.provider ?? 'email',
+          new_user: isNewUser,
         })
+        try { sessionStorage.setItem(SIGN_IN_TRACKED_KEY, '1') } catch { /* private mode */ }
 
         // First-link confirmation (R5.4): when Google was merged into a
         // pre-existing account (multiple identities incl. google), surface a
         // one-time notice. The helper self-guards via a localStorage ack flag,
         // so this is safe to call on every genuine sign-in.
         maybeNotifyGoogleLink(newUser)
+      }
+
+      // Clear the tab-scoped de-dupe flag on sign-out, so a genuine later
+      // sign-in in the same tab (e.g. a different person on a shared device)
+      // is tracked again instead of staying silently suppressed.
+      if (event === 'SIGNED_OUT') {
+        try { sessionStorage.removeItem(SIGN_IN_TRACKED_KEY) } catch { /* private mode */ }
       }
 
       prevUser = newUser

@@ -9,10 +9,11 @@
 import type { GetStaticPaths } from 'astro'
 import { getCollection, render, type CollectionEntry } from 'astro:content'
 import BlogLayout from '../../layouts/BlogLayout.astro'
+import { includeDrafts } from '../../lib/posts'
 
 export const getStaticPaths = (async () => {
   const posts = await getCollection('blog', ({ data }: CollectionEntry<'blog'>) =>
-    import.meta.env.PROD ? data.draft !== true : true,
+    includeDrafts || data.draft !== true,
   )
   return posts.map((post: CollectionEntry<'blog'>) => ({
     params: { slug: post.data.slug },

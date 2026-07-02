@@ -30,14 +30,18 @@ function gtag(...args: unknown[]): void {
   }
 }
 
-/** Fire a virtual page view. Call on every route change. */
+/**
+ * Fire a virtual page view. Call on every route change. GA4 only: Umami
+ * already auto-tracks every pageview itself via its own pushState hook
+ * (verified against the deployed tracker), so a manual `window.umami.track(path)`
+ * call here would be redundant and, worse, wrong - a bare string argument to
+ * `umami.track()` records a custom EVENT named that string, not a pageview.
+ * That bug used to log one junk event name per distinct SPA route (fixed
+ * 2026-07, see B1 in the funnel-analytics findings). The GA branch stays
+ * dormant as documented at the top of this file.
+ */
 export function trackPageView(path: string): void {
   gtag('event', 'page_view', { page_path: path })
-  // Umami tracks page views automatically on script load, but we also fire
-  // explicit calls for SPA navigation so client-side route changes register.
-  if (typeof window.umami?.track === 'function') {
-    window.umami.track(path)
-  }
 }
 
 /**
@@ -48,28 +52,41 @@ export function trackPageView(path: string): void {
  */
 export const KNOWN_EVENTS = [
   // Lifecycle / navigation
-  'landing',            // one-shot UTM attribution on first paint
-  'page_view',          // virtual page view on SPA route change
+  'landing',            // one-shot UTM-only attribution on first paint; organic/
+                         // direct landings rely on Umami's own auto-tracked pageview
+  'page_view',          // GA4 only (dormant). Umami never receives this name - it
+                         // auto-tracks pageviews itself, so this never appears in
+                         // the Umami events panel
   'page_not_found',     // 404 page hit
   // Auth
   'sign_up',            // email sign-up submitted
+  'email_verified',     // confirm link lands on ?verified=1 (one-shot, gated on the
+                         // same localStorage ack as the welcome toast; refreshes
+                         // do not refire)
   'sign_in_initiated',  // OAuth button clicked (method: github | google)
-  'sign_in',            // unauth -> auth transition (fired once, any method)
+  'sign_in',            // unauth -> auth transition (params: method; new_user, true
+                         // when user.created_at is within ~2 min of this event)
   'sign_out',           // sign-out
   'account_delete_reason', // optional exit-reason chip in the delete modal (anonymous; params: reason)
-  // Mock exam flow
+  // Mock exam flow. exam_started/exam_completed carry `guest: <bool>` (the
+  // funnel's guest-vs-signed-in denominator).
   'exam_started',
   'exam_abandoned',     // beforeunload during an active exam
   'timer_expired',      // exam timer hit zero
   'exam_completed',
   // Practice + per-question (question_answered is fired by BOTH the domain
-  // practice flow and the mock exam; the `surface` param disambiguates)
+  // practice flow and the mock exam; the `surface` param disambiguates).
+  // practice_started/practice_completed carry `guest: <bool>` like the exam
+  // events above; question_answered deliberately does not, to keep that
+  // high-volume payload lean.
   'practice_started',
   'question_answered',
   'practice_completed',
   // Engagement
   'cta_start_practice_exam', // primary "Start Practice Exam" CTA
-  'unlock_cta_clicked',      // guest sign-in nudge in practice/exam
+  'unlock_cta_clicked',      // guest sign-in nudge in practice/exam/header
+  'weakest_domain_cta_clicked', // "next up" CTA (surface: dashboard | exam_results;
+                                 // variant: weakest | unstarted)
   'share_result',            // results-screen share, pass-only (method: web_share | clipboard; params: cert, authed)
   'report_question_clicked',
   'donate_click',
