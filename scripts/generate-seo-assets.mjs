@@ -309,25 +309,31 @@ function parseBlogFrontmatter(raw) {
   const get = (key) => body.match(new RegExp(`^${key}:\\s*(.+)$`, 'm'))?.[1]?.trim().replace(/^['"]|['"]$/g, '')
   return {
     slug: get('slug'),
+    title: get('title'),
+    description: get('description'),
     date: get('date'),
     updated: get('updated'),
     draft: /^draft:\s*true\s*$/m.test(body),
   }
 }
 
+// `livePosts` is reused below to build the llms.txt "## Articles" section
+// (G5 content-scale pre-flight); kept outside the try block so it survives
+// past the sitemap-routes computation.
 let blogRoutes = []
+let livePosts = []
 try {
   const files = readdirSync(BLOG_DIR).filter(f => f.endsWith('.md'))
-  blogRoutes = files
+  livePosts = files
     .map(f => parseBlogFrontmatter(readFileSync(resolve(BLOG_DIR, f), 'utf8')))
     .filter(p => p && p.slug && !p.draft)
-    .map(p => ({
-      path: `/blog/${p.slug}`,
-      changefreq: 'monthly',
-      priority: '0.6',
-      lastmod: (p.updated ?? p.date ?? today).slice(0, 10),
-      image: '/og/og-blog.png',
-    }))
+  blogRoutes = livePosts.map(p => ({
+    path: `/blog/${p.slug}`,
+    changefreq: 'monthly',
+    priority: '0.6',
+    lastmod: (p.updated ?? p.date ?? today).slice(0, 10),
+    image: '/og/og-blog.png',
+  }))
   if (blogRoutes.length > 0) {
     ROUTES.push({ path: '/blog', changefreq: 'weekly', priority: '0.7' })
     ROUTES.push(...blogRoutes)
@@ -450,6 +456,24 @@ const faqSection = faqEntries.length > 0
       .join('\n\n')
   : ''
 
+// Build the "## Articles" section (G5 content-scale pre-flight): canonical
+// URL + one-line description per live (non-draft) post, newest first (same
+// order as the /blog index). Gated at 3+ live posts, since below that
+// threshold a 1-2 entry list reads as noise rather than a genuine article
+// index; the section is entirely absent from llms.txt rather than emitted
+// half-empty. No further code change is needed as posts ship: this
+// activates itself the moment the 3rd post flips to draft:false.
+const articlePosts = livePosts
+  .filter(p => p.title && p.description)
+  .slice()
+  .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''))
+const articlesSection = articlePosts.length >= 3
+  ? '\n\n## Articles\n\n' +
+    articlePosts
+      .map(p => `- [${p.title}](${SITE_URL}/blog/${p.slug}): ${p.description}`)
+      .join('\n')
+  : ''
+
 // Top-level `/` description block. Sourced from src/lib/citation-content.ts
 // (the SAME module the rendered home page uses) so the Locked_Citation_Phrases
 // can never drift between the home page and llms.txt (R7.3, R16.14). We build
@@ -494,7 +518,7 @@ ${providerSections}- [Blog](${SITE_URL}/blog): AWS certification study guides, e
 
 ## Certifications
 
-${certLevelSections}${comingSoonSection}${faqSection}
+${certLevelSections}${comingSoonSection}${faqSection}${articlesSection}
 
 ## Resources
 
@@ -503,7 +527,7 @@ ${certLevelSections}${comingSoonSection}${faqSection}
 - [Author portfolio](https://santonastaso.me)
 `
 writeFileSync(LLMS_TXT_PATH, llmsTxt)
-console.log(`✓ llms.txt rewritten (${activeCerts.length} active, ${comingSoonCerts.length} coming-soon, ${faqEntries.length} FAQ entries)`)
+console.log(`✓ llms.txt rewritten (${activeCerts.length} active, ${comingSoonCerts.length} coming-soon, ${faqEntries.length} FAQ entries, ${articlePosts.length} live post(s)${articlesSection ? '' : ', Articles section gated until 3'})`)
 
 // --- Rewrite public/_redirects ---
 // Legacy single-cert URLs map to the *current default cert's* practice flows.
