@@ -164,7 +164,14 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
             the page the user is already on). */}
         {initialPathname !== '/login' && (
           <Button
-            onClick={() => { if (!guardExamLeave('/login')) window.location.assign('/login') }}
+            onClick={() => {
+              // The only sign-in entry point analytics couldn't previously see
+              // (funnel step 3b). Fire-and-forget: record the click regardless
+              // of whether guardExamLeave defers the navigation behind a
+              // confirm modal.
+              trackEvent('unlock_cta_clicked', { location: 'header' })
+              if (!guardExamLeave('/login')) window.location.assign('/login')
+            }}
             variant="primary"
             size="sm"
             className="cc-auth-out whitespace-nowrap"
@@ -300,6 +307,7 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
               ) : (
                 <Button
                   onClick={() => {
+                    trackEvent('unlock_cta_clicked', { location: 'header' })
                     closeMobileMenu()
                     if (!guardExamLeave('/login')) window.location.assign('/login')
                   }}
