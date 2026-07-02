@@ -4,7 +4,7 @@ import { Flag, AlertCircle, LayoutGrid, Heart, ArrowLeft } from 'lucide-react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
-import { filterChipClass, reviewCellClass } from '../lib/buttonStyles'
+import { buttonClass, filterChipClass, reviewCellClass } from '../lib/buttonStyles'
 import { useTimer } from '../hooks/useTimer'
 import { useAuth } from '../hooks/useAuth'
 import { useSEO } from '../hooks/useSEO'
@@ -33,6 +33,7 @@ import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave, SIGN_OU
 import { useSignOut } from '../hooks/useSignOut'
 import { storePendingAttempt, consumePendingAttemptSavedNotice, markPendingAttemptSaveIntent, PENDING_ATTEMPT_SAVED_EVENT, peekPendingAttempt, hasPendingAttemptSaveIntent, type PendingAttempt } from '../lib/pendingAttempt'
 import { getProviderLabel } from '../data/certifications'
+import { findNextDomainAction } from '../lib/domainStats'
 
 type ExamScreen = 'start' | 'exam' | 'results' | 'review'
 
@@ -896,6 +897,29 @@ export function MockExam() {
           )}
 
           <div className="mt-6 space-y-3">
+            {/* Signed-in FAIL: route the moment of highest motivation straight
+                into targeted domain practice (M5; guests get the adaptive
+                UnlockCTA above instead). Weakest here is THIS exam's per-domain
+                accuracy (results.domainScores), a legitimate "weakest" for the
+                moment. Real anchor, not a router push: domain-practice is a
+                separate Astro document with its own chrome (see useCertNavigate
+                M0c). Brand variant = the platform's "start practising" action. */}
+            {user && !results!.passed && (() => {
+              const weakest = findNextDomainAction(cert.domains.map(d => ({
+                domainId: d.id,
+                percent: results!.domainScores[String(d.id)] ?? 0,
+                practiced: true,
+              })))
+              const weakestDomain = weakest ? cert.domains.find(d => d.id === weakest.domainId) : undefined
+              return weakestDomain ? (
+                <a
+                  href={`/${cert.provider}/${cert.code}/domain-practice?domain=${weakestDomain.id}`}
+                  className={buttonClass({ variant: 'brand', fullWidth: true })}
+                >
+                  Practice your weakest domain: {weakestDomain.name}
+                </a>
+              ) : null
+            })()}
             {/* Per-question review needs the loaded Question objects. A snapshot
                 rehydrate (P1-6) has none (questions stays empty on a fresh remount),
                 so gate on questions.length. Stateless, so it also stays correct
