@@ -37,7 +37,12 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
   // without waiting for useAuth()'s async getSession() to resolve (C1).
   const [authedHint] = useState(() =>
     typeof document !== 'undefined' && document.documentElement.classList.contains('cc-authed'))
-  const isAuthed = authedHint || Boolean(user)
+  // The hint only bridges the resolve window; the resolved `user` is
+  // authoritative after it. `authedHint || user` would latch true for the
+  // page's lifetime, leaving authed nav for a signed-out visitor after a
+  // failed `?code=` exchange / dead token / cross-tab sign-out (hardening F4,
+  // third instance of the "cc-authed means a real session" bug class).
+  const isAuthed = authLoading ? authedHint : Boolean(user)
 
   // Animate the drawer out before unmounting. Plays the 180ms (--dur-fast)
   // exit animation, then removes the drawer from the DOM.
@@ -71,6 +76,21 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
   useEffect(() => {
     if (authLoading) return
     document.documentElement.classList.toggle('cc-authed', Boolean(user))
+    // The PKCE exchange has settled, so the `code`/`state` params are spent.
+    // Strip them (hardening F8a): BaseLayout's `pageshow` script re-applies
+    // the optimistic `cc-authed` from ANY `?code=` URL, so a retained param
+    // re-plays authed-looking chrome for a guest on every bfcache restore /
+    // Back visit after a FAILED exchange (supabase-js leaves the URL alone on
+    // failure), and a bookmarked `?code=` URL repeats the doomed exchange.
+    // No consumer reads `code` after resolve (_ResetPassword exchanges during
+    // client init and only checks `user`).
+    if (/[?&]code=/.test(window.location.search)) {
+      const params = new URLSearchParams(window.location.search)
+      params.delete('code')
+      params.delete('state')
+      const qs = params.toString()
+      window.history.replaceState(null, '', window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash)
+    }
     // Tell same-page pre-paint scripts the real session has resolved (token now
     // persisted, `user` known). The home first-login greeting (index.astro) used
     // to re-run on a `cc-authed`-add MutationObserver, but `cc-authed` is now set

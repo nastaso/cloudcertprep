@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { getSupabase } from '../lib/supabase'
 import { trackEvent } from '../lib/analytics'
+import { sweepAuthTokens } from '../lib/authCleanup'
 
 /**
  * Sign-out helper that:
@@ -34,14 +35,7 @@ export function useSignOut(): () => Promise<void> {
       // ignore: cleanup below is the guarantee
     }
     await supabase.auth.signOut({ scope: 'local' }).catch(() => {})
-    try {
-      for (let i = localStorage.length - 1; i >= 0; i--) {
-        const k = localStorage.key(i)
-        if (k && k.startsWith('sb-') && k.endsWith('-auth-token')) localStorage.removeItem(k)
-      }
-    } catch {
-      // localStorage unavailable (private mode edge cases): nothing to clear
-    }
+    sweepAuthTokens()
     // `/` is a prerendered Astro document. The Header that triggers sign-out
     // renders both inside the static-page HeaderIsland (no route table) and
     // inside AppIsland, so a react-router push could land on a router that
