@@ -18,6 +18,9 @@ import PostCard from '../../components/PostCard.astro'
 import { SITE_URL } from '../../lib/seo-data'
 import { includeDrafts } from '../../lib/posts'
 
+// G5 content-scale pre-flight: pagination is consciously deferred until the
+// catalogue actually passes this trigger (see the file docblock above for
+// where `blog/page/[page].astro` would go). Do not build it early.
 const PAGE_SIZE = 10
 
 const posts = await getCollection('blog', ({ data }: CollectionEntry<'blog'>) =>
