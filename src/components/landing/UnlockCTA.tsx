@@ -8,12 +8,11 @@ import { trackEvent } from '../../lib/analytics'
  * sign-in conversion by placement and decide which deserve more prominence.
  */
 export type UnlockCTALocation =
-  | 'home_about'
-  | 'cert_about'
   | 'mock_exam_start'
   | 'exam_results'
   | 'domain_practice_wall'
   | 'practice_results'
+  | 'header'
 
 interface UnlockCTAProps {
   /** Click handler — typically `() => goToLogin(navigate, location)`. */

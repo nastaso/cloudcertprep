@@ -25,6 +25,7 @@ import {
 } from 'lucide-react'
 import { Alert } from './Alert'
 import { useAuth } from '../hooks/useAuth'
+import { trackEvent } from '../lib/analytics'
 import { getSupabase } from '../lib/supabase'
 import { formatRelativeDate } from '../lib/formatting'
 import { formatTime } from '../lib/scoring'
@@ -397,6 +398,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
               </div>
               <a
                 href={`${certPath}/domain-practice?domain=${nextDomain.id}`}
+                onClick={() => trackEvent('weakest_domain_cta_clicked', { surface: 'dashboard', variant: nextAction.kind })}
                 className="inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full bg-cta px-6 text-sm font-medium text-on-cta transition-colors duration-200 hover:bg-cta-hover"
               >
                 Practice this domain
