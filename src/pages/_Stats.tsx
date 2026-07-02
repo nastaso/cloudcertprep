@@ -9,11 +9,9 @@ import { CERTIFICATION_LIST, getCertTotalQuestions, getCertDomains } from '../da
 import { Trophy, TrendingUp, Clock, Check, RotateCw } from 'lucide-react'
 import { logError } from '../lib/logger'
 
-interface PlatformStats {
+interface PublicTotals {
   total_users: number
   total_questions_answered: number
-  total_exams_attempted: number
-  total_exams_passed: number
 }
 
 interface RecentWin {
@@ -47,7 +45,7 @@ interface StatsProps {
 }
 
 export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}) {
-  const [stats, setStats] = useState<PlatformStats | null>(null)
+  const [publicTotals, setPublicTotals] = useState<PublicTotals | null>(null)
   const [certStats, setCertStats] = useState<Record<string, CertStats>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -63,19 +61,16 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
       setError(null)
 
       const supabase = await getSupabase()
-      // Load platform stats from singleton table
-      const { data: statsData, error: statsError } = await supabase
-        .from('platform_stats')
-        .select('*')
-        .eq('id', 'singleton')
-        .single()
+      // Load live totals via SECURITY DEFINER RPC (bypasses RLS on auth.users /
+      // attempt_questions). Falls back silently if the function is not yet
+      // deployed on this env - the footer just won't render rather than erroring.
+      const { data: totalsData, error: totalsError } = await supabase
+        .rpc('get_public_totals')
 
-      if (statsError && statsError.code !== 'PGRST116') {
-        logError('Stats.loadStats.platformStats', statsError)
-      }
-
-      if (statsData) {
-        setStats(statsData)
+      if (totalsError) {
+        logError('Stats.loadStats.publicTotals', totalsError)
+      } else if (totalsData) {
+        setPublicTotals(totalsData)
       }
 
       // Load aggregate exam stats via SECURITY DEFINER RPC
@@ -382,11 +377,11 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
             )
           })}
 
-          {/* Platform Totals */}
-          {stats && (
+          {/* Platform Totals - live counts via get_public_totals() RPC */}
+          {publicTotals && (
             <div className="border-t border-text-muted/10 pt-6">
               <p className="text-text-muted text-xs md:text-sm text-center">
-                {stats.total_users.toLocaleString('en-US')} users · {stats.total_questions_answered.toLocaleString('en-US')} questions answered across all certifications
+                {publicTotals.total_users.toLocaleString('en-US')} users · {publicTotals.total_questions_answered.toLocaleString('en-US')} questions answered across all certifications
               </p>
             </div>
           )}
