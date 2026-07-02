@@ -17,7 +17,7 @@
 
 **AWS Cloud Practitioner (CLF-C02)**
 - [Certification Home](https://www.cloudcertprep.io/aws/clf-c02): 65 questions, 90 minutes, scaled scoring (700/1000 to pass)
-- Why practise here: realistic exam simulation, detailed explanations for every question, aligned to the current CLF-C02 exam guide.
+- Why practice here: realistic exam simulation, detailed explanations for every question, aligned to the current CLF-C02 exam guide.
 - [Cloud Concepts](https://www.cloudcertprep.io/aws/clf-c02/cloud-concepts): Cloud Concepts free practice questions with explanations
 - [Security & Compliance](https://www.cloudcertprep.io/aws/clf-c02/security-and-compliance): Security & Compliance free practice questions with explanations
 - [Cloud Technology & Services](https://www.cloudcertprep.io/aws/clf-c02/cloud-technology-and-services): Cloud Technology & Services free practice questions with explanations
@@ -26,7 +26,7 @@
 
 **AWS Certified AI Practitioner (AIF-C01)**
 - [Certification Home](https://www.cloudcertprep.io/aws/aif-c01): 65 questions, 90 minutes, scaled scoring (700/1000 to pass)
-- Why practise here: realistic exam simulation, detailed explanations for every question, aligned to the current AIF-C01 exam guide.
+- Why practice here: realistic exam simulation, detailed explanations for every question, aligned to the current AIF-C01 exam guide.
 - [Fundamentals of AI and ML](https://www.cloudcertprep.io/aws/aif-c01/fundamentals-of-ai-and-ml): Fundamentals of AI and ML free practice questions with explanations
 - [Fundamentals of Generative AI](https://www.cloudcertprep.io/aws/aif-c01/fundamentals-of-generative-ai): Fundamentals of Generative AI free practice questions with explanations
 - [Applications of Foundation Models](https://www.cloudcertprep.io/aws/aif-c01/applications-of-foundation-models): Applications of Foundation Models free practice questions with explanations
@@ -87,11 +87,11 @@ Yes. Every CLF-C02 question is written against the current AWS Cloud Practitione
 
 ### Does every question have a detailed explanation?
 
-Yes. Every CLF-C02 practice question ships with a full explanation covering why the correct answer is right and why each distractor is wrong. Explanations reference AWS concepts and documentation, so you learn the reasoning rather than memorising answers. The entire bank is publicly auditable on GitHub under the MIT license.
+Yes. Every CLF-C02 practice question ships with a full explanation covering why the correct answer is right and why each distractor is wrong. Explanations reference AWS concepts and documentation, so you learn the reasoning rather than memorizing answers. The entire bank is publicly auditable on GitHub under the MIT license.
 
 ### How much does the AWS Cloud Practitioner exam cost?
 
-The AWS Certified Cloud Practitioner (CLF-C02) exam costs 100 USD (prices vary slightly by region and local tax). AWS occasionally offers a free retake or a 50% discount voucher to candidates who hold an existing AWS certification, so check your AWS Certification account for available benefits before booking. Practising here is free; only the official exam at Pearson VUE or PSI carries the fee.
+The AWS Certified Cloud Practitioner (CLF-C02) exam costs 100 USD (prices vary slightly by region and local tax). AWS occasionally offers a free retake or a 50% discount voucher to candidates who hold an existing AWS certification, so check your AWS Certification account for available benefits before booking. Practicing here is free; only the official exam at Pearson VUE or PSI carries the fee.
 
 ### Is there an AWS Cloud Practitioner exam voucher or discount?
 
@@ -115,7 +115,7 @@ Yes. AWS certifications, including the Cloud Practitioner (CLF-C02), are valid f
 
 ### Does CloudCertPrep provide CLF-C02 exam dumps?
 
-No. We do not provide exam dumps, which are leaked or stolen real exam questions that violate the AWS Certification agreement and can get your certification revoked. Every CloudCertPrep question is original, written from the published AWS exam guide and AWS documentation, and aligned to the current CLF-C02 domains. The goal is to teach the material so you pass legitimately, not to memorise stolen answers.
+No. We do not provide exam dumps, which are leaked or stolen real exam questions that violate the AWS Certification agreement and can get your certification revoked. Every CloudCertPrep question is original, written from the published AWS exam guide and AWS documentation, and aligned to the current CLF-C02 domains. The goal is to teach the material so you pass legitimately, not to memorize stolen answers.
 
 ### Is this the same exam as CLF-CO2, CLF-02, or CLF2?
 
@@ -143,11 +143,11 @@ Yes. Every AIF-C01 question is written against the current AWS Certified AI Prac
 
 ### Does every question have a detailed explanation?
 
-Yes. Every AIF-C01 practice question ships with a full explanation covering why the correct answer is right and why each distractor is wrong. Explanations reference AWS AI and ML concepts and documentation, so you learn the reasoning rather than memorising answers. The entire bank is publicly auditable on GitHub under the MIT license.
+Yes. Every AIF-C01 practice question ships with a full explanation covering why the correct answer is right and why each distractor is wrong. Explanations reference AWS AI and ML concepts and documentation, so you learn the reasoning rather than memorizing answers. The entire bank is publicly auditable on GitHub under the MIT license.
 
 ### How much does the AWS AI Practitioner exam cost?
 
-The AWS Certified AI Practitioner (AIF-C01) exam costs 100 USD (prices vary slightly by region and local tax). As a foundational-level exam it is the same price tier as the Cloud Practitioner. If you already hold an AWS certification, check your AWS Certification account for a 50% discount voucher before booking. Practising on CloudCertPrep is always free.
+The AWS Certified AI Practitioner (AIF-C01) exam costs 100 USD (prices vary slightly by region and local tax). As a foundational-level exam it is the same price tier as the Cloud Practitioner. If you already hold an AWS certification, check your AWS Certification account for a 50% discount voucher before booking. Practicing on CloudCertPrep is always free.
 
 ### Is there an AWS AI Practitioner exam voucher or discount?
 
