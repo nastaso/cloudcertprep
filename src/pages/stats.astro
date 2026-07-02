@@ -83,6 +83,19 @@ const datasetJsonLd = serializeJsonLd({
   jsonLd={[datasetJsonLd]}
 >
   {/*
+    Shared wrapper for the snapshot -> live swap (FLASH F3). The live grid is
+    a differently-sized layout than the snapshot, so without a reserved
+    height the swap yanks the footer up or down in one frame (measured CLS up
+    to ~0.31 with the footer starting well inside a 900px viewport). The
+    min-height (viewport minus the md header, h-14 = 3.5rem) keeps the footer
+    at/below the fold before the swap, and, being a minimum, the region never
+    shrinks below it afterwards - so neither a taller nor a shorter live grid
+    moves anything visible. Costs a band of whitespace above the footer on
+    no-JS/crawler views of a short snapshot; same tradeoff as the app shells'
+    min-h-[70vh].
+  */}
+  <div class="min-h-[calc(100vh-3.5rem)]">
+  {/*
     Prerendered snapshot — the crawler-visible, citable surface. The React
     island below replaces these figures with live numbers after hydration.
     Both this block and the Dataset JSON-LD read the same snapshot file, so
@@ -143,4 +156,5 @@ const datasetJsonLd = serializeJsonLd({
   </section>
 
   <StatsIsland client:only="react" />
+  </div>
 </BaseLayout>

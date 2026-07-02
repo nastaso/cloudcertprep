@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect } from 'react'
 import { Skeleton } from '../components/Skeleton'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
 import { getSupabase } from '../lib/supabase'
 import { formatRelativeDate } from '../lib/formatting'
 import { formatTime } from '../lib/scoring'
-import { CERTIFICATION_LIST, getCertTotalQuestions, getCertDomains } from '../data/certifications'
+import { getSortedCerts, getCertTotalQuestions, getCertDomains, DEFAULT_CERT_ID } from '../data/certifications'
 import { Trophy, TrendingUp, Clock, Check, RotateCw } from 'lucide-react'
 import { logError } from '../lib/logger'
 
@@ -114,10 +114,11 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
       setLoading(false)
       // Hide the prerendered snapshot ONLY on a successful load (a single
       // forward swap to live numbers). On an errored first load we keep it, so
-      // the real cached numbers stay on screen behind a compact retry.
+      // the real cached numbers stay on screen behind a compact retry. The
+      // actual hide happens in the layout effect below, not here directly
+      // (FLASH F3).
       if (ok) {
         setLiveLoaded(true)
-        onLoaded?.()
       }
     }
   }
@@ -125,8 +126,19 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadStats()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Calling onLoaded() (which hides the prerendered snapshot) directly inside
+  // loadStats raced React's own commit: the snapshot's <h1> could be hidden
+  // before the live view's <h1> had actually painted, producing a one-frame
+  // gap where no heading was visible (FLASH F3). useLayoutEffect runs
+  // synchronously after the DOM has been updated with the live content but
+  // before the browser paints, so the snapshot-hide and the live-content-show
+  // land in the same frame - there is never a frame with zero (or two) <h1>s.
+  useLayoutEffect(() => {
+    if (liveLoaded) onLoaded?.()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [liveLoaded])
 
   // First-load phase: the prerendered snapshot is still standing in (it is
   // hidden only on a SUCCESSFUL load). Never replace it with a skeleton or the
@@ -225,8 +237,16 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
             </Alert>
           )}
 
-          {/* Certification Sections */}
-          {CERTIFICATION_LIST.map(cert => {
+          {/* Certification Sections. Same ordering as the home grid
+              (UI-PERFECTION S1): getSortedCerts() puts active certs before
+              coming-soon ones, then the flagship cert (DEFAULT_CERT_ID) leads
+              the actives. This also matches the prerendered snapshot's cert
+              order (stats.astro renders CERTIFICATIONS insertion order:
+              CLF -> AIF), so the snapshot -> live swap never visibly reorders
+              the certs. */}
+          {[...getSortedCerts()].sort((a, b) =>
+            a.code === DEFAULT_CERT_ID ? -1 : b.code === DEFAULT_CERT_ID ? 1 : 0,
+          ).map(cert => {
             const cs = certStats[cert.code]
 
             if (cert.status === 'coming-soon') {
@@ -245,10 +265,10 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
                     <TrendingUp className="w-5 h-5 text-text-muted flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div>
                       <p className="text-text-primary text-sm md:text-base mb-1">
-                        {getCertTotalQuestions(cert.code).toLocaleString('en-US')} practice questions available
+                        {getCertTotalQuestions(cert.code).toLocaleString('en-US')} questions authored so far
                       </p>
                       <p className="text-text-muted text-xs md:text-sm">
-                        Community stats will appear here once users start taking exams.
+                        Question bank in development. Community stats will appear here once users start taking exams.
                       </p>
                     </div>
                   </div>

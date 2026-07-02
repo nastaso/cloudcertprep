@@ -490,8 +490,11 @@ export function History() {
           {/* Cert filter row (logged-in only, shown whenever the user has any
               attempts). With a single cert it reads "All certs (N) · CLF-C02 (N)",
               signalling that history is cert-aware; the control stays put as
-              attempt distribution changes rather than appearing only at 2+ certs. */}
-          {user && certsWithAttempts.length >= 1 && (
+              attempt distribution changes rather than appearing only at 2+ certs.
+              Hidden on a load error (H2): with no data loaded there is nothing
+              to filter, and a zero-count chip row above the error band read as
+              "0 attempts" contradicting "couldn't load". */}
+          {!loadError && user && certsWithAttempts.length >= 1 && (
             <div className="flex flex-wrap items-center gap-2 mb-3">
               <span className="text-text-muted text-xs md:text-sm font-medium mr-1">
                 Certification:
@@ -519,8 +522,11 @@ export function History() {
             </div>
           )}
 
-          {/* Pass/fail filter and items-per-page (logged-in only). */}
-          {user && (
+          {/* Pass/fail filter and items-per-page (logged-in only). Hidden on
+              a load error (H2), same reasoning as the cert filter row above:
+              the "Show" select and All(0)/Passed(0)/Failed(0) chips otherwise
+              stay visible above the error band and retry button. */}
+          {!loadError && user && (
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
               <div className="flex gap-2">
                 <button
