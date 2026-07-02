@@ -282,14 +282,14 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
               <>
                 <SkeletonStatTile label="Questions practiced" />
                 <SkeletonStatTile label="Accuracy" />
-                <SkeletonStatTile label="Mock exams" />
+                <SkeletonStatTile label="Practice exams" />
                 <SkeletonStatTile label="Best score" />
               </>
             ) : (
               <>
                 <StatTile label="Questions practiced" value={questionsPracticed.toLocaleString('en-US')} suffix={`/ ${bankTotal.toLocaleString('en-US')}`} />
                 <StatTile label="Accuracy" value={String(accuracy)} suffix="%" hint="correct / answered" />
-                <StatTile label="Mock exams" value={String(examCount)} />
+                <StatTile label="Practice exams" value={String(examCount)} />
                 {/* Empty state: scaled scores start at 100, so a literal 0 is
                     misleading (HALO-CRITIQUE P1). Placeholder + the one next
                     action instead. */}
@@ -297,7 +297,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                   label="Best score"
                   value={bestScore > 0 ? bestScore.toLocaleString('en-US') : 'N/A'}
                   suffix={bestScore > 0 ? `/ ${(1000).toLocaleString('en-US')}` : undefined}
-                  hint={bestScore > 0 ? undefined : 'Take your first mock exam to set a baseline'}
+                  hint={bestScore > 0 ? undefined : 'Take your first practice exam to set a baseline'}
                 />
               </>
             )}
@@ -319,7 +319,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                 <FileText className="w-5 h-5 text-text-primary" aria-hidden="true" />
               </span>
               <h3 className="mt-4 text-lg md:text-xl font-semibold tracking-[-0.01em] text-text-primary">
-                Mock exam
+                Practice exam
                 <ArrowRight
                   className="ml-1.5 inline-block w-4 h-4 align-[-2px] text-text-primary/50 transition-[transform,color] duration-200 group-hover:translate-x-1 group-hover:text-text-primary"
                   aria-hidden="true"
@@ -511,12 +511,12 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
           ) : recentAttempts.length === 0 ? (
             <div className="bg-bg-card rounded-2xl border border-border-hairline p-8 md:p-10 text-center">
               <p className="text-text-primary font-medium">No attempts yet</p>
-              <p className="mt-1 text-sm text-text-muted">Take your first mock exam to start tracking your progress.</p>
+              <p className="mt-1 text-sm text-text-muted">Take your first practice exam to start tracking your progress.</p>
               <a
                 href={`${certPath}/practice-exam`}
                 className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-full bg-cta px-6 text-sm font-medium text-on-cta transition-colors duration-200 hover:bg-cta-hover"
               >
-                Start a mock exam
+                Start a practice exam
               </a>
             </div>
           ) : (
