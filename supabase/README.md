@@ -39,8 +39,8 @@ One row per question shown in an attempt. Used for History review and `domain_pr
 | Column | Type | Notes |
 |---|---|---|
 | `id` | `uuid` PK | |
-| `attempt_id` | `uuid` FK | References `exam_attempts(id)`, cascade on delete |
-| `user_id` | `uuid` FK | Denormalised for RLS efficiency |
+| `attempt_id` | `uuid` FK | References `exam_attempts(id)`, cascade on delete. NULL for Domain Practice rows (no parent exam). |
+| `user_id` | `uuid` FK | References `auth.users(id)`, cascade on delete. Denormalised for RLS efficiency. The user_id cascade is load-bearing: Domain Practice rows have `attempt_id = NULL`, so the attempt_id cascade never reaches them. |
 | `cert_code` | `text` NOT NULL | |
 | `question_id` | `text` NOT NULL | e.g. `'CLF-D3-0142'` |
 | `domain_id` | `integer` NOT NULL | 1-N (any positive integer) |
@@ -61,7 +61,7 @@ One row per `(user_id, cert_code, domain_id)`. Materialised view of attempt_ques
 
 | Column | Type | Notes |
 |---|---|---|
-| `user_id` | `uuid` FK | |
+| `user_id` | `uuid` FK | References `auth.users(id)`, cascade on delete |
 | `cert_code` | `text` NOT NULL | |
 | `domain_id` | `integer` NOT NULL | |
 | `questions_attempted` | `integer` NOT NULL | Unique question count |
@@ -145,8 +145,17 @@ Full source: see `src/pages/_Stats.tsx` for the call site. If you change the fun
 Self-service GDPR "right to erasure" backing the **Delete account** button on `/account`.
 RLS lets a user delete their own data rows but cannot remove the `auth.users` row itself
 (only the service_role can), so deletion runs server-side. The function authenticates the
-caller from their forwarded JWT, deletes their `attempt_questions`, `exam_attempts`, and
+caller from their forwarded JWT (it deletes ONLY that caller's own `auth.uid()`, never an id
+from the request body), deletes their `attempt_questions`, `exam_attempts`, and
 `domain_progress` rows, then deletes the `auth.users` row.
+
+The data tables now carry `ON DELETE CASCADE` FKs to `auth.users(id)` (see
+`supabase/sql/delete-account-cascade.sql`), so deleting the auth row alone erases the data;
+the explicit per-table deletes in the function are kept as defence-in-depth. `question_mastery`
+is deliberately NOT in the delete list - it is a read-only VIEW over `attempt_questions`
+(below), so erasing `attempt_questions` empties it. `platform_stats` is excluded too (a public
+aggregate, not personal data). Apply the cascade SQL to a project before relying on it for
+deletion; verify with `node scripts/verify-delete-cascade.mjs`.
 
 **Deploy (owner, one-time):**
 
