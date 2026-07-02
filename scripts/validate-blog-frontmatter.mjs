@@ -11,6 +11,9 @@
  *   - description length is 50-160
  *   - title length is 10-80
  *   - if ogImage is set, the referenced file exists under public/
+ *   - tags include at least one recognized cert-code tag (G5 tag taxonomy,
+ *     see the `tags` comment in src/content.config.ts) - domain-slug tags
+ *     are conditional per post, so they are documented but not enforced here
  *
  * Exits non-zero with a per-violation report on failure; prints a success
  * summary on pass. Run via `npm run prebuild` (appended to the chain).
@@ -23,6 +26,23 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
 const BLOG_DIR = join(ROOT, 'src', 'content', 'blog')
 const PUBLIC_DIR = join(ROOT, 'public')
+const CERT_REGISTRY_PATH = join(ROOT, 'src', 'data', 'certifications.ts')
+
+/**
+ * Known cert codes (e.g. 'clf-c02', 'aif-c01'), parsed out of the registry's
+ * `code: '...'` fields with a small regex - same lightweight-parse approach
+ * scripts/generate-seo-assets.mjs already uses to read this file at build
+ * time, kept here as its own tiny pass so this validator stays plain `node`
+ * (no tsx) rather than importing the .ts registry.
+ */
+function knownCertCodes() {
+  const source = readFileSync(CERT_REGISTRY_PATH, 'utf8')
+  const codes = new Set()
+  const re = /code:\s*'([a-z0-9-]+)'/g
+  let m
+  while ((m = re.exec(source)) !== null) codes.add(m[1])
+  return codes
+}
 
 const violations = []
 function violation(file, msg) {
@@ -102,6 +122,7 @@ if (!existsSync(BLOG_DIR)) {
 
 const files = readdirSync(BLOG_DIR).filter((f) => f.endsWith('.md'))
 const seenSlugs = new Map()
+const CERT_CODES = knownCertCodes()
 let nonDraftCount = 0
 
 for (const file of files) {
@@ -171,6 +192,18 @@ for (const file of files) {
         violation(file, `tag "${tag}" contains disallowed characters (< or >)`)
       }
     }
+  }
+
+  // Tag taxonomy (G5 content-scale pre-flight): every non-draft post must
+  // carry at least one recognized cert-code tag (see the `tags` comment in
+  // src/content.config.ts) so it always surfaces on that cert's domain
+  // landings, even before a domain-slug tag is added. Domain-slug tags are
+  // conditional per post, so they are documented but not enforced here.
+  if (!Array.isArray(fm.tags) || !fm.tags.some((tag) => CERT_CODES.has(tag))) {
+    violation(
+      file,
+      `tags [${Array.isArray(fm.tags) ? fm.tags.join(', ') : ''}] do not include a recognized cert-code tag (one of: ${[...CERT_CODES].join(', ')})`,
+    )
   }
 
   if (fm.ogImage) {

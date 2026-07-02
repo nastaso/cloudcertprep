@@ -1,6 +1,51 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
-import rehypeSanitize from 'rehype-sanitize';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import rehypeRaw from 'rehype-raw';
+
+// Minimal SVG presentation attributes needed for hand-authored inline
+// diagrams (G5 content-scale pre-flight). Deliberately excludes anything
+// that can reach outside the element (no href/xlink:href, no `<use>`/
+// `<foreignObject>`/`<script>` tags), so diagrams stay self-contained shapes
+// and text only.
+const svgPresentationAttrs = [
+  'viewBox', 'width', 'height', 'x', 'y', 'cx', 'cy', 'r', 'rx', 'ry', 'd',
+  'points', 'x1', 'y1', 'x2', 'y2', 'fill', 'stroke', 'strokeWidth',
+  'strokeLinecap', 'strokeLinejoin', 'strokeDasharray', 'transform',
+  'opacity', 'role', 'ariaLabel', 'ariaHidden', 'focusable',
+  'preserveAspectRatio',
+];
+
+// Extends rehype-sanitize's default (GitHub-flavoured) schema with
+// <figure>/<figcaption> and a minimal safe SVG element set, so a blog post
+// can hand-author an inline diagram. Everything else (script, style,
+// event-handler attributes, <use>, <foreignObject>) stays disallowed.
+const blogContentSanitizeSchema = {
+  ...defaultSchema,
+  tagNames: [
+    ...defaultSchema.tagNames,
+    'figure', 'figcaption',
+    'svg', 'g', 'path', 'circle', 'rect', 'line', 'polyline', 'polygon',
+    'ellipse', 'text', 'tspan', 'defs', 'linearGradient', 'stop',
+  ],
+  attributes: {
+    ...defaultSchema.attributes,
+    svg: svgPresentationAttrs,
+    g: svgPresentationAttrs,
+    path: svgPresentationAttrs,
+    circle: svgPresentationAttrs,
+    rect: svgPresentationAttrs,
+    line: svgPresentationAttrs,
+    polyline: svgPresentationAttrs,
+    polygon: svgPresentationAttrs,
+    ellipse: svgPresentationAttrs,
+    text: svgPresentationAttrs,
+    tspan: svgPresentationAttrs,
+    defs: svgPresentationAttrs,
+    linearGradient: [...svgPresentationAttrs, 'gradientUnits', 'gradientTransform'],
+    stop: [...svgPresentationAttrs, 'offset', 'stopColor', 'stopOpacity'],
+  },
+};
 
 // output: 'static' — no adapter needed. Every route is enumerable at build time
 // (home, about, blog, cert/domain landings, legal, 404). SSR is unnecessary
@@ -21,10 +66,27 @@ export default defineConfig({
   site: 'https://www.cloudcertprep.io',
   trailingSlash: 'never',
   // Sanitize HTML in blog markdown so a contributor PR cannot land raw
-  // <script>/onerror= handlers (stored-XSS via the content pipeline). Uses
-  // rehype-sanitize's default GitHub-flavoured allowlist. (security V7)
+  // <script>/onerror= handlers (stored-XSS via the content pipeline).
+  // (security V7)
+  //
+  // ORDERING NOTE (G5 content-scale pre-flight): Astro's own markdown
+  // pipeline appends its OWN `rehypeRaw` + `rehypeStringify` AFTER these
+  // user rehypePlugins (see @astrojs/markdown-remark). That means raw HTML
+  // written directly into a .md file is still an opaque, un-parsed `raw`
+  // hast node at the point a rehypePlugins-only `rehypeSanitize` step would
+  // run: hast-util-sanitize does not recognise that node type and silently
+  // drops the entire node. Verified: with `rehypePlugins: [rehypeSanitize]`
+  // alone, a raw <figure>/<svg>/<img> written in a post body rendered as
+  // nothing at all, regardless of the schema passed in, meaning every
+  // wave-1 diagram would have silently vanished at build time. Running
+  // `rehypeRaw` here FIRST turns the raw HTML into real element nodes
+  // before `rehypeSanitize` inspects them, so sanitization actually filters
+  // tags/attributes instead of no-op'ing on an opaque node. Astro's own
+  // trailing `rehypeRaw` call becomes a harmless no-op (nothing is left of
+  // type `raw` by then). `blogContentSanitizeSchema` (above) is the default
+  // GitHub-flavoured allowlist plus <figure>/<figcaption>/inline SVG.
   markdown: {
-    rehypePlugins: [rehypeSanitize],
+    rehypePlugins: [rehypeRaw, [rehypeSanitize, blogContentSanitizeSchema]],
   },
   // Prefetch on hover/touch so the island route chunks (login, practice-exam,
   // domain-practice, history) and prerendered pages begin loading before the

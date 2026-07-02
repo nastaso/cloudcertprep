@@ -710,3 +710,32 @@ body {
 .blog-content tbody tr:last-child td {
   border-bottom: 0;
 }
+
+/* Blog media - images, figures, and inline SVG diagrams (G5 content-scale
+   pre-flight, ahead of the first diagram-bearing post). Plain images shrink
+   to fit the column; figures centre their content and get the same
+   overflow-x scroll containment as the table above so a wide diagram never
+   blows out the page on a narrow screen. Diagrams should be authored with
+   fill="currentColor" / stroke="currentColor" instead of a hard-coded
+   colour, since the rule below is exactly what currentColor resolves to
+   inside .blog-content, so one inline <svg> renders correctly in both
+   themes. */
+.blog-content img,
+.blog-content svg {
+  max-width: 100%;
+  height: auto;
+}
+.blog-content svg {
+  color: rgb(var(--color-text-primary));
+}
+.blog-content figure {
+  margin: 0;
+  overflow-x: auto;
+  text-align: center;
+}
+.blog-content figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: rgb(var(--color-text-muted));
+}
