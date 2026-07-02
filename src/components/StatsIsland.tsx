@@ -16,6 +16,12 @@ import { ErrorBoundary } from './ErrorBoundary'
 
 const SNAPSHOT_SELECTOR = '[data-stats-snapshot]'
 
+// The swap itself is kept shift-free by the Astro shell, not by JS: the
+// snapshot and this island share a min-height wrapper in stats.astro that
+// keeps the footer at/below the fold before, during, and after the swap
+// (FLASH F3), and the wrapper's min-height means a shorter live grid never
+// pulls the footer back up either. Hiding the snapshot here is then a pure
+// in-place replacement.
 function hideSnapshot() {
   if (typeof document === 'undefined') return
   const el = document.querySelector<HTMLElement>(SNAPSHOT_SELECTOR)

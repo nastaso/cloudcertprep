@@ -15,11 +15,18 @@ import AppIsland from '../components/AppIsland.tsx'
   noscriptDirectory={true}
 >
   {/* Static island shell: reserves the body height + a spinner so the page is
-      never an empty, footer-only frame before the client:only island hydrates
-      (parity with login / practice-exam). AppIsland removes #cc-island-fallback
-      on mount; the spinner mirrors LoadingSpinner.tsx. */}
+      never an empty, footer-only frame before the client:only island hydrates.
+      AppIsland removes #cc-island-fallback on mount; the spinner mirrors
+      LoadingSpinner.tsx.
+      Top-aligned (not vertically centered like login / practice-exam) so the
+      handoff to Account's own near-top loading state (_Account.tsx's
+      authLoading spinner, positioned via p-4 md:p-8 rather than centered in
+      the viewport) is in place rather than a center-to-top jump (FLASH F2).
+      This is a deliberate divergence from the login/practice-exam spinner
+      position, scoped to the two routes whose component renders its own
+      near-top loading state next. */}
   <div class="relative flex-1 flex flex-col min-h-[70vh]">
-    <div id="cc-island-fallback" class="absolute inset-0 flex items-center justify-center" role="status" aria-label="Loading">
+    <div id="cc-island-fallback" class="absolute inset-0 flex items-start justify-center pt-8 sm:pt-12 md:pt-16" role="status" aria-label="Loading">
       <div class="w-12 h-12 relative">
         <div class="absolute inset-0 border-[3px] border-text-muted/20 rounded-full"></div>
         <div class="absolute inset-0 border-[3px] border-transparent border-t-text-primary/80 rounded-full animate-spin"></div>

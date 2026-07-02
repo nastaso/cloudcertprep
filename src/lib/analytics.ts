@@ -67,6 +67,7 @@ export const KNOWN_EVENTS = [
   'sign_in',            // unauth -> auth transition (params: method; new_user, true
                          // when user.created_at is within ~2 min of this event)
   'sign_out',           // sign-out
+  'account_delete_reason', // optional exit-reason chip in the delete modal (anonymous; params: reason)
   // Mock exam flow. exam_started/exam_completed carry `guest: <bool>` (the
   // funnel's guest-vs-signed-in denominator).
   'exam_started',
