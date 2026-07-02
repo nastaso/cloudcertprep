@@ -69,6 +69,7 @@ export const KNOWN_EVENTS = [
   // Engagement
   'cta_start_practice_exam', // primary "Start Practice Exam" CTA
   'unlock_cta_clicked',      // guest sign-in nudge in practice/exam
+  'share_result',            // results-screen share/copy (method: web_share | clipboard; outcome: pass | fail)
   'report_question_clicked',
   'donate_click',
   'github_click',

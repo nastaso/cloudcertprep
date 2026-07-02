@@ -15,6 +15,8 @@ import { OrderingInput } from '../components/OrderingInput'
 import { MatchingInput } from '../components/MatchingInput'
 import { Modal } from '../components/Modal'
 import { PassFailBanner } from '../components/PassFailBanner'
+import { ShareResultButton } from '../components/ShareResultButton'
+import { buildPassShareText, buildFailBreakdownText } from '../lib/shareResult'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { QuestionReviewCard } from '../components/QuestionReviewCard'
 import { UnlockCTA } from '../components/landing/UnlockCTA'
@@ -800,6 +802,43 @@ export function MockExam() {
             scaledScore={results!.scaledScore}
             percent={results!.percentScore}
           />
+          {/* Share affordance lives WITH the banner (the celebration moment),
+              not in the bottom action stack, which stays donate's territory.
+              A pass gets the celebratory text share; a fail gets a neutral
+              copy-my-breakdown for study notes (never celebratory copy, no
+              scaled score, no pass/fail wording). Guests get it too, since a
+              pre-signup share is pure top-of-funnel, but the quiet pill styling
+              keeps it secondary to UnlockCTA. Score data never rides in the
+              shared URL. (Growth Build 1, phase 1) */}
+          <div className="flex justify-end">
+            <ShareResultButton
+              text={
+                results!.passed
+                  ? buildPassShareText({
+                      certShortName: cert.shortName,
+                      scaledScore: results!.scaledScore,
+                      correctCount: results!.correctCount,
+                      totalQuestions: results!.totalQuestions,
+                    })
+                  : buildFailBreakdownText({
+                      certShortName: cert.shortName,
+                      correctCount: results!.correctCount,
+                      totalQuestions: results!.totalQuestions,
+                      domains: cert.domains.map(d => ({
+                        name: d.name,
+                        percent: results!.domainScores[String(d.id)] ?? 0,
+                      })),
+                    })
+              }
+              label={results!.passed ? 'Share my result' : 'Copy my domain breakdown'}
+              copyOnly={!results!.passed}
+              analytics={{
+                outcome: results!.passed ? 'pass' : 'fail',
+                cert: cert.code,
+                authed: Boolean(user),
+              }}
+            />
+          </div>
           {submitError && (
             <Alert tone="warning">
               {submitError}
