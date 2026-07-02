@@ -15,6 +15,8 @@ import { OrderingInput } from '../components/OrderingInput'
 import { MatchingInput } from '../components/MatchingInput'
 import { Modal } from '../components/Modal'
 import { PassFailBanner } from '../components/PassFailBanner'
+import { ShareResultButton } from '../components/ShareResultButton'
+import { buildPassShareText } from '../lib/shareResult'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { QuestionReviewCard } from '../components/QuestionReviewCard'
 import { UnlockCTA } from '../components/landing/UnlockCTA'
@@ -814,6 +816,31 @@ export function MockExam() {
             scaledScore={results!.scaledScore}
             percent={results!.percentScore}
           />
+          {/* Share affordance lives WITH the banner (the celebration moment),
+              not in the bottom action stack, which stays donate's territory.
+              Pass only, per owner decision: a fail screen stays focused on
+              its real actions (weakest-domain practice / sign-in CTA), so no
+              share/copy affordance is shown there. Guests get it too, since a
+              pre-signup share is pure top-of-funnel, but the quiet pill styling
+              keeps it secondary to UnlockCTA. Score data never rides in the
+              shared URL. (Growth Build 1, phase 1) */}
+          {results!.passed && (
+            <div className="flex justify-end">
+              <ShareResultButton
+                text={buildPassShareText({
+                  certShortName: cert.shortName,
+                  scaledScore: results!.scaledScore,
+                  correctCount: results!.correctCount,
+                  totalQuestions: results!.totalQuestions,
+                })}
+                label="Share my result"
+                analytics={{
+                  cert: cert.code,
+                  authed: Boolean(user),
+                }}
+              />
+            </div>
+          )}
           {submitError && (
             <Alert tone="warning">
               {submitError}
