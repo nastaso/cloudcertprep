@@ -663,14 +663,23 @@ export function MockExam() {
   const answeredCount = Array.from(answers.values()).filter(isQuestionAnswered).length
   const flaggedCount = Array.from(answers.values()).filter(s => s.flagged).length
 
+  // Guest-save loader, hoisted ABOVE the screen switch (hardening F3). The
+  // arm effect is deliberately screen-agnostic (start OR results), but the
+  // sole render consumer used to live inside the 'start' branch only - which
+  // the OAuth return never shows: the rehydrate effect swaps to 'results'
+  // one task later, so the loader was unreachable on the exact path it was
+  // built for and the bare results screen + stale "Sign in to save" CTA
+  // flashed until the redirect (#125 fixed the email path only). Mirrors the
+  // arm effect's own screen exclusions: never over an active exam or review.
+  if (savingToHistory && (screen === 'start' || screen === 'results')) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-8">
+        <LoadingSpinner text="Saving your attempt..." />
+      </div>
+    )
+  }
+
   if (screen === 'start') {
-    if (savingToHistory) {
-      return (
-        <div className="flex-1 flex items-center justify-center p-8">
-          <LoadingSpinner text="Saving your attempt..." />
-        </div>
-      )
-    }
     return (
       <div className="p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
