@@ -59,6 +59,10 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
     try {
       setLoading(true)
       setError(null)
+      // Reset the footer so a retry can never leave a stale totals line from a
+      // prior success next to freshly retried cert stats; it only re-renders
+      // from a fresh, validated RPC result below.
+      setPublicTotals(null)
 
       const supabase = await getSupabase()
       // Load live totals via SECURITY DEFINER RPC (bypasses RLS on auth.users /
@@ -69,7 +73,14 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
 
       if (totalsError) {
         logError('Stats.loadStats.publicTotals', totalsError)
-      } else if (totalsData) {
+      } else if (
+        Number.isFinite(totalsData?.total_users) &&
+        Number.isFinite(totalsData?.total_questions_answered) &&
+        totalsData.total_users > 0
+      ) {
+        // Shape-validated before storing: a drifted return (missing/null field,
+        // RETURNS TABLE array wrapping) must hide the footer, not throw in
+        // render. Zero users hides it too instead of bragging about "0 users".
         setPublicTotals(totalsData)
       }
 
@@ -79,7 +90,12 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
         .rpc('get_public_exam_stats')
 
       if (examStatsError) {
+        // postgrest-js resolves almost every failure (rate limit, restart,
+        // missing function) as {error} rather than throwing, so a resolved
+        // error must fail the load too - otherwise the snapshot is swapped
+        // for "Be the first" placeholders with no error UI and no retry.
         logError('Stats.loadStats.examStats', examStatsError)
+        setError('Failed to load statistics')
       }
 
       if (examStats?.cert_stats) {
@@ -89,7 +105,7 @@ export function Stats({ hideInitialSkeleton = false, onLoaded }: StatsProps = {}
         }
         setCertStats(certStatsMap)
       }
-      ok = true
+      ok = !examStatsError
 
     } catch (err: unknown) {
       logError('Stats.loadStats', err)
