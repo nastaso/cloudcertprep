@@ -1,20 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
-import { Share2, Check, Copy } from 'lucide-react'
+import { Share2, Check } from 'lucide-react'
 import { trackEvent } from '../lib/analytics'
 import { copyText } from '../lib/clipboard'
 
 interface ShareResultButtonProps {
   /** Full text to share/copy, prebuilt by the caller (lib/shareResult.ts). */
   text: string
-  /** Idle label, e.g. "Share my result" / "Copy my domain breakdown". */
+  /** Idle label, e.g. "Share my result". */
   label: string
-  /** Extra share_result params (outcome/cert/authed) for phase-2 gating. */
+  /** Extra share_result params (cert/authed) for phase-2 gating. */
   analytics: Record<string, unknown>
-  /**
-   * Skip navigator.share and go straight to the clipboard. The fail-state
-   * variant is "copy for study notes", not a share-sheet moment.
-   */
-  copyOnly?: boolean
 }
 
 type CopyState = 'idle' | 'copied' | 'failed'
@@ -26,7 +21,7 @@ type CopyState = 'idle' | 'copied' | 'failed'
  * guests it must stay visually secondary to UnlockCTA, whose sign-in is the
  * more valuable conversion.
  */
-export function ShareResultButton({ text, label, analytics, copyOnly = false }: ShareResultButtonProps) {
+export function ShareResultButton({ text, label, analytics }: ShareResultButtonProps) {
   const [copyState, setCopyState] = useState<CopyState>('idle')
   const resetTimer = useRef<number | null>(null)
 
@@ -41,7 +36,7 @@ export function ShareResultButton({ text, label, analytics, copyOnly = false }: 
   }
 
   async function handleClick() {
-    if (!copyOnly && typeof navigator.share === 'function') {
+    if (typeof navigator.share === 'function') {
       try {
         await navigator.share({ text })
         trackEvent('share_result', { ...analytics, method: 'web_share' })
@@ -57,7 +52,7 @@ export function ShareResultButton({ text, label, analytics, copyOnly = false }: 
     if (copied) trackEvent('share_result', { ...analytics, method: 'clipboard' })
   }
 
-  const Icon = copyState === 'copied' ? Check : copyOnly ? Copy : Share2
+  const Icon = copyState === 'copied' ? Check : Share2
   const shownLabel =
     copyState === 'copied' ? 'Copied' : copyState === 'failed' ? 'Could not copy' : label
 
