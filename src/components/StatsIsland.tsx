@@ -12,6 +12,7 @@
  * router-internally — every link is a real anchor to another Astro document.
  */
 import { Stats } from '../pages/_Stats'
+import { ErrorBoundary } from './ErrorBoundary'
 
 const SNAPSHOT_SELECTOR = '[data-stats-snapshot]'
 
@@ -27,5 +28,12 @@ export default function StatsIsland() {
   // -> live numbers (content going backwards). Instead the snapshot IS the
   // loading state: _Stats suppresses its first-load skeleton, and we hide the
   // snapshot the moment live numbers are ready (one forward swap, no flash).
-  return <Stats hideInitialSkeleton onLoaded={hideSnapshot} />
+  // ErrorBoundary: AppIsland wraps only the app routes, so without one here a
+  // render throw would unmount the island into a blank page (the snapshot is
+  // already display:none by then).
+  return (
+    <ErrorBoundary>
+      <Stats hideInitialSkeleton onLoaded={hideSnapshot} />
+    </ErrorBoundary>
+  )
 }
