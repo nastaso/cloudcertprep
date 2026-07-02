@@ -6,15 +6,27 @@ import { useSEO } from '../hooks/useSEO'
 import { getSupabase } from '../lib/supabase'
 import { sweepAuthTokens, eraseLocalTraces } from '../lib/authCleanup'
 import { logError } from '../lib/logger'
+import { trackEvent } from '../lib/analytics'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
 import { Modal } from '../components/Modal'
 import { Input } from '../components/Input'
 import { LoadingSpinner } from '../components/LoadingSpinner'
+import { filterChipClass } from '../lib/buttonStyles'
 import { Download, Trash2, UserCircle } from 'lucide-react'
 
 const SUPPORT_EMAIL = 'alex@cloudcertprep.io'
+
+// Optional, skippable exit-reason chips shown in the delete-confirmation
+// modal (GROW M1). Purely a success/churn signal for retention analysis -
+// never gates the Delete button, and only ever sent if the user opts in.
+const DELETE_REASONS = [
+  { value: 'passed_exam', label: 'Passed my exam' },
+  { value: 'better_tool', label: 'Found a better tool' },
+  { value: 'privacy', label: 'Privacy' },
+  { value: 'other', label: 'Other' },
+] as const
 
 /**
  * Account settings (signed-in only, noindex app route).
@@ -47,6 +59,7 @@ export function Account() {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [confirmText, setConfirmText] = useState('')
+  const [deleteReason, setDeleteReason] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
   // Synchronous re-entrancy guard (note 1): setDeleting is async, so a
@@ -141,6 +154,11 @@ export function Account() {
     setDeleteError(null)
     try {
       const supabase = await getSupabase()
+      // Optional exit-reason signal (GROW M1): anonymous, opt-in only - never
+      // gates deletion, and only sent if the user tapped a chip.
+      if (deleteReason) {
+        trackEvent('account_delete_reason', { reason: deleteReason })
+      }
       // 30s race (note 3): functions.invoke never times out on its own, and
       // the modal is deliberately unclosable mid-delete - a hung request would
       // lock the user on the spinner forever. The deletion itself is
@@ -252,7 +270,7 @@ export function Account() {
                 Permanently delete your account and all your data: exam attempts, domain progress, and your sign-in. This cannot be undone.
               </p>
               <Button
-                onClick={() => { setConfirmText(''); setDeleteError(null); setShowDeleteModal(true) }}
+                onClick={() => { setConfirmText(''); setDeleteError(null); setDeleteReason(null); setShowDeleteModal(true) }}
                 variant="danger"
                 leftIcon={<Trash2 className="w-4 h-4" aria-hidden="true" />}
               >
@@ -272,6 +290,34 @@ export function Account() {
           <p className="text-text-primary">
             This permanently erases your account, exam history, and progress. It cannot be undone.
           </p>
+          <p className="text-sm text-text-muted">
+            Want a copy first?{' '}
+            <button
+              type="button"
+              onClick={() => { setShowDeleteModal(false); handleExport() }}
+              disabled={deleting}
+              className="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors"
+            >
+              Download your data
+            </button>
+          </p>
+          <div>
+            <p className="text-sm text-text-muted mb-2">Mind sharing why? (optional)</p>
+            <div className="flex flex-wrap gap-2">
+              {DELETE_REASONS.map(r => (
+                <button
+                  key={r.value}
+                  type="button"
+                  onClick={() => setDeleteReason(prev => (prev === r.value ? null : r.value))}
+                  aria-pressed={deleteReason === r.value}
+                  disabled={deleting}
+                  className={filterChipClass({ active: deleteReason === r.value, size: 'sm' })}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </div>
           <p className="text-sm text-text-muted">
             Type <span className="font-mono font-semibold text-text-primary">DELETE</span> to confirm.
           </p>

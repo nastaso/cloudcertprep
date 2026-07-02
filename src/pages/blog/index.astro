@@ -16,11 +16,12 @@ import Breadcrumb from '../../components/Breadcrumb.astro'
 import HeroMini from '../../components/landing/HeroMini.astro'
 import PostCard from '../../components/PostCard.astro'
 import { SITE_URL } from '../../lib/seo-data'
+import { includeDrafts } from '../../lib/posts'
 
 const PAGE_SIZE = 10
 
 const posts = await getCollection('blog', ({ data }: CollectionEntry<'blog'>) =>
-  import.meta.env.PROD ? data.draft !== true : true,
+  includeDrafts || data.draft !== true,
 )
 const sorted = posts
   .sort((a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) => b.data.date.getTime() - a.data.date.getTime())
