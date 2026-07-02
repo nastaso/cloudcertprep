@@ -56,6 +56,7 @@ export const KNOWN_EVENTS = [
   'sign_in_initiated',  // OAuth button clicked (method: github | google)
   'sign_in',            // unauth -> auth transition (fired once, any method)
   'sign_out',           // sign-out
+  'account_delete_reason', // optional exit-reason chip in the delete modal (anonymous; params: reason)
   // Mock exam flow
   'exam_started',
   'exam_abandoned',     // beforeunload during an active exam
