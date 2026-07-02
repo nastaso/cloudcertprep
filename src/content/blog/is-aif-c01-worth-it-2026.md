@@ -9,7 +9,7 @@ ogImage: /og/og-blog.png
 draft: true
 faq:
   - q: "Is the AWS AI Practitioner (AIF-C01) worth it in 2026?"
-    a: "For most people who work near AI or cloud, yes. It is a low-cost, recognised way to prove foundational AI literacy, which more roles now expect. It is less worthwhile for experienced machine-learning engineers, who will find the depth too introductory."
+    a: "For most people who work near AI or cloud, yes. It is a low-cost, recognized way to prove foundational AI literacy, which more roles now expect. It is less worthwhile for experienced machine-learning engineers, who will find the depth too introductory."
   - q: "Is AIF-C01 hard to pass?"
     a: "AIF-C01 is a foundational exam, so it tests breadth of understanding rather than deep implementation. Most candidates with some AI or cloud exposure pass with focused study. There is no hands-on lab and no coding requirement."
   - q: "How long does it take to study for AIF-C01?"
@@ -30,7 +30,7 @@ _Last reviewed: June 2026._
 
 ## Is the AWS AI Practitioner worth it in 2026?
 
-Yes, AIF-C01 is worth it in 2026 for most people who work near AI or cloud, because it gives you a recognised, low-cost way to prove foundational AI literacy that hiring managers and clients increasingly expect. It is a strong fit for product, sales, support, analyst, and early developer roles, and a weaker fit for seasoned machine-learning engineers.
+Yes, AIF-C01 is worth it in 2026 for most people who work near AI or cloud, because it gives you a recognized, low-cost way to prove foundational AI literacy that hiring managers and clients increasingly expect. It is a strong fit for product, sales, support, analyst, and early developer roles, and a weaker fit for seasoned machine-learning engineers.
 
 The value is mostly a signal. Passing does not guarantee a job or a raise, but it shows you can talk about foundation models, generative AI, and responsible AI with a shared vocabulary. In a year when many teams are adding AI features, that fluency is becoming a baseline expectation rather than a nice-to-have.
 
@@ -54,7 +54,7 @@ The pattern is simple. If you make or influence AI-related decisions but are not
 
 AIF-C01 costs about USD 100 for the exam (before local tax or any voucher) and roughly 15 to 40 hours of study, depending on how much AI or cloud exposure you already have. The certification stays valid for three years, so the real cost is one focused study block rather than an ongoing commitment.
 
-Your background drives the time more than anything else. If you already use AWS or generative AI tools at work, the lower end is realistic. If the terms are new, budget closer to the upper end and lean on steady practice rather than passive reading. Either way, the money cost is modest next to most professional certifications, which is part of why the value calculation usually lands in its favour.
+Your background drives the time more than anything else. If you already use AWS or generative AI tools at work, the lower end is realistic. If the terms are new, budget closer to the upper end and lean on steady practice rather than passive reading. Either way, the money cost is modest next to most professional certifications, which is part of why the value calculation usually lands in its favor.
 
 ## What is on the AIF-C01 exam in 2026
 
@@ -86,7 +86,7 @@ More than half of the exam sits in generative AI and foundation models (domains 
 
 ## How to prepare for AIF-C01 for free
 
-The most efficient free preparation is to practise by domain until your weak areas are obvious, then sit a couple of full-length timed mock exams to rehearse pacing. Read the official AWS exam guide once for scope, then spend the bulk of your time answering questions and reviewing the explanations rather than re-reading notes.
+The most efficient free preparation is to practice by domain until your weak areas are obvious, then sit a couple of full-length timed mock exams to rehearse pacing. Read the official AWS exam guide once for scope, then spend the bulk of your time answering questions and reviewing the explanations rather than re-reading notes.
 
 A practical plan looks like this:
 
@@ -95,7 +95,9 @@ A practical plan looks like this:
 - **Do not neglect the rest.** Lock in [Guidelines for Responsible AI](/aws/aif-c01/guidelines-for-responsible-ai) and [Security, Compliance, and Governance](/aws/aif-c01/security-compliance-and-governance), where the questions are very passable with a little focus.
 - **Rehearse the real thing.** Finish with a full-length [AIF-C01 mock exam](/aws/aif-c01/practice-exam) so the 65-question, 90-minute format feels routine before exam day.
 
-Every question on the platform is open-source and comes with a written explanation, so you learn why an answer is right rather than memorising it. That is the difference between preparation that holds up under exam pressure and rote answers that fall apart on a reworded question.
+Every question on the platform is open-source and comes with a written explanation, so you learn why an answer is right rather than memorizing it. That is the difference between preparation that holds up under exam pressure and rote answers that fall apart on a reworded question.
+
+<!-- OWNER (rule 2): add a first-person builder line, e.g. how you validated the AIF question bank and these cost/format facts against the official exam guide while writing this verdict. Do not claim to have sat AIF-C01 before you pass it. -->
 
 ## Bottom line
 
@@ -105,7 +107,7 @@ AIF-C01 is worth it in 2026 for most people working near AI or cloud, and a sens
 
 ### Is the AWS AI Practitioner (AIF-C01) worth it in 2026?
 
-For most people who work near AI or cloud, yes. It is a low-cost, recognised way to prove foundational AI literacy, which more roles now expect. It is less worthwhile for experienced machine-learning engineers, who will find the depth too introductory.
+For most people who work near AI or cloud, yes. It is a low-cost, recognized way to prove foundational AI literacy, which more roles now expect. It is less worthwhile for experienced machine-learning engineers, who will find the depth too introductory.
 
 ### Is AIF-C01 hard to pass?
 

@@ -66,7 +66,7 @@ AIF-C01 splits five domains entirely within AI/ML:
 
 - **[Fundamentals of AI and ML](/aws/aif-c01/fundamentals-of-ai-and-ml)**, **[Fundamentals of Generative AI](/aws/aif-c01/fundamentals-of-generative-ai)**, **[Applications of Foundation Models](/aws/aif-c01/applications-of-foundation-models)**, **[Guidelines for Responsible AI](/aws/aif-c01/guidelines-for-responsible-ai)**, and **[Security, Compliance, and Governance](/aws/aif-c01/security-compliance-and-governance)**.
 
-You can drill either set directly: the [CLF-C02 practice](/aws/clf-c02) and the [AIF-C01 practice](/aws/aif-c01) are each organised around their real exam-guide domains.
+You can drill either set directly: the [CLF-C02 practice](/aws/clf-c02) and the [AIF-C01 practice](/aws/aif-c01) are each organized around their real exam-guide domains.
 
 ## Which should you take first?
 

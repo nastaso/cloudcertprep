@@ -60,6 +60,8 @@ Generative AI is the wrong choice when you need exact, deterministic, or guarant
 
 Two limits drive this. First, a generative model is probabilistic, so the same prompt can give different answers and confident-sounding output can be wrong. Second, its quality depends on data: gaps, bias, or stale information in the training or retrieval data show up directly in what it generates. When a task needs a single correct answer every time, a billing calculation or a compliance check, reach for deterministic logic or a predictive model and keep generative AI for the drafting and assistance around it. Knowing these limits, and the guardrails that manage them, is the focus of [responsible AI](/aws/aif-c01/guidelines-for-responsible-ai), domain 4 of the exam.
 
+<!-- OWNER (rule 2): add a first-person line, e.g. how you applied this generative-vs-predictive test when validating the AIF bank's domain 2 questions against the exam guide. Do not claim to have sat AIF-C01 before you pass it. -->
+
 ## Bottom line
 
 The rule is short: if a prompt produces new content, it is a generative AI task; if it returns a label, number, or ranking from existing data, it is not. Hold onto that and the exam-style "which of these is a generative AI task" questions become quick wins. To practice the real thing, drill the free, open-source [Fundamentals of Generative AI](/aws/aif-c01/fundamentals-of-generative-ai) questions, each with a written explanation, then take a full-length [AIF-C01 practice exam](/aws/aif-c01). If you are still weighing the cert itself, see [AIF-C01 vs CLF-C02: which to take first](/blog/aif-c01-vs-clf-c02).
