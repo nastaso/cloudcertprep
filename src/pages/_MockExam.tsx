@@ -4,7 +4,7 @@ import { Flag, AlertCircle, LayoutGrid, Heart, ArrowLeft } from 'lucide-react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
-import { filterChipClass, reviewCellClass } from '../lib/buttonStyles'
+import { buttonClass, filterChipClass, reviewCellClass } from '../lib/buttonStyles'
 import { useTimer } from '../hooks/useTimer'
 import { useAuth } from '../hooks/useAuth'
 import { useSEO } from '../hooks/useSEO'
@@ -15,6 +15,8 @@ import { OrderingInput } from '../components/OrderingInput'
 import { MatchingInput } from '../components/MatchingInput'
 import { Modal } from '../components/Modal'
 import { PassFailBanner } from '../components/PassFailBanner'
+import { ShareResultButton } from '../components/ShareResultButton'
+import { buildPassShareText } from '../lib/shareResult'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { QuestionReviewCard } from '../components/QuestionReviewCard'
 import { UnlockCTA } from '../components/landing/UnlockCTA'
@@ -33,6 +35,7 @@ import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave, SIGN_OU
 import { useSignOut } from '../hooks/useSignOut'
 import { storePendingAttempt, consumePendingAttemptSavedNotice, markPendingAttemptSaveIntent, PENDING_ATTEMPT_SAVED_EVENT, peekPendingAttempt, hasPendingAttemptSaveIntent, type PendingAttempt } from '../lib/pendingAttempt'
 import { getProviderLabel } from '../data/certifications'
+import { findNextDomainAction } from '../lib/domainStats'
 
 type ExamScreen = 'start' | 'exam' | 'results' | 'review'
 
@@ -813,6 +816,31 @@ export function MockExam() {
             scaledScore={results!.scaledScore}
             percent={results!.percentScore}
           />
+          {/* Share affordance lives WITH the banner (the celebration moment),
+              not in the bottom action stack, which stays donate's territory.
+              Pass only, per owner decision: a fail screen stays focused on
+              its real actions (weakest-domain practice / sign-in CTA), so no
+              share/copy affordance is shown there. Guests get it too, since a
+              pre-signup share is pure top-of-funnel, but the quiet pill styling
+              keeps it secondary to UnlockCTA. Score data never rides in the
+              shared URL. (Growth Build 1, phase 1) */}
+          {results!.passed && (
+            <div className="flex justify-end">
+              <ShareResultButton
+                text={buildPassShareText({
+                  certShortName: cert.shortName,
+                  scaledScore: results!.scaledScore,
+                  correctCount: results!.correctCount,
+                  totalQuestions: results!.totalQuestions,
+                })}
+                label="Share my result"
+                analytics={{
+                  cert: cert.code,
+                  authed: Boolean(user),
+                }}
+              />
+            </div>
+          )}
           {submitError && (
             <Alert tone="warning">
               {submitError}
@@ -896,6 +924,29 @@ export function MockExam() {
           )}
 
           <div className="mt-6 space-y-3">
+            {/* Signed-in FAIL: route the moment of highest motivation straight
+                into targeted domain practice (M5; guests get the adaptive
+                UnlockCTA above instead). Weakest here is THIS exam's per-domain
+                accuracy (results.domainScores), a legitimate "weakest" for the
+                moment. Real anchor, not a router push: domain-practice is a
+                separate Astro document with its own chrome (see useCertNavigate
+                M0c). Brand variant = the platform's "start practising" action. */}
+            {user && !results!.passed && (() => {
+              const weakest = findNextDomainAction(cert.domains.map(d => ({
+                domainId: d.id,
+                percent: results!.domainScores[String(d.id)] ?? 0,
+                practiced: true,
+              })))
+              const weakestDomain = weakest ? cert.domains.find(d => d.id === weakest.domainId) : undefined
+              return weakestDomain ? (
+                <a
+                  href={`/${cert.provider}/${cert.code}/domain-practice?domain=${weakestDomain.id}`}
+                  className={buttonClass({ variant: 'brand', fullWidth: true })}
+                >
+                  Practice your weakest domain: {weakestDomain.name}
+                </a>
+              ) : null
+            })()}
             {/* Per-question review needs the loaded Question objects. A snapshot
                 rehydrate (P1-6) has none (questions stays empty on a fresh remount),
                 so gate on questions.length. Stateless, so it also stays correct

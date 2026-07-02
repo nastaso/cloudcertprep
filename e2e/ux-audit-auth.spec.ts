@@ -159,21 +159,28 @@ test('P1-7: in-exam Sign out routes through the leave modal, then completes', as
   await page.waitForFunction(() => document.body.dataset.examActive === 'true', { timeout: 25000 })
 
   // Sign out (inside the account menu) during the exam must open the leave
-  // modal, NOT sign out immediately.
+  // modal, NOT sign out immediately. Since #121 the sign-out variant brands
+  // itself "Sign out?" with a "Sign out" confirm ("Leave the exam?"/"Leave
+  // exam" is the URL-navigation variant) - this test asserted the old shared
+  // copy and had been failing on the copy alone since then (the guard itself
+  // never broke; verified live 2026-07-02).
+  const signOutDialog = page.getByRole('dialog', { name: 'Sign out?' })
   await page.getByRole('button', { name: 'Account menu' }).click()
   await page.getByRole('button', { name: 'Sign out' }).click()
-  await expect(page.getByText('Leave the exam?')).toBeVisible()
+  await expect(signOutDialog).toBeVisible()
 
   // Stay keeps the attempt alive.
   await page.getByRole('button', { name: 'Stay in exam' }).click()
-  await expect(page.getByText('Leave the exam?')).toBeHidden()
+  await expect(signOutDialog).toBeHidden()
   expect(await page.evaluate(() => document.body.dataset.examActive)).toBe('true')
 
-  // Confirming completes the sign-out (back on '/', signed out -> Sign in shows).
+  // Confirming completes the sign-out (back on '/', signed out -> Sign in
+  // shows). The confirm click is scoped to the dialog so it can never match
+  // the account-menu's own Sign out entry.
   await page.getByRole('button', { name: 'Account menu' }).click()
   await page.getByRole('button', { name: 'Sign out' }).click()
-  await expect(page.getByText('Leave the exam?')).toBeVisible()
-  await page.getByRole('button', { name: 'Leave exam' }).click()
+  await expect(signOutDialog).toBeVisible()
+  await signOutDialog.getByRole('button', { name: 'Sign out' }).click()
   await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
   await expect(page.getByRole('button', { name: 'Sign in' }).first()).toBeVisible({ timeout: 15000 })
 })
