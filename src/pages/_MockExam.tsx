@@ -865,7 +865,7 @@ export function MockExam() {
               </div>
             </div>
 
-            <h3 className="text-xl font-semibold text-text-primary mb-4">Domain breakdown</h3>
+            <h2 className="text-xl font-semibold text-text-primary mb-4">Domain breakdown</h2>
             <div className="space-y-4">
               {cert.domains.map(domain => {
                 const score = results!.domainScores[String(domain.id)] ?? 0
@@ -1474,7 +1474,7 @@ export function MockExam() {
 
                 {/* Question Number Grid */}
                 <div>
-                  <h3 className="text-xs md:text-sm font-semibold text-text-muted mb-2 text-center">Questions:</h3>
+                  <h2 className="text-xs md:text-sm font-semibold text-text-muted mb-2 text-center">Questions:</h2>
                   <div className="grid grid-cols-[repeat(auto-fit,minmax(32px,32px))] md:grid-cols-[repeat(auto-fit,minmax(36px,36px))] gap-0.5 md:gap-1 justify-center">
                     {results.questionResults.map((result, idx) => {
                       const isCurrentQuestion = filteredQuestions[reviewQuestionIndex]?.questionId === result.questionId

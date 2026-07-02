@@ -26,7 +26,7 @@ Both are entry-level and neither requires hands-on lab work. They follow AWS's s
 
 ## CLF-C02 vs AIF-C01 at a glance
 
-| | CLF-C02 | AIF-C01 |
+| Aspect | CLF-C02 | AIF-C01 |
 | --- | --- | --- |
 | Focus | The AWS Cloud, broadly | AI and ML on AWS |
 | Level | Foundational | Foundational |

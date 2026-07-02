@@ -62,6 +62,8 @@ export function DonateButton({ isExamActive, pathname }: DonateButtonProps) {
     // page. Fade it in rather than snapping into place. Reduced-motion users get
     // it instantly (global override neutralizes the animation).
     <div
+      role="complementary"
+      aria-label="Support this project"
       className={`hidden lg:block fixed bottom-6 left-6 z-40 group animate-fade-in transition-[opacity,transform] duration-gentle ease-out ${nearFooter ? 'pointer-events-none translate-y-3 opacity-0' : 'opacity-100'}`}
     >
       <a

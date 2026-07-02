@@ -366,7 +366,7 @@ export function Login() {
                     <BookOpen className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-text-primary font-semibold mb-1">{getActiveTotalQuestions().toLocaleString('en-US')}+ practice questions</h3>
+                    <h2 className="text-text-primary font-semibold mb-1">{getActiveTotalQuestions().toLocaleString('en-US')}+ practice questions</h2>
                     <p className="text-text-muted text-sm">Up to date with the latest exam guides, across multiple AWS certifications</p>
                   </div>
                 </div>
@@ -376,7 +376,7 @@ export function Login() {
                     <FileText className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-text-primary font-semibold mb-1">Full-length practice exams</h3>
+                    <h2 className="text-text-primary font-semibold mb-1">Full-length practice exams</h2>
                     <p className="text-text-muted text-sm">Timed exams in the same format as the real thing</p>
                   </div>
                 </div>
@@ -386,7 +386,7 @@ export function Login() {
                     <Target className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-text-primary font-semibold mb-1">Domain practice</h3>
+                    <h2 className="text-text-primary font-semibold mb-1">Domain practice</h2>
                     <p className="text-text-muted text-sm">Practice one domain at a time with instant feedback</p>
                   </div>
                 </div>
@@ -396,7 +396,7 @@ export function Login() {
                     <TrendingUp className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-text-primary font-semibold mb-1">Progress tracking</h3>
+                    <h2 className="text-text-primary font-semibold mb-1">Progress tracking</h2>
                     <p className="text-text-muted text-sm">Monitor your scores across all domains and review past attempts</p>
                   </div>
                 </div>
@@ -406,7 +406,7 @@ export function Login() {
                     <CheckCircle className="w-5 h-5 text-brand" aria-hidden="true" />
                   </div>
                   <div>
-                    <h3 className="text-text-primary font-semibold mb-1">100% free</h3>
+                    <h2 className="text-text-primary font-semibold mb-1">100% free</h2>
                     <p className="text-text-muted text-sm">No hidden fees, no premium tiers, no paywalls, no ads</p>
                   </div>
                 </div>
