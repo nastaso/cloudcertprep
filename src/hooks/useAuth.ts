@@ -46,6 +46,39 @@ function setState(next: AuthState) {
   listeners.forEach(cb => cb())
 }
 
+/**
+ * True when an onAuthStateChange event is a bare token refresh for the SAME
+ * user that is already published - i.e. nothing a React consumer needs to see.
+ *
+ * A TOKEN_REFRESHED event rotates the JWT but does not change who is signed in;
+ * supabase-js holds the new access token internally. Publishing a fresh `user`
+ * object for it would change the object's identity on every refresh, re-running
+ * every consumer effect keyed on `user` (History, CertDashboard, Account,
+ * DomainProgressStrip, DomainPractice) and re-issuing an authenticated query.
+ * Combined with supabase-js refreshing again around that query, that spun an
+ * infinite refetch/refresh loop that hammered the auth /token endpoint until
+ * Supabase returned 429 and the session died - reported as "logged out after
+ * 50+ requests on /history" (issue #159). When this returns true the caller
+ * keeps the existing reference (no setState), so no consumer effect re-fires.
+ *
+ * Returns false for every identity-changing event (SIGNED_IN, USER_UPDATED,
+ * SIGNED_OUT, INITIAL_SESSION) and for a refresh that somehow changes the user
+ * id or arrives before any user is established, so those still publish normally.
+ * Exported for unit testing (see useAuth.test.ts).
+ */
+export function isRedundantTokenRefresh(
+  event: string,
+  newUser: User | null,
+  currentUser: User | null,
+): boolean {
+  return (
+    event === 'TOKEN_REFRESHED'
+    && newUser !== null
+    && currentUser !== null
+    && newUser.id === currentUser.id
+  )
+}
+
 // Best-effort sync check for a persisted Supabase session token.
 //
 // SYNC: same scan also lives at window.__ccHasSession (BaseLayout.astro
@@ -218,6 +251,15 @@ function init() {
       // is tracked again instead of staying silently suppressed.
       if (event === 'SIGNED_OUT') {
         try { sessionStorage.removeItem(SIGN_IN_TRACKED_KEY) } catch { /* private mode */ }
+      }
+
+      // Skip the state publish on a bare same-user token refresh so the `user`
+      // reference stays stable and no consumer effect re-fires (see
+      // isRedundantTokenRefresh for the full rationale / issue #159). prevUser
+      // still advances so downstream identity checks stay correct.
+      if (isRedundantTokenRefresh(event, newUser, state.user)) {
+        prevUser = newUser
+        return
       }
 
       prevUser = newUser
