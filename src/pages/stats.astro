@@ -1,12 +1,13 @@
 ---
 /**
  * /stats — React island shell. NOINDEX for now (temporary, see note below).
- * Temporarily noindex and removed from the footer and SEO assets: the community
- * sample is too small to publish a credible "community pass rate" (a handful of
- * attempts is not a meaningful benchmark and could read as misleading). Re-enable
- * indexing, the footer link, and sitemap/llms.txt entries once attempt volume is
- * large enough. The prerender, Dataset JSON-LD, and snapshot wiring all stay in
- * place so re-enabling is a one-line robots flip.
+ * The page is now linked from the footer (as of #150) but stays noindex and out
+ * of the sitemap / llms.txt SEO assets: the community sample is still too small
+ * to publish a credible "community pass rate" as an indexable, citable surface
+ * (a handful of attempts is not a meaningful benchmark and could read as
+ * misleading). Re-enable indexing and the sitemap/llms.txt entries once attempt
+ * volume is large enough. The prerender, Dataset JSON-LD, and snapshot wiring
+ * all stay in place so re-enabling is a one-line robots flip.
  *
  * Prerenders the as-of-last-deploy community stats SNAPSHOT into static HTML
  * and feeds the SAME snapshot values into the Dataset JSON-LD (STATS-SNAPSHOT-
