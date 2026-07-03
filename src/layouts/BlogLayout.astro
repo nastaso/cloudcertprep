@@ -233,27 +233,32 @@ const updatedDisplay = data.updated
           <div class={`blog-content max-w-[68ch] mx-auto${showToc ? ' lg:mx-0 [&_:is(h2,h3)]:scroll-mt-24' : ''}`}>
             <slot />
           </div>
+          {/* A single <nav> landmark, not <aside>-wrapping-<nav>: the outer
+              <aside> duplicated the inner nav's role/label, and axe's
+              landmark-complementary-is-top-level flags a complementary
+              region nested inside <article> anyway. A table of contents is
+              navigation, so <nav> is the correct (and now top-level-safe)
+              role; merging the two elements avoids trading that flag for a
+              landmark-unique violation (two nested navs sharing one name). */}
           {showToc && (
-            <aside class="hidden lg:block" aria-label="Table of contents">
-              <nav class="sticky top-24" aria-label="Table of contents">
-                <p class="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted mb-3">
-                  On this page
-                </p>
-                <ul class="space-y-1 list-none p-0 m-0 border-l border-border-hairline">
-                  {toc.map((h) => (
-                    <li>
-                      <a
-                        href={`#${h.slug}`}
-                        data-toc-link
-                        class={`-ml-px block border-l border-transparent py-1 text-sm leading-snug text-text-muted transition-colors duration-200 hover:border-text-muted hover:text-text-primary focus-visible:outline-none focus-visible:border-text-muted focus-visible:text-text-primary [&[data-active=true]]:border-text-primary [&[data-active=true]]:text-text-primary [&[data-active=true]]:font-medium ${h.depth === 3 ? 'pl-6' : 'pl-3'}`}
-                      >
-                        {h.text}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            </aside>
+            <nav class="hidden lg:block sticky top-24" aria-label="Table of contents">
+              <p class="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted mb-3">
+                On this page
+              </p>
+              <ul class="space-y-1 list-none p-0 m-0 border-l border-border-hairline">
+                {toc.map((h) => (
+                  <li>
+                    <a
+                      href={`#${h.slug}`}
+                      data-toc-link
+                      class={`-ml-px block border-l border-transparent py-1 text-sm leading-snug text-text-muted transition-colors duration-200 hover:border-text-muted hover:text-text-primary focus-visible:outline-none focus-visible:border-text-muted focus-visible:text-text-primary [&[data-active=true]]:border-text-primary [&[data-active=true]]:text-text-primary [&[data-active=true]]:font-medium ${h.depth === 3 ? 'pl-6' : 'pl-3'}`}
+                    >
+                      {h.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           )}
         </div>
 
