@@ -180,7 +180,7 @@ src/
 
 scripts/          Build/prebuild + CI checks:
   validate-questions.mjs    Question-bank validator (`npm run validate`)
-  generate-seo-assets.mjs   Sitemap + question-counts.ts + llms.txt + _redirects
+  generate-seo-assets.mjs   Sitemap + question-counts.ts + llms.txt + _redirects + manifest.json
   generate-og-images.mjs    Per-cert / per-domain / blog OG composites
   generate-stats-snapshot.mjs   Build-time /stats snapshot
   validate-blog-frontmatter.mjs, validate-internal-links.mjs,
