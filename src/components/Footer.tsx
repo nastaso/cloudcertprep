@@ -58,6 +58,7 @@ export function Footer() {
               <li><a href="/about" className={navLink}>About</a></li>
               <li><a href="/blog" className={navLink}>Blog</a></li>
               <li><a href="/contribute" className={navLink}>Contribute</a></li>
+              <li><a href="/stats" className={navLink}>Community stats</a></li>
               <li>
                 <a
                   href={KOFI_URL}
