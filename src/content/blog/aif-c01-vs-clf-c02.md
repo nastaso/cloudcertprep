@@ -41,9 +41,9 @@ Both are entry-level and neither requires hands-on lab work. They follow AWS's s
 
 ## The headline difference: cloud breadth vs AI focus
 
-CLF-C02 validates a broad, foundational understanding of the AWS Cloud as a whole: core compute, storage, networking and database services, security and the shared responsibility model, pricing, and support. It is the natural first step into the AWS certification track and assumes no prior cloud knowledge.
+CLF-C02 validates a broad, foundational understanding of the AWS Cloud as a whole: core compute, storage, networking and database services, [security and the shared responsibility model](/aws/clf-c02/security-and-compliance), pricing, and support. It is the natural first step into the AWS certification track and assumes no prior cloud knowledge.
 
-AIF-C01 is narrower and deeper on one theme: artificial intelligence and machine learning on AWS. It covers AI/ML fundamentals, generative AI concepts, foundation models and prompt engineering, responsible AI, and the security and governance of AI systems. AWS positions it as foundational with no formal prerequisites and no required cloud experience, though candidates who already understand basic AWS concepts (regions, IAM, S3, the shared responsibility model) tend to find some AIF-C01 topics easier to place in context.
+AIF-C01 is narrower and deeper on one theme: artificial intelligence and machine learning on AWS. It covers AI/ML fundamentals, generative AI concepts, [foundation models and prompt engineering](/aws/aif-c01/applications-of-foundation-models), responsible AI, and the security and governance of AI systems. AWS positions it as foundational with no formal prerequisites and no required cloud experience, though candidates who already understand basic AWS concepts (regions, IAM, S3, the shared responsibility model) tend to find some AIF-C01 topics easier to place in context.
 
 ## What stays the same
 

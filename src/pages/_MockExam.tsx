@@ -203,7 +203,7 @@ export function MockExam() {
     ? `Question ${currentIndex + 1} of ${cert.examQuestionCount} · CloudCertPrep`
     : screen === 'results' ? 'Exam results · CloudCertPrep'
     : screen === 'review' ? 'Review exam · CloudCertPrep'
-    : `${cert.shortName} Mock Exam · ${cert.examQuestionCount} Questions, ${examMinutes} Min, Free · CloudCertPrep`
+    : `${cert.shortName} Practice Exam · ${cert.examQuestionCount} Questions, ${examMinutes} Min, Free · CloudCertPrep`
   // Per-cert canonical so each cert's practice exam ranks for its own
   // keyword space (e.g. /aws/aif-c01/practice-exam vs /aws/clf-c02/practice-exam).
   // NOTE: this route ships robots=noindex (set on the Astro shell), so it must
@@ -213,7 +213,7 @@ export function MockExam() {
   // Google renders the island JS. (M0d)
   useSEO({
     title: pageTitle,
-    description: `Free ${cert.examQuestionCount}-question ${cert.shortName} mock exam, ${examMinutes}-minute timer, scaled scoring (${cert.passingScore}/1000 to pass), exact ${cert.shortName} exam format. Open-source MIT-licensed alternative to paid AWS practice platforms. No signup needed.`,
+    description: `Free ${cert.examQuestionCount}-question ${cert.shortName} practice exam, ${examMinutes}-minute timer, scaled scoring (${cert.passingScore}/1000 to pass), exact ${cert.shortName} exam format. Open-source MIT-licensed alternative to paid AWS practice platforms. No signup needed.`,
     canonical: null,
   })
 

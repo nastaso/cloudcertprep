@@ -86,7 +86,7 @@ project, not on prod.)
 
 ### `platform_stats`
 
-Single-row singleton table with aggregate counters. Maintained by triggers on `exam_attempts` and `attempt_questions`.
+Single-row singleton table with aggregate counters. Trigger-maintained on insert only (see Triggers below), via the shared `increment_platform_stat()` function. It never decrements, so it does not correct itself when a user is deleted.
 
 | Column | Type | Notes |
 |---|---|---|
@@ -96,7 +96,14 @@ Single-row singleton table with aggregate counters. Maintained by triggers on `e
 | `total_exams_attempted` | `integer` NOT NULL | |
 | `total_exams_passed` | `integer` NOT NULL | |
 
-**RLS:** SELECT allowed for `anon` and `authenticated` (public stats page).
+**RLS:** SELECT allowed for `anon` and `authenticated`.
+
+> **Corrected 2026-07-02:** this table is the owner's private all-time cumulative
+> counter, not a page data source - no runtime code reads it. This note previously
+> said "the public stats page reads it"; that stopped being true once the Stats
+> page footer moved to `get_public_totals()` (see RPC functions below), which
+> counts live rows directly and therefore self-corrects after account deletions,
+> unlike this table.
 
 ---
 
@@ -126,6 +133,20 @@ Returns aggregated per-cert stats (pass rates, avg scores, domain difficulty, re
 - Used by the Stats page.
 
 Full source: see `src/pages/_Stats.tsx` for the call site. If you change the function signature, update the `CertStats` and `DomainStat` interfaces in that file.
+
+---
+
+### `get_public_totals()`
+
+Returns live site-wide totals as JSON: `{ total_users, total_questions_answered }`. Both fields are a plain `count(*)` on `auth.users` and `public.attempt_questions` respectively, so - unlike the `platform_stats` singleton above - the numbers self-correct after account deletions.
+
+- `SECURITY DEFINER` (the only way to read `auth.users` from the client; RLS otherwise blocks it entirely).
+- `SET search_path = ''` (empty - stricter than `get_public_exam_stats()`, which uses `public`).
+- `LANGUAGE sql`, not `plpgsql` (a single query, no procedural logic needed).
+- Granted to `anon, authenticated` only (no `service_role` grant).
+- Used by the Stats page footer, below the per-cert cards.
+
+Full source: see `src/pages/_Stats.tsx` for the call site. If you change the function signature, update the `PublicTotals` interface in that file. The client validates the returned shape before rendering it, so a missing/null field - or the function simply not existing yet on an env - hides the footer instead of breaking the page.
 
 ---
 
