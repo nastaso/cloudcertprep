@@ -35,10 +35,13 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // Access-Control-Allow-Origin is pinned to the production site origin (was '*').
-// Account deletion is only ever invoked from https://cloudcertprep.io/account,
-// so no other origin needs a credentialed cross-origin call to this function.
+// The site is served at https://www.cloudcertprep.io - the apex 301-redirects to
+// www and SITE_URL is the www host - so the browser Origin on the /account delete
+// call is always www. This value MUST match that exact origin or the CORS preflight
+// (the delete call sends an Authorization header) blocks account deletion for every
+// user. No other origin needs a cross-origin call to this function.
 const CORS = {
-  'Access-Control-Allow-Origin': 'https://cloudcertprep.io',
+  'Access-Control-Allow-Origin': 'https://www.cloudcertprep.io',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
