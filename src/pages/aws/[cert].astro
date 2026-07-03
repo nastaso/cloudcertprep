@@ -429,6 +429,12 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
         }
         apply()
         window.addEventListener('pageshow', apply)
+        // Also re-apply once HeaderInteractive resolves auth: on a `?code=`
+        // OAuth return the token lands AFTER first paint, so the initial apply()
+        // bails (no session yet). `cc:session-resolved` fires when useAuth
+        // resolves; apply() is idempotent. Future-proofs this pre-hide for any
+        // in-page sign-in entry point on the cert page (L58).
+        window.addEventListener('cc:session-resolved', apply)
       })()
     </script>
   )}
