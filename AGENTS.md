@@ -50,6 +50,9 @@ opening PRs, see `CONTRIBUTING.md`; for a project overview, see `README.md`.
   `generate-og-images`, `validate-blog-frontmatter`, `validate-internal-links`.
 - **postbuild** - `check:citation` (citation phrases present), `check:graph` (internal
   link graph intact), `check:person-graph` (person/author JSON-LD byte-identical),
+  `check:seo-head` (full `<head>` SEO surface - title/description/canonical/robots/og/twitter/
+  per-page JSON-LD - snapshotted against `scripts/seo-head-baseline.json` for the 18 indexable
+  pages; re-bless intentional changes with `node scripts/check-seo-head.mjs --update`),
   `csp:hash` (rewrites `dist/_headers` to a hash-based CSP over every inline script/style).
 
 A failing guard means your change moved locked output. Treat it as a real failure.
@@ -78,6 +81,11 @@ are no migrations in the repo - and **RLS is the security boundary**, not app co
 - **`format: 'file'`** emits `/about.html`, served at `/about` with no trailing slash and
   no 301 - this matches every canonical tag. Don't switch to `directory`.
 - **Cache headers target `/_astro/*`** (the hashed, immutable asset path), not `/assets/*`.
+- **Never run e2e on the default port.** `playwright.config.ts` defaults to port 4321 and
+  reuses an already-running server, so a bare `npm run e2e` can silently drive a human's
+  live dev/preview session (and, with a service-role key in `.env.local`, un-gate the
+  realcreds specs). Agents/CI-alikes must always set an isolated port:
+  `PW_PORT=4399 PW_REUSE_SERVER=0 npm run e2e`.
 - **RLS is the only auth boundary.** Client code is untrusted; never assume an app-level
   check protects data.
 

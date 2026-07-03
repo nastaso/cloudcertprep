@@ -115,12 +115,40 @@ test.describe('conversion events — anonymous, no-auth flows', () => {
 
   test('github_click fires when the header GitHub link is activated', async ({ page, context }) => {
     await installEventCapture(page)
+
+    // Record when the header island finishes hydrating. HeaderInteractive is a
+    // `client:idle` island (see Header.astro), so the React onClick that fires
+    // github_click is attached only once requestIdleCallback runs - NOT at first
+    // paint. Under full-suite parallelism that idle callback can land well after
+    // the server-rendered link is already visible, so asserting visibility and
+    // clicking immediately raced hydration: the click hit the static <a> before
+    // its handler existed and no event fired (the flake). The island dispatches
+    // `cc:session-resolved` from a mount effect once auth resolves (guest
+    // included) - i.e. AFTER React has committed and wired the onClick - so it is
+    // the app's own "this island is live" signal. No arbitrary sleep.
+    await page.addInitScript(() => {
+      ;(window as unknown as { __ccHeaderHydrated: boolean }).__ccHeaderHydrated = false
+      window.addEventListener(
+        'cc:session-resolved',
+        () => {
+          ;(window as unknown as { __ccHeaderHydrated: boolean }).__ccHeaderHydrated = true
+        },
+        { once: true },
+      )
+    })
+
     await page.goto('/')
 
-    // Wait for the header island (client:load) to hydrate so the onClick
-    // handler is attached.
     const githubLink = page.getByRole('link', { name: 'View source on GitHub' }).first()
     await expect(githubLink).toBeVisible()
+
+    // Gate the click on hydration, not just visibility: wait until the island has
+    // wired its handlers before clicking.
+    await page.waitForFunction(
+      () => (window as unknown as { __ccHeaderHydrated?: boolean }).__ccHeaderHydrated === true,
+      undefined,
+      { timeout: 15000 },
+    )
 
     // The link is target="_blank"; clicking opens a new tab. The onClick fires
     // trackEvent synchronously before the navigation, so the event is recorded
