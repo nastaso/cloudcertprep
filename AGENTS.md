@@ -53,7 +53,9 @@ opening PRs, see `CONTRIBUTING.md`; for a project overview, see `README.md`.
   `check:seo-head` (full `<head>` SEO surface - title/description/canonical/robots/og/twitter/
   per-page JSON-LD - snapshotted against `scripts/seo-head-baseline.json` for the 18 indexable
   pages; re-bless intentional changes with `node scripts/check-seo-head.mjs --update`),
-  `csp:hash` (rewrites `dist/_headers` to a hash-based CSP over every inline script/style).
+  `csp:hash` (rewrites `dist/_headers` to a hash-based CSP over every inline script/style),
+  `cf:headers` (propagates that CSP into `functions/_csp.generated.js` for the Cloudflare
+  Pages Function).
 
 A failing guard means your change moved locked output. Treat it as a real failure.
 
