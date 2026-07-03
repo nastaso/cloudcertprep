@@ -27,12 +27,18 @@
 // Supabase injects SUPABASE_URL, SUPABASE_ANON_KEY, and
 // SUPABASE_SERVICE_ROLE_KEY into the function runtime automatically; no extra
 // secrets to set. The client calls it via supabase.functions.invoke
-// ('delete-account', { method: 'POST' }) from /account.
+// ('delete-account', { method: 'POST' }) from /account. The function's
+// verify_jwt posture is pinned in supabase/config.toml.
+//
+// NOTE: editing this file changes nothing on prod until the owner redeploys.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+// Access-Control-Allow-Origin is pinned to the production site origin (was '*').
+// Account deletion is only ever invoked from https://cloudcertprep.io/account,
+// so no other origin needs a credentialed cross-origin call to this function.
 const CORS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://cloudcertprep.io',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }

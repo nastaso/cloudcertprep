@@ -1,0 +1,19 @@
+# Supabase CLI project config.
+#
+# This repo has no local-dev or migration workflow - the live Supabase project
+# is the source of truth (see supabase/README.md), and RLS is the security
+# boundary. This file exists ONLY to pin the delete-account Edge Function's
+# deploy posture in version control, so `verify_jwt` is a reviewable fact in the
+# repo instead of a deploy-time-only setting nobody can see.
+#
+# `project_id` is just a local label the CLI uses to namespace working state; it
+# is NOT the remote project ref. Deploys target a project explicitly, e.g.:
+#   npx supabase@latest functions deploy delete-account --project-ref <ref>
+# Editing this file changes nothing until the owner redeploys the function.
+project_id = "cloudcertprep"
+
+[functions.delete-account]
+# Require a valid Supabase JWT at the platform edge before the function runs.
+# Defence in depth: the function itself ALSO verifies the caller via
+# auth.getUser() and only ever deletes that caller's own auth.uid().
+verify_jwt = true
