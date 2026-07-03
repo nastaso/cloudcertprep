@@ -81,6 +81,11 @@ are no migrations in the repo - and **RLS is the security boundary**, not app co
 - **`format: 'file'`** emits `/about.html`, served at `/about` with no trailing slash and
   no 301 - this matches every canonical tag. Don't switch to `directory`.
 - **Cache headers target `/_astro/*`** (the hashed, immutable asset path), not `/assets/*`.
+- **Never run e2e on the default port.** `playwright.config.ts` defaults to port 4321 and
+  reuses an already-running server, so a bare `npm run e2e` can silently drive a human's
+  live dev/preview session (and, with a service-role key in `.env.local`, un-gate the
+  realcreds specs). Agents/CI-alikes must always set an isolated port:
+  `PW_PORT=4399 PW_REUSE_SERVER=0 npm run e2e`.
 - **RLS is the only auth boundary.** Client code is untrusted; never assume an app-level
   check protects data.
 
