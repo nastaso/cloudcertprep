@@ -290,7 +290,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
               <>
                 <StatTile label="Questions practiced" value={questionsPracticed.toLocaleString('en-US')} suffix={`/ ${bankTotal.toLocaleString('en-US')}`} />
                 <StatTile label="Accuracy" value={String(accuracy)} suffix="%" hint="correct / answered" />
-                <StatTile label="Practice exams" value={String(examCount)} />
+                <StatTile label="Practice exams" value={String(examCount)} hint="completed, all-time" />
                 {/* Empty state: scaled scores start at 100, so a literal 0 is
                     misleading (HALO-CRITIQUE P1). Placeholder + the one next
                     action instead. */}
@@ -298,7 +298,7 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
                   label="Best score"
                   value={bestScore > 0 ? bestScore.toLocaleString('en-US') : 'N/A'}
                   suffix={bestScore > 0 ? `/ ${(1000).toLocaleString('en-US')}` : undefined}
-                  hint={bestScore > 0 ? undefined : 'Take your first practice exam to set a baseline'}
+                  hint={bestScore > 0 ? 'scaled score' : 'Take your first practice exam to set a baseline'}
                 />
               </>
             )}
