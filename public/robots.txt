@@ -1,7 +1,13 @@
-License: https://www.cloudcertprep.io/license.xml
+# NOTE: An RSL license doc ships at /license.xml (open, attribution-friendly,
+# consistent with the repo's MIT license) and a Content-Signal stance would be
+# "search/ai-input/ai-train all welcome". Neither is advertised here yet: the
+# RSL `License:` directive and the `Content-Signal:` line are non-standard
+# robots.txt lines that Lighthouse's robots.txt validator rejects, which drops
+# the SEO audit below 100 (a hard project constraint). Discovery of both is
+# deferred until a Lighthouse-compatible mechanism (e.g. an HTTP Link header)
+# is chosen.
 
 User-agent: *
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
 # /login, /reset-password, /history, and query-string variants (?fbclid,
 # ?utm_*, ?gclid) used to be Disallowed here for crawl-budget reasons. But
@@ -16,7 +22,7 @@ Allow: /
 # is never in the prerendered HTML a crawler sees regardless of these rules.
 #
 # Browse-mode citation crawlers (answer a user's live query, then cite us) are
-# welcome on the full indexable surface — this is the LLM-citation flywheel.
+# welcome on the full indexable surface (the LLM-citation flywheel).
 User-agent: ChatGPT-User
 Allow: /
 User-agent: PerplexityBot
