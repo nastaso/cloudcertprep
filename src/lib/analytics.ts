@@ -94,6 +94,11 @@ export const KNOWN_EVENTS = [
                               // floating | results - the four independent donate surfaces)
   'github_click',
   'affiliate_click',    // reserved for the deferred affiliate iteration
+  // Observability. Production client-side errors, routed here by logError (dev
+  // still logs to console). Params: context (call-site label) + message
+  // (trimmed, no PII/tokens). Throttled at the global-handler source so a render
+  // loop cannot spam the events panel (AnalyticsBootstrap).
+  'client_error',
 ] as const
 
 export type KnownEvent = (typeof KNOWN_EVENTS)[number]
