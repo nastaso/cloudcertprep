@@ -1,3 +1,6 @@
 # Sponsor button shown at the top of the GitHub repo page.
-# Single entry: Ko-fi (one-off and monthly support, no platform cut).
+# Ko-fi (one-off and monthly support, no platform cut) plus GitHub Sponsors
+# (0% platform fee, keeps support inside GitHub). GitHub Sponsors must be
+# enabled on the account for this entry to activate the button.
 ko_fi: alexsantonastaso
+github: [nastaso]
