@@ -315,6 +315,57 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
         })
       })()
     </script>
+
+    {/* Core Web Vitals field beacon (audit N7). Captures LCP, CLS, and INP via
+        PerformanceObserver and reports them ONCE per page (at pagehide /
+        visibility-hidden) through the cookieless analytics sink,
+        window.umami.track - NOT a separate RUM / Cloudflare Web Analytics beacon,
+        which would contradict the privacy promise (privacy.astro: cookieless
+        Umami, "you cannot opt out" because it never identifies you). Registered
+        as KNOWN_EVENTS.web_vitals. Silent no-op wherever PerformanceObserver or
+        window.umami is absent (local dev has no Umami script; unsupported
+        browsers feature-detect out). LCP: keep the final largest-contentful-paint
+        entry. CLS: sum layout-shift entries into 1s/5s session windows, keep the
+        max session value. INP: worst interaction duration from event-timing
+        entries (plus first-input). Inline so the CSP-hash generator covers it. */}
+    <script is:inline>
+      (function () {
+        if (!('PerformanceObserver' in window)) return
+        var lcp = 0, cls = 0, sess = 0, first = 0, last = 0, inp = 0, sent = false
+        function watch(type, cb, opts) {
+          try {
+            var po = new PerformanceObserver(function (l) { l.getEntries().forEach(cb) })
+            po.observe(Object.assign({ type: type, buffered: true }, opts))
+          } catch (e) {}
+        }
+        watch('largest-contentful-paint', function (e) { lcp = e.startTime })
+        watch('layout-shift', function (e) {
+          if (e.hadRecentInput) return
+          if (sess && e.startTime - last < 1000 && e.startTime - first < 5000) sess += e.value
+          else { first = e.startTime; sess = e.value }
+          last = e.startTime
+          if (sess > cls) cls = sess
+        })
+        function interaction(e) { if (e.interactionId && e.duration > inp) inp = e.duration }
+        watch('event', interaction, { durationThreshold: 40 })
+        watch('first-input', interaction)
+        function report() {
+          if (sent) return
+          sent = true
+          try {
+            if (window.umami && typeof window.umami.track === 'function') {
+              window.umami.track('web_vitals', {
+                lcp: Math.round(lcp),
+                cls: Math.round(cls * 1000) / 1000,
+                inp: Math.round(inp)
+              })
+            }
+          } catch (e) {}
+        }
+        addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') report() })
+        addEventListener('pagehide', report)
+      })()
+    </script>
     {noscriptDirectory && <noscript>
       <style>
         .cc-no { font-family: system-ui, -apple-system, sans-serif; max-width: 720px; margin: 0 auto; padding: 2rem 1rem; line-height: 1.6; color: #1c1917; }

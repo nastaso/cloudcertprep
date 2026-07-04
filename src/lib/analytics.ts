@@ -94,6 +94,11 @@ export const KNOWN_EVENTS = [
                               // floating | results - the four independent donate surfaces)
   'github_click',
   'affiliate_click',    // reserved for the deferred affiliate iteration
+  // Performance (field RUM). Fired once per page at pagehide / visibility-hidden
+  // by the inline Core Web Vitals beacon in BaseLayout.astro (params: lcp, cls,
+  // inp). Cookieless: reports through window.umami.track like every other event,
+  // never a separate RUM/Cloudflare beacon, so the privacy promise holds.
+  'web_vitals',
 ] as const
 
 export type KnownEvent = (typeof KNOWN_EVENTS)[number]
