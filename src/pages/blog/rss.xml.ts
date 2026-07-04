@@ -17,12 +17,19 @@ export async function GET(context: APIContext) {
     (a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) =>
       b.data.date.getTime() - a.data.date.getTime(),
   )
+  const site = context.site ?? new URL('https://www.cloudcertprep.io')
+  const selfHref = new URL('/blog/rss.xml', site).href
 
   return rss({
     title: 'CloudCertPrep Blog',
     description:
       'Guides, exam-format breakdowns, and study strategy for AWS certification exams from the CloudCertPrep team.',
-    site: context.site ?? 'https://www.cloudcertprep.io',
+    site,
+    // `format: 'file'` serves posts at /blog/slug with no trailing slash, so
+    // item links must match (issue #71) or they 404 via the canonical redirect.
+    trailingSlash: false,
+    xmlns: { atom: 'http://www.w3.org/2005/Atom' },
+    customData: `<atom:link href="${selfHref}" rel="self" type="application/rss+xml"/>`,
     items: sorted.map((post: CollectionEntry<'blog'>) => ({
       title: post.data.title,
       description: post.data.description,

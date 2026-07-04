@@ -1,14 +1,14 @@
+License: https://www.cloudcertprep.io/license.xml
+
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Allow: /
-# Auth and transient pages also have <meta name="robots" content="noindex">
-# but listing them here saves crawl budget.
-Disallow: /login
-Disallow: /reset-password
-Disallow: /history
-# Block query-string variants. Social trackers (?fbclid, ?utm_*, ?gclid) can
-# create duplicate crawls of canonical URLs. We have canonical tags as the
-# primary defence; this is belt-and-braces.
-Disallow: /*?
+# /login, /reset-password, /history, and query-string variants (?fbclid,
+# ?utm_*, ?gclid) used to be Disallowed here for crawl-budget reasons. But
+# /login, /reset-password, and /history already carry <meta name="robots"
+# content="noindex">, and a Disallow stops a crawler from ever reaching that
+# tag - it hides the noindex signal instead of letting it be honored. Crawl
+# access is intentionally left open here so crawlers can read and honor it.
 
 # --- AI crawler preferences (R23.8) ---
 # Preference-signaling only, NOT an enforcement boundary. The interactive
@@ -22,6 +22,19 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 User-agent: Google-Extended
+Allow: /
+
+# 2026 citation/answer-engine crawlers: search-index and user-triggered fetch
+# bots for AI answer engines, same citation flywheel as above.
+User-agent: OAI-SearchBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: Perplexity-User
+Allow: /
+User-agent: Applebot
 Allow: /
 
 # Training-ingestion crawlers may read the marketing/landing surface but we
