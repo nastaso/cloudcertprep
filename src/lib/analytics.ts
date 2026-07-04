@@ -88,8 +88,10 @@ export const KNOWN_EVENTS = [
   'weakest_domain_cta_clicked', // "next up" CTA (surface: dashboard | exam_results;
                                  // variant: weakest | unstarted)
   'share_result',            // results-screen share, pass-only (method: web_share | clipboard; params: cert, authed)
+  'post_share_clicked',      // blog post share/copy-link row (method: web_share | clipboard)
   'report_question_clicked',
-  'donate_click',
+  'donate_click',            // Ko-fi link activated (params: location: footer | mobile_drawer |
+                              // floating | results - the four independent donate surfaces)
   'github_click',
   'affiliate_click',    // reserved for the deferred affiliate iteration
 ] as const

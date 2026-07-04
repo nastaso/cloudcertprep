@@ -2,19 +2,23 @@ import { describe, it, expect } from 'vitest'
 import {
   CERTIFICATIONS,
   CERTIFICATION_LIST,
+  CERTS_UNDER_REVIEW,
   DEFAULT_CERT_ID,
   PROVIDERS,
+  getActiveProviders,
   getActiveTotalQuestions,
   getCertByPath,
   getCertDomainCounts,
   getCertDomains,
   getCertTotalQuestions,
   getCertsByProvider,
+  getLevelLabel,
   getProviderInfo,
   getProviderLabel,
   getSortedCerts,
+  isCertNoindex,
 } from './certifications'
-import type { CertProvider } from './certifications'
+import type { CertLevel, CertProvider } from './certifications'
 
 describe('CERTIFICATIONS registry', () => {
   it('contains the default cert', () => {
@@ -210,6 +214,57 @@ describe('getProviderLabel', () => {
 
   it('falls back to upper-case for unknown providers', () => {
     expect(getProviderLabel('oracle')).toBe('ORACLE')
+  })
+})
+
+describe('getLevelLabel', () => {
+  it('returns display labels for every known cert level', () => {
+    const expected: Record<CertLevel, string> = {
+      foundational: 'Foundational',
+      associate: 'Associate',
+      professional: 'Professional',
+      specialty: 'Specialty',
+    }
+
+    for (const [level, label] of Object.entries(expected)) {
+      expect(getLevelLabel(level)).toBe(label)
+    }
+  })
+
+  it('falls back to the raw level for unknown values', () => {
+    expect(getLevelLabel('expert')).toBe('expert')
+  })
+})
+
+describe('isCertNoindex', () => {
+  it('returns false for active certs that are not under review', () => {
+    expect(isCertNoindex(CERTIFICATIONS['clf-c02'])).toBe(false)
+  })
+
+  it('returns true for coming-soon certs', () => {
+    expect(isCertNoindex(CERTIFICATIONS['saa-c03'])).toBe(true)
+  })
+
+  it('returns true for active certs under review', () => {
+    CERTS_UNDER_REVIEW.add('clf-c02')
+    try {
+      expect(isCertNoindex(CERTIFICATIONS['clf-c02'])).toBe(true)
+    } finally {
+      CERTS_UNDER_REVIEW.delete('clf-c02')
+    }
+  })
+})
+
+describe('getActiveProviders', () => {
+  it('returns providers with active certs in canonical order without duplicates', () => {
+    const providers = getActiveProviders()
+    const expected = (['aws', 'azure', 'gcp'] as const).filter(provider =>
+      CERTIFICATION_LIST.some(cert => cert.provider === provider && cert.status === 'active'),
+    )
+
+    expect(providers).toEqual(expected)
+    expect(new Set(providers).size).toBe(providers.length)
+    expect(providers.every(provider => PROVIDERS[provider])).toBe(true)
   })
 })
 

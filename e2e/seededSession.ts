@@ -98,6 +98,14 @@ export interface SeedOptions {
    *  - null: install NO route (let requests hit other routes / the network)
    */
   rest?: ((route: Route) => unknown) | null
+  /**
+   * Seconds from now for the seeded access token's `expires_at` (and JWT `exp`).
+   * Default 3600 (safely valid - supabase-js never refreshes on init). Pass a
+   * small or negative value to seed a near-expiry/expired session so
+   * supabase-js's `getSession()` refreshes it on init - needed to exercise the
+   * TOKEN_REFRESHED path (see auth-refresh-budget.spec.ts, issue #159).
+   */
+  expiresInSec?: number
 }
 
 // Build a structurally valid (unsigned) JWT so any supabase-js path that decodes
@@ -120,7 +128,7 @@ export async function seedSession(page: Page, opts: SeedOptions = {}): Promise<S
   const user: SeededUser = { ...DEFAULT_USER, ...opts.user }
   const ref = getSeedRef()
   const nowSec = Math.floor(Date.now() / 1000)
-  const expiresAt = nowSec + 3600
+  const expiresAt = nowSec + (opts.expiresInSec ?? 3600)
 
   const session = {
     access_token: fakeJwt({
