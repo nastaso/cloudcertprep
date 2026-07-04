@@ -45,6 +45,20 @@ const aboutPageJsonLd = serializeJsonLd({
   publisher: { '@id': `${SITE_URL}/#organization` },
 })
 
+// ProfilePage JSON-LD. The About page is the canonical author profile for the
+// E-E-A-T signal: its "Who maintains it" section profiles the maintainer. Typing
+// the page as a ProfilePage whose mainEntity is the Person_Entity
+// (@id=".../#author") lets search engines treat this URL as Alex's authoritative
+// profile page, reinforcing the cross-property author identity.
+const profilePageJsonLd = serializeJsonLd({
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  '@id': `${SITE_URL}/about#profilepage`,
+  url: canonical,
+  name: 'Alex Santonastaso',
+  mainEntity: { '@id': `${SITE_URL}/#author` },
+})
+
 // HowTo JSON-LD describing the study methodology a learner follows when
 // working through the practice banks. Anchored by @id to the same
 // Organization + Person graph as the AboutPage block above.
@@ -128,7 +142,7 @@ const link = 'text-text-primary hover:text-text-primary/70 underline'
   title="About CloudCertPrep · Free Open-Source AWS Practice Exams"
   description="CloudCertPrep is a free, ad-free, open-source AWS practice platform built by Alex Santonastaso. See how the question banks work and why it stays free."
   canonical={canonical}
-  jsonLd={[aboutPageJsonLd, howToJsonLd, methodologyHowToJsonLd]}
+  jsonLd={[aboutPageJsonLd, profilePageJsonLd, howToJsonLd, methodologyHowToJsonLd]}
   headerOverlay={true}
   headerNoAuthedFrost={true}
 >
