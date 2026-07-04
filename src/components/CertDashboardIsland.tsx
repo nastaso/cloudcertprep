@@ -20,6 +20,7 @@ import { useEffect, useState, type CSSProperties } from 'react'
 import {
   ArrowRight,
   FileText,
+  History,
   RotateCw,
   Target,
 } from 'lucide-react'
@@ -30,9 +31,10 @@ import { getSupabase } from '../lib/supabase'
 import { formatRelativeDate } from '../lib/formatting'
 import { formatTime } from '../lib/scoring'
 import { logError } from '../lib/logger'
-import { CERTIFICATIONS } from '../data/certifications'
+import { CERTIFICATIONS, getCrossCertSuggestion } from '../data/certifications'
 import { LEVEL_ACCENT_UI_HEX, LEVEL_ACCENT_UI_RGB } from '../lib/levelAccent'
 import { calculateDomainMastery, findNextDomainAction } from '../lib/domainStats'
+import { computeDueCounts, type DueCountRow } from '../lib/spacedRepetition'
 import type { DomainProgress } from '../types'
 
 /** Minimal domain shape needed by the dashboard sidebar. */
@@ -108,6 +110,11 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
   const [domainProgress, setDomainProgress] = useState<DomainProgress[]>([])
   const [recentAttempts, setRecentAttempts] = useState<RecentAttempt[]>([])
   const [examCount, setExamCount] = useState(0)
+  // The user's own spaced-repetition rows for THIS cert, fed to computeDueCounts
+  // for the review-queue surface. Fetched in the SAME one-shot Promise.all as the
+  // rest of the dashboard data (never its own effect), so it inherits the exact
+  // #159-hardened gating and adds no extra render-triggered query.
+  const [masteryRows, setMasteryRows] = useState<DueCountRow[]>([])
   // Data-fetch status for the data-dependent sections (stat strip, domain
   // mastery, recent attempts). While loading, they render a skeleton instead
   // of a flash of all-zeros (which reads as a wiped account to a returning
@@ -154,14 +161,31 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
           .eq('cert_code', cert.code)
           .order('attempted_at', { ascending: false })
           .limit(5),
+        supabase
+          .from('question_mastery')
+          // Only the three columns computeDueCounts reads. RLS scopes this to
+          // the caller's own rows (user_id = auth.uid()); the explicit user_id
+          // filter is belt-and-suspenders, not the security boundary.
+          .select('is_mastered, last_was_wrong, in_exclusion_window')
+          .eq('user_id', user.id)
+          .eq('cert_code', cert.code),
       ])
-        .then(([progressRes, attemptsRes]) => {
+        .then(([progressRes, attemptsRes, masteryRes]) => {
           if (cancelled) return
           if (progressRes.error) logError('CertDashboard.loadProgress', progressRes.error)
           if (attemptsRes.error) logError('CertDashboard.loadAttempts', attemptsRes.error)
           if (progressRes.data) setDomainProgress(progressRes.data as DomainProgress[])
           if (attemptsRes.data) setRecentAttempts(attemptsRes.data as RecentAttempt[])
           if (typeof attemptsRes.count === 'number') setExamCount(attemptsRes.count)
+          // The review-queue surface is supplementary: a mastery-query failure
+          // just hides it (empty rows -> 0 due), it never trips the dashboard
+          // error state that domain_progress + exam_attempts own.
+          if (masteryRes.error) {
+            logError('CertDashboard.loadMastery', masteryRes.error)
+            setMasteryRows([])
+          } else {
+            setMasteryRows((masteryRes.data ?? []) as DueCountRow[])
+          }
           // Surface an error only when BOTH queries failed; a partial failure
           // still has useful data to show. Either way the skeleton resolves.
           if (progressRes.error && attemptsRes.error) {
@@ -242,6 +266,13 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
   }))
   const nextDomain = nextAction ? cert.domains.find(d => d.id === nextAction.domainId) : undefined
 
+  // Return-loop surfaces. `dueCounts` turns the (otherwise invisible) spaced-
+  // repetition state into an action count; `crossCert` is the sibling cert to
+  // nudge once this one is rolling. Both are pure derivations off already-loaded
+  // data - no extra fetch, no effect.
+  const dueCounts = computeDueCounts(masteryRows)
+  const crossCert = getCrossCertSuggestion(cert.code)
+
   return (
     <div className="max-w-6xl mx-auto pt-6 md:pt-10 pb-16 md:pb-24 space-y-8 md:space-y-10 stagger" aria-busy={dataLoading}>
         {dataLoading && <p className="sr-only" role="status">Loading your dashboard</p>}
@@ -303,6 +334,48 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
               </>
             )}
           </div>
+        )}
+
+        {/* Review queue: surfaces the (otherwise invisible) spaced-repetition
+            state as ONE action count and deep-links into the existing domain-
+            practice flow (which runs the SM-2 selection). Rendered only once the
+            fetch resolves and there is genuinely something due, so a new user or
+            a mastery-query failure simply never sees it (no zero/empty clutter,
+            no false error). Action-framed, distinct from the two primary
+            practice cards below. */}
+        {!dataError && !dataLoading && dueCounts.dueForReview > 0 && (
+          <section aria-labelledby="review-queue-heading">
+            <div className="bg-bg-card border border-border-hairline rounded-2xl shadow-card p-5 md:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-start gap-3 min-w-0">
+                <span className="mt-0.5 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-bg-dark border border-border-hairline">
+                  <History className="w-5 h-5" style={{ color: levelAccent }} aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <p id="review-queue-heading" className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-text-muted">
+                    Review queue
+                  </p>
+                  <p className="mt-1.5 text-text-primary font-medium">
+                    <span className="font-semibold tabular-nums">{dueCounts.dueForReview}</span>{' '}
+                    {dueCounts.dueForReview === 1 ? 'question' : 'questions'} due for review
+                    {dueCounts.missedReadyToRetry > 0 && (
+                      <span className="text-text-muted">
+                        {' · '}
+                        <span className="font-semibold tabular-nums text-text-primary">{dueCounts.missedReadyToRetry}</span>{' '}
+                        missed, ready to retry
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              <a
+                href={`${certPath}/domain-practice`}
+                onClick={() => trackEvent('review_queue_cta_clicked', { surface: 'dashboard' })}
+                className="inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full bg-cta px-6 text-sm font-medium text-on-cta transition-colors duration-200 hover:bg-cta-hover"
+              >
+                Review now
+              </a>
+            </div>
+          </section>
         )}
 
         {/* Practice Modes: the two primary actions, full-width prominent cards. */}
@@ -556,6 +629,29 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
             </div>
           )}
         </section>
+        )}
+
+        {/* Cross-cert nudge (return loop 2): a quiet, secondary line pointing at
+            the sibling cert once this dashboard is in use. Deliberately recessed
+            (page-tinted panel, muted copy) so it never competes with the primary
+            practice actions above. Hidden under the dashboard error state to keep
+            that view focused; independent of the data fetch otherwise. Only
+            renders when a real sibling cert exists (getCrossCertSuggestion). */}
+        {!dataError && crossCert && (
+          <section aria-label="Other certifications">
+            <a
+              href={`/${crossCert.provider}/${crossCert.code}`}
+              onClick={() => trackEvent('cross_cert_nudge_clicked', { surface: 'dashboard', to: crossCert.code })}
+              className="group flex items-center justify-between gap-4 rounded-2xl border border-border-hairline bg-bg-dark/50 px-5 py-4 transition-colors duration-200 hover:border-text-muted/40"
+            >
+              <p className="text-sm text-text-muted">
+                Studying more than one exam?{' '}
+                <span className="font-medium text-text-primary">{crossCert.shortName}</span>{' '}
+                practice is free too, same question bank, same zero cost.
+              </p>
+              <ArrowRight className="w-4 h-4 flex-shrink-0 text-text-muted transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
+            </a>
+          </section>
         )}
     </div>
   )

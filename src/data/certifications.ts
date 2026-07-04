@@ -712,6 +712,25 @@ export function getCertByPath(
 }
 
 /**
+ * Pick another practice-ready cert to cross-promote from a given cert's
+ * dashboard and post-pass results (the "return loop" nudge). Returns the first
+ * OTHER same-provider cert that is itself indexable/available (active and not
+ * under review, i.e. `!isCertNoindex`), in the canonical `getSortedCerts`
+ * order, or null when there is no sensible sibling to suggest. Deterministic,
+ * so the nudge is stable across renders. Same provider keeps the URL prefix and
+ * the "same bank, same zero cost" framing honest.
+ */
+export function getCrossCertSuggestion(certCode: string): Certification | null {
+  const current = CERTIFICATIONS[certCode]
+  if (!current) return null
+  return (
+    getSortedCerts(current.provider).find(
+      c => c.code !== current.code && !isCertNoindex(c),
+    ) ?? null
+  )
+}
+
+/**
  * Resolve a provider segment (e.g. `'aws'`) to the list of certs for that
  * provider, or null when the provider is unknown. Used by the provider landing
  * page (`/<provider>`) and the cert switcher's grouped menu.
