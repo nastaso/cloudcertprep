@@ -77,8 +77,20 @@ describe('KNOWN_EVENTS', () => {
     expect(new Set(KNOWN_EVENTS).size).toBe(KNOWN_EVENTS.length)
   })
 
-  it('includes the load-bearing exam_completed and share_result events', () => {
-    expect(KNOWN_EVENTS).toContain('exam_completed')
-    expect(KNOWN_EVENTS).toContain('share_result')
+  it('includes the load-bearing events (incl. production client_error)', () => {
+    // exam_completed/share_result were guarded by #166; sign_in/exam_started/
+    // question_answered/client_error fold in the #181 assertion (client_error is
+    // fired by the freshness-observability logger routing). A missing name here
+    // means an event a call site still fires was dropped from the registry.
+    for (const required of [
+      'sign_in',
+      'exam_started',
+      'exam_completed',
+      'question_answered',
+      'share_result',
+      'client_error',
+    ]) {
+      expect(KNOWN_EVENTS, `KNOWN_EVENTS is missing "${required}"`).toContain(required)
+    }
   })
 })

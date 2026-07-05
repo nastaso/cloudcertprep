@@ -1,5 +1,7 @@
 # CloudCertPrep security disclosure policy (RFC 9116).
 # Full policy, scope, and PII/auth-provider details: see SECURITY.md in the repo.
+# The Expires date below is only a source-tree fallback; every build refreshes
+# it in dist to now + 364 days (see scripts/update-security-txt-expires.mjs).
 Contact: mailto:alex@cloudcertprep.io
 Policy: https://github.com/nastaso/cloudcertprep/blob/main/SECURITY.md
 Preferred-Languages: en

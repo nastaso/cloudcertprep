@@ -22,6 +22,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { findStaleCerts } from './generate-bank-lastmod.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const dataDir = join(__dirname, '..', 'src', 'data')
@@ -396,6 +397,21 @@ try {
   }
 } catch (e) {
   err(`generated/question-counts.ts: could not read for sync check: ${e.message}`)
+}
+
+// Freshness-ledger staleness check (WARNING only, R2.12-adjacent). Flags when a
+// bank's current content hash differs from the committed ledger
+// (src/data/bank-lastmod.json), so the published "last updated" date cannot
+// silently go stale. Non-fatal here; a unit test hard-fails CI on the same drift.
+try {
+  for (const { certCode, reason } of findStaleCerts()) {
+    warn(
+      `bank-lastmod ledger: "${certCode}" ${reason}. Run \`npm run bank:lastmod\` ` +
+        `and commit src/data/bank-lastmod.json so the published freshness date reflects it.`,
+    )
+  }
+} catch (e) {
+  warn(`bank-lastmod ledger: staleness check skipped (${e.message})`)
 }
 
 console.log('')
