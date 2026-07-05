@@ -22,7 +22,7 @@ function toMessage(err: unknown): string {
   else if (typeof err === 'string') raw = err
   else {
     try {
-      raw = String(err)
+      raw = JSON.stringify(err) ?? String(err)
     } catch {
       raw = 'unstringifiable error'
     }
