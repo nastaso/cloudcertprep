@@ -95,12 +95,20 @@ function bodyOf(raw) {
   return m ? m[1] : raw
 }
 
+function normalizeAuthorityUrl(url) {
+  // Strip the fragment and any trailing slash so two links to the same page
+  // (e.g. with/without a `#section` hash or trailing `/`) count once, not twice.
+  const path = url.pathname.replace(/\/+$/, '')
+  return `${url.hostname.toLowerCase()}${path}${url.search}`
+}
+
 function countAuthorityLinks(body) {
   const found = new Set()
   const collect = (href) => {
     if (!/^https?:\/\//i.test(href)) return
     try {
-      if (isAuthorityHost(new URL(href).hostname)) found.add(href)
+      const url = new URL(href)
+      if (isAuthorityHost(url.hostname)) found.add(normalizeAuthorityUrl(url))
     } catch {
       // Malformed URL - not a citation either way.
     }
