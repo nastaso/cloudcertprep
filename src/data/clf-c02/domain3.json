@@ -543,12 +543,12 @@
     "question": "What is the lowest-cost, durable storage option for retaining database backups for immediate retrieval?",
     "options": {
       "A": "Amazon S3",
-      "B": "Amazon S3 Glacier",
+      "B": "Amazon S3 Glacier Flexible Retrieval",
       "C": "Amazon EBS",
       "D": "Amazon EC2 Instance Store"
     },
     "answer": "A",
-    "explanation": "Amazon S3 Standard provides durable, highly available object storage with immediate millisecond retrieval, and is more cost-effective than EBS for backup storage while meeting the immediate retrieval requirement.\nAmazon S3 Glacier is designed for long-term archival storage at very low cost, but retrieval times range from minutes to hours depending on the retrieval tier selected, making it unsuitable for backups that require immediate access. Amazon EBS provides persistent block storage volumes attached directly to EC2 instances for low-latency disk access, and is significantly more expensive per gigabyte than S3 for storing backup data. Amazon EC2 Instance Store provides temporary block storage physically attached to the host machine, and is ephemeral storage that is lost when the instance stops, making it entirely unsuitable for durable backup storage.",
+    "explanation": "Amazon S3 Standard provides durable, highly available object storage with immediate millisecond retrieval, and is more cost-effective than EBS for backup storage while meeting the immediate retrieval requirement.\nAmazon S3 Glacier Flexible Retrieval is designed for long-term archival storage at very low cost, and retrieval takes from minutes to hours, making it unsuitable for backups that require immediate access. Amazon EBS provides persistent block storage volumes attached directly to EC2 instances for low-latency disk access, and is significantly more expensive per gigabyte than S3 for storing backup data. Amazon EC2 Instance Store provides temporary block storage physically attached to the host machine, and is ephemeral storage that is lost when the instance stops, making it entirely unsuitable for durable backup storage.",
     "isMultiAnswer": false
   },
   {
