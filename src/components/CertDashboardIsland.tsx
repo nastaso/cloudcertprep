@@ -634,10 +634,13 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
         {/* Cross-cert nudge (return loop 2): a quiet, secondary line pointing at
             the sibling cert once this dashboard is in use. Deliberately recessed
             (page-tinted panel, muted copy) so it never competes with the primary
-            practice actions above. Hidden under the dashboard error state to keep
-            that view focused; independent of the data fetch otherwise. Only
-            renders when a real sibling cert exists (getCrossCertSuggestion). */}
-        {!dataError && crossCert && (
+            practice actions above. Gated on the load having settled (not
+            dataLoading) AND succeeded (not dataError) - crossCert is a pure
+            derivation with no fetch of its own, so without the dataLoading
+            check it would render immediately on mount and then vanish if the
+            dashboard fetch subsequently failed (a flash-on-then-disappear).
+            Only renders when a real sibling cert exists (getCrossCertSuggestion). */}
+        {!dataLoading && !dataError && crossCert && (
           <section aria-label="Other certifications">
             <a
               href={`/${crossCert.provider}/${crossCert.code}`}
