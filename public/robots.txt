@@ -1,11 +1,12 @@
 # NOTE: An RSL license doc ships at /license.xml (open, attribution-friendly,
 # consistent with the repo's MIT license) and a Content-Signal stance would be
-# "search/ai-input/ai-train all welcome". Neither is advertised here yet: the
-# RSL `License:` directive and the `Content-Signal:` line are non-standard
-# robots.txt lines that Lighthouse's robots.txt validator rejects, which drops
-# the SEO audit below 100 (a hard project constraint). Discovery of both is
-# deferred until a Lighthouse-compatible mechanism (e.g. an HTTP Link header)
-# is chosen.
+# "search/ai-input/ai-train all welcome". Neither is advertised via robots.txt
+# lines here: the RSL `License:` directive and the `Content-Signal:` line are
+# non-standard robots.txt lines that Lighthouse's robots.txt validator
+# rejects, which drops the SEO audit below 100 (a hard project constraint).
+# License discovery instead ships as a Lighthouse-safe HTTP `Link:
+# <.../license.xml>; rel="license"` response header on public/_headers.
+# Content-Signal discovery has no such mechanism yet and stays deferred.
 
 User-agent: *
 Allow: /
@@ -31,22 +32,32 @@ User-agent: Google-Extended
 Allow: /
 
 # 2026 citation/answer-engine crawlers: search-index and user-triggered fetch
-# bots for AI answer engines, same citation flywheel as above.
+# bots for AI answer engines (they browse or fetch on a user's live query,
+# then cite us), same citation flywheel as above. None of these train models.
 User-agent: OAI-SearchBot
 Allow: /
-User-agent: ClaudeBot
-Allow: /
 User-agent: Claude-SearchBot
+Allow: /
+User-agent: Claude-User
 Allow: /
 User-agent: Perplexity-User
 Allow: /
 User-agent: Applebot
 Allow: /
 
-# Training-ingestion crawlers may read the marketing/landing surface but we
+# Training-ingestion crawlers (they fetch pages to build model training data,
+# not to answer a live query) may read the marketing/landing surface but we
 # prefer they skip the interactive practice/auth shells (no useful prerendered
 # content there anyway).
 User-agent: GPTBot
+Allow: /
+Disallow: /login
+Disallow: /reset-password
+Disallow: /history
+Disallow: /*/practice-exam
+Disallow: /*/domain-practice
+
+User-agent: ClaudeBot
 Allow: /
 Disallow: /login
 Disallow: /reset-password
