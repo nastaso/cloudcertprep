@@ -729,7 +729,7 @@ body {
   color: rgb(var(--color-text-primary));
 }
 .blog-content figure {
-  margin: 0;
+  margin-inline: 0;
   overflow-x: auto;
   text-align: center;
 }

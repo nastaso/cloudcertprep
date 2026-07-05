@@ -2,6 +2,13 @@ import { test, expect, type Page } from '@playwright/test'
 import { createClient } from '@supabase/supabase-js'
 import { readFileSync } from 'node:fs'
 
+// Matches playwright.config.ts's own PORT/BASE_URL derivation: with PW_PORT unset
+// this is byte-identical to the old hardcoded localhost:4321, but under the
+// documented isolated-port recipe (PW_PORT=4399 ...) it follows the server this
+// spec's own baseURL actually points at, instead of racing/hanging against a
+// human's real session on 4321.
+const BASE_URL = `http://localhost:${Number(process.env.PW_PORT) || 4321}`
+
 // This spec creates and deletes REAL users via the service-role admin client, so
 // it must run serially: playwright.config sets fullyParallel:true, and the
 // afterAll cleanup below could otherwise race a sibling test that is still using
@@ -71,7 +78,7 @@ test('sign in (confirmed user) lands authenticated + dashboard renders (P1-10 ro
 
   // Sign-in success does window.location.assign(from='/'); wait for it so the
   // session is persisted before we navigate on (fixes the earlier race).
-  await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
+  await page.waitForURL(`${BASE_URL}/`, { timeout: 20000 })
   // Signed-in indicator is now the account/user menu avatar (Sign out moved
   // inside it).
   await expect(page.getByRole('button', { name: 'Account menu' }).first()).toBeVisible({ timeout: 15000 })
@@ -131,7 +138,7 @@ test('P0-2: confirming the signup link redirects to /?verified=1 welcome card', 
     type: 'signup',
     email,
     password: PW,
-    options: { redirectTo: 'http://localhost:4321/?verified=1' },
+    options: { redirectTo: `${BASE_URL}/?verified=1` },
   })
   expect(error).toBeFalsy()
   const link = data.properties?.action_link
@@ -152,7 +159,7 @@ test('P1-7: in-exam Sign out routes through the leave modal, then completes', as
   await page.locator('#email').fill(email)
   await page.locator('#password').fill(PW)
   await submitForm(page)
-  await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
+  await page.waitForURL(`${BASE_URL}/`, { timeout: 20000 })
 
   await page.goto('/aws/clf-c02/practice-exam')
   await page.getByRole('button', { name: 'Start exam', exact: true }).click()
@@ -181,7 +188,7 @@ test('P1-7: in-exam Sign out routes through the leave modal, then completes', as
   await page.getByRole('button', { name: 'Sign out' }).click()
   await expect(signOutDialog).toBeVisible()
   await signOutDialog.getByRole('button', { name: 'Sign out' }).click()
-  await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
+  await page.waitForURL(`${BASE_URL}/`, { timeout: 20000 })
   await expect(page.getByRole('button', { name: 'Sign in' }).first()).toBeVisible({ timeout: 15000 })
 })
 
@@ -192,7 +199,7 @@ test('Practice menu (signed in): includes a Dashboard link per active cert', asy
   await page.locator('#email').fill(email)
   await page.locator('#password').fill(PW)
   await submitForm(page)
-  await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
+  await page.waitForURL(`${BASE_URL}/`, { timeout: 20000 })
 
   const trigger = page.getByRole('button', { name: 'Practice', exact: true })
   await expect(trigger).toBeVisible({ timeout: 10000 })
