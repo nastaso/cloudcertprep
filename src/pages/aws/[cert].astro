@@ -96,16 +96,19 @@ const robots = isCertNoindex(cert) ? 'noindex' : 'index, follow'
 
 // Breadcrumb items mirror the canonical navigation hierarchy. When there is
 // only one active provider, the provider hub collapses to `/`, so the trail
-// is Home → CertShortName.
+// is Home → Credential name. The cert crumb uses the full credential name
+// (cert.name) rather than the short code, so the BreadcrumbList structured data
+// names the certification the way search engines index it (D8). The visible
+// mono trail in the hero keeps the compact short code for wayfinding.
 const breadcrumbItems = getActiveProviders().length > 1
   ? [
       { label: 'Home', to: '/' },
       { label: providerLabel, to: `/${cert.provider}` },
-      { label: cert.shortName },
+      { label: cert.name },
     ]
   : [
       { label: 'Home', to: '/' },
-      { label: cert.shortName },
+      { label: cert.name },
     ]
 
 // Build-time community enrollment for this cert (audit W15). Course rich
@@ -139,6 +142,14 @@ const courseJsonLd = serializeJsonLd({
     name: cert.name,
     credentialCategory: 'certification',
     educationalLevel: levelLabel,
+    // Official AWS exam-guide URL for this credential (omitted for certs that
+    // do not carry one, e.g. coming-soon certs).
+    ...(cert.examGuideUrl ? { url: cert.examGuideUrl } : {}),
+    recognizedBy: {
+      '@type': 'Organization',
+      name: 'Amazon Web Services',
+      url: 'https://aws.amazon.com',
+    },
   },
   hasCourseInstance: {
     '@type': 'CourseInstance',

@@ -244,9 +244,13 @@ const heroBullets = [
   'Detailed explanations',
 ]
 
+// Position-2 crumb uses the full credential name (cert.name) rather than the
+// short code, so the BreadcrumbList structured data names the certification the
+// way search engines index it (D8). The visible mono trail in the hero keeps
+// the compact short code for wayfinding.
 const breadcrumbItems = [
   { label: 'Home', to: '/' },
-  { label: cert.shortName, to: certPath },
+  { label: cert.name, to: certPath },
   { label: domain.name },
 ]
 

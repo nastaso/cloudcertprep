@@ -31,6 +31,13 @@ jobs:
         uses: github/codeql-action/init@411c4c9a36b3fca4d674f06b6396b2c6d23522c6 # v3.36.3
         with:
           languages: javascript-typescript
+          # scripts/ holds build-time generator/validator scripts (regex over
+          # local JSON, self-generated HTML for SEO assets) that CodeQL
+          # repeatedly flags as false positives - they never touch untrusted
+          # user input. Excluded from analysis to cut noise in the Security tab.
+          config: |
+            paths-ignore:
+              - scripts/
 
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@411c4c9a36b3fca4d674f06b6396b2c6d23522c6 # v3.36.3

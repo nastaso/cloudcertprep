@@ -1,0 +1,7 @@
+# CloudCertPrep security disclosure policy (RFC 9116).
+# Full policy, scope, and PII/auth-provider details: see SECURITY.md in the repo.
+Contact: mailto:alex@cloudcertprep.io
+Policy: https://github.com/nastaso/cloudcertprep/blob/main/SECURITY.md
+Preferred-Languages: en
+Canonical: https://www.cloudcertprep.io/.well-known/security.txt
+Expires: 2027-07-04T00:00:00.000Z
