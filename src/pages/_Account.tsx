@@ -154,11 +154,6 @@ export function Account() {
     setDeleteError(null)
     try {
       const supabase = await getSupabase()
-      // Optional exit-reason signal (GROW M1): anonymous, opt-in only - never
-      // gates deletion, and only sent if the user tapped a chip.
-      if (deleteReason) {
-        trackEvent('account_delete_reason', { reason: deleteReason })
-      }
       // 30s race (note 3): functions.invoke never times out on its own, and
       // the modal is deliberately unclosable mid-delete - a hung request would
       // lock the user on the spinner forever. The deletion itself is
@@ -169,6 +164,12 @@ export function Account() {
           setTimeout(() => reject(new Error('delete-account timed out after 30s')), 30000)),
       ])
       if (error) throw error
+      // Optional exit-reason signal (GROW M1): anonymous, opt-in only - never
+      // gates deletion, and only sent once deletion has actually succeeded, so
+      // a hard failure (thrown above) never logs a churn reason.
+      if (deleteReason) {
+        trackEvent('account_delete_reason', { reason: deleteReason })
+      }
       // The account (and session) no longer exist; clear the local token and
       // leave the app. The home banner acknowledges the deletion. signOut can
       // itself reject at the storage layer, which used to land the user on
@@ -295,7 +296,7 @@ export function Account() {
             <button
               type="button"
               onClick={() => { setShowDeleteModal(false); handleExport() }}
-              disabled={deleting}
+              disabled={deleting || exporting}
               className="text-text-primary underline underline-offset-2 hover:text-text-primary/70 transition-colors"
             >
               Download your data
