@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { useFocusTrap } from '../hooks/useFocusTrap'
 
@@ -15,6 +15,7 @@ const EXIT_MS = 180
 
 export function Modal({ isOpen, title, children, onClose }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
+  const titleId = useId()
   // Keep the modal mounted through its exit animation: a hard cut on close reads
   // abrupt. `render` stays true until the exit completes. Opening is a derived
   // state-during-render adjustment (React's "adjust state when a prop changes"
@@ -56,13 +57,13 @@ export function Modal({ isOpen, title, children, onClose }: ModalProps) {
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="modal-title"
+        aria-labelledby={titleId}
         tabIndex={-1}
         className={`relative bg-bg-card rounded-2xl border border-border-hairline shadow-overlay max-w-2xl w-full max-h-[90vh] overflow-y-auto ${closing ? 'animate-scale-out pointer-events-none' : 'animate-scale-in'}`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border-hairline">
-          <h2 id="modal-title" className="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary">{title}</h2>
+          <h2 id={titleId} className="text-xl md:text-2xl font-semibold tracking-[-0.01em] text-text-primary">{title}</h2>
           <button
             onClick={onClose}
             aria-label="Close dialog"
