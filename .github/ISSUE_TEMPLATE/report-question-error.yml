@@ -1,7 +1,7 @@
 name: Report a question error
 description: Report an inaccurate, ambiguous, or outdated practice question.
 title: "Question error: <id>"
-labels: ["question-error"]
+labels: ["question-bank"]
 body:
   - type: input
     id: question_id

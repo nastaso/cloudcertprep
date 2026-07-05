@@ -99,6 +99,11 @@ export const KNOWN_EVENTS = [
   // inp). Cookieless: reports through window.umami.track like every other event,
   // never a separate RUM/Cloudflare beacon, so the privacy promise holds.
   'web_vitals',
+  // Observability. Production client-side errors, routed here by logError (dev
+  // still logs to console). Params: context (call-site label) + message
+  // (trimmed, no PII/tokens). Throttled at the global-handler source so a render
+  // loop cannot spam the events panel (AnalyticsBootstrap).
+  'client_error',
 ] as const
 
 export type KnownEvent = (typeof KNOWN_EVENTS)[number]

@@ -14,6 +14,7 @@
     "check:astro": "astro check",
     "preview": "astro preview",
     "validate": "node scripts/validate-questions.mjs",
+    "bank:lastmod": "node scripts/generate-bank-lastmod.mjs",
     "sitemap": "npx tsx scripts/generate-seo-assets.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "security-txt:refresh": "node scripts/update-security-txt-expires.mjs",
