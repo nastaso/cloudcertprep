@@ -34,6 +34,7 @@ import {
   type Certification,
 } from '../../data/certifications'
 import { SITE_URL } from '../../lib/seo-data'
+import { getCertLastmod } from '../../lib/bankFreshness'
 import { serializeJsonLd } from '../../lib/jsonld'
 import snapshot from '../../lib/generated/stats-snapshot.json'
 import CertSpecPanel from '../../components/landing/CertSpecPanel.astro'
@@ -115,8 +116,12 @@ const breadcrumbItems = getActiveProviders().length > 1
 // attemptsCompleted per cert. Only emitted when there is real data (>0).
 const certSnapshot = snapshot.certs.find(c => c.certCode === cert.code)
 const enrollment = certSnapshot?.attemptsCompleted ?? 0
-// Build date for the Course dateModified freshness signal (audit W21).
-const buildDateIso = new Date().toISOString().slice(0, 10)
+// Course dateModified freshness signal (audit W21). Sourced from the committed
+// question-bank freshness ledger (src/data/bank-lastmod.json) so it only moves
+// when this cert's bank content actually changes, not on every deploy. The
+// check:seo-head guard normalizes JSON-LD dates to <DATE>, so the SOURCE change
+// leaves the locked baseline byte-identical.
+const bankLastmod = getCertLastmod(cert.code)
 
 // Course JSON-LD for the certification.
 const courseJsonLd = serializeJsonLd({
@@ -130,7 +135,7 @@ const courseJsonLd = serializeJsonLd({
   isAccessibleForFree: true,
   educationalLevel: levelLabel,
   teaches: cert.domains.map(d => d.name).join(', '),
-  dateModified: buildDateIso,
+  dateModified: bankLastmod,
   ...(enrollment > 0 ? { totalHistoricalEnrollment: enrollment } : {}),
   about: {
     '@type': 'EducationalOccupationalCredential',
@@ -310,7 +315,7 @@ const latestPosts = (taggedPosts.length > 0 ? taggedPosts : allPosts).slice(0, 2
 
             {isActive && (
               <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 74 222 128;">
-                <LastUpdatedStamp examGuideVersion={cert.examGuideVersion} examGuideUrl={cert.examGuideUrl} />
+                <LastUpdatedStamp examGuideVersion={cert.examGuideVersion} examGuideUrl={cert.examGuideUrl} lastmod={bankLastmod} />
               </div>
             )}
           </div>

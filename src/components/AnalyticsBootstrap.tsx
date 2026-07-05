@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { trackEvent } from '../lib/analytics'
+import { logError } from '../lib/logger'
 
 declare global {
   interface Window {
@@ -57,7 +58,43 @@ export default function AnalyticsBootstrap() {
       trackEvent(name, eventParams)
     }
     document.addEventListener('click', onClick)
-    return () => document.removeEventListener('click', onClick)
+
+    // Global error funnel -> logError -> client_error (production observability).
+    // Uncaught errors and unhandled promise rejections previously vanished in
+    // production (logError only tried a never-installed window.Sentry). Route
+    // them through logError so they land in Umami. THROTTLED: a render/refresh
+    // loop (the #159 incident class) could otherwise fire thousands of events,
+    // so cap forwarding to MAX_ERRORS_PER_WINDOW per rolling window; overflow is
+    // dropped (still logged to console in dev via logError itself).
+    const MAX_ERRORS_PER_WINDOW = 10
+    const WINDOW_MS = 60_000
+    let windowStart = Date.now()
+    let windowCount = 0
+    const overThrottle = (): boolean => {
+      const now = Date.now()
+      if (now - windowStart > WINDOW_MS) {
+        windowStart = now
+        windowCount = 0
+      }
+      windowCount += 1
+      return windowCount > MAX_ERRORS_PER_WINDOW
+    }
+    const onError = (e: ErrorEvent) => {
+      if (overThrottle()) return
+      logError('window.onerror', e.error ?? e.message)
+    }
+    const onRejection = (e: PromiseRejectionEvent) => {
+      if (overThrottle()) return
+      logError('unhandledrejection', e.reason)
+    }
+    window.addEventListener('error', onError)
+    window.addEventListener('unhandledrejection', onRejection)
+
+    return () => {
+      document.removeEventListener('click', onClick)
+      window.removeEventListener('error', onError)
+      window.removeEventListener('unhandledrejection', onRejection)
+    }
   }, [])
 
   return null

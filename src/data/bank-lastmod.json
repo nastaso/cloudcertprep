@@ -1,0 +1,17 @@
+{
+  "_comment": "Freshness ledger for the question banks. Each entry pins a cert bank (src/data/<cert>/domainN.json) to { contentHash, lastmod }, where lastmod is the date that bank content last changed. The production build READS lastmod (sitemap <lastmod>, Course.dateModified, the visible \"Last updated\" stamp) and NEVER mutates this file, so freshness reflects real content change, not deploy time. Maintainer workflow: after editing a bank run `npm run bank:lastmod` and commit this file. `npm run validate` warns and the unit suite fails if it drifts.",
+  "certs": {
+    "aif-c01": {
+      "contentHash": "0e4a81c8d362b0aef5126c58d0aaf802df8b8f8cb47a6ff1ed1c6843de8c7e42",
+      "lastmod": "2026-07-04"
+    },
+    "clf-c02": {
+      "contentHash": "a51b279496b347cbfe04a269b879ba697f6066601e44795061f65ef22f906232",
+      "lastmod": "2026-07-04"
+    },
+    "saa-c03": {
+      "contentHash": "f1d5eb5cad2c83ec61c2e475cc9d888397becb9b017c77c2c86735b52c90d3ea",
+      "lastmod": "2026-07-04"
+    }
+  }
+}
