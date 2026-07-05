@@ -20,6 +20,11 @@ import {
   HOME_H1,
   buildHomeMetaDescription,
 } from '../src/lib/citation-content.ts'
+// Question-bank freshness ledger: the sitemap <lastmod> for cert + domain
+// landings reads each cert's real content-change date from the committed ledger
+// (src/data/bank-lastmod.json) instead of git history, which is unavailable on
+// Cloudflare's shallow clone and previously fell back to the build date (N18).
+import { readLedger, getLedgerLastmod } from './generate-bank-lastmod.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUTPUT_PATH = resolve(__dirname, '../public/sitemap.xml')
@@ -187,6 +192,10 @@ function parseFaqEntries(questionCountsByCert) {
 const certs = parseCertRegistry()
 const providers = Array.from(new Set(certs.map(c => c.provider)))
 
+// Committed freshness ledger, read once. Cert + domain landing <lastmod> values
+// below come from here (falling back to `today` at render if a cert is missing).
+const bankLedger = readLedger()
+
 // Distinct providers that have at least one *active* cert. Mirrors the
 // `getActiveProviders()` helper in `src/data/certifications.ts` so the
 // "is multi-provider?" decision is consistent between client code and
@@ -262,7 +271,7 @@ const CERT_LANDING_ROUTES = certs
     changefreq: 'weekly',
     priority: '0.9',
     image: `/og/og-${cert.code}.png`,
-    lastmod: gitLastmod(`src/data/${cert.code}`, 'src/data/certifications.ts'),
+    lastmod: getLedgerLastmod(bankLedger, cert.code),
   }))
 
 // Domain_Landings: one indexable page per (active cert, domain). Practice flow
@@ -284,7 +293,9 @@ const DOMAIN_LANDING_ROUTES = certs
       changefreq: 'weekly',
       priority: '0.7',
       image: `/og/og-${cert.code}-${slugifyDomain(domain.name)}.png`,
-      lastmod: gitLastmod(`src/data/${cert.code}/domain${domain.id}.json`, 'src/data/certifications.ts'),
+      // Per-cert bank freshness (all domains of a cert share the cert's ledger
+      // date; the ledger hashes the whole bank, not per-domain).
+      lastmod: getLedgerLastmod(bankLedger, cert.code),
     })),
   )
 

@@ -2,8 +2,11 @@
 /**
  * LastUpdatedStamp.astro — a small muted "Last updated" / alignment line.
  *
- * Auto-derives the month + year from the build timestamp (`new Date()`), so
- * every prerender stamps the page with its deploy date.
+ * Derives the month + year from the `lastmod` prop (an ISO YYYY-MM-DD content-
+ * change date from the freshness ledger, src/data/bank-lastmod.json) so a pure
+ * redeploy never refreshes the visible date. When no `lastmod` is supplied
+ * (non-cert callers such as /about, which key off no question bank) it falls
+ * back to the build timestamp (`new Date()`) as before.
  *
  * When an `examGuideVersion` is supplied (e.g. 'AIF-C01 (1.1, April 2026)'),
  * the stamp renders an exam-guide alignment statement:
@@ -36,15 +39,31 @@ interface Props {
    * as an outbound link to it.
    */
   examGuideUrl?: string
+  /**
+   * Optional ISO YYYY-MM-DD content-change date from the freshness ledger
+   * (getCertLastmod). When provided, the visible month/year reflects the bank's
+   * real last-updated date instead of the build/deploy date. Omitted callers
+   * fall back to the current date.
+   */
+  lastmod?: string
 }
 
-const { examGuideVersion, examGuideUrl } = Astro.props
+const { examGuideVersion, examGuideUrl, lastmod } = Astro.props
 
-// Derive "Month Year" from the build timestamp.
-const monthYear = new Date().toLocaleDateString('en-US', {
-  month: 'long',
-  year: 'numeric',
-})
+// Derive "Month Year" from the ledger date when supplied, else the build
+// timestamp. Parse the ISO date into local Y/M parts (day pinned to 1) so a
+// non-UTC build timezone can never shift the month at a month boundary.
+function toMonthYear(iso?: string): string {
+  if (iso && /^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+    const [year, month] = iso.split('-').map(Number)
+    return new Date(year, month - 1, 1).toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric',
+    })
+  }
+  return new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+}
+const monthYear = toMonthYear(lastmod)
 
 // Parse the 'CODE (version)' label into its two parts. Group 1 is everything
 // before " (", group 2 is the text inside the parens.
