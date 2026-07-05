@@ -49,7 +49,7 @@ export const organizationNode = {
   url: 'https://www.cloudcertprep.io/',
   description:
     'Free, open-source cloud certification practice exam platform. MIT licensed, no ads, no paywalls.',
-  foundingDate: '2026',
+  foundingDate: '2026-03',
   logo: {
     '@type': 'ImageObject',
     url: 'https://www.cloudcertprep.io/icon-512.png',
@@ -81,6 +81,7 @@ export const personNode = {
     'https://github.com/nastaso',
     'https://ko-fi.com/alexsantonastaso',
     'https://www.credly.com/badges/a67cce3e-4833-4682-8e9e-314454333667',
+    'https://www.linkedin.com/in/alex-santonastaso/',
   ],
   // Verified credential behind the E-E-A-T signal: the CLF-C02 pass, evidenced
   // by the public Credly badge (same URL as the sameAs entry). Additive only.
