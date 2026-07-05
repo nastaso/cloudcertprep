@@ -2,6 +2,12 @@ import { test, expect, type Page } from '@playwright/test'
 import { createClient } from '@supabase/supabase-js'
 import { readFileSync, mkdirSync } from 'node:fs'
 
+// Matches playwright.config.ts's own PORT/BASE_URL derivation: with PW_PORT unset
+// this is byte-identical to the old hardcoded localhost:4321, but under the
+// documented isolated-port recipe (PW_PORT=4399 ...) it follows the server this
+// spec's own baseURL actually points at.
+const BASE_URL = `http://localhost:${Number(process.env.PW_PORT) || 4321}`
+
 // Dark+light screenshots of the UX-audit surfaces for owner visual review.
 // Saved under .kiro/ (gitignored). Run after a build against the test backend.
 test.use({ reducedMotion: 'reduce' })
@@ -56,7 +62,7 @@ async function signIn(page: Page, email: string): Promise<void> {
   await expect(page.locator('input[name="cf-turnstile-response"]')).toHaveValue(/.+/, { timeout: 25000 })
   await page.waitForTimeout(750)
   await page.locator('form button[type="submit"]').click()
-  await page.waitForURL('http://localhost:4321/', { timeout: 20000 })
+  await page.waitForURL(`${BASE_URL}/`, { timeout: 20000 })
 }
 
 for (const theme of ['light', 'dark'] as const) {
