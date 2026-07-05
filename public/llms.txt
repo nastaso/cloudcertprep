@@ -173,6 +173,12 @@ Yes. Like all AWS certifications, the AI Practitioner (AIF-C01) is valid for thr
 
 No. We do not provide exam dumps, which are leaked or stolen real exam questions that violate the AWS Certification agreement and can get your certification revoked. Every AIF-C01 question is original, written from the published AWS exam guide and AWS documentation, and aligned to the five current AIF-C01 domains. We help you pass legitimately by teaching the material, not by sharing stolen answers.
 
+## Articles
+
+- [AWS Cloud Practitioner Passing Score (700/1000) and Pass Rate](https://www.cloudcertprep.io/blog/aws-cloud-practitioner-passing-score): The AWS Cloud Practitioner (CLF-C02) passing score is 700/1000. Here is what that means, the pass-rate context, and what happens if you fail.
+- [Is the AWS Cloud Practitioner Exam Hard?](https://www.cloudcertprep.io/blog/is-aws-cloud-practitioner-exam-hard): How hard is the AWS Cloud Practitioner (CLF-C02) exam? An honest difficulty breakdown by domain, with study time, pass-rate context, and prep tips.
+- [AIF-C01 vs CLF-C02: Which AWS Cert to Take First](https://www.cloudcertprep.io/blog/aif-c01-vs-clf-c02): A practical comparison of the AWS Certified AI Practitioner (AIF-C01) and Cloud Practitioner (CLF-C02) exams, and which foundational cert to sit first.
+
 ## Resources
 
 - [GitHub repository](https://github.com/nastaso/cloudcertprep)

@@ -389,6 +389,66 @@
       "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"@id\":\"https://www.cloudcertprep.io/blog/aif-c01-vs-clf-c02#faq\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What is the difference between AIF-C01 and CLF-C02?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"CLF-C02 (Cloud Practitioner) covers the AWS Cloud broadly: core services, security, pricing, and support. AIF-C01 (AI Practitioner) focuses on AI and machine learning on AWS. Both are foundational, 65 questions, 90 minutes, and pass at 700 out of 1000; the only real difference is the subject matter.\"}},{\"@type\":\"Question\",\"name\":\"Should I take CLF-C02 or AIF-C01 first?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"For most people new to AWS, take CLF-C02 first. It builds the cloud vocabulary (regions, IAM, S3, the shared responsibility model) that makes several AIF-C01 topics easier to follow. Take AIF-C01 first only if your work is squarely in AI or ML and you already know cloud basics.\"}},{\"@type\":\"Question\",\"name\":\"Do I need CLF-C02 before AIF-C01?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No. AIF-C01 is foundational and has no prerequisites. Knowing basic AWS concepts helps you place some topics in context, but it is not required to sit or pass the exam.\"}},{\"@type\":\"Question\",\"name\":\"Is AIF-C01 harder than CLF-C02?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"They are the same level (foundational), length (65 questions, 90 minutes), and passing score (700 out of 1000). AIF-C01 is narrower and deeper on AI and ML and adds two question formats (ordering and matching) that CLF-C02 does not use, but neither is harder by design; it depends on your background.\"}},{\"@type\":\"Question\",\"name\":\"How much do the CLF-C02 and AIF-C01 exams cost?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Each exam fee is about USD 100 before any local tax, and each certification is valid for three years.\"}}]}"
     ]
   },
+  "blog/aws-cloud-practitioner-passing-score.html": {
+    "title": "AWS Cloud Practitioner Passing Score (700/1000) and Pass Rate",
+    "canonical": "https://www.cloudcertprep.io/blog/aws-cloud-practitioner-passing-score",
+    "meta": {
+      "description": "The AWS Cloud Practitioner (CLF-C02) passing score is 700/1000. Here is what that means, the pass-rate context, and what happens if you fail.",
+      "og:description": "The AWS Cloud Practitioner (CLF-C02) passing score is 700/1000. Here is what that means, the pass-rate context, and what happens if you fail.",
+      "og:image": "https://www.cloudcertprep.io/og/og-blog.png",
+      "og:image:alt": "AWS Cloud Practitioner Passing Score (700/1000) and Pass Rate",
+      "og:image:height": "630",
+      "og:image:type": "image/png",
+      "og:image:width": "1200",
+      "og:locale": "en_US",
+      "og:locale:alternate": "en_GB",
+      "og:site_name": "CloudCertPrep",
+      "og:title": "AWS Cloud Practitioner Passing Score (700/1000) and Pass Rate",
+      "og:type": "article",
+      "og:url": "https://www.cloudcertprep.io/blog/aws-cloud-practitioner-passing-score",
+      "robots": "index, follow, max-image-preview:large",
+      "twitter:card": "summary_large_image",
+      "twitter:description": "The AWS Cloud Practitioner (CLF-C02) passing score is 700/1000. Here is what that means, the pass-rate context, and what happens if you fail.",
+      "twitter:image": "https://www.cloudcertprep.io/og/og-blog.png",
+      "twitter:image:alt": "AWS Cloud Practitioner Passing Score (700/1000) and Pass Rate",
+      "twitter:title": "AWS Cloud Practitioner Passing Score (700/1000) and Pass Rate",
+      "twitter:url": "https://www.cloudcertprep.io/blog/aws-cloud-practitioner-passing-score"
+    },
+    "jsonld": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BlogPosting\",\"@id\":\"https://www.cloudcertprep.io/blog/aws-cloud-practitioner-passing-score#article\",\"headline\":\"AWS Cloud Practitioner Passing Score (700/1000) and Pass Rate\",\"description\":\"The AWS Cloud Practitioner (CLF-C02) passing score is 700/1000. Here is what that means, the pass-rate context, and what happens if you fail.\",\"datePublished\":\"<DATETIME>\",\"dateModified\":\"<DATETIME>\",\"url\":\"https://www.cloudcertprep.io/blog/aws-cloud-practitioner-passing-score\",\"mainEntityOfPage\":{\"@type\":\"WebPage\",\"@id\":\"https://www.cloudcertprep.io/blog/aws-cloud-practitioner-passing-score\"},\"inLanguage\":\"en\",\"author\":{\"@type\":\"Person\",\"@id\":\"https://www.cloudcertprep.io/#author\"},\"publisher\":{\"@id\":\"https://www.cloudcertprep.io/#organization\"},\"image\":{\"@type\":\"ImageObject\",\"url\":\"https://www.cloudcertprep.io/og/og-blog.png\",\"width\":1200,\"height\":630},\"keywords\":\"clf-c02, exam-format, study-tips\"}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"@id\":\"https://www.cloudcertprep.io/blog/aws-cloud-practitioner-passing-score#faq\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"What score do you need to pass the AWS Cloud Practitioner exam?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"The passing score is 700 out of 1000. CLF-C02 uses a scaled score from 100 to 1000, so 700 is not 70% of questions correct; it is a scaled threshold AWS sets to keep difficulty consistent across exam versions. You pass or fail against 700, and the result shows as pass or fail.\"}},{\"@type\":\"Question\",\"name\":\"Is 700 the same as 70 percent on the Cloud Practitioner exam?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"No. The 100 to 1000 scale is not a simple percentage. Because questions vary in difficulty and 15 of the 65 are unscored, the number you need correct to reach 700 is not a fixed 70%. Aim well above the threshold in practice rather than targeting an exact percentage.\"}},{\"@type\":\"Question\",\"name\":\"Is there an official AWS Cloud Practitioner pass rate?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"AWS does not publish an official pass rate. CLF-C02 is widely regarded as high-pass because it is foundational and well-resourced, but any specific figure you see is an unofficial estimate. Focus on your own practice scores, which are the only reliable readiness measure.\"}},{\"@type\":\"Question\",\"name\":\"What happens if you fail the AWS Cloud Practitioner exam?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"If you fail, you wait 14 days before retaking and pay the exam fee again each attempt. You can retake as many times as you need; only the 14-day wait applies between attempts. Your score report shows performance by domain, so use it to target weak areas before you rebook.\"}}]}"
+    ]
+  },
+  "blog/is-aws-cloud-practitioner-exam-hard.html": {
+    "title": "Is the AWS Cloud Practitioner Exam Hard?",
+    "canonical": "https://www.cloudcertprep.io/blog/is-aws-cloud-practitioner-exam-hard",
+    "meta": {
+      "description": "How hard is the AWS Cloud Practitioner (CLF-C02) exam? An honest difficulty breakdown by domain, with study time, pass-rate context, and prep tips.",
+      "og:description": "How hard is the AWS Cloud Practitioner (CLF-C02) exam? An honest difficulty breakdown by domain, with study time, pass-rate context, and prep tips.",
+      "og:image": "https://www.cloudcertprep.io/og/og-blog.png",
+      "og:image:alt": "Is the AWS Cloud Practitioner Exam Hard?",
+      "og:image:height": "630",
+      "og:image:type": "image/png",
+      "og:image:width": "1200",
+      "og:locale": "en_US",
+      "og:locale:alternate": "en_GB",
+      "og:site_name": "CloudCertPrep",
+      "og:title": "Is the AWS Cloud Practitioner Exam Hard?",
+      "og:type": "article",
+      "og:url": "https://www.cloudcertprep.io/blog/is-aws-cloud-practitioner-exam-hard",
+      "robots": "index, follow, max-image-preview:large",
+      "twitter:card": "summary_large_image",
+      "twitter:description": "How hard is the AWS Cloud Practitioner (CLF-C02) exam? An honest difficulty breakdown by domain, with study time, pass-rate context, and prep tips.",
+      "twitter:image": "https://www.cloudcertprep.io/og/og-blog.png",
+      "twitter:image:alt": "Is the AWS Cloud Practitioner Exam Hard?",
+      "twitter:title": "Is the AWS Cloud Practitioner Exam Hard?",
+      "twitter:url": "https://www.cloudcertprep.io/blog/is-aws-cloud-practitioner-exam-hard"
+    },
+    "jsonld": [
+      "{\"@context\":\"https://schema.org\",\"@type\":\"BlogPosting\",\"@id\":\"https://www.cloudcertprep.io/blog/is-aws-cloud-practitioner-exam-hard#article\",\"headline\":\"Is the AWS Cloud Practitioner Exam Hard?\",\"description\":\"How hard is the AWS Cloud Practitioner (CLF-C02) exam? An honest difficulty breakdown by domain, with study time, pass-rate context, and prep tips.\",\"datePublished\":\"<DATETIME>\",\"dateModified\":\"<DATETIME>\",\"url\":\"https://www.cloudcertprep.io/blog/is-aws-cloud-practitioner-exam-hard\",\"mainEntityOfPage\":{\"@type\":\"WebPage\",\"@id\":\"https://www.cloudcertprep.io/blog/is-aws-cloud-practitioner-exam-hard\"},\"inLanguage\":\"en\",\"author\":{\"@type\":\"Person\",\"@id\":\"https://www.cloudcertprep.io/#author\"},\"publisher\":{\"@id\":\"https://www.cloudcertprep.io/#organization\"},\"image\":{\"@type\":\"ImageObject\",\"url\":\"https://www.cloudcertprep.io/og/og-blog.png\",\"width\":1200,\"height\":630},\"keywords\":\"clf-c02, study-tips, exam-format\"}",
+      "{\"@context\":\"https://schema.org\",\"@type\":\"FAQPage\",\"@id\":\"https://www.cloudcertprep.io/blog/is-aws-cloud-practitioner-exam-hard#faq\",\"mainEntity\":[{\"@type\":\"Question\",\"name\":\"How hard is the AWS Cloud Practitioner exam?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"It is one of the more approachable IT certifications. CLF-C02 is foundational, multiple choice and multiple response, with no hands-on tasks, and tests breadth of cloud concepts rather than deep technical skill. With one to three weeks of focused study and full-length practice, most beginners pass comfortably on the first attempt.\"}},{\"@type\":\"Question\",\"name\":\"Is AWS Cloud Practitioner hard for beginners?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Not especially. CLF-C02 is designed for people new to the cloud, including non-technical roles. The main challenge is the breadth of services and terminology, not difficulty. Structured study by domain plus practice questions with explanations makes it very manageable for a complete beginner.\"}},{\"@type\":\"Question\",\"name\":\"Which CLF-C02 domain is the hardest?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Most people find Cloud Technology and Services the most demanding, because it is the largest domain at 34% and covers the widest range of services. Billing, Pricing, and Support is usually the easiest at 12%. Weighting your study toward the technology domain pays off most.\"}},{\"@type\":\"Question\",\"name\":\"How long should I study for the Cloud Practitioner exam?\",\"acceptedAnswer\":{\"@type\":\"Answer\",\"text\":\"Most candidates need one to three weeks of part-time study. With prior IT or cloud exposure a focused week can be enough; with none, plan three to four weeks. The reliable readiness signal is consistently scoring above 80% on full-length timed practice across all four domains.\"}}]}"
+    ]
+  },
   "contribute.html": {
     "title": "Contribute to CloudCertPrep · Open-Source AWS Practice Exams",
     "canonical": "https://www.cloudcertprep.io/contribute",
