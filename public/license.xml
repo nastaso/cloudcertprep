@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rsl xmlns="https://rslstandard.org/rsl">
+  <content url="https://www.cloudcertprep.io/">
+    <license>
+      <permits type="usage">all</permits>
+      <payment type="free">
+        <standard>https://github.com/nastaso/cloudcertprep/blob/main/LICENSE</standard>
+      </payment>
+      <legal type="contact">https://www.cloudcertprep.io/about</legal>
+    </license>
+  </content>
+</rsl>

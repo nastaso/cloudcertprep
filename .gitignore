@@ -63,3 +63,6 @@ lerna-debug.log*
 # Local build / QA artifacts (regenerated or one-off; never source)
 .lighthouseci/
 cloudcertprep-cfg/
+
+# Local Supabase CLI state (not source; per-machine)
+supabase/.temp/
