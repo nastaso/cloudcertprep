@@ -43,6 +43,7 @@ import {
 } from '../../../data/keyword-clusters'
 import { getFeaturedSampleIds } from '../../../data/featured-samples'
 import { SITE_URL } from '../../../lib/seo-data'
+import { getCertLastmod } from '../../../lib/bankFreshness'
 import { GITHUB_REPO_URL } from '../../../lib/constants'
 import { LEVEL_ACCENT_HEX, LEVEL_ACCENT_RGB, LEVEL_ACCENT_UI_HEX } from '../../../lib/levelAccent'
 
@@ -351,7 +352,7 @@ const levelAccentUi = LEVEL_ACCENT_UI_HEX[cert.level]
         </ul>
 
         <div class="mt-5" style="--color-text-muted: 139 149 163; --color-text-primary: 244 246 248; --color-success: 74 222 128;">
-          <LastUpdatedStamp examGuideVersion={cert.examGuideVersion} examGuideUrl={cert.examGuideUrl} />
+          <LastUpdatedStamp examGuideVersion={cert.examGuideVersion} examGuideUrl={cert.examGuideUrl} lastmod={getCertLastmod(cert.code)} />
         </div>
       </header>
     </div>
