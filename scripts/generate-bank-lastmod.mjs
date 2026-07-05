@@ -33,6 +33,7 @@
 
 import { readdirSync, readFileSync, writeFileSync, statSync, existsSync } from 'node:fs'
 import { createHash } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
 import { join, dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -41,6 +42,7 @@ const __dirname = dirname(__filename)
 
 export const DATA_DIR = join(__dirname, '..', 'src', 'data')
 export const LEDGER_PATH = join(DATA_DIR, 'bank-lastmod.json')
+const REPO_ROOT = resolve(__dirname, '..')
 
 const DOMAIN_FILE_RE = /^domain\d+\.json$/
 
@@ -106,6 +108,30 @@ export function getLedgerLastmod(ledger, certCode) {
 }
 
 /**
+ * The ledger as it existed at the last commit (HEAD), used only to catch a
+ * maintainer hand-editing a cert's lastmod backwards in the working tree
+ * while its bank content stays unchanged. Never throws: returns { certs: {} }
+ * when git or a prior commit of the file is unavailable (fresh repo, shallow
+ * tarball checkout, first-ever run, etc).
+ */
+export function readCommittedLedger(repoRoot = REPO_ROOT) {
+  try {
+    const raw = execFileSync('git', ['show', 'HEAD:src/data/bank-lastmod.json'], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+    const parsed = JSON.parse(raw)
+    if (parsed && typeof parsed === 'object' && parsed.certs && typeof parsed.certs === 'object') {
+      return parsed
+    }
+  } catch {
+    /* no git, no commits yet, or the file didn't exist at HEAD - ignore */
+  }
+  return { certs: {} }
+}
+
+/**
  * Certs whose CURRENT bank hash differs from the committed ledger (or that are
  * missing from it). Empty array means the ledger is in sync. Used by the
  * validator (warning) and the unit test (hard failure).
@@ -139,25 +165,48 @@ const LEDGER_COMMENT =
  */
 export function buildLedger(dataDir = DATA_DIR, ledgerPath = LEDGER_PATH, today = todayIso()) {
   const prev = readLedger(ledgerPath)
+  const committed = readCommittedLedger()
   const certs = {}
   const bumped = []
   const kept = []
+  const regressions = []
   for (const certCode of listBankCerts(dataDir)) {
     const contentHash = computeBankHash(certCode, dataDir)
     const prevEntry = prev.certs[certCode]
     if (prevEntry && prevEntry.contentHash === contentHash && prevEntry.lastmod) {
       certs[certCode] = { contentHash, lastmod: prevEntry.lastmod }
       kept.push(certCode)
+      // Guard: content is unchanged since the last commit, but a hand edit
+      // could have moved the working-tree date backwards. Compare against
+      // what was actually committed, not against itself.
+      const committedEntry = committed.certs[certCode]
+      if (
+        committedEntry &&
+        committedEntry.contentHash === contentHash &&
+        committedEntry.lastmod &&
+        prevEntry.lastmod < committedEntry.lastmod
+      ) {
+        regressions.push({ certCode, from: committedEntry.lastmod, to: prevEntry.lastmod })
+      }
     } else {
       certs[certCode] = { contentHash, lastmod: today }
       bumped.push(certCode)
     }
   }
-  return { bumped, kept, ledger: { _comment: LEDGER_COMMENT, certs } }
+  return { bumped, kept, regressions, ledger: { _comment: LEDGER_COMMENT, certs } }
 }
 
 function main() {
-  const { bumped, kept, ledger } = buildLedger()
+  const { bumped, kept, regressions, ledger } = buildLedger()
+  if (regressions.length) {
+    for (const { certCode, from, to } of regressions) {
+      console.error(
+        `✗ ${certCode}: lastmod moved backwards (${from} -> ${to}) for unchanged bank content - ` +
+          `fix the hand-edited date in src/data/bank-lastmod.json.`
+      )
+    }
+    process.exitCode = 1
+  }
   writeFileSync(LEDGER_PATH, JSON.stringify(ledger, null, 2) + '\n')
   const parts = [`${bumped.length + kept.length} cert bank(s)`]
   if (bumped.length) parts.push(`bumped: ${bumped.join(', ')}`)
