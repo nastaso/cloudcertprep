@@ -84,6 +84,14 @@ const gaMeasurementId = import.meta.env.VITE_GA_MEASUREMENT_ID ?? ''
 // untouched.
 const isNoindexPreview = import.meta.env.PUBLIC_NOINDEX === 'true'
 const effectiveRobots = isNoindexPreview ? 'noindex' : robots
+// Google Discover / image-search eligibility: allow large image previews on
+// indexable pages (max-image-preview:large). Appended only when the page is
+// actually indexable; a noindex page keeps its bare directive so the
+// preview-gate and canonical-suppression logic below stay a plain
+// `includes('noindex')` test. (Additive metadata; no render/layout impact.)
+const robotsContent = effectiveRobots.includes('noindex')
+  ? effectiveRobots
+  : `${effectiveRobots}, max-image-preview:large`
 ---
 <!doctype html>
 <html lang="en">
@@ -128,7 +136,7 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
     <meta name="twitter:image:alt" content={title} />
 
     <!-- Additional SEO -->
-    <meta name="robots" content={effectiveRobots} />
+    <meta name="robots" content={robotsContent} />
     {/* On noindex previews (branch deploys / deploy previews) the real robots
         value is preserved here so postbuild guards (validate-internal-graph)
         can validate the INTENDED production structure. Never emitted in
@@ -313,6 +321,78 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
           if (el.getBoundingClientRect().top < vh) el.classList.add('is-revealed')
           else io.observe(el)
         })
+      })()
+    </script>
+
+    {/* Core Web Vitals field beacon (audit N7). Captures LCP, CLS, and INP via
+        PerformanceObserver and reports them ONCE per page (at pagehide /
+        visibility-hidden) through the cookieless analytics sink,
+        window.umami.track - NOT a separate RUM / Cloudflare Web Analytics beacon,
+        which would contradict the privacy promise (privacy.astro: cookieless
+        Umami, "you cannot opt out" because it never identifies you). Registered
+        as KNOWN_EVENTS.web_vitals. Silent no-op wherever PerformanceObserver or
+        window.umami is absent (local dev has no Umami script; unsupported
+        browsers feature-detect out). LCP: keep the final largest-contentful-paint
+        entry. CLS: sum layout-shift entries into 1s/5s session windows, keep the
+        max session value. INP: web-vitals-style estimate - the floor(count/50)-th
+        worst interaction duration, deduped by interactionId, from event-timing
+        entries (plus first-input) - so exam pages with hundreds of taps stay
+        comparable to CrUX instead of pinning to the single worst tap. Metrics
+        that never fired are OMITTED from the payload (never sent as 0) so
+        dashboard averages stay honest; CLS 0 is kept whenever layout-shift is
+        supported (zero shift is a real, perfect score). A pageview where
+        nothing was measured sends no event at all. Inline so the CSP-hash
+        generator covers it. */}
+    <script is:inline>
+      (function () {
+        if (!('PerformanceObserver' in window)) return
+        var lcp = -1, cls = 0, sess = 0, first = 0, last = 0, sent = false
+        var durs = {}, seen = 0
+        var clsOk = (PerformanceObserver.supportedEntryTypes || []).indexOf('layout-shift') > -1
+        function watch(type, cb, opts) {
+          try {
+            var po = new PerformanceObserver(function (l) { l.getEntries().forEach(cb) })
+            po.observe(Object.assign({ type: type, buffered: true }, opts))
+          } catch (e) {}
+        }
+        watch('largest-contentful-paint', function (e) { lcp = e.startTime })
+        watch('layout-shift', function (e) {
+          if (e.hadRecentInput) return
+          if (sess && e.startTime - last < 1000 && e.startTime - first < 5000) sess += e.value
+          else { first = e.startTime; sess = e.value }
+          last = e.startTime
+          if (sess > cls) cls = sess
+        })
+        function interaction(e) {
+          var id = e.interactionId || (e.entryType === 'first-input' ? -1 : 0)
+          if (!id) return
+          if (!(id in durs)) seen++
+          if (!(id in durs) || e.duration > durs[id]) durs[id] = e.duration
+        }
+        watch('event', interaction, { durationThreshold: 40 })
+        watch('first-input', interaction)
+        function report() {
+          if (sent) return
+          sent = true
+          var data = {}
+          if (lcp >= 0) data.lcp = Math.round(lcp)
+          if (clsOk) data.cls = Math.round(cls * 1000) / 1000
+          var all = []
+          for (var k in durs) all.push(durs[k])
+          if (all.length) {
+            all.sort(function (a, b) { return b - a })
+            var n = performance.interactionCount || seen
+            data.inp = Math.round(all[Math.min(all.length - 1, Math.floor(n / 50))])
+          }
+          if (lcp < 0 && !clsOk && !all.length) return
+          try {
+            if (window.umami && typeof window.umami.track === 'function') {
+              window.umami.track('web_vitals', data)
+            }
+          } catch (e) {}
+        }
+        addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') report() })
+        addEventListener('pagehide', report)
       })()
     </script>
     {noscriptDirectory && <noscript>
