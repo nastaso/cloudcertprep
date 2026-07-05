@@ -19,10 +19,12 @@
  *
  * INVARIANCE CONTRACT:
  *   - Person `@id` MUST stay `https://www.cloudcertprep.io/#author`.
- *   - Person `sameAs[]` MUST be preserved verbatim.
- *   - The ONLY permitted change is appending the Credly badge URL to
- *     Person.sameAs[] in task 7.4. When that lands, update BOTH
- *     `src/lib/base-graph.ts` AND the PERSON snapshot string below in the same
+ *   - Person `sameAs[]` MUST be preserved verbatim (the Credly badge URL is now
+ *     part of the locked list). Additive entity enrichments applied in the
+ *     entity-head bundle (Organization.logo/foundingDate/contactPoint,
+ *     Person.worksFor/hasCredential, and the knowsAbout Thing objects) are part
+ *     of the snapshot below. Any further edit MUST update BOTH
+ *     `src/lib/base-graph.ts` AND the matching snapshot string below in the same
  *     commit; any other drift is a build-failing regression.
  *
  * Exits non-zero (fails the build) on any drift or any page missing a node.
@@ -41,9 +43,9 @@ const SNAPSHOT = Object.freeze({
   WebSite:
     '{"@context":"https://schema.org","@type":"WebSite","name":"CloudCertPrep","alternateName":"Free open-source AWS certification practice exams","url":"https://www.cloudcertprep.io/","description":"Free, open-source AWS certification practice exams with full-length mock exams, domain practice, adaptive spaced repetition, and progress tracking. MIT licensed.","inLanguage":"en","author":{"@id":"https://www.cloudcertprep.io/#author"},"publisher":{"@id":"https://www.cloudcertprep.io/#organization"}}',
   Organization:
-    '{"@context":"https://schema.org","@type":"Organization","@id":"https://www.cloudcertprep.io/#organization","name":"CloudCertPrep","url":"https://www.cloudcertprep.io/","description":"Free, open-source cloud certification practice exam platform. MIT licensed, no ads, no paywalls.","founder":{"@id":"https://www.cloudcertprep.io/#author"},"sameAs":["https://github.com/nastaso/cloudcertprep","https://ko-fi.com/alexsantonastaso"]}',
+    '{"@context":"https://schema.org","@type":"Organization","@id":"https://www.cloudcertprep.io/#organization","name":"CloudCertPrep","url":"https://www.cloudcertprep.io/","description":"Free, open-source cloud certification practice exam platform. MIT licensed, no ads, no paywalls.","foundingDate":"2026-03","logo":{"@type":"ImageObject","url":"https://www.cloudcertprep.io/icon-512.png","width":512,"height":512},"founder":{"@id":"https://www.cloudcertprep.io/#author"},"contactPoint":{"@type":"ContactPoint","contactType":"customer support","email":"alex@cloudcertprep.io"},"sameAs":["https://github.com/nastaso/cloudcertprep","https://ko-fi.com/alexsantonastaso"]}',
   Person:
-    '{"@context":"https://schema.org","@type":"Person","@id":"https://www.cloudcertprep.io/#author","name":"Alex Santonastaso","url":"https://santonastaso.me","jobTitle":"Software Engineer","sameAs":["https://santonastaso.me","https://github.com/nastaso","https://ko-fi.com/alexsantonastaso","https://www.credly.com/badges/a67cce3e-4833-4682-8e9e-314454333667"],"knowsAbout":["AWS Certified Cloud Practitioner (CLF-C02)","AWS Certified AI Practitioner (AIF-C01)","Amazon Web Services","Cloud computing","Certification exam preparation"]}',
+    '{"@context":"https://schema.org","@type":"Person","@id":"https://www.cloudcertprep.io/#author","name":"Alex Santonastaso","url":"https://santonastaso.me","jobTitle":"Software Engineer","worksFor":{"@id":"https://www.cloudcertprep.io/#organization"},"sameAs":["https://santonastaso.me","https://github.com/nastaso","https://ko-fi.com/alexsantonastaso","https://www.credly.com/badges/a67cce3e-4833-4682-8e9e-314454333667","https://www.linkedin.com/in/alex-santonastaso/"],"hasCredential":{"@type":"EducationalOccupationalCredential","name":"AWS Certified Cloud Practitioner","credentialCategory":"certification","url":"https://www.credly.com/badges/a67cce3e-4833-4682-8e9e-314454333667"},"knowsAbout":[{"@type":"Thing","name":"AWS Certified Cloud Practitioner (CLF-C02)"},{"@type":"Thing","name":"AWS Certified AI Practitioner (AIF-C01)"},{"@type":"Thing","name":"Amazon Web Services","sameAs":"https://en.wikipedia.org/wiki/Amazon_Web_Services"},{"@type":"Thing","name":"Cloud computing","sameAs":"https://en.wikipedia.org/wiki/Cloud_computing"},{"@type":"Thing","name":"Certification exam preparation"}]}',
 })
 
 function fail(msg) {

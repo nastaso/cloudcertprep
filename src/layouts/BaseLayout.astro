@@ -84,6 +84,14 @@ const gaMeasurementId = import.meta.env.VITE_GA_MEASUREMENT_ID ?? ''
 // untouched.
 const isNoindexPreview = import.meta.env.PUBLIC_NOINDEX === 'true'
 const effectiveRobots = isNoindexPreview ? 'noindex' : robots
+// Google Discover / image-search eligibility: allow large image previews on
+// indexable pages (max-image-preview:large). Appended only when the page is
+// actually indexable; a noindex page keeps its bare directive so the
+// preview-gate and canonical-suppression logic below stay a plain
+// `includes('noindex')` test. (Additive metadata; no render/layout impact.)
+const robotsContent = effectiveRobots.includes('noindex')
+  ? effectiveRobots
+  : `${effectiveRobots}, max-image-preview:large`
 ---
 <!doctype html>
 <html lang="en">
@@ -128,7 +136,7 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
     <meta name="twitter:image:alt" content={title} />
 
     <!-- Additional SEO -->
-    <meta name="robots" content={effectiveRobots} />
+    <meta name="robots" content={robotsContent} />
     {/* On noindex previews (branch deploys / deploy previews) the real robots
         value is preserved here so postbuild guards (validate-internal-graph)
         can validate the INTENDED production structure. Never emitted in

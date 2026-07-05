@@ -129,7 +129,8 @@ surface to static HTML at build time, and the interactive flows hydrate as
 |    platform_stats       aggregate counters                  |
 |    question_mastery     view, SECURITY INVOKER, RLS         |
 |                                                             |
-|  RPC: get_public_exam_stats() returns aggregates only       |
+|  RPCs (aggregates only, no user rows):                      |
+|    get_public_exam_stats()   get_public_totals()            |
 |                                                             |
 |  Security: RLS on every user-data table                     |
 |            policy: auth.uid() = user_id                     |
@@ -153,7 +154,7 @@ surface to static HTML at build time, and the interactive flows hydrate as
 | Hosting | Cloudflare Pages (auto-deploy from `main`) |
 | Email | Brevo SMTP via Supabase Auth |
 | Analytics | Umami (cookieless, always on) |
-| CI | GitHub Actions: validate, lint, astro check, test, build, citation guard |
+| CI | GitHub Actions: validate, lint, astro check, test, build, citation guard, Playwright e2e, Lighthouse |
 
 The marketing surface is prerendered static HTML, so crawlers and LLM browse-mode read full content with no JavaScript. Interactive islands are code-split and hydrate on demand. See `npm run build` output for exact sizes against your local build.
 

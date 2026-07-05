@@ -7,6 +7,10 @@ updated: 2026-06-24
 tags: ['clf-c02', 'aif-c01', 'exam-format']
 ogImage: /og/og-blog.png
 draft: false
+# Grandfathered from the N1 outbound-citation check (scripts/validate-blog-frontmatter.mjs):
+# this post predates the check and has 0 outbound authority links today.
+# Remove this flag once >=2 AWS-docs/NIST citations are added to the body.
+citationsExempt: true
 faq:
   - q: "What is the difference between AIF-C01 and CLF-C02?"
     a: "CLF-C02 (Cloud Practitioner) covers the AWS Cloud broadly: core services, security, pricing, and support. AIF-C01 (AI Practitioner) focuses on AI and machine learning on AWS. Both are foundational, 65 questions, 90 minutes, and pass at 700 out of 1000; the only real difference is the subject matter."
