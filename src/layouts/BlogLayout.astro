@@ -182,7 +182,7 @@ const updatedDisplay = data.updated
           <h1 class="font-display mt-3 text-[1.75rem] leading-[1.12] md:text-[2.5rem] font-bold tracking-[-0.025em] text-[#F4F6F8]">{data.title}</h1>
 
           <p class="mt-4 text-sm text-[#9AA6B2]">
-            By <a href="https://santonastaso.me" class="text-[#C9D2DC] underline underline-offset-2 hover:text-white transition-colors">Alex Santonastaso</a>
+            By <a href="https://santonastaso.me" rel="author" class="text-[#C9D2DC] underline underline-offset-2 hover:text-white transition-colors">Alex Santonastaso</a>
             {readingMinutes && <span>{' · '}{readingMinutes} min read</span>}
           </p>
 
@@ -260,6 +260,19 @@ const updatedDisplay = data.updated
               </ul>
             </nav>
           )}
+        </div>
+
+        {/* Author bio (N6): a small, factual "about the author" box at the end
+            of every post's body, distinct from the <head> article:author meta
+            and the Person JSON-LD node above (both untouched) - this is the
+            reader-facing E-E-A-T surface, not a crawler-facing one. */}
+        <div class={`mt-10 max-w-[68ch] mx-auto${showToc ? ' lg:mx-0' : ''}`}>
+          <div class="rounded-xl border border-border-hairline bg-bg-card/70 p-5 md:p-6">
+            <p class="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-text-muted mb-2">About the author</p>
+            <p class="text-sm text-text-muted leading-relaxed">
+              <a href="https://santonastaso.me" class="font-semibold text-text-primary hover:underline underline-offset-2">Alex Santonastaso</a> is a software engineer who built CloudCertPrep to prepare for the AWS Certified Cloud Practitioner exam, then passed it. He maintains the platform and its open-source question banks, which are validated by an automated checker and publicly auditable on GitHub.
+            </p>
+          </div>
         </div>
 
         {/* Quiet share/copy-link row (GROW M3 rider): sits between the post
