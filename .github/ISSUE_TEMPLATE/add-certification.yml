@@ -1,7 +1,7 @@
 name: Add a certification
 description: Propose adding a new AWS (or other) certification to CloudCertPrep.
 title: "Add certification: <code>"
-labels: ["new-cert", "enhancement"]
+labels: ["enhancement"]
 body:
   - type: input
     id: cert_code

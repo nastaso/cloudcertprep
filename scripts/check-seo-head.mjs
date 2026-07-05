@@ -19,11 +19,13 @@
  * no rendering, no network, no new dependency. Build- and environment-varying
  * tokens are normalized before snapshotting so builds match across machines and
  * CI (a local build with live Supabase creds vs a CI build on a placeholder URL
- * with the committed stats snapshot). Normalized (see `normalize` below):
- *   - hashed /_astro/ asset URLs (defensive; not in the head surface today),
- *   - ISO dates/datetimes (Course.dateModified is `new Date()` at build time),
+ * with the committed stats snapshot). Normalized:
+ *   - hashed /_astro/ asset URLs (defensive; not in the head surface today) and
+ *     ISO dates/datetimes (Course.dateModified is `new Date()` at build time) -
+ *     string-level, see `normalize` below;
  *   - Course.totalHistoricalEnrollment (live community stats: value changes
- *     every refresh and the field is omitted at 0, so presence varies too).
+ *     every refresh and the field is omitted at 0, so presence varies too) -
+ *     deleted by parsing each JSON-LD block, see `stripEnrollment` below.
  *
  * SCOPE - which pages: exactly the INDEXABLE pages, detected self-containedly as
  * "not a redirect stub AND robots is not noindex". That is the same 18 pages the
@@ -106,14 +108,27 @@ function normalize(s) {
       // Datetime first so the date half of an ISO datetime is not partly matched.
       .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?/g, '<DATETIME>')
       .replace(/\d{4}-\d{2}-\d{2}/g, '<DATE>')
-      // Course.totalHistoricalEnrollment is LIVE community data from the stats
-      // snapshot: its value changes every stats refresh AND the field is omitted
-      // entirely when a cert has 0 completed attempts, so both value and presence
-      // vary by build environment. Strip it (with its leading comma) so the guard
-      // locks the SEO structure, not the live number. It only ever appears
-      // mid-object (after dateModified), so a leading comma is always present.
-      .replace(/,"totalHistoricalEnrollment":\d+/g, '')
   )
+}
+
+// Course.totalHistoricalEnrollment is LIVE community data from the stats
+// snapshot: its value changes every stats refresh AND the field is omitted
+// entirely when a cert has 0 completed attempts, so both value and presence
+// vary by build environment. Delete it so the guard locks the SEO structure,
+// not the live number. We PARSE the JSON-LD and recursively delete the key
+// wherever it occurs rather than matching a positional `,"key":123` regex: a
+// future refactor that reorders the Course object (e.g. makes this the FIRST
+// key, dropping its leading comma) would silently defeat the regex and false-
+// fail every build. JSON.stringify preserves insertion order, so every other
+// key stays byte-identical.
+function stripEnrollment(value) {
+  if (Array.isArray(value)) {
+    for (const item of value) stripEnrollment(item)
+  } else if (value && typeof value === 'object') {
+    delete value.totalHistoricalEnrollment
+    for (const key of Object.keys(value)) stripEnrollment(value[key])
+  }
+  return value
 }
 
 function headOf(html) {
@@ -172,7 +187,10 @@ function extractMeta(head) {
   return Object.fromEntries(Object.entries(meta).sort(([a], [b]) => a.localeCompare(b)))
 }
 
-// Per-page JSON-LD block bodies, platform nodes removed, order preserved.
+// Per-page JSON-LD block bodies, platform nodes removed, order preserved. Each
+// body is parsed, stripped of the live enrollment stat (see stripEnrollment),
+// and re-serialized. A <head> JSON-LD block that does not parse is a defect, so
+// fail loudly rather than snapshotting garbage.
 function extractJsonLd(head) {
   const bodies = []
   const re = /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
@@ -182,15 +200,14 @@ function extractJsonLd(head) {
     let node
     try {
       node = JSON.parse(body)
-    } catch {
-      bodies.push(body) // malformed: keep raw so drift is still caught
-      continue
+    } catch (err) {
+      fail(`Unparseable JSON-LD in a <head> block: ${err.message}\n      body: ${body.slice(0, 200)}`)
     }
     const type = node && node['@type']
     const id = node && node['@id']
     const isPlatform = type === 'WebSite' || (typeof id === 'string' && PLATFORM_IDS.has(id))
     if (isPlatform) continue
-    bodies.push(body)
+    bodies.push(JSON.stringify(stripEnrollment(node)))
   }
   return bodies
 }
