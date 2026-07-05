@@ -4,8 +4,8 @@
  *
  * Ports the visible content of the former React `_Privacy.tsx` page into static
  * HTML rendered inside BaseLayout. No React app is mounted; the chrome
- * (Header/Footer/etc.) comes from BaseLayout islands. Includes the Google OAuth
- * data-fields disclosure required by R5.6.
+ * (Header/Footer/etc.) comes from BaseLayout islands. Includes the Google and
+ * GitHub OAuth data-fields disclosures required by R5.6.
  *
  * Satisfies: R1.2, R5.6
  */
@@ -20,6 +20,7 @@ const breadcrumbItems = [
 ---
 
 <!-- Google OAuth data fields: email, name, profile picture URL. No other data requested, no tokens stored. (R5.6, expanded in Phase 13) -->
+<!-- GitHub OAuth data fields: email, name, username, profile picture URL. No other data requested, no tokens stored. (R5.6, L75) -->
 
 <BaseLayout
   title="Privacy Policy · CloudCertPrep"
@@ -41,7 +42,7 @@ const breadcrumbItems = [
 
   <div class="sheet-overlap pb-16 md:pb-24 pt-10 md:pt-14">
     <div class="max-w-3xl mx-auto px-4 md:px-8">
-      <p class="font-mono text-[12px] tracking-wide text-text-muted mb-8 max-w-[68ch] mx-auto">Last updated: June 2026</p>
+      <p class="font-mono text-[12px] tracking-wide text-text-muted mb-8 max-w-[68ch] mx-auto">Last updated: July 2026</p>
 
       <div class="space-y-8 max-w-[68ch] mx-auto">
         <section>
@@ -76,6 +77,13 @@ const breadcrumbItems = [
           <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Signing in with Google</h2>
           <p class="text-text-muted text-base leading-[1.7]">
             When you sign in with Google, CloudCertPrep receives your email address, your name, and your profile picture URL from Google. We do not request any other Google data, and we do not store your Google access or refresh tokens.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="text-lg md:text-xl font-semibold text-text-primary mb-3">Signing in with GitHub</h2>
+          <p class="text-text-muted text-base leading-[1.7]">
+            When you sign in with GitHub, CloudCertPrep receives your email address, your name, your GitHub username, and your profile picture URL from GitHub. We do not request any other GitHub data, and we do not store your GitHub access or refresh tokens.
           </p>
         </section>
 
