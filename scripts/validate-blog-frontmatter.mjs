@@ -39,12 +39,19 @@ const CERT_REGISTRY_PATH = join(ROOT, 'src', 'data', 'certifications.ts')
  * time, kept here as its own tiny pass so this validator stays plain `node`
  * (no tsx) rather than importing the .ts registry.
  */
+// Cert code must be lowercase letters, digits, and hyphens only (same shape
+// as scripts/generate-seo-assets.mjs's CERT_CODE_REGEX). This also excludes
+// the PROVIDERS registry's bare `code: 'aws'/'azure'/'gcp'` entries, which
+// match the raw `code: '...'` regex but aren't real cert-page tags.
+const CERT_CODE_REGEX = /^[a-z]+-[a-z0-9]+$/
 function knownCertCodes() {
   const source = readFileSync(CERT_REGISTRY_PATH, 'utf8')
   const codes = new Set()
   const re = /code:\s*'([a-z0-9-]+)'/g
   let m
-  while ((m = re.exec(source)) !== null) codes.add(m[1])
+  while ((m = re.exec(source)) !== null) {
+    if (CERT_CODE_REGEX.test(m[1])) codes.add(m[1])
+  }
   return codes
 }
 
@@ -65,7 +72,6 @@ function violation(file, msg) {
 const AUTHORITY_ALLOWLIST = [
   'aws.amazon.com',
   'docs.aws.amazon.com',
-  '*.amazon.com',
   'nist.gov',
   'www.nist.gov',
   'bls.gov', // US Bureau of Labor Statistics - authority source for salary/labor-market posts
