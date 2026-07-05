@@ -326,12 +326,21 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
         window.umami is absent (local dev has no Umami script; unsupported
         browsers feature-detect out). LCP: keep the final largest-contentful-paint
         entry. CLS: sum layout-shift entries into 1s/5s session windows, keep the
-        max session value. INP: worst interaction duration from event-timing
-        entries (plus first-input). Inline so the CSP-hash generator covers it. */}
+        max session value. INP: web-vitals-style estimate - the floor(count/50)-th
+        worst interaction duration, deduped by interactionId, from event-timing
+        entries (plus first-input) - so exam pages with hundreds of taps stay
+        comparable to CrUX instead of pinning to the single worst tap. Metrics
+        that never fired are OMITTED from the payload (never sent as 0) so
+        dashboard averages stay honest; CLS 0 is kept whenever layout-shift is
+        supported (zero shift is a real, perfect score). A pageview where
+        nothing was measured sends no event at all. Inline so the CSP-hash
+        generator covers it. */}
     <script is:inline>
       (function () {
         if (!('PerformanceObserver' in window)) return
-        var lcp = 0, cls = 0, sess = 0, first = 0, last = 0, inp = 0, sent = false
+        var lcp = -1, cls = 0, sess = 0, first = 0, last = 0, sent = false
+        var durs = {}, seen = 0
+        var clsOk = (PerformanceObserver.supportedEntryTypes || []).indexOf('layout-shift') > -1
         function watch(type, cb, opts) {
           try {
             var po = new PerformanceObserver(function (l) { l.getEntries().forEach(cb) })
@@ -346,19 +355,31 @@ const effectiveRobots = isNoindexPreview ? 'noindex' : robots
           last = e.startTime
           if (sess > cls) cls = sess
         })
-        function interaction(e) { if (e.interactionId && e.duration > inp) inp = e.duration }
+        function interaction(e) {
+          var id = e.interactionId || (e.entryType === 'first-input' ? -1 : 0)
+          if (!id) return
+          if (!(id in durs)) seen++
+          if (!(id in durs) || e.duration > durs[id]) durs[id] = e.duration
+        }
         watch('event', interaction, { durationThreshold: 40 })
         watch('first-input', interaction)
         function report() {
           if (sent) return
           sent = true
+          var data = {}
+          if (lcp >= 0) data.lcp = Math.round(lcp)
+          if (clsOk) data.cls = Math.round(cls * 1000) / 1000
+          var all = []
+          for (var k in durs) all.push(durs[k])
+          if (all.length) {
+            all.sort(function (a, b) { return b - a })
+            var n = performance.interactionCount || seen
+            data.inp = Math.round(all[Math.min(all.length - 1, Math.floor(n / 50))])
+          }
+          if (lcp < 0 && !clsOk && !all.length) return
           try {
             if (window.umami && typeof window.umami.track === 'function') {
-              window.umami.track('web_vitals', {
-                lcp: Math.round(lcp),
-                cls: Math.round(cls * 1000) / 1000,
-                inp: Math.round(inp)
-              })
+              window.umami.track('web_vitals', data)
             }
           } catch (e) {}
         }
