@@ -22,29 +22,41 @@ interface CapturedEvent {
   params?: Record<string, unknown>
 }
 
-declare global {
-  interface Window {
-    __events: CapturedEvent[]
-  }
-}
-
-/** Stub window.umami so every trackEvent lands in window.__events. */
-async function installEventCapture(page: Page): Promise<void> {
+/**
+ * Stub window.umami so every trackEvent is relayed off-page via
+ * navigator.sendBeacon, and capture those beacons Node-side. A plain
+ * window.__events sink does not survive the post-delete hard navigation
+ * (window.location.assign wipes page globals); sendBeacon is designed to
+ * keep delivering during unload, and page.route observes it reliably even
+ * across that navigation.
+ */
+async function installEventCapture(page: Page): Promise<CapturedEvent[]> {
+  const events: CapturedEvent[] = []
+  await page.route('**/__evt', async route => {
+    const body = route.request().postData()
+    if (body) {
+      try {
+        events.push(JSON.parse(body) as CapturedEvent)
+      } catch {
+        // ignore malformed beacon bodies
+      }
+    }
+    await route.fulfill({ status: 204, body: '' })
+  })
   await page.addInitScript(() => {
-    const sink: CapturedEvent[] = []
-    ;(window as unknown as { __events: CapturedEvent[] }).__events = sink
     ;(window as unknown as { umami: unknown }).umami = {
       track: (name: string, params?: Record<string, unknown>) => {
-        sink.push({ name, params })
+        navigator.sendBeacon('/__evt', JSON.stringify({ name, params }))
       },
     }
   })
+  return events
 }
 
 /**
  * Stub the delete-account Edge Function. `delayMs` holds the response open so
- * assertions can read window.__events BEFORE the success path redirects away
- * (trackEvent fires synchronously before the invoke).
+ * assertions can observe the "Deleting your account..." spinner before the
+ * success path redirects away.
  */
 async function stubDeleteFunction(page: Page, opts: { status: number; delayMs?: number }): Promise<void> {
   await page.route('**/functions/v1/delete-account', async route => {
@@ -81,7 +93,7 @@ test('chips are optional and toggleable; Delete enables on typed DELETE alone', 
 })
 
 test('no chip selected: deletion proceeds and account_delete_reason does NOT fire', async ({ page }) => {
-  await installEventCapture(page)
+  const events = await installEventCapture(page)
   await seedSession(page)
   await stubDeleteFunction(page, { status: 200, delayMs: 1200 })
   await openDeleteModal(page)
@@ -89,16 +101,18 @@ test('no chip selected: deletion proceeds and account_delete_reason does NOT fir
   await page.getByPlaceholder('DELETE').fill('DELETE')
   await page.getByRole('button', { name: 'Delete account' }).click()
 
-  // Read events while the stub holds the response open (pre-redirect).
+  // The stub holds the response open long enough to observe the spinner.
   await expect(page.getByText('Deleting your account...')).toBeVisible()
-  const events = await page.evaluate(() => window.__events)
-  expect(events.filter(e => e.name === 'account_delete_reason')).toHaveLength(0)
 
+  // trackEvent (if any) fires just before the hard navigation away; assert
+  // against the Node-side capture after the redirect lands, once the
+  // beacon (if any) has had a chance to arrive.
   await page.waitForURL('**/?account_deleted=1')
+  await expect.poll(() => events.filter(e => e.name === 'account_delete_reason').length).toBe(0)
 })
 
 test('chip selected: account_delete_reason fires once, anonymously, at deletion time', async ({ page }) => {
-  await installEventCapture(page)
+  const events = await installEventCapture(page)
   await seedSession(page)
   await stubDeleteFunction(page, { status: 200, delayMs: 1200 })
   await openDeleteModal(page)
@@ -108,13 +122,15 @@ test('chip selected: account_delete_reason fires once, anonymously, at deletion 
   await page.getByRole('button', { name: 'Delete account' }).click()
 
   await expect(page.getByText('Deleting your account...')).toBeVisible()
-  const events = await page.evaluate(() => window.__events)
-  const reasonEvents = events.filter(e => e.name === 'account_delete_reason')
-  expect(reasonEvents).toHaveLength(1)
-  // Anonymous: the payload is the reason slug and nothing else.
-  expect(reasonEvents[0].params).toEqual({ reason: 'better_tool' })
 
+  // The event fires right before the success redirect; wait for the
+  // redirect, then assert against the Node-side beacon capture (which
+  // survives the navigation, unlike an in-page window.__events sink).
   await page.waitForURL('**/?account_deleted=1')
+  const reasonEvents = () => events.filter(e => e.name === 'account_delete_reason')
+  await expect.poll(() => reasonEvents().length).toBe(1)
+  // Anonymous: the payload is the reason slug and nothing else.
+  expect(reasonEvents()[0].params).toEqual({ reason: 'better_tool' })
 })
 
 test('export pointer closes the modal and runs the existing export', async ({ page }) => {

@@ -14,6 +14,10 @@
  *   - tags include at least one recognized cert-code tag (G5 tag taxonomy,
  *     see the `tags` comment in src/content.config.ts) - domain-slug tags
  *     are conditional per post, so they are documented but not enforced here
+ *   - N1 citations: at least 2 outbound links in the post BODY (not
+ *     frontmatter) point at an authority-allowlisted host (AWS docs, NIST,
+ *     named labor-market sources - see AUTHORITY_ALLOWLIST below). Opt out
+ *     per post with `citationsExempt: true`.
  *
  * Exits non-zero with a per-violation report on failure; prints a success
  * summary on pass. Run via `npm run prebuild` (appended to the chain).
@@ -35,18 +39,91 @@ const CERT_REGISTRY_PATH = join(ROOT, 'src', 'data', 'certifications.ts')
  * time, kept here as its own tiny pass so this validator stays plain `node`
  * (no tsx) rather than importing the .ts registry.
  */
+// Cert code must be lowercase letters, digits, and hyphens only (same shape
+// as scripts/generate-seo-assets.mjs's CERT_CODE_REGEX). This also excludes
+// the PROVIDERS registry's bare `code: 'aws'/'azure'/'gcp'` entries, which
+// match the raw `code: '...'` regex but aren't real cert-page tags.
+const CERT_CODE_REGEX = /^[a-z]+-[a-z0-9]+$/
 function knownCertCodes() {
   const source = readFileSync(CERT_REGISTRY_PATH, 'utf8')
   const codes = new Set()
   const re = /code:\s*'([a-z0-9-]+)'/g
   let m
-  while ((m = re.exec(source)) !== null) codes.add(m[1])
+  while ((m = re.exec(source)) !== null) {
+    if (CERT_CODE_REGEX.test(m[1])) codes.add(m[1])
+  }
   return codes
 }
 
 const violations = []
 function violation(file, msg) {
   violations.push(`${file}: ${msg}`)
+}
+
+/**
+ * N1 outbound-citation allowlist (GEO/AI-citation content-quality gate).
+ * Hosts that count as an "authority citation" - keep in sync with the
+ * canonical sources in .kiro/content/blog-sources.md (AWS official
+ * docs/exam guides, NIST). Add a named labor-market source here ONLY once a
+ * post actually links to it (no source is cited yet as of this check's
+ * introduction - see the PR that added this list for the current state).
+ * Easy to edit: add/remove a string; '*.example.com' matches any subdomain.
+ */
+const AUTHORITY_ALLOWLIST = [
+  'aws.amazon.com',
+  'docs.aws.amazon.com',
+  'nist.gov',
+  'www.nist.gov',
+  'bls.gov', // US Bureau of Labor Statistics - authority source for salary/labor-market posts
+  'www.bls.gov',
+]
+
+function isAuthorityHost(hostname) {
+  const host = hostname.toLowerCase()
+  return AUTHORITY_ALLOWLIST.some((entry) =>
+    entry.startsWith('*.') ? host.endsWith(entry.slice(1)) : host === entry,
+  )
+}
+
+// Same link-extraction patterns as scripts/validate-internal-links.mjs, so
+// the two scripts can't drift on what counts as a link in the post body.
+const mdLinkRegex = /(!?)\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g
+const htmlAnchorRegex = /<a\b[^>]*\bhref\s*=\s*["']([^"']+)["'][^>]*>/gi
+
+function bodyOf(raw) {
+  const m = raw.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?([\s\S]*)$/)
+  return m ? m[1] : raw
+}
+
+function normalizeAuthorityUrl(url) {
+  // Strip the fragment and any trailing slash so two links to the same page
+  // (e.g. with/without a `#section` hash or trailing `/`) count once, not twice.
+  const path = url.pathname.replace(/\/+$/, '')
+  return `${url.hostname.toLowerCase()}${path}${url.search}`
+}
+
+function countAuthorityLinks(body) {
+  const found = new Set()
+  const collect = (href) => {
+    if (!/^https?:\/\//i.test(href)) return
+    try {
+      const url = new URL(href)
+      if (isAuthorityHost(url.hostname)) found.add(normalizeAuthorityUrl(url))
+    } catch {
+      // Malformed URL - not a citation either way.
+    }
+  }
+
+  mdLinkRegex.lastIndex = 0
+  let m
+  while ((m = mdLinkRegex.exec(body)) !== null) {
+    if (m[1] === '!') continue // skip images
+    collect(m[2])
+  }
+  htmlAnchorRegex.lastIndex = 0
+  while ((m = htmlAnchorRegex.exec(body)) !== null) collect(m[1])
+
+  return found.size
 }
 
 /**
@@ -211,6 +288,23 @@ for (const file of files) {
     const ogPath = join(PUBLIC_DIR, rel)
     if (!existsSync(ogPath)) {
       violation(file, `ogImage "${fm.ogImage}" not found under public/ (${ogPath})`)
+    }
+  }
+
+  // N1 citations: every non-draft post needs >=2 outbound links (in the
+  // body, not frontmatter) to an authority-allowlisted host - the cheapest
+  // AI-citation/GEO lever (see .kiro/content/BLOG-PUBLISHING-AND-SEO-CHECKS).
+  // `citationsExempt: true` grandfathers a post that legitimately has none
+  // yet (e.g. published before this check existed); remove the flag once
+  // real citations are added.
+  const citationsExempt = String(fm.citationsExempt).toLowerCase() === 'true'
+  if (!citationsExempt) {
+    const authorityLinkCount = countAuthorityLinks(bodyOf(raw))
+    if (authorityLinkCount < 2) {
+      violation(
+        file,
+        `only ${authorityLinkCount} outbound authority citation(s) found, need >=2 (allowlist: ${AUTHORITY_ALLOWLIST.join(', ')}) - add citations or set citationsExempt: true`,
+      )
     }
   }
 }
