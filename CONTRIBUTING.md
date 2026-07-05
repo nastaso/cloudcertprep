@@ -263,7 +263,7 @@ Always use the `Button` component from `src/components/Button.tsx` for any click
 
 ## What happens after you submit
 
-I review every PR personally. Small, focused PRs typically get a response within a week. I may ask for changes, especially around UX consistency. Don't take it personally; the goal is keeping the app coherent for everyone.
+I aim to give every new issue and PR a first triage response within 24 hours. I review every PR personally. Small, focused PRs typically get a response within a week. I may ask for changes, especially around UX consistency. Don't take it personally; the goal is keeping the app coherent for everyone.
 
 ## License
 

@@ -1,42 +1,56 @@
 /**
  * Centralized error logging.
- * - Development: Logs to console for debugging
- * - Production: Sends to Sentry if VITE_SENTRY_DSN is configured
- * 
- * To enable Sentry:
- * 1. Add @sentry/react to package.json
- * 2. Set VITE_SENTRY_DSN in .env
- * 3. Initialize Sentry in main.tsx before rendering
+ * - Development: logs to the console for debugging.
+ * - Production: routes to Umami (cookieless, CSP-allowlisted) via the existing
+ *   trackEvent('client_error', ...) pipeline, so client-side errors are visible
+ *   instead of vanishing. (Umami was chosen over Sentry: it is already loaded,
+ *   already CSP-allowlisted, and adds no dependency.)
+ *
+ * The payload carries the call-site `context` and a trimmed error `message`
+ * only - never PII, tokens, or full stacks - so no user data leaves the client.
  */
+import { trackEvent } from './analytics'
 
-interface SentryLike {
-  captureException(err: unknown, context?: { tags?: Record<string, string> }): void
-}
+/** Max characters of an error message forwarded to analytics (keeps the event
+ * payload lean and avoids dumping large strings into the events panel). */
+const MAX_MESSAGE_LEN = 200
 
-declare global {
-  interface Window {
-    Sentry?: SentryLike
+/** Reduce an unknown thrown value to a short, safe message string. */
+function toMessage(err: unknown): string {
+  let raw: string
+  if (err instanceof Error) raw = err.message || err.name
+  else if (typeof err === 'string') raw = err
+  else {
+    try {
+      raw = JSON.stringify(err) ?? String(err)
+    } catch {
+      raw = 'unstringifiable error'
+    }
   }
+  return raw.slice(0, MAX_MESSAGE_LEN)
 }
 
 export function logError(context: string, err: unknown): void {
-  // Always log to console in development
+  // Development: console for debugging (unchanged behavior).
   if (import.meta.env.DEV) {
     console.error(`[${context}]`, err)
+    return
   }
-  
-  // Send to Sentry in production if configured. Guard `window` so a call
-  // during prerender/SSR (no DOM) does not throw a ReferenceError.
-  if (import.meta.env.PROD && typeof window !== 'undefined' && window.Sentry) {
-    try {
-      window.Sentry.captureException(err, { tags: { context } })
-    } catch (sentryErr) {
-      // Fallback to console if Sentry fails
-      console.error('[Sentry Error]', sentryErr)
-      console.error(`[${context}]`, err)
-    }
-  } else if (import.meta.env.PROD) {
-    // Production without Sentry: at least log to console
+
+  // Production. Guard `window` so a call during prerender/SSR (no DOM) does not
+  // throw a ReferenceError; fall back to console there so the error still shows
+  // up in build logs.
+  if (typeof window === 'undefined') {
+    console.error(`[${context}]`, err)
+    return
+  }
+
+  // Route to Umami. trackEvent is a no-op if the tracker is not loaded, and is
+  // wrapped so telemetry can never itself throw and mask the original error.
+  try {
+    trackEvent('client_error', { context, message: toMessage(err) })
+  } catch (trackErr) {
+    console.error('[client_error tracking failed]', trackErr)
     console.error(`[${context}]`, err)
   }
 }
