@@ -24,6 +24,7 @@ import {
   Target,
 } from 'lucide-react'
 import { Alert } from './Alert'
+import { ErrorBoundary } from './ErrorBoundary'
 import { useAuth } from '../hooks/useAuth'
 import { trackEvent } from '../lib/analytics'
 import { getSupabase } from '../lib/supabase'
@@ -562,5 +563,9 @@ function CertDashboard({ cert }: { cert: CertDashboardCert }) {
 }
 
 export default function CertDashboardIsland({ cert }: { cert: CertDashboardCert }) {
-  return <CertDashboard cert={cert} />
+  return (
+    <ErrorBoundary>
+      <CertDashboard cert={cert} />
+    </ErrorBoundary>
+  )
 }
