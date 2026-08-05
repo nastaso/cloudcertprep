@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { trackEvent } from '../lib/analytics'
 import { logError } from '../lib/logger'
+import { ErrorBoundary } from './ErrorBoundary'
 
 declare global {
   interface Window {
@@ -97,5 +98,5 @@ export default function AnalyticsBootstrap() {
     }
   }, [])
 
-  return null
+  return <ErrorBoundary>{null}</ErrorBoundary>
 }

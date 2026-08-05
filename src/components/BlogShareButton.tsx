@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Share2, Check } from 'lucide-react'
 import { trackEvent } from '../lib/analytics'
 import { copyText } from '../lib/clipboard'
+import { ErrorBoundary } from './ErrorBoundary'
 
 interface BlogShareButtonProps {
   /** Post title, passed to navigator.share as the share sheet's title. */
@@ -55,13 +56,15 @@ export function BlogShareButton({ title, url }: BlogShareButtonProps) {
     copyState === 'copied' ? 'Copied' : copyState === 'failed' ? 'Could not copy' : 'Share'
 
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-border-hairline bg-bg-card px-5 text-sm font-medium text-text-muted transition-colors duration-200 hover:border-text-muted/40 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-muted/40"
-    >
-      <Icon className="h-4 w-4" aria-hidden="true" />
-      <span aria-live="polite">{shownLabel}</span>
-    </button>
+    <ErrorBoundary>
+      <button
+        type="button"
+        onClick={handleClick}
+        className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-border-hairline bg-bg-card px-5 text-sm font-medium text-text-muted transition-colors duration-200 hover:border-text-muted/40 hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-muted/40"
+      >
+        <Icon className="h-4 w-4" aria-hidden="true" />
+        <span aria-live="polite">{shownLabel}</span>
+      </button>
+    </ErrorBoundary>
   )
 }

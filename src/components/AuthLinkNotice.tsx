@@ -3,6 +3,7 @@ import { CheckCircle, AlertTriangle, X } from 'lucide-react'
 import { buttonClass } from '../lib/buttonStyles'
 import { useAuth } from '../hooks/useAuth'
 import { trackEvent } from '../lib/analytics'
+import { ErrorBoundary } from './ErrorBoundary'
 
 /**
  * Non-modal top notice: a dismissible toast pinned just below the header,
@@ -79,7 +80,7 @@ function readNoticeOnce(): Notice {
  * Home-side safety net for the two auth redirects that previously dead-ended on
  * the marketing home with no signal. Renders null for normal traffic.
  */
-export default function AuthLinkNotice() {
+function AuthLinkNoticeInner() {
   const [notice, setNotice] = useState<Notice>(readNoticeOnce)
 
   // Strip auth params from the URL and write the ack after mount so these
@@ -164,5 +165,13 @@ export default function AuthLinkNotice() {
       </a>
       <DismissButton onClick={() => setNotice(null)} />
     </TopNotice>
+  )
+}
+
+export default function AuthLinkNotice() {
+  return (
+    <ErrorBoundary>
+      <AuthLinkNoticeInner />
+    </ErrorBoundary>
   )
 }
