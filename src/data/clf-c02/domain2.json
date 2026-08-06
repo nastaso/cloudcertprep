@@ -2652,7 +2652,7 @@
   },
   {
     "id": "q808",
-    "question": "Which AWS service will provide a way to generate encryption keys that can be used to encrypt data?",
+    "question": "Which AWS services provide ways to generate encryption keys that can be used to encrypt data? (Select TWO)",
     "options": {
       "A": "Amazon Macie",
       "B": "AWS Certificate Manager",
