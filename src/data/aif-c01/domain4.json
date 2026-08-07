@@ -968,5 +968,35 @@
       "Amazon Augmented AI (Amazon A2I)",
       "Amazon SageMaker Model Cards"
     ]
-  }
+  },
+  {
+  "id": "aif-q465",
+  "question": "A company's board of directors has no data science background but needs to understand how each input variable influences a demand forecasting model's predictions. Which approach best meets this requirement?",
+  "options": {
+    "A": "Share the raw Python training code and hyperparameter configuration",
+    "B": "Generate Partial Dependence Plots showing how each feature affects the predicted output",
+    "C": "Provide a sample of the raw training dataset",
+    "D": "Share model convergence tables showing loss and accuracy across training epochs"
+  },
+  "answer": "B",
+  "explanation": "Partial Dependence Plots show how a model's prediction changes as one input feature varies while other features are held constant, producing a simple visual curve that non-technical stakeholders can interpret without needing to understand the underlying math. Amazon SageMaker Clarify can generate these plots automatically as part of its explainability reporting.\nRaw training code and convergence tables are development artifacts meant for data scientists, not business audiences, and a sample of training data shows what the model was fed rather than what it learned or how it uses that information to make predictions.",
+  "isMultiAnswer": false,
+  "taskStatement": "4.2",
+  "services": ["Amazon SageMaker Clarify"]
+},
+  {
+  "id": "aif-q466",
+  "question": "A healthcare company deploys an AI diagnostic tool and requires that a clinician always review and approve the model's suggestion before it becomes final. Which AWS service supports this requirement?",
+  "options": {
+    "A": "Amazon SageMaker Model Monitor",
+    "B": "Amazon Augmented AI (A2I)",
+    "C": "Amazon Bedrock Guardrails",
+    "D": "AWS Audit Manager"
+  },
+  "answer": "B",
+  "explanation": "Amazon Augmented AI, also known as A2I, introduces human review into an AI workflow by routing model outputs to a human reviewer before a decision is finalized, which directly supports the requirement for mandatory clinician approval.\nModel Monitor tracks data drift and model quality after deployment rather than inserting a human into each decision, Bedrock Guardrails filters generative model output for safety rather than routing decisions to a person, and Audit Manager collects compliance evidence rather than performing real time human review of individual predictions.",
+  "isMultiAnswer": false,
+  "taskStatement": "4.1",
+  "services": ["Amazon Augmented AI (A2I)"]
+}
 ]
