@@ -1,5 +1,6 @@
 import { useExamActive } from '../hooks/useExamActive'
 import { DonateButton } from './DonateButton'
+import { ErrorBoundary } from './ErrorBoundary'
 
 /**
  * Thin island wrapper for mounting the floating DonateButton inside Astro
@@ -9,5 +10,9 @@ import { DonateButton } from './DonateButton'
  */
 export default function DonateButtonIsland({ pathname }: { pathname?: string }) {
   const isExamActive = useExamActive()
-  return <DonateButton isExamActive={isExamActive} pathname={pathname} />
+  return (
+    <ErrorBoundary>
+      <DonateButton isExamActive={isExamActive} pathname={pathname} />
+    </ErrorBoundary>
+  )
 }
