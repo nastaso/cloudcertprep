@@ -809,7 +809,7 @@
   },
   {
     "id": "q231",
-    "question": "Which of the following services will help businesses ensure compliance in AWS?",
+    "question": "Which of the following services helps businesses demonstrate compliance by providing an auditable record of account and API activity in AWS?",
     "options": {
       "A": "Amazon CloudFront",
       "B": "AWS Migration Hub",
@@ -1392,7 +1392,7 @@
       "D",
       "E"
     ],
-    "explanation": "If unrecognized resources appear in your AWS account, this may indicate a security compromise where an attacker has gained access and is creating resources, so you should change your root account password and access keys immediately to revoke the attacker's access and protect the account.\nClosing the account immediately would permanently terminate all resources and data without first investigating the extent of the compromise or recovering any workloads, making it a disproportionate response before proper incident response steps have been completed. Removing all IAM users from the account would lock out your legitimate team members and prevent any investigation or remediation work from being performed, making incident response significantly harder without actually addressing the underlying security compromise. Opening a new root account does not address the compromised account, as the original account with its resources and data would still be exposed; incident response requires securing the existing account rather than abandoning it.",
+    "explanation": "Unrecognized resources can mean an attacker has gained access to the account, so the priority is to revoke that access and remove the attacker's foothold. AWS guidance for unauthorized activity is to change the root user password and the passwords of the IAM users you created, rotate their access keys, and deactivate or delete any IAM users you did not create, which is what opening an investigation and removing the compromised IAM users accomplishes.\nStopping all running services does not revoke the attacker's credentials, so the attacker can simply restart or recreate the resources; it also takes down legitimate production workloads before the compromise has been scoped. Giving your root account password to AWS Support is never correct, because AWS Support will never ask for your password and sharing root credentials widens the compromise rather than containing it. Reviewing the CloudTrail logs is genuinely part of incident response and is how you identify which credentials were used, but the same option also deletes every IAM user with access to your resources, which would lock out your legitimate team and block the investigation; AWS advises deactivating the IAM users you did not create, not all of them.",
     "isMultiAnswer": true
   },
   {
@@ -2983,7 +2983,7 @@
       "D": "AWS Certificate Manager"
     },
     "answer": "C",
-    "explanation": "AWS KMS manages encryption keys and integrates natively with CloudTrail to encrypt log files stored in S3, ensuring that CloudTrail log data is protected at rest using KMS-managed keys.\nAWS Certificate Manager provisions and manages SSL/TLS certificates for encrypting data in transit between applications and end users, and is a certificate management service rather than a service for encrypting data received and stored by CloudTrail. Amazon Macie uses machine learning to discover and classify sensitive data stored in S3, and while it can identify sensitive content in CloudTrail logs stored in S3, it does not perform the encryption of that data. AWS Shield provides managed DDoS protection at the network and transport layers, and is a traffic protection service with no capability to encrypt data stored by CloudTrail or any other AWS service.",
+    "explanation": "AWS KMS manages encryption keys and integrates natively with CloudTrail to encrypt log files stored in S3, ensuring that CloudTrail log data is protected at rest using KMS-managed keys. CloudTrail calls this server-side encryption with a KMS key (SSE-KMS), and you choose the KMS key the trail uses.\nAWS Secrets Manager stores, rotates, and manages access to secrets such as database credentials and API keys. It protects those secrets using KMS, but it is not the service that encrypts the log data CloudTrail delivers. AWS Systems Manager provides operational management for EC2 instances and other resources, covering patching, run commands, and parameter storage, and is an operations and configuration service with no role in encrypting CloudTrail logs. AWS Certificate Manager provisions and manages SSL/TLS certificates for encrypting data in transit between applications and end users, and is a certificate management service rather than a service for encrypting data received and stored by CloudTrail.",
     "isMultiAnswer": false
   },
   {

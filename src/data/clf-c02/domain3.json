@@ -466,7 +466,7 @@
     "options": {
       "A": "Amazon Rekognition provides automatic watermarking of images",
       "B": "Amazon Rekognition provides automatic detection of objects appearing in pictures",
-      "C": "Amazon Recognition provides the ability to resize millions of images automatically",
+      "C": "Amazon Rekognition provides the ability to resize millions of images automatically",
       "D": "Amazon Rekognition uses Amazon Mechanical Turk to allow humans to bid on object detection jobs"
     },
     "answer": "B",
@@ -2534,8 +2534,8 @@
       "C": "There is no charge when your AWS Lambda code is not running",
       "D": "AWS Lambda can be called directly from any mobile app"
     },
-    "answer": "D",
-    "explanation": "AWS Lambda functions cannot be invoked directly from a mobile app without using an intermediary API layer such as Amazon API Gateway or AWS AppSync; direct invocation from arbitrary external code is not supported, making this statement false rather than a genuine benefit.\nLambda running code without provisioning or managing servers is a genuine benefit; it eliminates the need to select, patch, or maintain underlying compute infrastructure. Lambda does provide resizable compute capacity, automatically scaling from a few requests per day to thousands per second based on the incoming trigger volume. There is genuinely no charge when Lambda code is not running; billing is based on the number of requests and the duration of execution, making it cost-free during idle periods.",
+    "answer": "B",
+    "explanation": "Resizable compute capacity in the cloud is how AWS describes Amazon EC2, not AWS Lambda. With EC2 you choose an instance type and resize it as your needs change, which is the capacity model the phrase refers to. Lambda works the other way round: you never provision or resize a pool of compute capacity, and Lambda simply runs as many concurrent execution environments as the incoming request volume requires. This statement borrows the EC2 description, so it is the one that is not a benefit of Lambda.\nRunning code without provisioning or managing servers is AWS's headline description of Lambda and a genuine benefit, since Lambda manages the underlying infrastructure including capacity provisioning, patching, and scaling. There is genuinely no charge when your Lambda code is not running, because billing is based on the number of requests and the duration of execution, so an idle function costs nothing. Lambda can be called directly from a mobile app; AWS documents that you can set up your code to trigger automatically from other AWS services or call it directly from any web or mobile app, using the AWS SDK with credentials from a service such as Amazon Cognito.",
     "isMultiAnswer": false
   },
   {

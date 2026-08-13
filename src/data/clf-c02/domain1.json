@@ -1001,7 +1001,7 @@
   },
   {
     "id": "q583",
-    "question": "What costs are included when comparing AWS Total Cost of Ownership (TCO) with on-premises TCO?",
+    "question": "In a Total Cost of Ownership (TCO) comparison, which cost does a company stop paying for directly when it moves a workload out of its own data center and onto AWS?",
     "options": {
       "A": "Project management",
       "B": "Antivirus software licensing",
