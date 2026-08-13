@@ -87,6 +87,10 @@ export const KNOWN_EVENTS = [
   'unlock_cta_clicked',      // guest sign-in nudge in practice/exam/header
   'weakest_domain_cta_clicked', // "next up" CTA (surface: dashboard | exam_results;
                                  // variant: weakest | unstarted)
+  'review_queue_cta_clicked',   // dashboard "Review now" CTA on the due-for-review
+                                 // surface (surface: dashboard)
+  'cross_cert_nudge_clicked',   // sibling-cert nudge on the dashboard + post-pass
+                                 // results (surface: dashboard | exam_results; to: cert code)
   'share_result',            // results-screen share, pass-only (method: web_share | clipboard; params: cert, authed)
   'post_share_clicked',      // blog post share/copy-link row (method: web_share | clipboard)
   'report_question_clicked',
