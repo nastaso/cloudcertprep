@@ -97,6 +97,33 @@ npm run validate
 
 CI runs the same check on every PR.
 
+## How the certification registry works
+
+`src/data/certifications.ts` is the source of truth for certification metadata, domain configuration, and generated certification assets. Each registry entry implements `Certification` and contains a `domains` array of `CertDomain` entries.
+
+| `Certification` field | Meaning |
+|---|---|
+| `code` | Lowercase certification identifier used in data paths and URLs, such as `clf-c02`. |
+| `provider` | Cloud provider that owns the certification, such as `aws`. |
+| `level` | Vendor difficulty tier used to group and order certifications. |
+| `name` | Full certification name displayed to users. |
+| `shortName` | Compact exam code displayed in navigation and labels. |
+| `examQuestionCount` | Number of questions in a full mock exam. |
+| `examTimeSeconds` | Time limit for a full mock exam, in seconds. |
+| `passingScore` | Scaled score required to pass. |
+| `status` | Availability state: `active` or `coming-soon`. |
+| `domains` | Ordered list of the certification's exam domains. |
+
+| `CertDomain` field | Meaning |
+|---|---|
+| `id` | Numeric domain identifier matched by question files and loaders. |
+| `name` | Domain name displayed in practice and reporting views. |
+| `questionCount` | Number of available practice questions for the domain. |
+| `examProportion` | Fraction of a generated mock exam assigned to the domain, such as `0.24` for 24%. |
+| `weight` | Optional official exam-guide percentage shown in landing-page copy, such as `24` for 24%. |
+
+`examProportion` controls CloudCertPrep's mock-exam question mix, while `weight` records the official exam-guide percentage; they are related values with distinct purposes. The cert switcher stays hidden while only one certification is `active` and appears when a second certification becomes active. `src/lib/generated/question-counts.ts` is generated from the registry during the build and must never be edited by hand.
+
 ## Adding a new certification
 
 Five steps:
