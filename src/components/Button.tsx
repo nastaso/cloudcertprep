@@ -86,12 +86,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {loading ? (
         <>
           <ButtonSpinner />
-          {loadingText ?? children}
+          {/* Google Translate replaces text children with <font> nodes. Keep
+              the label inside a stable element so React removes the wrapper,
+              rather than a translated text node, when loading changes. */}
+          <span>{loadingText ?? children}</span>
         </>
       ) : (
         <>
           {leftIcon}
-          {children}
+          <span>{children}</span>
           {rightIcon}
           {arrow && <ButtonArrow />}
         </>

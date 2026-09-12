@@ -2,6 +2,31 @@ import { test, expect, type Route } from '@playwright/test'
 import { seedSession } from './seededSession'
 
 /**
+ * Chrome's Google Translate replaces text nodes with nested <font> elements.
+ * React can otherwise retain a stale reference to the original text node when
+ * a component later swaps a conditional label.
+ */
+async function emulateGoogleTranslate(page: import('@playwright/test').Page): Promise<void> {
+  await page.locator('body').evaluate(() => {
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+    const textNodes: Text[] = []
+
+    while (walker.nextNode()) {
+      const node = walker.currentNode
+      if (node.nodeValue?.trim()) textNodes.push(node as Text)
+    }
+
+    for (const textNode of textNodes) {
+      const outerFont = document.createElement('font')
+      const innerFont = document.createElement('font')
+      innerFont.textContent = textNode.nodeValue
+      outerFont.append(innerFont)
+      textNode.parentNode?.replaceChild(outerFont, textNode)
+    }
+  })
+}
+
+/**
  * PR-2: localStorage crash safety + stuck dashboard error state.
  * Runs in CI with the seeded-session fixture (no real backend / Turnstile).
  * Source: EDGE-CASE-FINDINGS-2026-06-28.md, surfaces 3 + 7.
@@ -10,6 +35,46 @@ import { seedSession } from './seededSession'
 // ---------------------------------------------------------------------------
 // Storage crash safety: theme toggle with localStorage blocked
 // ---------------------------------------------------------------------------
+
+test('footer theme toggle survives Google Translate DOM changes', async ({ page }) => {
+  const pageErrors: Error[] = []
+  page.on('pageerror', error => pageErrors.push(error))
+
+  await page.goto('/')
+
+  const toggle = page.getByRole('button', { name: 'Switch to dark mode' })
+  await expect(toggle).toBeVisible({ timeout: 15000 })
+  await emulateGoogleTranslate(page)
+
+  await toggle.click()
+
+  await expect(page.getByRole('button', { name: 'Switch to light mode' })).toBeVisible()
+  expect(pageErrors).toEqual([])
+})
+
+test('practice exam starts and advances after Google Translate DOM changes', async ({ page }) => {
+  await page.goto('/aws/clf-c02/practice-exam')
+
+  const startExam = page.getByRole('button', { name: 'Start exam' })
+  await expect(startExam).toBeVisible({ timeout: 15000 })
+
+  // Starting the exam swaps the button label for its loading state. Without a
+  // stable label wrapper, React tries to remove the text node that Translate
+  // already replaced and the app ErrorBoundary takes over.
+  await emulateGoogleTranslate(page)
+  await startExam.click()
+  await expect(page.getByText('Question 1 of 65', { exact: true })).toBeVisible({ timeout: 15000 })
+
+  // Translate also processes the freshly-rendered question and answer text.
+  // Moving to the next question must replace those values rather than leaving
+  // the previous question visible inside nested <font> elements.
+  await emulateGoogleTranslate(page)
+  await page.getByRole('button', { name: 'Next' }).click()
+
+  await expect(page.getByText('Question 2 of 65', { exact: true })).toBeVisible()
+  await expect(page.locator('h2.cc-question-stem')).toContainText('A company has users across multiple geographic regions')
+  await expect(page.getByText(/something went wrong/i)).toHaveCount(0)
+})
 
 test('useTheme: theme toggles without crashing when localStorage is blocked', async ({ page }) => {
   // Proxy localStorage so setItem throws a SecurityError (storage-blocked browser).

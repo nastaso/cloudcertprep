@@ -1023,10 +1023,10 @@ export function MockExam() {
           <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
               <span className="text-text-primary text-sm md:text-base font-medium whitespace-nowrap">
-                Question {currentIndex + 1} of {questions.length}
+                <span>{`Question ${currentIndex + 1} of ${questions.length}`}</span>
               </span>
               <span className="text-text-muted text-xs hidden sm:inline whitespace-nowrap">
-                {answeredCount} answered
+                <span>{`${answeredCount} answered`}</span>
               </span>
             </div>
             <div className="flex items-center gap-3 md:gap-4">
@@ -1036,7 +1036,7 @@ export function MockExam() {
                   timer.seconds < TIMER_PULSE_THRESHOLD ? 'text-warning animate-pulse' : 'text-text-primary'
                 }`}
               >
-                {formatTime(timer.seconds)}
+                <span>{formatTime(timer.seconds)}</span>
               </div>
               <TimerAnnouncer seconds={timer.seconds} />
               <Button onClick={() => setShowEndModal(true)} variant="secondary" size="sm">
@@ -1072,7 +1072,9 @@ export function MockExam() {
                 <LayoutGrid className="w-4 h-4" aria-hidden="true" />
                 View all questions
               </span>
-              <span className="font-mono text-xs text-text-muted tabular-nums">{answeredCount}/{questions.length}</span>
+              <span className="font-mono text-xs text-text-muted tabular-nums">
+                <span>{`${answeredCount}/${questions.length}`}</span>
+              </span>
             </Button>
 
             <Card className="mb-3">
@@ -1083,7 +1085,7 @@ export function MockExam() {
                   question stem forces an early break with a big trailing gap (reads
                   as "wrapped wrong"). Body-length text wants greedy wrapping. */}
               <h2 className="cc-question-stem text-base md:text-lg text-text-primary mb-4 md:mb-5">
-                {currentQuestion.question}
+                <span>{currentQuestion.question}</span>
                 {currentType === 'multi' && (
                   <span className="text-text-primary font-semibold ml-2">(Select {Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER})</span>
                 )}
@@ -1143,10 +1145,10 @@ export function MockExam() {
                   <div className="mb-3 text-xs md:text-sm text-text-muted">
                     {Array.isArray(currentState?.userAnswer) && currentState.userAnswer.length > 0 ? (
                       <span className="text-text-primary font-medium">
-                        {currentState.userAnswer.length}/{requiredCount} answers selected
+                        <span>{`${currentState.userAnswer.length}/${requiredCount} answers selected`}</span>
                       </span>
                     ) : (
-                      <span>Select {requiredCount} answers</span>
+                      <span>{`Select ${requiredCount} answers`}</span>
                     )}
                   </div>
                 )
@@ -1158,9 +1160,9 @@ export function MockExam() {
                 return (
                   <div className="mb-3 text-xs md:text-sm text-text-muted">
                     {selectedCount > 0 ? (
-                      <span className="text-text-primary font-medium">{selectedCount}/{leftCount} matched</span>
+                      <span className="text-text-primary font-medium"><span>{`${selectedCount}/${leftCount} matched`}</span></span>
                     ) : (
-                      <span>Match all {leftCount} items</span>
+                      <span>{`Match all ${leftCount} items`}</span>
                     )}
                   </div>
                 )

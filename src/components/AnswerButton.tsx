@@ -51,7 +51,7 @@ export function AnswerButton({ label, text, state, onClick, disabled, compact }:
         {label}
       </span>
       <div className={`flex-1 text-text-primary ${compact ? 'pt-0' : 'pt-0 md:pt-0.5'}`}>
-        {text}
+        <span>{text}</span>
       </div>
       {/* Non-color cue for the graded states (color alone fails colorblind
           users): a check on the correct answer, an X on a wrong pick. */}
