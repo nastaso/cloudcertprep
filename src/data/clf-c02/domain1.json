@@ -50,6 +50,7 @@
     "answer": "C",
     "explanation": "Elasticity is the cloud best practice of dynamically adjusting compute capacity up or down in response to demand, avoiding over-provisioning during low-traffic periods and under-provisioning during peaks, which directly reduces cost.\nBuild security in every layer is the Defense in Depth principle from the Security pillar of the Well-Architected Framework, which addresses threat protection rather than capacity management. Parallelizing tasks is a performance design principle that distributes workloads across multiple smaller components to increase throughput, not a mechanism for dynamically adjusting capacity to control costs. Adopting monolithic architecture consolidates all application components into a single tightly coupled unit, which is the opposite of a cloud best practice and does not support dynamic scaling.",
     "isMultiAnswer": false,
+    "lastVerified": "2026-10-02",
     "services": []
   },
   {
@@ -2611,5 +2612,23 @@
     "answer": "B",
     "explanation": "Rehosting, or lift and shift, moves the application to AWS without any changes to the code or architecture, while replatforming, or lift, tinker, and shift, makes targeted optimizations during migration such as switching to a managed database or changing the caching layer, without fundamentally redesigning the application.\nRehosting does not change any application code, and replatforming makes only targeted changes, so the first option reverses the relationship between the two strategies. Rehosting moves the existing application to the cloud rather than replacing it with SaaS, which would be the repurchase strategy. Rehosting is generally faster than replatforming because it requires fewer changes and less testing, not slower, since the application is moved without modification.",
     "isMultiAnswer": false
+  },
+  {
+    "id": "q1142",
+    "question": "A company runs an Amazon EC2 workload that is consistently using only a small fraction of its instance capacity. Which AWS cost optimization practice should the company use to reduce spending?",
+    "options": {
+      "A": "Rightsizing",
+      "B": "Overprovisioning",
+      "C": "Data duplication",
+      "D": "Vertical sharding"
+    },
+    "answer": "A",
+    "explanation": "Rightsizing means selecting an instance type and size that matches the workload's actual performance and capacity requirements. Moving an underutilized EC2 workload to a smaller suitable instance can reduce spending without changing the application's purpose.\nOverprovisioning increases cost by allocating more capacity than the workload needs. Data duplication creates additional storage and processing requirements rather than optimizing compute costs. Vertical sharding is a database partitioning technique, not an AWS cost optimization practice for selecting EC2 capacity.",
+    "isMultiAnswer": false,
+    "taskStatement": "1.4",
+    "lastVerified": "2026-10-02",
+    "services": [
+      "Amazon EC2"
+    ]
   }
 ]

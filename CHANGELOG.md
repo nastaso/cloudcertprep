@@ -65,6 +65,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Internal
 
+- CLF-C02 contribution update: verified q013 and recorded its 2026-10-02
+  verification date, tagged q003 with AWS CloudTrail, and added q1142 covering
+  EC2 rightsizing under task statement 1.4. The CLF-C02 bank now contains 1,051
+  questions, with generated counts, freshness metadata, sitemap, manifest, and
+  llms.txt assets regenerated. Question-bank validation passes; the remaining
+  warnings apply only to placeholder SAA-C03 explanations.
 - Service-metadata tagging for CLF-C02 questions q013, q015, and q023 (#49, #68, #86).
 - Extracted spaced-repetition question selection into a tested pure function (#82).
 - Added unit coverage for the exam leave guard, the groupBy helper, the SEO URL builders, and relative-date formatting (#54, #55, #64, #85).
