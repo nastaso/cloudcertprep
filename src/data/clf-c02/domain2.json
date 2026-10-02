@@ -10,7 +10,10 @@
     },
     "answer": "B",
     "explanation": "AWS CloudTrail records all API calls and account activity across an AWS environment, capturing who performed each action, from which IP address, and at what time, making it the definitive source for identifying who terminated EC2 instances.\nAmazon Inspector is an automated security assessment service that scans EC2 instances and container images for software vulnerabilities and unintended network exposure, and does not record who performed API actions or management events. AWS Trusted Advisor inspects your AWS environment and provides recommendations across security, cost, performance, and fault tolerance, and is an advisory tool rather than an audit log of account activity. EC2 Instance Usage Report provides billing and usage data about EC2 instances and does not contain API call logs or identity information about who terminated instances.",
-    "isMultiAnswer": false
+    "isMultiAnswer": false,
+    "services": [
+      "AWS CloudTrail"
+    ]
   },
   {
     "id": "q005",

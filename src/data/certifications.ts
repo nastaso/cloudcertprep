@@ -171,7 +171,7 @@ export const CERTIFICATIONS: Record<string, Certification> = {
     examTimeSeconds: 90 * 60,
     passingScore: 700,
     domains: [
-      { id: 1, name: 'Cloud Concepts', questionCount: 187, examProportion: 0.24, weight: 24, taskRange: '1.1-1.4', blurb: 'what the AWS Cloud offers, the Cloud Adoption Framework, and core design ideas like elasticity, high availability, and why cloud can cost less than your own servers' },
+      { id: 1, name: 'Cloud Concepts', questionCount: 188, examProportion: 0.24, weight: 24, taskRange: '1.1-1.4', blurb: 'what the AWS Cloud offers, the Cloud Adoption Framework, and core design ideas like elasticity, high availability, and why cloud can cost less than your own servers' },
       { id: 2, name: 'Security & Compliance', questionCount: 247, examProportion: 0.30, weight: 30, taskRange: '2.1-2.4', blurb: 'the AWS shared responsibility model, identity and access management, encryption, and the AWS tools that keep cloud workloads secure and compliant' },
       { id: 3, name: 'Cloud Technology & Services', questionCount: 384, examProportion: 0.34, weight: 34, taskRange: '3.1-3.8', blurb: 'the main AWS compute, storage, networking, and database services, the ways to deploy and run workloads on AWS, and how to pick the right service for a job' },
       { id: 4, name: 'Billing, Pricing & Support', questionCount: 232, examProportion: 0.12, weight: 12, taskRange: '4.1-4.3', blurb: 'how AWS pricing works, the free tier, the tools for tracking and managing costs, and the support plans AWS customers can choose from' },

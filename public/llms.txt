@@ -1,6 +1,6 @@
 # CloudCertPrep
 
-> Free open-source AWS certification practice exams: 1,050+ Cloud Practitioner (CLF-C02) and 419+ AI Practitioner (AIF-C01) questions. No signup, no ads. Maintained by Alex Santonastaso, CloudCertPrep keeps every question bank MIT licensed and publicly auditable on GitHub, with domain-by-domain practice driven by adaptive spaced repetition.
+> Free open-source AWS certification practice exams: 1,051+ Cloud Practitioner (CLF-C02) and 419+ AI Practitioner (AIF-C01) questions. No signup, no ads. Maintained by Alex Santonastaso, CloudCertPrep keeps every question bank MIT licensed and publicly auditable on GitHub, with domain-by-domain practice driven by adaptive spaced repetition.
 
 ## Pages
 
@@ -22,7 +22,7 @@
 - [Security & Compliance](https://www.cloudcertprep.io/aws/clf-c02/security-and-compliance): Security & Compliance free practice questions with explanations
 - [Cloud Technology & Services](https://www.cloudcertprep.io/aws/clf-c02/cloud-technology-and-services): Cloud Technology & Services free practice questions with explanations
 - [Billing, Pricing & Support](https://www.cloudcertprep.io/aws/clf-c02/billing-pricing-and-support): Billing, Pricing & Support free practice questions with explanations
-- Question Bank: 1050 questions across 4 domains (Cloud Concepts, Security & Compliance, Cloud Technology & Services, Billing, Pricing & Support)
+- Question Bank: 1051 questions across 4 domains (Cloud Concepts, Security & Compliance, Cloud Technology & Services, Billing, Pricing & Support)
 
 **AWS Certified AI Practitioner (AIF-C01)**
 - [Certification Home](https://www.cloudcertprep.io/aws/aif-c01): 65 questions, 90 minutes, scaled scoring (700/1000 to pass)
@@ -71,7 +71,7 @@ See CONTRIBUTING.md in the repository at https://github.com/nastaso/cloudcertpre
 
 ### What is the format of the AWS Cloud Practitioner practice exams?
 
-Practice exams mirror the real AWS Cloud Practitioner (CLF-C02) exam: 65 multiple-choice and multiple-response questions in 90 minutes, scaled scoring from 100 to 1000 with a 700 passing threshold. With 1,050+ questions in the pool, you get over 10^100 possible exam combinations.
+Practice exams mirror the real AWS Cloud Practitioner (CLF-C02) exam: 65 multiple-choice and multiple-response questions in 90 minutes, scaled scoring from 100 to 1000 with a 700 passing threshold. With 1,051+ questions in the pool, you get over 10^100 possible exam combinations.
 
 ### How accurate is this as an AWS Cloud Practitioner exam simulator?
 
