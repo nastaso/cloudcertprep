@@ -57,13 +57,20 @@ export function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps) 
           return (
             <li key={c.key} className="flex items-center gap-1.5 text-xs">
               {ok ? (
-                <Check className="w-3.5 h-3.5 text-success flex-shrink-0" />
+                <Check
+                  className="w-3.5 h-3.5 text-success flex-shrink-0"
+                  aria-hidden="true"
+                />
               ) : (
-                <X className="w-3.5 h-3.5 text-text-muted flex-shrink-0" />
+                <X
+                  className="w-3.5 h-3.5 text-text-muted flex-shrink-0"
+                  aria-hidden="true"
+                />
               )}
               <span className={ok ? 'text-text-primary' : 'text-text-muted'}>
                 {c.text}
               </span>
+              <span className="sr-only">, {ok ? 'met' : 'not met'}</span>
             </li>
           )
         })}

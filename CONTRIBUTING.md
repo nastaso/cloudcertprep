@@ -97,6 +97,33 @@ npm run validate
 
 CI runs the same check on every PR.
 
+## How the certification registry works
+
+`src/data/certifications.ts` is the source of truth for certification metadata, domain configuration, and generated certification assets. Each registry entry implements `Certification` and contains a `domains` array of `CertDomain` entries.
+
+| `Certification` field | Meaning |
+|---|---|
+| `code` | Lowercase certification identifier used in data paths and URLs, such as `clf-c02`. |
+| `provider` | Cloud provider that owns the certification, such as `aws`. |
+| `level` | Vendor difficulty tier used to group and order certifications. |
+| `name` | Full certification name displayed to users. |
+| `shortName` | Compact exam code displayed in navigation and labels. |
+| `examQuestionCount` | Number of questions in a full mock exam. |
+| `examTimeSeconds` | Time limit for a full mock exam, in seconds. |
+| `passingScore` | Scaled score required to pass. |
+| `status` | Availability state: `active` or `coming-soon`. |
+| `domains` | Ordered list of the certification's exam domains. |
+
+| `CertDomain` field | Meaning |
+|---|---|
+| `id` | Numeric domain identifier matched by question files and loaders. |
+| `name` | Domain name displayed in practice and reporting views. |
+| `questionCount` | Number of available practice questions for the domain. |
+| `examProportion` | Fraction of a generated mock exam assigned to the domain, such as `0.24` for 24%. |
+| `weight` | Optional official exam-guide percentage shown in landing-page copy, such as `24` for 24%. |
+
+`examProportion` controls CloudCertPrep's mock-exam question mix, while `weight` records the official exam-guide percentage; they are related values with distinct purposes. `src/lib/generated/question-counts.ts` is generated from the registry during the build and must never be edited by hand.
+
 ## Adding a new certification
 
 Five steps:
@@ -137,7 +164,7 @@ Five steps:
    ```
 5. **Run `npm run validate` and `npm run build`** to confirm everything works. Open a PR.
 
-The cert switcher, mock exam, domain practice, history, and stats pages all pick up the new cert automatically once the cert config, question files, and loaders are wired. The cert switcher is hidden while only one cert has `status: 'active'` and re-appears automatically once a second cert is flipped to active. No frontend or backend code changes are needed regardless of how many domains the cert has; the `exam_attempts.domain_scores` JSONB column scales per-cert. The sitemap (`public/sitemap.xml`), per-cert question counts (`src/lib/generated/question-counts.ts`), `public/llms.txt`, `public/manifest.json`, and `public/_redirects` are all regenerated from `certifications.ts` via `scripts/generate-seo-assets.mjs` (wired as `prebuild`) and will include the new cert's routes automatically.
+The cert switcher, mock exam, domain practice, history, and stats pages all pick up the new cert automatically once the cert config, question files, and loaders are wired. No frontend or backend code changes are needed regardless of how many domains the cert has; the `exam_attempts.domain_scores` JSONB column scales per-cert. The sitemap (`public/sitemap.xml`), per-cert question counts (`src/lib/generated/question-counts.ts`), `public/llms.txt`, `public/manifest.json`, and `public/_redirects` are all regenerated from `certifications.ts` via `scripts/generate-seo-assets.mjs` (wired as `prebuild`) and will include the new cert's routes automatically.
 
 ## Adding a blog post
 
