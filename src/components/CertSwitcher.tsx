@@ -206,7 +206,7 @@ export function CertSwitcher({ variant, onSelect, initialPathname }: CertSwitche
                       Soon
                     </span>
                   )}
-                  {isActive && <Check className="w-4 h-4 text-brand ml-2" />}
+                  {isActive && <Check className="w-4 h-4 text-brand ml-2" aria-hidden="true" />}
                 </button>
               </li>
             )
