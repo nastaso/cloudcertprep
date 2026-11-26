@@ -48,10 +48,13 @@ One row per question shown in an attempt. Used for History review and `domain_pr
 | `correct_answer` | `text` NOT NULL | Same encoding |
 | `is_correct` | `boolean` NOT NULL | |
 | `was_flagged` | `boolean` NOT NULL DEFAULT `false` | User flagged for review during exam |
+| `created_at` | `timestamptz` DEFAULT `now()` | When the answer was saved |
 
 **RLS:** enabled. `auth.uid() = user_id`.
 
-**Indexes:** `(attempt_id)`, `(user_id, domain_id, cert_code)` for the mastery query in `useSpacedRepetition`.
+**Indexes:** `(attempt_id)`, `(user_id, domain_id, cert_code)` for the mastery query in `useSpacedRepetition`, and `(user_id, created_at DESC) WHERE user_id IS NOT NULL`.
+
+Two older indexes were dropped on 2026-11-26 to stay under the 500 MB free-plan limit: `idx_aq_user_question` `(user_id, question_id)` had never been used (0 scans, 77 MB), and `idx_aq_user_domain` `(user_id, domain_id)` repeated the start of `(user_id, domain_id, cert_code)`, which serves the same lookups (17 MB). To restore them: `create index concurrently idx_aq_user_question on public.attempt_questions (user_id, question_id);` and `create index concurrently idx_aq_user_domain on public.attempt_questions (user_id, domain_id);`
 
 ---
 
@@ -97,6 +100,8 @@ Single-row singleton table with aggregate counters. Trigger-maintained on insert
 | `total_exams_passed` | `integer` NOT NULL | |
 
 **RLS:** SELECT allowed for `anon` and `authenticated`.
+
+**`increment_platform_stat(text, integer)`:** `SECURITY DEFINER`, owned by `postgres`. Since 2026-11-26 `EXECUTE` is revoked from `anon`, `authenticated` and `PUBLIC`, so a visitor can no longer change the counters through the Data API. The owner `postgres` keeps the right, and so do the trigger functions below, because they are `SECURITY DEFINER` functions owned by `postgres`. A fourth function, `on_question_answered()`, also calls it but no trigger uses it.
 
 > **Corrected 2026-07-02:** this table is the owner's private all-time cumulative
 > counter, not a page data source - no runtime code reads it. This note previously
