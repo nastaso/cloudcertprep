@@ -1,5 +1,6 @@
 import { useAuth } from '../hooks/useAuth'
 import { AccountLinkNotice } from './AccountLinkNotice'
+import { ErrorBoundary } from './ErrorBoundary'
 
 /**
  * Thin island wrapper for mounting AccountLinkNotice inside Astro pages.
@@ -10,5 +11,9 @@ import { AccountLinkNotice } from './AccountLinkNotice'
  */
 export default function AccountLinkNoticeIsland() {
   useAuth()
-  return <AccountLinkNotice />
+  return (
+    <ErrorBoundary>
+      <AccountLinkNotice />
+    </ErrorBoundary>
+  )
 }

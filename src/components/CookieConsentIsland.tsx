@@ -1,4 +1,5 @@
 import { CookieConsent } from './CookieConsent'
+import { ErrorBoundary } from './ErrorBoundary'
 
 /**
  * Thin island wrapper for mounting CookieConsent inside Astro pages.
@@ -6,5 +7,9 @@ import { CookieConsent } from './CookieConsent'
  * this is a simple re-export as a default export for Astro island usage.
  */
 export default function CookieConsentIsland() {
-  return <CookieConsent />
+  return (
+    <ErrorBoundary>
+      <CookieConsent />
+    </ErrorBoundary>
+  )
 }

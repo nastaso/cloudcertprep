@@ -18,6 +18,7 @@
  * document, not an SPA route.
  */
 import { useEffect, useState } from 'react'
+import { ErrorBoundary } from './ErrorBoundary'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { getSupabase } from '../lib/supabase'
@@ -189,5 +190,9 @@ function Strip(props: DomainProgressStripProps) {
 }
 
 export default function DomainProgressStrip(props: DomainProgressStripProps) {
-  return <Strip {...props} />
+  return (
+    <ErrorBoundary>
+      <Strip {...props} />
+    </ErrorBoundary>
+  )
 }

@@ -1,5 +1,6 @@
 import { useExamActive } from '../hooks/useExamActive'
 import { Footer } from './Footer'
+import { ErrorBoundary } from './ErrorBoundary'
 
 /**
  * Island wrapper for mounting Footer inside Astro pages. Subscribes to the
@@ -12,5 +13,9 @@ import { Footer } from './Footer'
 export default function FooterIsland() {
   const isExamActive = useExamActive()
   if (isExamActive) return null
-  return <Footer />
+  return (
+    <ErrorBoundary>
+      <Footer />
+    </ErrorBoundary>
+  )
 }

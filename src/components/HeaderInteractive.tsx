@@ -9,6 +9,7 @@ import { Menu, X, Heart, Sun, Moon, Github, History, Info, BookOpen, Home, UserC
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
 import { Button } from './Button'
+import { ErrorBoundary } from './ErrorBoundary'
 import { CertSwitcher } from './CertSwitcher'
 import { PracticeMenu } from './PracticeMenu'
 import { UserMenu } from './UserMenu'
@@ -102,6 +103,7 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
   }, [authLoading, user])
 
   return (
+    <ErrorBoundary>
     <>
       {/* Hamburger - mobile only. Available on EVERY route, including during an
           active timed exam, so a mobile user always has a menu affordance (bug
@@ -338,5 +340,6 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
         document.body,
       )}
     </>
+    </ErrorBoundary>
   )
 }
