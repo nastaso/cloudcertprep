@@ -122,7 +122,7 @@ CI runs the same check on every PR.
 | `examProportion` | Fraction of a generated mock exam assigned to the domain, such as `0.24` for 24%. |
 | `weight` | Optional official exam-guide percentage shown in landing-page copy, such as `24` for 24%. |
 
-`examProportion` controls CloudCertPrep's mock-exam question mix, while `weight` records the official exam-guide percentage; they are related values with distinct purposes. The cert switcher stays hidden while only one certification is `active` and appears when a second certification becomes active. `src/lib/generated/question-counts.ts` is generated from the registry during the build and must never be edited by hand.
+`examProportion` controls CloudCertPrep's mock-exam question mix, while `weight` records the official exam-guide percentage; they are related values with distinct purposes. `src/lib/generated/question-counts.ts` is generated from the registry during the build and must never be edited by hand.
 
 ## Adding a new certification
 
@@ -164,7 +164,7 @@ Five steps:
    ```
 5. **Run `npm run validate` and `npm run build`** to confirm everything works. Open a PR.
 
-The cert switcher, mock exam, domain practice, history, and stats pages all pick up the new cert automatically once the cert config, question files, and loaders are wired. The cert switcher is hidden while only one cert has `status: 'active'` and re-appears automatically once a second cert is flipped to active. No frontend or backend code changes are needed regardless of how many domains the cert has; the `exam_attempts.domain_scores` JSONB column scales per-cert. The sitemap (`public/sitemap.xml`), per-cert question counts (`src/lib/generated/question-counts.ts`), `public/llms.txt`, `public/manifest.json`, and `public/_redirects` are all regenerated from `certifications.ts` via `scripts/generate-seo-assets.mjs` (wired as `prebuild`) and will include the new cert's routes automatically.
+The cert switcher, mock exam, domain practice, history, and stats pages all pick up the new cert automatically once the cert config, question files, and loaders are wired. No frontend or backend code changes are needed regardless of how many domains the cert has; the `exam_attempts.domain_scores` JSONB column scales per-cert. The sitemap (`public/sitemap.xml`), per-cert question counts (`src/lib/generated/question-counts.ts`), `public/llms.txt`, `public/manifest.json`, and `public/_redirects` are all regenerated from `certifications.ts` via `scripts/generate-seo-assets.mjs` (wired as `prebuild`) and will include the new cert's routes automatically.
 
 ## Adding a blog post
 
