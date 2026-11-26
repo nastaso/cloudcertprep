@@ -39,7 +39,7 @@ export function Footer() {
               {theme === 'dark'
                 ? <Sun className="w-4 h-4" aria-hidden="true" />
                 : <Moon className="w-4 h-4" aria-hidden="true" />}
-              {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+              <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
             </button>
           </div>
 

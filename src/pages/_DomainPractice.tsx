@@ -732,7 +732,7 @@ export function DomainPractice() {
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-text-muted text-sm">
-                Question {currentIndex + 1} of {questions.length}
+                <span>{`Question ${currentIndex + 1} of ${questions.length}`}</span>
               </span>
             </div>
             {/* Advance when the current question is answered (showFeedback), so
@@ -744,7 +744,7 @@ export function DomainPractice() {
           {/* Question */}
           <Card className="mb-3">
             <h2 className="cc-question-stem text-base md:text-lg text-text-primary mb-4 md:mb-5">
-              {currentQuestion.question}
+              <span>{currentQuestion.question}</span>
               {currentType === 'multi' && (
                 <span className="text-text-primary font-semibold ml-2">(Select {Array.isArray(currentQuestion.answer) ? currentQuestion.answer.length : MAX_MULTI_ANSWER})</span>
               )}
@@ -822,10 +822,10 @@ export function DomainPractice() {
                 <div className="mb-3 text-xs md:text-sm text-text-muted">
                   {Array.isArray(userAnswer) && userAnswer.length > 0 ? (
                     <span className="text-text-primary font-medium" aria-live="polite" aria-atomic="true">
-                      {userAnswer.length}/{requiredCount} answers selected
+                      <span>{`${userAnswer.length}/${requiredCount} answers selected`}</span>
                     </span>
                   ) : (
-                    <span>Select {requiredCount} answers</span>
+                    <span>{`Select ${requiredCount} answers`}</span>
                   )}
                 </div>
               )
@@ -873,10 +873,10 @@ export function DomainPractice() {
                     <div className="mb-3 text-xs md:text-sm text-text-muted">
                       {selectedCount > 0 ? (
                         <span className="text-text-primary font-medium" aria-live="polite" aria-atomic="true">
-                          {selectedCount}/{leftCount} matched
+                          <span>{`${selectedCount}/${leftCount} matched`}</span>
                         </span>
                       ) : (
-                        <span>Match all {leftCount} items</span>
+                        <span>{`Match all ${leftCount} items`}</span>
                       )}
                     </div>
                   ) : !touched && (

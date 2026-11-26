@@ -96,7 +96,7 @@ export function UserMenu() {
             {theme === 'dark'
               ? <Sun className="h-4 w-4 shrink-0 text-text-muted" aria-hidden="true" />
               : <Moon className="h-4 w-4 shrink-0 text-text-muted" aria-hidden="true" />}
-            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
           </button>
           <div className="my-1.5 border-t border-border-hairline/70" />
           <button

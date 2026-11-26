@@ -288,7 +288,7 @@ export default function HeaderInteractive({ initialPathname }: { initialPathname
                 {theme === 'dark'
                   ? <Sun className="w-5 h-5 text-text-muted" aria-hidden="true" />
                   : <Moon className="w-5 h-5 text-text-muted" aria-hidden="true" />}
-                {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                <span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>
               </button>
             </nav>
 
