@@ -4,6 +4,7 @@ import {
   toggleMultiAnswer,
   toOriginalAnswer,
   shuffleQuestionOptions,
+  shuffleAndMapQuestions,
   getQuestionType,
   matchesToTokens,
   toOriginalMatchTokens,
@@ -154,6 +155,83 @@ describe('shuffleQuestionOptions', () => {
       )!
       expect(question.correctMatches![displayKey]).toBe(targetKey)
     }
+  })
+})
+
+describe('shuffleAndMapQuestions', () => {
+  const baseQuestion: Question = {
+    id: 'q1',
+    domainId: 1,
+    question: 'Sample',
+    options: { A: 'apple', B: 'banana', C: 'cherry', D: 'date', E: '' },
+    answer: 'B',
+    explanation: '',
+    isMultiAnswer: false,
+  }
+
+  it('creates one key map for each question ID', () => {
+    const questions = ['q1', 'q2', 'q3'].map(id => ({ ...baseQuestion, id }))
+
+    const { keyMaps } = shuffleAndMapQuestions(questions)
+
+    expect(keyMaps.size).toBe(3)
+    questions.forEach(question => {
+      expect(keyMaps.has(question.id)).toBe(true)
+    })
+  })
+
+  it('preserves every non-empty option value for each question', () => {
+    const questions = ['q1', 'q2', 'q3'].map((id, index) => ({
+      ...baseQuestion,
+      id,
+      options: {
+        A: `apple-${index}`,
+        B: `banana-${index}`,
+        C: `cherry-${index}`,
+        D: `date-${index}`,
+        E: '',
+      },
+    }))
+
+    const { questions: shuffled } = shuffleAndMapQuestions(questions)
+
+    questions.forEach((original, index) => {
+      const originalValues = Object.values(original.options).filter(value => value !== '').sort()
+      const shuffledValues = Object.values(shuffled[index].options).filter(value => value !== '').sort()
+      expect(shuffledValues).toEqual(originalValues)
+    })
+  })
+
+  it('round-trips a single answer to its original key', () => {
+    // Repeated rather than a single shuffle: the shuffle is random, and a
+    // broken toOriginalAnswer can still pass by luck whenever the shuffle
+    // happens to leave 'D' at 'D' (a fixed point) - confirmed by mutation
+    // testing, an identity-function toOriginalAnswer only failed this
+    // assertion on ~40% of single runs. Looping drives that false-negative
+    // probability to negligible.
+    for (let i = 0; i < 30; i++) {
+      const original: Question = { ...baseQuestion, id: 'single-round-trip', answer: 'D' }
+      const { questions, keyMaps } = shuffleAndMapQuestions([original])
+      const keyMap = keyMaps.get(original.id)
+
+      expect(keyMap).toBeDefined()
+      expect(toOriginalAnswer(questions[0].answer, keyMap!)).toBe('D')
+    }
+  })
+
+  it('round-trips a multi-answer set to its original keys', () => {
+    const original: Question = {
+      ...baseQuestion,
+      id: 'multi-round-trip',
+      answer: ['A', 'C'],
+      isMultiAnswer: true,
+    }
+    const { questions, keyMaps } = shuffleAndMapQuestions([original])
+    const keyMap = keyMaps.get(original.id)
+
+    expect(keyMap).toBeDefined()
+    const roundTripped = toOriginalAnswer(questions[0].answer, keyMap!) as string[]
+    expect([...roundTripped].sort()).toEqual([...(original.answer as string[])].sort())
   })
 })
 

@@ -8,6 +8,7 @@ import {
   isAnswerCorrect,
   correctAnswerFor,
   getExamDomainTargets,
+  selectExamQuestions,
   computeExamTiming,
 } from './scoring'
 import { MIN_VALID_EXAM_SECONDS } from './constants'
@@ -103,6 +104,91 @@ describe('getExamDomainTargets', () => {
     expect(targets[2]).toBe(20) // round(65 * 0.30)
     expect(targets[3]).toBe(22) // round(65 * 0.34)
     expect(targets[4]).toBe(7) // remainder = 65 - 16 - 20 - 22
+  })
+})
+
+describe('selectExamQuestions', () => {
+  const cert: Certification = {
+    code: 'test',
+    provider: 'aws',
+    level: 'foundational',
+    name: 'Test cert',
+    shortName: 'TEST',
+    status: 'active',
+    examQuestionCount: 10,
+    examTimeSeconds: 90 * 60,
+    passingScore: 700,
+    domains: [
+      { id: 1, name: 'D1', examProportion: 0.5, questionCount: 10 },
+      { id: 2, name: 'D2', examProportion: 0.5, questionCount: 10 },
+    ],
+  }
+  const targets = getExamDomainTargets(cert)
+
+  function makeQuestions(domainId: number, count: number): Question[] {
+    return Array.from({ length: count }, (_, index) => ({
+      id: `d${domainId}-q${index + 1}`,
+      domainId,
+      question: `Domain ${domainId} question ${index + 1}`,
+      options: { A: 'a', B: 'b', C: 'c', D: 'd', E: '' },
+      answer: 'A',
+      explanation: '',
+      isMultiAnswer: false,
+    }))
+  }
+
+  it('selects the exact target count from each exact-quota domain pool', () => {
+    const pool = cert.domains.flatMap(domain => makeQuestions(domain.id, targets[domain.id]))
+
+    const selected = selectExamQuestions(pool, cert)
+
+    expect(selected).toHaveLength(cert.examQuestionCount)
+    expect(selected.map(question => question.id).sort()).toEqual(pool.map(question => question.id).sort())
+    cert.domains.forEach(domain => {
+      expect(selected.filter(question => question.domainId === domain.id)).toHaveLength(targets[domain.id])
+    })
+  })
+
+  it('returns every available question when a domain pool is below quota', () => {
+    const scarceDomainQuestions = makeQuestions(1, 2)
+    const otherDomainQuestions = makeQuestions(2, targets[2])
+    const pool = [...scarceDomainQuestions, ...otherDomainQuestions]
+
+    const selected = selectExamQuestions(pool, cert)
+    const selectedScarceIds = selected
+      .filter(question => question.domainId === 1)
+      .map(question => question.id)
+      .sort()
+    const expectedLength = cert.examQuestionCount - (targets[1] - scarceDomainQuestions.length)
+
+    expect(selectedScarceIds).toEqual(scarceDomainQuestions.map(question => question.id).sort())
+    expect(selected).toHaveLength(expectedLength)
+  })
+
+  it('does not return duplicate question IDs in a full run', () => {
+    const pool = cert.domains.flatMap(domain => makeQuestions(domain.id, targets[domain.id] + 2))
+
+    const selected = selectExamQuestions(pool, cert)
+    const selectedIds = selected.map(question => question.id)
+
+    expect(selected).toHaveLength(cert.examQuestionCount)
+    expect(new Set(selectedIds).size).toBe(selectedIds.length)
+  })
+
+  it('keeps each selected question within its original domain quota', () => {
+    const pool = cert.domains.flatMap(domain => makeQuestions(domain.id, targets[domain.id] + 2))
+    const originalDomains = new Map(pool.map(question => [question.id, question.domainId]))
+    const domainTwoIds = new Set(pool.filter(question => question.domainId === 2).map(question => question.id))
+
+    const selected = selectExamQuestions(pool, cert)
+    const domainOneIds = selected.filter(question => question.domainId === 1).map(question => question.id)
+
+    expect(domainOneIds.every(id => !domainTwoIds.has(id))).toBe(true)
+    cert.domains.forEach(domain => {
+      const domainQuestions = selected.filter(question => question.domainId === domain.id)
+      expect(domainQuestions.every(question => originalDomains.get(question.id) === domain.id)).toBe(true)
+      expect(domainQuestions.length).toBeLessThanOrEqual(targets[domain.id])
+    })
   })
 })
 

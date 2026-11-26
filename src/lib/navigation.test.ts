@@ -1,5 +1,54 @@
-import { describe, it, expect } from 'vitest'
-import { safeFrom } from './navigation'
+import { describe, it, expect, vi } from 'vitest'
+import type { Location } from 'react-router-dom'
+import { goToLogin, safeFrom } from './navigation'
+
+describe('goToLogin', () => {
+  it('composes pathname, search, and hash into the return location', () => {
+    const navigate = vi.fn()
+    const location = {
+      pathname: '/aws/clf-c02',
+      search: '?mode=practice',
+      hash: '#question-4',
+    } as Location
+
+    goToLogin(navigate, location)
+
+    expect(navigate).toHaveBeenCalledWith('/login', {
+      state: { from: '/aws/clf-c02?mode=practice#question-4' },
+    })
+  })
+
+  it('uses only the pathname when search and hash are empty', () => {
+    const navigate = vi.fn()
+    const location = {
+      pathname: '/stats',
+      search: '',
+      hash: '',
+    } as Location
+
+    goToLogin(navigate, location)
+
+    expect(navigate).toHaveBeenCalledWith('/login', {
+      state: { from: '/stats' },
+    })
+  })
+
+  it('navigates exactly once with the composed location in state', () => {
+    const navigate = vi.fn()
+    const location = {
+      pathname: '/aws/aif-c01',
+      search: '?domain=2',
+      hash: '#review',
+    } as Location
+
+    goToLogin(navigate, location)
+
+    expect(navigate).toHaveBeenCalledTimes(1)
+    expect(navigate).toHaveBeenCalledWith('/login', {
+      state: { from: '/aws/aif-c01?domain=2#review' },
+    })
+  })
+})
 
 describe('safeFrom', () => {
   it('allows a same-origin path with search and hash', () => {
