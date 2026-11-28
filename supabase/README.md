@@ -54,7 +54,7 @@ One row per question shown in an attempt. Used for History review and `domain_pr
 
 **Indexes:** `(attempt_id)`, `(user_id, domain_id, cert_code)` for the mastery query in `useSpacedRepetition`, and `(user_id, created_at DESC) WHERE user_id IS NOT NULL`.
 
-Two older indexes were dropped on 2026-11-26 to stay under the 500 MB free-plan limit: `idx_aq_user_question` `(user_id, question_id)` had never been used (0 scans, 77 MB), and `idx_aq_user_domain` `(user_id, domain_id)` repeated the start of `(user_id, domain_id, cert_code)`, which serves the same lookups (17 MB). To restore them: `create index concurrently idx_aq_user_question on public.attempt_questions (user_id, question_id);` and `create index concurrently idx_aq_user_domain on public.attempt_questions (user_id, domain_id);`
+Two older indexes were dropped on 2026-11-26 because nothing needed them: `idx_aq_user_question` `(user_id, question_id)` had never been used, and `idx_aq_user_domain` `(user_id, domain_id)` repeated the start of `(user_id, domain_id, cert_code)`, which serves the same lookups. To restore them: `create index concurrently idx_aq_user_question on public.attempt_questions (user_id, question_id);` and `create index concurrently idx_aq_user_domain on public.attempt_questions (user_id, domain_id);`
 
 ---
 
