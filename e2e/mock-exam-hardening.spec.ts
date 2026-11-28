@@ -54,6 +54,16 @@ test('retake does not re-open the "Ready to submit?" modal over question 1', asy
   await expect(page.getByText('Question 1 of', { exact: false })).toBeVisible()
 })
 
+test('results screen shows the star-on-GitHub CTA linking to the repo', async ({ page }) => {
+  await page.goto(EXAM_URL)
+  await startExam(page)
+  await submitExam(page) // guest, 0 answers -> fail results (CTA shows on pass AND fail)
+
+  const starCta = page.getByRole('link', { name: /star the repo on GitHub/i })
+  await expect(starCta).toBeVisible()
+  await expect(starCta).toHaveAttribute('href', 'https://github.com/nastaso/cloudcertprep')
+})
+
 test('signed-in sub-60s submit shows an explicit "not saved" notice', async ({ page }) => {
   await seedSession(page)
   await page.goto(EXAM_URL)

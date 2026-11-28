@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useRef, Fragment } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Flag, AlertCircle, LayoutGrid, Heart, ArrowLeft } from 'lucide-react'
+import { Flag, AlertCircle, LayoutGrid, Heart, ArrowLeft, Star } from 'lucide-react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
@@ -29,7 +29,7 @@ import type { Question, OptionKey } from '../types'
 import { loadAllQuestions } from '../data/questions'
 import { shuffleAndMapQuestions, toggleMultiAnswer, getQuestionType, encodeAnswerForDb, type OptionKeyMap } from '../lib/utils'
 import { trackEvent } from '../lib/analytics'
-import { KOFI_URL } from '../lib/constants'
+import { KOFI_URL, GITHUB_REPO_URL } from '../lib/constants'
 import { MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
 import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave, SIGN_OUT_SENTINEL, markIntentionalLeave } from '../lib/examGuard'
 import { useSignOut } from '../hooks/useSignOut'
@@ -995,6 +995,26 @@ export function MockExam() {
               <span className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-text-primary">
                 <Heart className="w-4 h-4 text-danger" fill="currentColor" aria-hidden="true" />
                 Buy me a coffee
+              </span>
+            </a>
+
+            {/* Quiet star-on-GitHub ask at the highest-intent moment (just
+                finished an exam) - growth lever A7, the site-to-repo funnel is
+                near-invisible. Recessed (no fill, hairline border only) so it
+                sits below both the primary result actions and the Ko-fi ask and
+                never competes with them. Shown on pass AND fail. Reuses the
+                existing `github_click` event with its own `location: 'results'`.
+                Real anchor to the repo with honest link text; min 44px tall. */}
+            <a
+              href={GITHUB_REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackEvent('github_click', { location: 'results' })}
+              className="flex min-h-[44px] items-center justify-center gap-2 rounded-2xl border border-border-hairline p-4 text-center text-sm text-text-muted transition-colors duration-200 hover:border-text-muted/40"
+            >
+              <Star className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+              <span>
+                CloudCertPrep is free and open source. If it helped, <span className="font-medium text-text-primary">star the repo on GitHub</span> so others can find it.
               </span>
             </a>
           </div>
