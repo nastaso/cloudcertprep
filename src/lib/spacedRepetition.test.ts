@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import {
   selectQuestions,
+  computeDueCounts,
   type MasteryRow,
+  type DueCountRow,
 } from './spacedRepetition'
 import type { Question } from '../types'
 
@@ -144,5 +146,81 @@ describe('selectQuestions', () => {
     const ids = result.map(question => question.id)
 
     expect(new Set(ids).size).toBe(ids.length)
+  })
+})
+
+describe('computeDueCounts', () => {
+  const row = (
+    over: Partial<DueCountRow> = {},
+  ): DueCountRow => ({
+    is_mastered: false,
+    last_was_wrong: false,
+    in_exclusion_window: false,
+    ...over,
+  })
+
+  it('returns zero for no rows (new user)', () => {
+    expect(computeDueCounts([])).toEqual({
+      dueForReview: 0,
+      missedReadyToRetry: 0,
+    })
+  })
+
+  it('counts a seen, un-mastered, cooled-down row as due', () => {
+    expect(computeDueCounts([row()])).toEqual({
+      dueForReview: 1,
+      missedReadyToRetry: 0,
+    })
+  })
+
+  it('excludes rows still in their cooldown (exclusion) window', () => {
+    const counts = computeDueCounts([
+      row({ in_exclusion_window: true }),
+      row({ in_exclusion_window: true, last_was_wrong: true }),
+    ])
+    expect(counts).toEqual({ dueForReview: 0, missedReadyToRetry: 0 })
+  })
+
+  it('excludes mastered rows even when their last answer was wrong', () => {
+    const counts = computeDueCounts([
+      row({ is_mastered: true }),
+      row({ is_mastered: true, last_was_wrong: true }),
+    ])
+    expect(counts).toEqual({ dueForReview: 0, missedReadyToRetry: 0 })
+  })
+
+  it('counts a last-wrong, cooled-down row as both due and missed', () => {
+    expect(computeDueCounts([row({ last_was_wrong: true })])).toEqual({
+      dueForReview: 1,
+      missedReadyToRetry: 1,
+    })
+  })
+
+  it('missedReadyToRetry is a subset of dueForReview on a mixed set', () => {
+    const counts = computeDueCounts([
+      row({ last_was_wrong: true }), // due + missed
+      row(), // due only
+      row({ last_was_wrong: true }), // due + missed
+      row({ in_exclusion_window: true, last_was_wrong: true }), // cooling down
+      row({ is_mastered: true }), // locked in
+    ])
+    expect(counts).toEqual({ dueForReview: 3, missedReadyToRetry: 2 })
+    expect(counts.missedReadyToRetry).toBeLessThanOrEqual(counts.dueForReview)
+  })
+
+  it('accepts full MasteryRow shapes (extra columns ignored)', () => {
+    const full: MasteryRow = {
+      question_id: 'q1',
+      correct_streak: 0,
+      last_was_wrong: true,
+      last_seen_at: '2026-01-01T00:00:00Z',
+      is_mastered: false,
+      in_exclusion_window: false,
+      weight: 5,
+    }
+    expect(computeDueCounts([full])).toEqual({
+      dueForReview: 1,
+      missedReadyToRetry: 1,
+    })
   })
 })

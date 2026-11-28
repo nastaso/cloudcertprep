@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useRef, Fragment } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Flag, AlertCircle, LayoutGrid, Heart, ArrowLeft } from 'lucide-react'
+import { Flag, AlertCircle, LayoutGrid, Heart, ArrowLeft, ArrowRight } from 'lucide-react'
 import { Button } from '../components/Button'
 import { Card } from '../components/Card'
 import { Alert } from '../components/Alert'
@@ -34,7 +34,7 @@ import { MAX_MULTI_ANSWER, TIMER_PULSE_THRESHOLD } from '../lib/constants'
 import { registerExamLeaveHandler, confirmExamLeave, isIntentionalLeave, SIGN_OUT_SENTINEL, markIntentionalLeave } from '../lib/examGuard'
 import { useSignOut } from '../hooks/useSignOut'
 import { storePendingAttempt, consumePendingAttemptSavedNotice, markPendingAttemptSaveIntent, PENDING_ATTEMPT_SAVED_EVENT, peekPendingAttempt, hasPendingAttemptSaveIntent, type PendingAttempt } from '../lib/pendingAttempt'
-import { getProviderLabel } from '../data/certifications'
+import { getProviderLabel, getCrossCertSuggestion } from '../data/certifications'
 import { findNextDomainAction } from '../lib/domainStats'
 
 type ExamScreen = 'start' | 'exam' | 'results' | 'review'
@@ -660,6 +660,9 @@ export function MockExam() {
   const currentType = currentQuestion ? getQuestionType(currentQuestion) : 'single'
   const answeredCount = Array.from(answers.values()).filter(isQuestionAnswered).length
   const flaggedCount = Array.from(answers.values()).filter(s => s.flagged).length
+  // Sibling cert to nudge on a PASS (return loop 2). Pure lookup off the current
+  // cert code; rendered only on the pass results branch below.
+  const crossCert = getCrossCertSuggestion(cert.code)
 
   // Guest-save loader, hoisted ABOVE the screen switch (hardening F3). The
   // arm effect is deliberately screen-agnostic (start OR results), but the
@@ -977,6 +980,27 @@ export function MockExam() {
                 Retake exam
               </Button>
             </div>
+
+            {/* Cross-cert nudge on a PASS (return loop 2): one quiet, secondary
+                line pointing at the sibling cert at the moment the user has just
+                cleared this one. Pass-only (a fail stays focused on its weakest-
+                domain / sign-in actions) and only when a real sibling exists.
+                Recessed styling keeps it well below the primary result actions
+                and the donate ask; cert-aware copy (CLF pass -> AIF, and back). */}
+            {results!.passed && crossCert && (
+              <a
+                href={`/${crossCert.provider}/${crossCert.code}`}
+                onClick={() => trackEvent('cross_cert_nudge_clicked', { surface: 'exam_results', to: crossCert.code })}
+                className="group flex items-center justify-between gap-4 rounded-2xl border border-border-hairline bg-bg-dark/50 px-5 py-4 transition-colors duration-200 hover:border-text-muted/40"
+              >
+                <p className="text-sm text-text-muted">
+                  Passed {cert.shortName}?{' '}
+                  <span className="font-medium text-text-primary">{crossCert.shortName}</span>{' '}
+                  practice is ready, same question bank, same zero cost.
+                </p>
+                <ArrowRight className="w-4 h-4 flex-shrink-0 text-text-muted transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
+              </a>
+            )}
 
             {/* Quiet support ask at the highest-intent moment (just finished an
                 exam). Results screen only, never mid-exam, no orange (that is

@@ -13,6 +13,7 @@ import {
   getCertTotalQuestions,
   getCertsByProvider,
   getLevelLabel,
+  getCrossCertSuggestion,
   getProviderInfo,
   getProviderLabel,
   getSortedCerts,
@@ -302,6 +303,39 @@ describe('SAA-C03 exam config matches the official AWS spec', () => {
     expect(saa.examQuestionCount).toBe(65)
     expect(saa.examTimeSeconds).toBe(130 * 60)
     expect(saa.passingScore).toBe(720)
+  })
+})
+
+describe('getCrossCertSuggestion (return-loop nudge target)', () => {
+  it('returns null for an unknown cert code', () => {
+    expect(getCrossCertSuggestion('nope-x99')).toBeNull()
+  })
+
+  it('never suggests the cert itself', () => {
+    for (const cert of CERTIFICATION_LIST) {
+      const suggestion = getCrossCertSuggestion(cert.code)
+      if (suggestion) expect(suggestion.code).not.toBe(cert.code)
+    }
+  })
+
+  it('only ever suggests an indexable, same-provider cert', () => {
+    for (const cert of CERTIFICATION_LIST) {
+      const suggestion = getCrossCertSuggestion(cert.code)
+      if (!suggestion) continue
+      expect(suggestion.provider).toBe(cert.provider)
+      expect(isCertNoindex(suggestion)).toBe(false)
+    }
+  })
+
+  it('cross-links the two active AWS foundational certs to each other', () => {
+    expect(getCrossCertSuggestion('clf-c02')?.code).toBe('aif-c01')
+    expect(getCrossCertSuggestion('aif-c01')?.code).toBe('clf-c02')
+  })
+
+  it('is stable across repeated calls', () => {
+    expect(getCrossCertSuggestion('clf-c02')?.code).toBe(
+      getCrossCertSuggestion('clf-c02')?.code,
+    )
   })
 })
 
